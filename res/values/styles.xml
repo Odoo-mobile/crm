@@ -20,8 +20,14 @@
         <item name="android:actionBarStyle">@style/CustomActionbar</item>
     </style>
 
-    <style name="CustomActionbar" parent="android:style/Widget.Holo.Light.ActionBar">
-        <item name="android:background">#ddebebeb</item>
+    <style name="CustomActionbar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
+        <item name="android:background">@color/odoo_purple_tran</item>
+        <item name="android:titleTextStyle">@style/ActionBar.TitleTextStyle</item>
+    </style>
+
+    <style name="ActionBar.TitleTextStyle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">#ffffff</item>
     </style>
 
     <style name="Widget.PullToRefresh.ProgressBar.Horizontal.Center" parent="android:Widget.ProgressBar.Horizontal">

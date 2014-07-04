@@ -33,7 +33,7 @@
                 android:text="@string/str_user_login"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#0099CC"
+                android:textColor="@color/odoo_purple"
                 android:textStyle="bold" />
 
             <View
@@ -41,7 +41,7 @@
                 android:layout_height="1dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
-                android:background="#0099CC" />
+                android:background="@color/odoo_purple" />
 
             <TextView
                 android:id="@+id/txvUserLoginName"
@@ -62,7 +62,7 @@
                 android:text="@string/str_user_name"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#0099CC"
+                android:textColor="@color/odoo_purple"
                 android:textStyle="bold" />
 
             <View
@@ -70,7 +70,7 @@
                 android:layout_height="1dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
-                android:background="#0099CC" />
+                android:background="@color/odoo_purple" />
 
             <TextView
                 android:id="@+id/txvUserName"
@@ -91,7 +91,7 @@
                 android:text="@string/str_server_url"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#0099CC"
+                android:textColor="@color/odoo_purple"
                 android:textStyle="bold" />
 
             <View
@@ -99,7 +99,7 @@
                 android:layout_height="1dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
-                android:background="#0099CC" />
+                android:background="@color/odoo_purple" />
 
             <TextView
                 android:id="@+id/txvServerUrl"
@@ -120,7 +120,7 @@
                 android:text="@string/str_database"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#0099CC"
+                android:textColor="@color/odoo_purple"
                 android:textStyle="bold" />
 
             <View
@@ -128,7 +128,7 @@
                 android:layout_height="1dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
-                android:background="#0099CC" />
+                android:background="@color/odoo_purple" />
 
             <TextView
                 android:id="@+id/txvDatabase"
@@ -149,7 +149,7 @@
                 android:text="@string/str_timezone"
                 android:textAllCaps="true"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#0099CC"
+                android:textColor="@color/odoo_purple"
                 android:textStyle="bold" />
 
             <View
@@ -157,7 +157,7 @@
                 android:layout_height="1dp"
                 android:layout_marginBottom="5dp"
                 android:layout_marginTop="5dp"
-                android:background="#0099CC" />
+                android:background="@color/odoo_purple" />
 
             <TextView
                 android:id="@+id/txvTimeZone"
