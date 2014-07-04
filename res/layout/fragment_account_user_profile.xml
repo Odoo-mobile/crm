@@ -16,7 +16,7 @@
             android:background="#ebebeb"
             android:contentDescription="@string/account_user_dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_action_user" />
+            android:src="@drawable/avatar" />
 
         <LinearLayout
             android:layout_width="match_parent"

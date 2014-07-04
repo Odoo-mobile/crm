@@ -11,7 +11,7 @@
         android:layout_gravity="center_vertical"
         android:layout_margin="5dp"
         android:contentDescription="UserProfilePic"
-        android:src="@drawable/ic_action_social_person" />
+        android:src="@drawable/avatar" />
 
     <LinearLayout
         android:layout_width="match_parent"

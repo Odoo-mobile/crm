@@ -9,6 +9,5 @@
                 android:startColor="#8bd7f0" />
         </shape>
     </item>
-    <item android:drawable="@drawable/caret_grey"/>
 
 </layer-list>

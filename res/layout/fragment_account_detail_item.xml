@@ -13,7 +13,7 @@
         android:background="#cccccc"
         android:contentDescription="@string/account_user_dp"
         android:padding="1dp"
-        android:src="@drawable/ic_action_user" />
+        android:src="@drawable/avatar" />
 
     <LinearLayout
         android:layout_width="match_parent"

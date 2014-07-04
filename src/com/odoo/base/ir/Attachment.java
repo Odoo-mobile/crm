@@ -357,7 +357,7 @@ public class Attachment implements OnClickListener {
 		mNotificationBuilder = new NotificationCompat.Builder(mContext);
 		mNotificationBuilder.setContentTitle("Downloading attachment");
 		mNotificationBuilder.setContentText("Download in progress");
-		mNotificationBuilder.setSmallIcon(R.drawable.ic_oe_notification);
+		mNotificationBuilder.setSmallIcon(R.drawable.ic_odoo_o);
 		mNotificationBuilder.setVibrate(new long[] { 1000, 1000 });
 		mNotificationBuilder.setAutoCancel(true);
 		mNotificationBuilder.setOngoing(true);
@@ -372,7 +372,7 @@ public class Attachment implements OnClickListener {
 		intent.setDataAndType(uri, mimeType);
 		mNotificationResultIntent = PendingIntent.getActivity(mContext, 0,
 				intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		mNotificationBuilder.addAction(R.drawable.ic_oe_notification,
+		mNotificationBuilder.addAction(R.drawable.ic_odoo_o,
 				"Download attachment", mNotificationResultIntent);
 		mNotificationBuilder.setOngoing(false);
 		mNotificationBuilder.setAutoCancel(true);
@@ -429,35 +429,24 @@ public class Attachment implements OnClickListener {
 			if (!mAttachmentInfo.getString("file_uri").equals("false")) {
 				return null;
 			} else {
-				//FIXME: replaced OEHelper with OdooHelper ??
-			/*	if (mOdoo.odoo() != null) {
-					try {
-						OEFieldsHelper fields = new OEFieldsHelper(
-								new String[] { "name", "datas", "file_type",
-										"res_model", "res_id" });
-						OEDomain domain = new OEDomain();
-						domain.add("id", "=", mAttachmentInfo.getInt("id"));
-						JSONObject result = mOdoo.odoo().search_read(
-								mDb.getModelName(), fields.get(), domain.get());
-						if (result.getJSONArray("records").length() > 0) {
-							JSONObject row = result.getJSONArray("records")
-									.getJSONObject(0);
-							String file_path = createFile(
-									row.getString("name"),
-									row.getString("datas"),
-									row.getString("file_type"));
-							Uri uri = Uri.fromFile(new File(file_path));
-							mNotification = setFileIntent(uri);
-							OEValues values = new OEValues();
-							values.put("file_uri", uri.toString());
-							// mDb.update(values, mAttachmentInfo.getInt("id"));
-						} else {
-							error = true;
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}*/
+				// FIXME: replaced OEHelper with OdooHelper ??
+				/*
+				 * if (mOdoo.odoo() != null) { try { OEFieldsHelper fields = new
+				 * OEFieldsHelper( new String[] { "name", "datas", "file_type",
+				 * "res_model", "res_id" }); OEDomain domain = new OEDomain();
+				 * domain.add("id", "=", mAttachmentInfo.getInt("id"));
+				 * JSONObject result = mOdoo.odoo().search_read(
+				 * mDb.getModelName(), fields.get(), domain.get()); if
+				 * (result.getJSONArray("records").length() > 0) { JSONObject
+				 * row = result.getJSONArray("records") .getJSONObject(0);
+				 * String file_path = createFile( row.getString("name"),
+				 * row.getString("datas"), row.getString("file_type")); Uri uri
+				 * = Uri.fromFile(new File(file_path)); mNotification =
+				 * setFileIntent(uri); OEValues values = new OEValues();
+				 * values.put("file_uri", uri.toString()); // mDb.update(values,
+				 * mAttachmentInfo.getInt("id")); } else { error = true; } }
+				 * catch (Exception e) { e.printStackTrace(); } }
+				 */
 			}
 			return null;
 		}

@@ -7,22 +7,22 @@
     <FrameLayout
         android:id="@+id/ptr_content"
         android:layout_width="match_parent"
-        android:layout_height="48dp" >
+        android:layout_height="?android:attr/actionBarSize" >
 
         <View
             android:id="@+id/ptr_text_opaque_bg"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?android:attr/colorBackground"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/ptr_text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:fontFamily="sans-serif-condensed"
             android:gravity="center"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textColor="#006c9e" />
+            android:textColor="#ffffff" />
     </FrameLayout>
 
     <ProgressBar
@@ -30,6 +30,6 @@
         style="@style/Widget.PullToRefresh.ProgressBar.Horizontal.Center"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="-5dp" />
+        android:layout_marginTop="-11dp" />
 
 </LinearLayout>
