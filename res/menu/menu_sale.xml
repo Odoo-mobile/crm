@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_sale_create"
+        android:icon="@drawable/ic_action_content_new"
+        android:showAsAction="always"
+        android:title="New">
+    </item>
+
+</menu>

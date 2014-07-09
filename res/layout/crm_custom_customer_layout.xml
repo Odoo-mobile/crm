@@ -1,0 +1,58 @@
+<odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="5dp"
+    odoo:background_selector="@drawable/oe_listview_background_selector"
+    odoo:model="res.partner" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal" >
+
+        <odoo.controls.OField
+            android:layout_width="75dp"
+            android:layout_height="75dp"
+            odoo:binaryType="image"
+            android:layout_gravity="center_vertical"
+            odoo:field_name="image_small"
+            odoo:with_label="false" >
+        </odoo.controls.OField>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical" >
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                odoo:fieldTextStyle="bold"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:textLines="1"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                odoo:field_name="email"
+                odoo:textLines="1"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                odoo:field_name="phone"
+                odoo:textLines="1"
+                odoo:with_label="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+</odoo.controls.OForm>
