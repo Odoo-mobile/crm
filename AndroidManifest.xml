@@ -78,6 +78,26 @@
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
         </service>
+
+        <provider
+            android:name="com.odoo.addons.crm.providers.crm.CRMProvider"
+            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Leads"
+            android:syncable="true" />
+
+        <service
+            android:name="com.odoo.addons.crm.services.CRMService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_crm_data" />
+        </service>
     </application>
 
 </manifest>
