@@ -13,7 +13,7 @@
         android:paddingTop="5dp" />
 
     <odoo.controls.OList
-        android:id="@+id/listRecords"
+        android:id="@+id/crm_listRecords"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
     </odoo.controls.OList>

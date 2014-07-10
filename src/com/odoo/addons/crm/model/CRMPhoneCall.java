@@ -2,7 +2,7 @@ package com.odoo.addons.crm.model;
 
 import android.content.Context;
 
-import com.odoo.addons.crm.model.CRMdb.CRMCaseCateg;
+import com.odoo.addons.crm.model.CRMLead.CRMCaseCateg;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;
@@ -13,8 +13,7 @@ import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 
-public class CRMPhoneCallDB extends OModel{
-
+public class CRMPhoneCall extends OModel {
 
 	OColumn user_id = new OColumn("Responsible", ResUsers.class,
 			RelationType.ManyToOne);
@@ -27,13 +26,13 @@ public class CRMPhoneCallDB extends OModel{
 	OColumn categ_id = new OColumn("Category", CRMCaseCateg.class,
 			RelationType.ManyToOne);
 	OColumn date = new OColumn("Date", ODateTime.class);
-	OColumn opportunity_id = new OColumn("Lead/Opportunity", CRMdb.class,
+	OColumn opportunity_id = new OColumn("Lead/Opportunity", CRMLead.class,
 			RelationType.ManyToOne);
 	OColumn call_audio_file = new OColumn("recorded audio file",
 			OVarchar.class, 200).setLocalColumn();
-	
-	public CRMPhoneCallDB(Context context) {
-		super(context,"crm.phonecall");
+
+	public CRMPhoneCall(Context context) {
+		super(context, "crm.phonecall");
 	}
 
 }

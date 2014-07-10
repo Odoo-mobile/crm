@@ -14,7 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.odoo.addons.crm.model.CRMdb;
+import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
@@ -54,7 +54,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 
 	public void init() {
 		checkArguments();
-		mListControl = (OList) mView.findViewById(R.id.listRecords);
+		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
@@ -69,7 +69,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new CRMdb(getActivity());
+		return new CRMLead(getActivity());
 	}
 
 	@Override
@@ -88,11 +88,11 @@ public class CRM extends BaseFragment implements OnPullListener,
 		int count = 0;
 		switch (key) {
 		case Leads:
-			count = new CRMdb(context).count("type = ?",
+			count = new CRMLead(context).count("type = ?",
 					new String[] { "lead" });
 			break;
 		case Opportunties:
-			count = new CRMdb(context).count("type = ?",
+			count = new CRMLead(context).count("type = ?",
 					new String[] { "opportunity" });
 		default:
 			break;

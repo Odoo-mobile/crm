@@ -13,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.odoo.addons.crm.model.CRMPhoneCallDB;
+import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
@@ -51,7 +51,7 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 
 	public void init() {
 		checkArguments();
-		mListControl = (OList) mView.findViewById(R.id.listRecords);
+		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
 		 mTouchListener.setPullableView(mListControl, this);
 		// mListControl.setOnRowClickListener(this);
@@ -66,7 +66,7 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new CRMPhoneCallDB(context);
+		return new CRMPhoneCall(context);
 	}
 
 	@Override
@@ -83,7 +83,7 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 		int count = 0;
 		switch (key) {
 		case SchduledLoggedcalls:
-			count = new CRMPhoneCallDB(context).count();
+			count = new CRMPhoneCall(context).count();
 			break;
 		default:
 			break;
@@ -92,11 +92,11 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 	}
 
 	private Fragment object(Keys value) {
-		CRMPhoneCalls crm = new CRMPhoneCalls();
+		CRMPhoneCalls crmCalls = new CRMPhoneCalls();
 		Bundle args = new Bundle();
 		args.putString("crmcall", value.toString());
-		crm.setArguments(args);
-		return crm;
+		crmCalls.setArguments(args);
+		return crmCalls;
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {

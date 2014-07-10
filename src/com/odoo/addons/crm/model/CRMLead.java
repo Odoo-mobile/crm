@@ -17,7 +17,7 @@ import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.util.ODate;
 
-public class CRMdb extends OModel {
+public class CRMLead extends OModel {
 
 	OColumn partner_id = new OColumn("Partner", ResPartner.class,
 			RelationType.ManyToOne);
@@ -56,7 +56,7 @@ public class CRMdb extends OModel {
 			RelationType.ManyToOne);
 	OColumn planned_cost = new OColumn("Planned Cost", OReal.class, 20);
 
-	public CRMdb(Context context) {
+	public CRMLead(Context context) {
 		super(context, "crm.lead");
 	}
 

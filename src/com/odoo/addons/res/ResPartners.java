@@ -1,4 +1,4 @@
-package com.odoo.addons.sale;
+package com.odoo.addons.res;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.odoo.addons.sale.model.SaleOrder;
-import com.odoo.addons.sale.providers.sale.SalesProvider;
+import com.odoo.addons.res.providers.res.ResProvider;
+import com.odoo.base.res.ResPartner;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.receivers.SyncFinishReceiver;
@@ -25,12 +25,12 @@ import com.odoo.util.drawer.DrawerItem;
 import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
-public class Sales extends BaseFragment implements OnPullListener {
+public class ResPartners extends BaseFragment implements OnPullListener {
 
-	public static final String TAG = Sales.class.getSimpleName();
+	public static final String TAG = ResPartners.class.getSimpleName();
 
 	enum Keys {
-		Quotation, Sale_order
+		Customer
 	}
 
 	View mView = null;
@@ -38,8 +38,13 @@ public class Sales extends BaseFragment implements OnPullListener {
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
-	Keys mCurrentKey = Keys.Quotation;
+	Keys mCurrentKey = Keys.Customer;
 	Boolean mSyncDone = false;
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return new ResPartner(getActivity());
+	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,11 +53,6 @@ public class Sales extends BaseFragment implements OnPullListener {
 		mView = inflater.inflate(R.layout.crm_layout, container, false);
 		init();
 		return mView;
-	}
-
-	@Override
-	public Object databaseHelper(Context context) {
-		return new SaleOrder(getActivity());
 	}
 
 	public void init() {
@@ -67,33 +67,7 @@ public class Sales extends BaseFragment implements OnPullListener {
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		mCurrentKey = Keys.valueOf(arg.getString("sales"));
-	}
-
-	@Override
-	public List<DrawerItem> drawerMenus(Context context) {
-		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-
-		menu.add(new DrawerItem(TAG, "Quotation",
-				count(context, Keys.Quotation), 0, object(Keys.Quotation)));
-		menu.add(new DrawerItem(TAG, "Sales Order", count(context,
-				Keys.Sale_order), 0, object(Keys.Sale_order)));
-		return menu;
-	}
-
-	private int count(Context context, Keys key) {
-		int count = 0;
-		switch (key) {
-		case Quotation:
-			count = new SaleOrder(context).count("state = ?", new String[]{"draft"});
-			break;
-		case Sale_order:
-			count = new SaleOrder(context).count("state = ?", new String[]{"manual"});
-			break;
-		default:
-			break;
-		}
-		return count;
+		mCurrentKey = Keys.valueOf(arg.getString("resPartner"));
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
@@ -105,15 +79,12 @@ public class Sales extends BaseFragment implements OnPullListener {
 				@Override
 				public void run() {
 					if (db().isEmptyTable() && !mSyncDone) {
-						scope.main().requestSync(SalesProvider.AUTHORITY);
+						scope.main().requestSync(ResProvider.AUTHORITY);
 					}
 					mListRecords.clear();
 					switch (mCurrentKey) {
-					case Quotation:
-						mListRecords.addAll(db().select("state = ?", new String[]{"draft"}));
-						break;
-					case Sale_order:
-						mListRecords.addAll(db().select("state = ?", new String[]{"manual"}));
+					case Customer:
+						mListRecords.addAll(db().select());
 						break;
 					}
 				}
@@ -125,11 +96,8 @@ public class Sales extends BaseFragment implements OnPullListener {
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
 			switch (mCurrentKey) {
-			case Quotation:
-				mListControl.setCustomView(R.layout.sale_list_custom_layout);
-				break;
-			case Sale_order:
-				mListControl.setCustomView(R.layout.sale_list_custom_layout);
+			case Customer:
+				mListControl.setCustomView(R.layout.crm_view);
 				break;
 			}
 			mListControl.initListControl(mListRecords);
@@ -139,7 +107,7 @@ public class Sales extends BaseFragment implements OnPullListener {
 
 	@Override
 	public void onPullStarted(View arg0) {
-		scope.main().requestSync(SalesProvider.AUTHORITY);
+		scope.main().requestSync(ResProvider.AUTHORITY);
 	}
 
 	@Override
@@ -169,12 +137,32 @@ public class Sales extends BaseFragment implements OnPullListener {
 		}
 	};
 
-	private Fragment object(Keys value) {
-		Sales sales = new Sales();
-		Bundle args = new Bundle();
-		args.putString("sales", value.toString());
-		sales.setArguments(args);
-		return sales;
+	@Override
+	public List<DrawerItem> drawerMenus(Context context) {
+		List<DrawerItem> menu = new ArrayList<DrawerItem>();
+		menu.add(new DrawerItem(TAG, "Sales", true));
+		menu.add(new DrawerItem(TAG, "Customer", count(context, Keys.Customer),
+				0, object(Keys.Customer)));
+		return menu;
 	}
 
+	private int count(Context context, Keys key) {
+		int count = 0;
+		switch (key) {
+		case Customer:
+			count = new ResPartner(context).count();
+			break;
+		default:
+			break;
+		}
+		return count;
+	}
+
+	private Fragment object(Keys value) {
+		ResPartners resPartners = new ResPartners();
+		Bundle args = new Bundle();
+		args.putString("resPartner", value.toString());
+		resPartners.setArguments(args);
+		return resPartners;
+	}
 }
