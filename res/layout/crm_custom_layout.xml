@@ -1,5 +1,6 @@
 <odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res/com.odoo.crm"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
@@ -19,9 +20,29 @@
     <odoo.controls.OField
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        odoo:field_name="description"
-        odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+        odoo:field_name="partner_id"
         odoo:with_label="false" >
     </odoo.controls.OField>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="horizontal" >
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="stage_id"
+            odoo:with_label="false" >
+        </odoo.controls.OField>
+
+        <odoo.controls.OField
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            odoo:field_name="create_date"
+            odoo:with_label="false" >
+        </odoo.controls.OField>
+    </LinearLayout>
 
 </odoo.controls.OForm>

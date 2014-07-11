@@ -19,7 +19,7 @@ import com.odoo.util.ODate;
 
 public class CRMLead extends OModel {
 
-	OColumn partner_id = new OColumn("Partner", ResPartner.class,
+	OColumn partner_id = new OColumn("Customer", ResPartner.class,
 			RelationType.ManyToOne);
 	OColumn name = new OColumn("Subject", OVarchar.class, 64).setRequired(true);
 	OColumn email_from = new OColumn("Email", OVarchar.class, 128);
@@ -29,7 +29,7 @@ public class CRMLead extends OModel {
 	OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
 			RelationType.ManyToMany);
 	OColumn contact_name = new OColumn("Contact Name", OVarchar.class, 64);
-	OColumn partner_name = new OColumn("Partner Name", ODateTime.class, 64);
+	OColumn partner_name = new OColumn("Partner Name", OVarchar.class, 64);
 	OColumn opt_out = new OColumn("Opt-Out", OBoolean.class);
 	OColumn type = new OColumn("Type", OVarchar.class, 64);
 	OColumn priority = new OColumn("Priority", OVarchar.class, 64);

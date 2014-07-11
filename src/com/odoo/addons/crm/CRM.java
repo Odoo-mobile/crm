@@ -47,7 +47,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		scope = new AppScope(this);
-		mView = inflater.inflate(R.layout.crm_layout, container, false);
+		mView = inflater.inflate(R.layout.common_list_control, container, false);
 		init();
 		return mView;
 	}
@@ -132,10 +132,10 @@ public class CRM extends BaseFragment implements OnPullListener,
 			super.onPostExecute(result);
 			switch (mCurrentKey) {
 			case Leads:
-				mListControl.setCustomView(R.layout.crm_view);
+				mListControl.setCustomView(R.layout.crm_custom_layout);
 				break;
 			case Opportunties:
-				mListControl.setCustomView(R.layout.crm_view);
+				mListControl.setCustomView(R.layout.crm_custom_layout);
 				break;
 			}
 			mListControl.initListControl(mListRecords);

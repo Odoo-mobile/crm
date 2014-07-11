@@ -50,7 +50,7 @@ public class ResPartners extends BaseFragment implements OnPullListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		scope = new AppScope(getActivity());
-		mView = inflater.inflate(R.layout.crm_layout, container, false);
+		mView = inflater.inflate(R.layout.common_list_control, container, false);
 		init();
 		return mView;
 	}
@@ -97,7 +97,7 @@ public class ResPartners extends BaseFragment implements OnPullListener {
 			super.onPostExecute(result);
 			switch (mCurrentKey) {
 			case Customer:
-				mListControl.setCustomView(R.layout.crm_view);
+				mListControl.setCustomView(R.layout.crm_custom_layout);
 				break;
 			}
 			mListControl.initListControl(mListRecords);
