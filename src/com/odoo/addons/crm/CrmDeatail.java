@@ -115,11 +115,6 @@ public class CrmDeatail extends BaseFragment {
 			break;
 		case R.id.menu_crm_detail_save:
 			mEditMode = false;
-
-			// OValues extraValues= new OValues();
-			// extraValues.put("type","Lead");
-			// mForm.setValues(extraValues);
-
 			OValues values = mForm.getFormValues();
 			if (values != null) {
 				updateMenu(mEditMode);

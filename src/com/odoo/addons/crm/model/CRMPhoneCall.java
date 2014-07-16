@@ -12,6 +12,7 @@ import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.util.ODate;
 
 public class CRMPhoneCall extends OModel {
 
@@ -25,7 +26,8 @@ public class CRMPhoneCall extends OModel {
 	OColumn duration = new OColumn("Duration", OReal.class);
 	OColumn categ_id = new OColumn("Category", CRMCaseCateg.class,
 			RelationType.ManyToOne);
-	OColumn date = new OColumn("Date", ODateTime.class);
+	OColumn date = new OColumn("Date", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
 	OColumn opportunity_id = new OColumn("Lead/Opportunity", CRMLead.class,
 			RelationType.ManyToOne);
 	OColumn call_audio_file = new OColumn("recorded audio file",

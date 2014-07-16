@@ -1,6 +1,5 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:odoo="http://schemas.android.com/apk/res-auto"
-    xmlns:app="http://schemas.android.com/apk/res/com.odoo.crm"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
@@ -31,9 +30,35 @@
                 odoo:with_label="true" >
             </odoo.controls.OField>
 
-           
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="date"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+             <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="partner_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+             <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="user_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+            
         </odoo.controls.OForm>
-
     </LinearLayout>
 
 </ScrollView>

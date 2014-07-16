@@ -48,6 +48,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		setHasOptionsMenu(true);
 		scope = new AppScope(this);
 		mView = inflater
 				.inflate(R.layout.common_list_control, container, false);
@@ -114,7 +115,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_crm_phone_detail_create) {
+		if (item.getItemId() == R.id.menu_crm_detail_create) {
 			CRMPhoneDetail crmPhoneDeatil = new CRMPhoneDetail();
 			Bundle bundle = new Bundle();
 			bundle.putString("key", mCurrentKey.toString());

@@ -146,8 +146,6 @@ public class OSyncHelper {
 					new Object[] { true })) {
 
 				Integer recId = row.getInt("id");
-				Log.e("Called","Id :"+recId);
-				mOdoo.debug(true);
 				JSONObject values = createJSONValues(model, row);
 				if (values != null) {
 					mOdoo.updateValues(model.getModelName(), values, recId);
