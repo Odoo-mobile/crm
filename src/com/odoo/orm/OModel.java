@@ -562,6 +562,14 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		mCheckInActiveRecord = checkInactiveRecord;
 	}
 
+	public Boolean checkForWriteDate() {
+		return true;
+	}
+
+	public Boolean checkForCreateDate() {
+		return true;
+	}
+
 	class AutoUpdateOnServer extends AsyncTask<Void, Void, Void> {
 
 		@Override
