@@ -8,8 +8,8 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.addons.crm.model.CRMLead;
+import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.service.OService;
@@ -32,17 +32,18 @@ public class CRMService extends OService {
 			OSyncHelper sync = null;
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
+
 			if (extras != null) {
-				if (extras.containsKey("crmcall")) {
+				if (extras.containsKey("crmphone")) {
 					CRMPhoneCall db = new CRMPhoneCall(context);
 					sync = db.getSyncHelper();
 				} else {
 					CRMLead db = new CRMLead(context);
 					sync = db.getSyncHelper();
 				}
+				if (sync.syncWithServer())
+					context.sendBroadcast(intent);
 			}
-			if (sync.syncWithServer())
-				context.sendBroadcast(intent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

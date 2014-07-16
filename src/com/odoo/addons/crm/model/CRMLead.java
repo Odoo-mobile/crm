@@ -31,7 +31,7 @@ public class CRMLead extends OModel {
 	OColumn contact_name = new OColumn("Contact Name", OVarchar.class, 64);
 	OColumn partner_name = new OColumn("Partner Name", OVarchar.class, 64);
 	OColumn opt_out = new OColumn("Opt-Out", OBoolean.class);
-	OColumn type = new OColumn("Type", OVarchar.class, 64);
+	OColumn type = new OColumn("Type", OVarchar.class, 64).setDefault("lead");
 	OColumn priority = new OColumn("Priority", OVarchar.class, 64);
 	OColumn date_open = new OColumn("Assigned", ODateTime.class);
 	OColumn date_closed = new OColumn("Closed", ODateTime.class);
@@ -50,7 +50,8 @@ public class CRMLead extends OModel {
 	OColumn planned_revenue = new OColumn("Expected Revenue", OReal.class, 20);
 	OColumn ref = new OColumn("Reference", OVarchar.class, 64);
 	OColumn ref2 = new OColumn("Reference 2", OVarchar.class, 64);
-	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class).setParsePatter(ODate.DEFAULT_FORMAT);
+	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
 	OColumn title_action = new OColumn("Next Action", OVarchar.class, 64);
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);
@@ -94,15 +95,4 @@ public class CRMLead extends OModel {
 		}
 
 	}
-
-//	public static class CRMPhoneCall extends OModel {
-//
-//
-//		public CRMPhoneCall(Context context) {
-//			super(context, "crm.phonecall");
-//		}
-//
-//	}
-	
-	//public class static CRMProduct extends 
 }

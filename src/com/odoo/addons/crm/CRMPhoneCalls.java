@@ -4,12 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.OList;
+import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -25,11 +29,12 @@ import com.odoo.util.drawer.DrawerItem;
 import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
-public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
+public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
+		OnRowClickListener {
 
 	public static final String TAG = CRMPhoneCalls.class.getSimpleName();
 
-	enum Keys {
+	enum PhoneKeys {
 		SchduledLoggedcalls
 	}
 
@@ -38,13 +43,14 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
-	Keys mCurrentKey = Keys.SchduledLoggedcalls;
+	PhoneKeys mCurrentKey = PhoneKeys.SchduledLoggedcalls;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		scope = new AppScope(this);
-		mView = inflater.inflate(R.layout.common_list_control, container, false);
+		mView = inflater
+				.inflate(R.layout.common_list_control, container, false);
 		init();
 		return mView;
 	}
@@ -53,15 +59,15 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 		checkArguments();
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
-		 mTouchListener.setPullableView(mListControl, this);
-		// mListControl.setOnRowClickListener(this);
+		mTouchListener.setPullableView(mListControl, this);
+		mListControl.setOnRowClickListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
 	}
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		mCurrentKey = Keys.valueOf(arg.getString("crmcall"));
+		mCurrentKey = PhoneKeys.valueOf(arg.getString("crmphone"));
 	}
 
 	@Override
@@ -75,11 +81,12 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 
 		menu.add(new DrawerItem(TAG, "Phone Call", true));
 		menu.add(new DrawerItem(TAG, "Logged Calls", count(context,
-				Keys.SchduledLoggedcalls), 0, object(Keys.SchduledLoggedcalls)));
+				PhoneKeys.SchduledLoggedcalls), 0,
+				object(PhoneKeys.SchduledLoggedcalls)));
 		return menu;
 	}
 
-	private int count(Context context, Keys key) {
+	private int count(Context context, PhoneKeys key) {
 		int count = 0;
 		switch (key) {
 		case SchduledLoggedcalls:
@@ -91,12 +98,30 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 		return count;
 	}
 
-	private Fragment object(Keys value) {
+	private Fragment object(PhoneKeys value) {
 		CRMPhoneCalls crmCalls = new CRMPhoneCalls();
 		Bundle args = new Bundle();
-		args.putString("crmcall", value.toString());
+		args.putString("crmphone", value.toString());
 		crmCalls.setArguments(args);
 		return crmCalls;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.menu_crm, menu);
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.menu_crm_phone_detail_create) {
+			CRMPhoneDetail crmPhoneDeatil = new CRMPhoneDetail();
+			Bundle bundle = new Bundle();
+			bundle.putString("key", mCurrentKey.toString());
+			crmPhoneDeatil.setArguments(bundle);
+			startFragment(crmPhoneDeatil, true);
+		}
+		return super.onOptionsItemSelected(item);
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
@@ -108,7 +133,9 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 				@Override
 				public void run() {
 					if (db().isEmptyTable()) {
-						scope.main().requestSync(CRMProvider.AUTHORITY);
+						Bundle args = new Bundle();
+						args.putString("crmphone", "pull_callLog");
+						scope.main().requestSync(CRMProvider.AUTHORITY,args);
 					}
 					mListRecords.clear();
 					switch (mCurrentKey) {
@@ -126,7 +153,7 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 			super.onPostExecute(result);
 			switch (mCurrentKey) {
 			case SchduledLoggedcalls:
-				mListControl.setCustomView(R.layout.crm_custom_layout);
+				mListControl.setCustomView(R.layout.crm_phone_custom_layout);
 				break;
 			}
 			mListControl.initListControl(mListRecords);
@@ -138,7 +165,7 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 	@Override
 	public void onPullStarted(View arg0) {
 		Bundle args = new Bundle();
-		args.putString("crmcall", "pull_callLog");
+		args.putString("crmphone", "pull_callLog");
 		scope.main().requestSync(CRMProvider.AUTHORITY, args);
 	}
 
@@ -168,5 +195,14 @@ public class CRMPhoneCalls extends BaseFragment implements  OnPullListener{
 		}
 	};
 
+	@Override
+	public void onRowItemClick(int position, View view, ODataRow row) {
+		CRMPhoneDetail crmPhoneDetail = new CRMPhoneDetail();
+		Bundle bundle = new Bundle();
+		bundle.putString("key", mCurrentKey.toString());
+		bundle.putAll(row.getPrimaryBundleData());
+		crmPhoneDetail.setArguments(bundle);
+		startFragment(crmPhoneDetail, true);
+	}
 
 }

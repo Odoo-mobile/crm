@@ -78,7 +78,8 @@
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
         </service>
-
+        
+		<!-- Lead/Opportunity service -->
         <provider
             android:name="com.odoo.addons.crm.providers.crm.CRMProvider"
             android:authorities="com.odoo.addons.crm.providers.crm"
@@ -98,13 +99,14 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_crm_data" />
         </service>
-
+		
+        <!-- Quotation/SalesOrder service -->
         <provider
             android:name="com.odoo.addons.sale.providers.sale.SalesProvider"
             android:authorities="com.odoo.addons.sale.providers.sale"
             android:enabled="true"
             android:exported="true"
-            android:label="Leads"
+            android:label="Sales"
             android:syncable="true" />
 
         <service
@@ -119,12 +121,13 @@
                 android:resource="@xml/sync_sale_data" />
         </service>
 
+        <!-- Res service -->
         <provider
             android:name="com.odoo.addons.res.providers.res.ResProvider"
             android:authorities="com.odoo.addons.res.providers.res"
             android:enabled="true"
             android:exported="true"
-            android:label="Leads"
+            android:label="Res"
             android:syncable="true" />
 
         <service

@@ -261,6 +261,13 @@ public class OForm extends LinearLayout {
 	 * 
 	 * @return the form values, null if validation failed
 	 */
+//	OValues mExtraValues = null; 
+//	public OValues setValues(OValues oValues){
+//		if(oValues != null){
+//			mExtraValues = oValues;
+//		}
+//		return oValues;
+//	}
 	public OValues getFormValues() {
 		OValues values = null;
 		if (validateForm()) {
@@ -269,6 +276,11 @@ public class OForm extends LinearLayout {
 				OField field = (OField) findViewWithTag(key);
 				values.put(field.getFieldName(), field.getValue());
 			}
+//			if(mExtraValues != null){
+//				for (String key : mExtraValues.keys()) {
+//					values.put(key, mExtraValues.get(key));
+//				}
+//			}
 			if (mRecord != null) {
 				values.put("local_record",
 						Boolean.parseBoolean(mRecord.getString("local_record")));

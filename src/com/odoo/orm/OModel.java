@@ -17,7 +17,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import com.odoo.App;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;

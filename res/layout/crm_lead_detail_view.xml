@@ -1,0 +1,187 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res/com.odoo.crm"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipToPadding="false"
+    android:fillViewport="true"
+    android:paddingTop="?android:attr/actionBarSize" >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <odoo.controls.OForm
+            android:id="@+id/crmLeadDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:visibility="gone"
+            odoo:model="crm.lead" >
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="company_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="contact_name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="partner_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="description"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+        </odoo.controls.OForm>
+
+        <odoo.controls.OForm
+            android:id="@+id/crmOppDetail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:visibility="gone"
+            odoo:model="crm.lead" >
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="name"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <odoo.controls.OField
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    odoo:field_name="planned_revenue"
+                    odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                    odoo:label_color="@color/odoo_purple"
+                    odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:with_label="true" >
+                </odoo.controls.OField>
+
+                <odoo.controls.OLabel
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:label="at"
+                    app:textAppearance="?android:attr/textAppearanceSmall" >
+                </odoo.controls.OLabel>
+
+                <odoo.controls.OField
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    odoo:field_name="probability"
+                    odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                    odoo:label_color="@color/odoo_purple"
+                    odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:with_label="false" >
+                </odoo.controls.OField>
+            </LinearLayout>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="partner_id"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="horizontal" >
+
+                <odoo.controls.OField
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    odoo:field_name="title_action"
+                    odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                    odoo:label_color="@color/odoo_purple"
+                    odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:with_label="true" >
+                </odoo.controls.OField>
+
+                <odoo.controls.OField
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    odoo:field_name="title_action"
+                    odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                    odoo:label_color="@color/odoo_purple"
+                    odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:with_label="false" >
+                </odoo.controls.OField>
+            </LinearLayout>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="date_deadline"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:field_name="description"
+                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                odoo:label_color="@color/odoo_purple"
+                odoo:label_textAppearance="?android:attr/textAppearanceSmall"
+                odoo:with_label="true" >
+            </odoo.controls.OField>
+        </odoo.controls.OForm>
+    </LinearLayout>
+
+</ScrollView>
