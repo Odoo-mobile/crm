@@ -25,14 +25,13 @@ public class CRMLead extends OModel {
 	OColumn email_from = new OColumn("Email", OVarchar.class, 128);
 	OColumn create_date = new OColumn("Creation Date", ODateTime.class);
 	OColumn description = new OColumn("Note", OText.class);
-	OColumn write_date = new OColumn("Update Date", ODateTime.class);
 	OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
 			RelationType.ManyToMany);
 	OColumn contact_name = new OColumn("Contact Name", OVarchar.class, 64);
 	OColumn partner_name = new OColumn("Partner Name", OVarchar.class, 64);
 	OColumn opt_out = new OColumn("Opt-Out", OBoolean.class);
 	OColumn type = new OColumn("Type", OVarchar.class, 64).setDefault("lead");
-	OColumn priority = new OColumn("Priority", OVarchar.class, 64);
+	OColumn priority = new OColumn("Priority", OVarchar.class, 10);
 	OColumn date_open = new OColumn("Assigned", ODateTime.class);
 	OColumn date_closed = new OColumn("Closed", ODateTime.class);
 	OColumn stage_id = new OColumn("Stage", CRMCaseStage.class,
