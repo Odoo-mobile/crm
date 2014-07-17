@@ -1,5 +1,6 @@
 package com.odoo.addons.crm.model;
 
+import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.base.res.ResCompany;
@@ -15,9 +16,12 @@ import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 
 public class CRMLead extends OModel {
+
+	Context mContext = null;
 
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
 			RelationType.ManyToOne);
@@ -45,12 +49,19 @@ public class CRMLead extends OModel {
 			RelationType.ManyToOne);
 	OColumn country_id = new OColumn("Country", ResCountry.class,
 			RelationType.ManyToOne);
+	
+	/**
+	 * Only used for type opportunity
+	 */
+	
 	OColumn probability = new OColumn("Success Rate (%)", OReal.class, 20);
 	OColumn planned_revenue = new OColumn("Expected Revenue", OReal.class, 20);
 	OColumn ref = new OColumn("Reference", OVarchar.class, 64);
 	OColumn ref2 = new OColumn("Reference 2", OVarchar.class, 64);
 	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class)
 			.setParsePatter(ODate.DEFAULT_FORMAT);
+	OColumn date_action = new OColumn("Next Action Date", ODateTime.class)
+	.setParsePatter(ODate.DEFAULT_FORMAT);
 	OColumn title_action = new OColumn("Next Action", OVarchar.class, 64);
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);
@@ -58,6 +69,16 @@ public class CRMLead extends OModel {
 
 	public CRMLead(Context context) {
 		super(context, "crm.lead");
+		mContext = context;
+	}
+
+	@Override
+	public ODomain defaultDomain() {
+		ODomain domain = new ODomain();
+		domain.add("|");
+		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		domain.add("user_id", "=", false);
+		return domain;
 	}
 
 	public static class CRMCaseCateg extends OModel {

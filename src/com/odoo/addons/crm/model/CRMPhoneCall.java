@@ -1,5 +1,6 @@
 package com.odoo.addons.crm.model;
 
+import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.addons.crm.model.CRMLead.CRMCaseCateg;
@@ -12,10 +13,12 @@ import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 
 public class CRMPhoneCall extends OModel {
 
+	Context mContext = null;
 	OColumn user_id = new OColumn("Responsible", ResUsers.class,
 			RelationType.ManyToOne);
 	OColumn partner_id = new OColumn("Contact", ResPartner.class,
@@ -35,6 +38,16 @@ public class CRMPhoneCall extends OModel {
 
 	public CRMPhoneCall(Context context) {
 		super(context, "crm.phonecall");
+		mContext = context;
+	}
+
+	@Override
+	public ODomain defaultDomain() {
+		ODomain domain = new ODomain();
+		domain.add("|");
+		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		domain.add("user_id", "=", false);
+		return domain;
 	}
 
 }

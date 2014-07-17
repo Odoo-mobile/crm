@@ -5,7 +5,7 @@
         android:id="@+id/menu_crm_detail_create"
         android:icon="@drawable/ic_action_content_new"
         android:showAsAction="ifRoom|withText"
-        android:title="Create New">
+        android:title="@string/label_create">
     </item>
 
 </menu>

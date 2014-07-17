@@ -5,19 +5,19 @@
         android:id="@+id/menu_phone_detail_edit"
         android:icon="@drawable/ic_action_notes"
         android:showAsAction="ifRoom|withText"
-        android:title="Edit">
+        android:title="@string/label_edit">
     </item>
     <item
         android:id="@+id/menu_phone_detail_delete"
         android:icon="@drawable/ic_action_remove"
         android:showAsAction="ifRoom|withText"
-        android:title="Delete">
+        android:title="@string/label_delete">
     </item>
     <item
         android:id="@+id/menu_phone_detail_save"
         android:icon="@drawable/ic_action_done"
         android:showAsAction="ifRoom|withText"
-        android:title="Save">
+        android:title="@string/label_save">
     </item>
 
 </menu>

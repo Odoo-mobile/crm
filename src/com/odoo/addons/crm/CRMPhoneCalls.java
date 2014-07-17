@@ -89,13 +89,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 
 	private int count(Context context, PhoneKeys key) {
 		int count = 0;
-		switch (key) {
-		case SchduledLoggedcalls:
-			count = new CRMPhoneCall(context).count();
-			break;
-		default:
-			break;
-		}
+		count = new CRMPhoneCall(context).count();
 		return count;
 	}
 
@@ -112,7 +106,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 		menu.clear();
 		inflater.inflate(R.menu.menu_crm, menu);
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_crm_detail_create) {
@@ -136,14 +130,10 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 					if (db().isEmptyTable()) {
 						Bundle args = new Bundle();
 						args.putString("crmphone", "pull_callLog");
-						scope.main().requestSync(CRMProvider.AUTHORITY,args);
+						scope.main().requestSync(CRMProvider.AUTHORITY, args);
 					}
 					mListRecords.clear();
-					switch (mCurrentKey) {
-					case SchduledLoggedcalls:
-						mListRecords.addAll(db().select());
-						break;
-					}
+					mListRecords.addAll(db().select());
 				}
 			});
 			return null;
@@ -152,11 +142,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			switch (mCurrentKey) {
-			case SchduledLoggedcalls:
-				mListControl.setCustomView(R.layout.crm_phone_custom_layout);
-				break;
-			}
+			mListControl.setCustomView(R.layout.crm_phone_custom_layout);
 			mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
@@ -200,7 +186,6 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	public void onRowItemClick(int position, View view, ODataRow row) {
 		CRMPhoneDetail crmPhoneDetail = new CRMPhoneDetail();
 		Bundle bundle = new Bundle();
-		bundle.putString("key", mCurrentKey.toString());
 		bundle.putAll(row.getPrimaryBundleData());
 		crmPhoneDetail.setArguments(bundle);
 		startFragment(crmPhoneDetail, true);

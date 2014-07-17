@@ -12,7 +12,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.odoo.addons.crm.CRMPhoneCalls.PhoneKeys;
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
@@ -24,7 +23,6 @@ import com.odoo.util.drawer.DrawerItem;
 public class CRMPhoneDetail extends BaseFragment {
 
 	private View mView = null;
-	private PhoneKeys mKey = null;
 	private Integer mId = null;
 	private Boolean mLocalRecord = false;
 	Menu mMenu = null;
@@ -49,14 +47,8 @@ public class CRMPhoneDetail extends BaseFragment {
 
 	private void init() {
 		// updateMenu(mEditMode);
-		switch (mKey) {
-		case SchduledLoggedcalls:
-			OControls.setVisible(mView, R.id.crmPhoneDetail);
-			mForm = (OForm) mView.findViewById(R.id.crmPhoneDetail);
-			break;
-		default:
-			break;
-		}
+		OControls.setVisible(mView, R.id.crmPhoneDetail);
+		mForm = (OForm) mView.findViewById(R.id.crmPhoneDetail);
 		CRMPhoneCall crmPhone = new CRMPhoneCall(getActivity());
 		if (mId != null) {
 			mRecord = crmPhone.select(mId);
@@ -69,7 +61,6 @@ public class CRMPhoneDetail extends BaseFragment {
 
 	public void initArgs() {
 		Bundle arg = getArguments();
-		mKey = PhoneKeys.valueOf(arg.getString("key"));
 		if (arg.containsKey("id")) {
 			mLocalRecord = arg.getBoolean("local_record");
 			if (mLocalRecord) {
@@ -107,21 +98,13 @@ public class CRMPhoneDetail extends BaseFragment {
 			if (values != null) {
 				updateMenu(mEditMode);
 				if (mId != null) {
-					switch (mKey) {
-					case SchduledLoggedcalls:
-						new CRMPhoneCall(getActivity()).update(values, mId,
-								mLocalRecord);
-						break;
-					}
+					new CRMPhoneCall(getActivity()).update(values, mId,
+							mLocalRecord);
 				} else {
-					switch (mKey) {
-					case SchduledLoggedcalls:
-						new CRMPhoneCall(getActivity()).create(values);
-						break;
-					}
+					new CRMPhoneCall(getActivity()).create(values);
 				}
-				getActivity().getSupportFragmentManager().popBackStack();
 			}
+			getActivity().getSupportFragmentManager().popBackStack();
 			break;
 		case R.id.menu_phone_detail_delete:
 			new CRMPhoneCall(getActivity()).delete(mId);

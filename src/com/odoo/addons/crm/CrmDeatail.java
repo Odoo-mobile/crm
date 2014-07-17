@@ -37,7 +37,7 @@ public class CrmDeatail extends BaseFragment {
 			Bundle savedInstanceState) {
 		initArgs();
 		setHasOptionsMenu(true);
-		mView = inflater.inflate(R.layout.crm_lead_detail_view, container,
+		mView = inflater.inflate(R.layout.crm_detail_view, container,
 				false);
 		return mView;
 	}
