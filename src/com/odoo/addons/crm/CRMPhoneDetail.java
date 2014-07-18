@@ -93,7 +93,6 @@ public class CRMPhoneDetail extends BaseFragment {
 			break;
 		case R.id.menu_phone_detail_save:
 			mEditMode = false;
-
 			OValues values = mForm.getFormValues();
 			if (values != null) {
 				updateMenu(mEditMode);
