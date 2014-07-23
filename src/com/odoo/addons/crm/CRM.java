@@ -73,7 +73,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new CRMLead(getActivity());
+		return new CRMLead(context);
 	}
 
 	@Override

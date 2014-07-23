@@ -85,7 +85,7 @@
             android:authorities="com.odoo.addons.crm.providers.crm"
             android:enabled="true"
             android:exported="true"
-            android:label="Leads"
+            android:label="Leads/Opportunities"
             android:syncable="true" />
 
         <service
@@ -106,7 +106,7 @@
             android:authorities="com.odoo.addons.sale.providers.sale"
             android:enabled="true"
             android:exported="true"
-            android:label="Sales"
+            android:label="Quotation/SalesOrder"
             android:syncable="true" />
 
         <service

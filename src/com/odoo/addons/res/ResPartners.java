@@ -43,14 +43,15 @@ public class ResPartners extends BaseFragment implements OnPullListener {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new ResPartner(getActivity());
+		return new ResPartner(context);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		scope = new AppScope(getActivity());
-		mView = inflater.inflate(R.layout.common_list_control, container, false);
+		mView = inflater
+				.inflate(R.layout.common_list_control, container, false);
 		init();
 		return mView;
 	}

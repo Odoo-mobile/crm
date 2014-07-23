@@ -45,14 +45,15 @@ public class Sales extends BaseFragment implements OnPullListener {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		scope = new AppScope(getActivity());
-		mView = inflater.inflate(R.layout.common_list_control, container, false);
+		mView = inflater
+				.inflate(R.layout.common_list_control, container, false);
 		init();
 		return mView;
 	}
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new SaleOrder(getActivity());
+		return new SaleOrder(context);
 	}
 
 	public void init() {
@@ -85,10 +86,12 @@ public class Sales extends BaseFragment implements OnPullListener {
 		int count = 0;
 		switch (key) {
 		case Quotation:
-			count = new SaleOrder(context).count("state = ?", new String[]{"draft"});
+			count = new SaleOrder(context).count("state = ?",
+					new String[] { "draft" });
 			break;
 		case Sale_order:
-			count = new SaleOrder(context).count("state = ?", new String[]{"manual"});
+			count = new SaleOrder(context).count("state = ?",
+					new String[] { "manual" });
 			break;
 		default:
 			break;
@@ -110,10 +113,12 @@ public class Sales extends BaseFragment implements OnPullListener {
 					mListRecords.clear();
 					switch (mCurrentKey) {
 					case Quotation:
-						mListRecords.addAll(db().select("state = ?", new String[]{"draft"}));
+						mListRecords.addAll(db().select("state = ?",
+								new String[] { "draft" }));
 						break;
 					case Sale_order:
-						mListRecords.addAll(db().select("state = ?", new String[]{"manual"}));
+						mListRecords.addAll(db().select("state = ?",
+								new String[] { "manual" }));
 						break;
 					}
 				}

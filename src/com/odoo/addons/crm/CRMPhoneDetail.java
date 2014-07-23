@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.crm.R;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.support.BaseFragment;
@@ -24,7 +25,6 @@ public class CRMPhoneDetail extends BaseFragment {
 
 	private View mView = null;
 	private Integer mId = null;
-	private Boolean mLocalRecord = false;
 	Menu mMenu = null;
 	private Boolean mEditMode = true;
 	private OForm mForm = null;
@@ -61,12 +61,8 @@ public class CRMPhoneDetail extends BaseFragment {
 
 	public void initArgs() {
 		Bundle arg = getArguments();
-		if (arg.containsKey("id")) {
-			mLocalRecord = arg.getBoolean("local_record");
-			if (mLocalRecord) {
-				mId = arg.getInt("local_id");
-			} else
-				mId = arg.getInt("id");
+		if (arg.containsKey(OColumn.ROW_ID)) {
+			mId = arg.getInt(OColumn.ROW_ID);
 		}
 	}
 
@@ -97,8 +93,7 @@ public class CRMPhoneDetail extends BaseFragment {
 			if (values != null) {
 				updateMenu(mEditMode);
 				if (mId != null) {
-					new CRMPhoneCall(getActivity()).update(values, mId,
-							mLocalRecord);
+					new CRMPhoneCall(getActivity()).update(values, mId);
 				} else {
 					new CRMPhoneCall(getActivity()).create(values);
 				}

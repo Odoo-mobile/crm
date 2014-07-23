@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.odoo.addons.crm.CRM.Keys;
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.crm.R;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.support.BaseFragment;
@@ -26,7 +27,6 @@ public class CrmDeatail extends BaseFragment {
 	private View mView = null;
 	private Keys mKey = null;
 	private Integer mId = null;
-	private Boolean mLocalRecord = false;
 	Menu mMenu = null;
 	private Boolean mEditMode = true;
 	private OForm mForm = null;
@@ -37,8 +37,7 @@ public class CrmDeatail extends BaseFragment {
 			Bundle savedInstanceState) {
 		initArgs();
 		setHasOptionsMenu(true);
-		mView = inflater.inflate(R.layout.crm_detail_view, container,
-				false);
+		mView = inflater.inflate(R.layout.crm_detail_view, container, false);
 		return mView;
 	}
 
@@ -62,7 +61,7 @@ public class CrmDeatail extends BaseFragment {
 		}
 		CRMLead crmLead = new CRMLead(getActivity());
 		if (mId != null) {
-			mRecord = crmLead.select(mId, mLocalRecord);
+			mRecord = crmLead.select(mId);
 			mForm.initForm(mRecord);
 		} else {
 			mForm.setModel(crmLead);
@@ -71,19 +70,15 @@ public class CrmDeatail extends BaseFragment {
 	}
 
 	private void updateMenu(boolean edit_mode) {
-		mMenu.findItem(R.id.menu_crm_detail_save).setVisible(edit_mode);
-		mMenu.findItem(R.id.menu_crm_detail_edit).setVisible(!edit_mode);
+			mMenu.findItem(R.id.menu_crm_detail_save).setVisible(edit_mode);
+			mMenu.findItem(R.id.menu_crm_detail_edit).setVisible(!edit_mode);
 	}
 
 	public void initArgs() {
 		Bundle arg = getArguments();
 		mKey = Keys.valueOf(arg.getString("key"));
-		if (arg.containsKey("id")) {
-			mLocalRecord = arg.getBoolean("local_record");
-			if (mLocalRecord) {
-				mId = arg.getInt("local_id");
-			} else
-				mId = arg.getInt("id");
+		if (arg.containsKey(OColumn.ROW_ID)) {
+			mId = arg.getInt(OColumn.ROW_ID);
 		}
 	}
 
@@ -121,12 +116,10 @@ public class CrmDeatail extends BaseFragment {
 				if (mId != null) {
 					switch (mKey) {
 					case Leads:
-						new CRMLead(getActivity()).update(values, mId,
-								mLocalRecord);
+						new CRMLead(getActivity()).update(values, mId);
 						break;
 					case Opportunities:
-						new CRMLead(getActivity()).update(values, mId,
-								mLocalRecord);
+						new CRMLead(getActivity()).update(values, mId);
 						break;
 					}
 				} else {
@@ -143,8 +136,8 @@ public class CrmDeatail extends BaseFragment {
 			}
 			break;
 		case R.id.menu_crm_detail_delete:
-				new CRMLead(getActivity()).delete(mId);
-				getActivity().getSupportFragmentManager().popBackStack();
+			new CRMLead(getActivity()).delete(mId);
+			getActivity().getSupportFragmentManager().popBackStack();
 			break;
 		}
 		return super.onOptionsItemSelected(item);
