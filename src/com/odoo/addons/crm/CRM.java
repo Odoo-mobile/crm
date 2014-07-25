@@ -11,6 +11,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -32,7 +35,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 	public static final String TAG = CRM.class.getSimpleName();
 
 	enum Keys {
-		Leads, Opportunties
+		Leads, Opportunities
 	}
 
 	View mView = null;
@@ -47,7 +50,8 @@ public class CRM extends BaseFragment implements OnPullListener,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		scope = new AppScope(this);
-		mView = inflater.inflate(R.layout.common_list_control, container, false);
+		mView = inflater
+				.inflate(R.layout.common_list_control, container, false);
 		init();
 		return mView;
 	}
@@ -69,7 +73,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new CRMLead(getActivity());
+		return new CRMLead(context);
 	}
 
 	@Override
@@ -79,8 +83,8 @@ public class CRM extends BaseFragment implements OnPullListener,
 		menu.add(new DrawerItem(TAG, "CRM", true));
 		menu.add(new DrawerItem(TAG, "Leads", count(context, Keys.Leads), 0,
 				object(Keys.Leads)));
-		menu.add(new DrawerItem(TAG, "Opportunties", count(context,
-				Keys.Opportunties), 0, object(Keys.Opportunties)));
+		menu.add(new DrawerItem(TAG, "Opportunities", count(context,
+				Keys.Opportunities), 0, object(Keys.Opportunities)));
 		return menu;
 	}
 
@@ -91,7 +95,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 			count = new CRMLead(context).count("type = ?",
 					new String[] { "lead" });
 			break;
-		case Opportunties:
+		case Opportunities:
 			count = new CRMLead(context).count("type = ?",
 					new String[] { "opportunity" });
 		default:
@@ -117,7 +121,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 						mListRecords.addAll(db().select("type = ?",
 								new String[] { "lead" }));
 						break;
-					case Opportunties:
+					case Opportunities:
 						mListRecords.addAll(db().select("type = ?",
 								new String[] { "opportunity" }));
 						break;
@@ -134,7 +138,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 			case Leads:
 				mListControl.setCustomView(R.layout.crm_custom_layout);
 				break;
-			case Opportunties:
+			case Opportunities:
 				mListControl.setCustomView(R.layout.crm_custom_layout);
 				break;
 			}
@@ -182,32 +186,31 @@ public class CRM extends BaseFragment implements OnPullListener,
 		crm.setArguments(args);
 		return crm;
 	}
+	
+	public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == R.id.menu_crm_detail_create) {
+			CrmDeatail crmDetail = new CrmDeatail();
+			Bundle bundle = new Bundle();
+			bundle.putString("key", mCurrentKey.toString());
+			crmDetail.setArguments(bundle);
+			startFragment(crmDetail, true);
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.menu_crm, menu);
+	}
 
 	@Override
 	public void onRowItemClick(int position, View view, ODataRow row) {
-		// TODO Auto-generated method stub
-
+		CrmDeatail crmDetail = new CrmDeatail();
+		Bundle bundle = new Bundle();
+		bundle.putString("key", mCurrentKey.toString());
+		bundle.putAll(row.getPrimaryBundleData());
+		crmDetail.setArguments(bundle);
+		startFragment(crmDetail, true);
 	}
-
-	// @Override
-	// public boolean onOptionsItemSelected(MenuItem item) {
-	// if (item.getItemId() == R.id.menu_library_detail_create) {
-	// LibraryDetail library = new LibraryDetail();
-	// Bundle bundle = new Bundle();
-	// bundle.putString("key", mCurrentKey.toString());
-	// library.setArguments(bundle);
-	// startFragment(library, true);
-	// }
-	// return super.onOptionsItemSelected(item);
-	// }
-
-	// @Override
-	// public void onRowItemClick(int position, View view, ODataRow row) {
-	// LibraryDetail library = new LibraryDetail();
-	// Bundle bundle = new Bundle();
-	// bundle.putString("key", mCurrentKey.toString());
-	// bundle.putAll(row.getPrimaryBundleData());
-	// library.setArguments(bundle);
-	// startFragment(library, true);
-	// }
 }

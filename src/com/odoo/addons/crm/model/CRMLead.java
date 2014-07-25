@@ -1,5 +1,6 @@
 package com.odoo.addons.crm.model;
 
+import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.base.res.ResCompany;
@@ -15,43 +16,51 @@ import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 
 public class CRMLead extends OModel {
+
+	Context mContext = null;
 
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
 			RelationType.ManyToOne);
 	OColumn name = new OColumn("Subject", OVarchar.class, 64).setRequired(true);
 	OColumn email_from = new OColumn("Email", OVarchar.class, 128);
-	OColumn create_date = new OColumn("Creation Date", ODateTime.class);
 	OColumn description = new OColumn("Note", OText.class);
-	OColumn write_date = new OColumn("Update Date", ODateTime.class);
 	OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
 			RelationType.ManyToMany);
 	OColumn contact_name = new OColumn("Contact Name", OVarchar.class, 64);
 	OColumn partner_name = new OColumn("Partner Name", OVarchar.class, 64);
 	OColumn opt_out = new OColumn("Opt-Out", OBoolean.class);
-	OColumn type = new OColumn("Type", OVarchar.class, 64);
-	OColumn priority = new OColumn("Priority", OVarchar.class, 64);
-	OColumn date_open = new OColumn("Assigned", ODateTime.class);
-	OColumn date_closed = new OColumn("Closed", ODateTime.class);
+	OColumn type = new OColumn("Type", OVarchar.class, 64).setDefault("lead");
+	OColumn priority = new OColumn("Priority", OVarchar.class, 10);
+	OColumn date_open = new OColumn("Assigned", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
+	OColumn date_closed = new OColumn("Closed", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
 	OColumn stage_id = new OColumn("Stage", CRMCaseStage.class,
 			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
 			RelationType.ManyToOne);
 	OColumn referred = new OColumn("Refferd By", OVarchar.class);
-	//No filed in V7.0(date_last_stage_update)
-	OColumn date_last_stage_update = new OColumn("Last Stage Update",
-			ODateTime.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne);
 	OColumn country_id = new OColumn("Country", ResCountry.class,
 			RelationType.ManyToOne);
+
+	/**
+	 * Only used for type opportunity
+	 */
+
 	OColumn probability = new OColumn("Success Rate (%)", OReal.class, 20);
 	OColumn planned_revenue = new OColumn("Expected Revenue", OReal.class, 20);
 	OColumn ref = new OColumn("Reference", OVarchar.class, 64);
 	OColumn ref2 = new OColumn("Reference 2", OVarchar.class, 64);
-	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class).setParsePatter(ODate.DEFAULT_FORMAT);
+	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
+	OColumn date_action = new OColumn("Next Action Date", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
 	OColumn title_action = new OColumn("Next Action", OVarchar.class, 64);
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);
@@ -59,6 +68,16 @@ public class CRMLead extends OModel {
 
 	public CRMLead(Context context) {
 		super(context, "crm.lead");
+		mContext = context;
+	}
+
+	@Override
+	public ODomain defaultDomain() {
+		ODomain domain = new ODomain();
+		domain.add("|");
+		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		domain.add("user_id", "=", false);
+		return domain;
 	}
 
 	public static class CRMCaseCateg extends OModel {
@@ -95,15 +114,4 @@ public class CRMLead extends OModel {
 		}
 
 	}
-
-//	public static class CRMPhoneCall extends OModel {
-//
-//
-//		public CRMPhoneCall(Context context) {
-//			super(context, "crm.phonecall");
-//		}
-//
-//	}
-	
-	//public class static CRMProduct extends 
 }

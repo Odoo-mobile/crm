@@ -15,9 +15,8 @@ import com.odoo.orm.types.OVarchar;
 
 public class SaleOrder extends OModel {
 
-	OColumn name = new OColumn("name", OVarchar.class, 64).setRequired(true);
-	OColumn date_order = new OColumn("Date",
-			ODateTime.class).setRequired(true);
+	OColumn name = new OColumn("name", OVarchar.class, 64);
+	OColumn date_order = new OColumn("Date", ODateTime.class).setRequired(true);
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
 			RelationType.ManyToOne).setRequired(true);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
@@ -27,7 +26,7 @@ public class SaleOrder extends OModel {
 	OColumn amount_tax = new OColumn("Tax", OInteger.class);
 	OColumn client_order_ref = new OColumn("Client Order Reference",
 			OVarchar.class, 100);
-	OColumn state = new OColumn("status", OVarchar.class, 10).setRequired(true);
+	OColumn state = new OColumn("status", OVarchar.class, 10).setDefault("draft");
 	OColumn currency_id = new OColumn("currency", ResCurrency.class,
 			RelationType.ManyToOne).setRequired(true);
 	OColumn order_line = new OColumn("Order Lines", SalesOrderLine.class,

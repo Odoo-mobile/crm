@@ -1,20 +1,24 @@
 package com.odoo.addons.crm.model;
 
+import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.addons.crm.model.CRMLead.CRMCaseCateg;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;
-import com.odoo.orm.OModel;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.OModel;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.OUser;
+import com.odoo.util.ODate;
 
 public class CRMPhoneCall extends OModel {
 
+	Context mContext = null;
 	OColumn user_id = new OColumn("Responsible", ResUsers.class,
 			RelationType.ManyToOne);
 	OColumn partner_id = new OColumn("Contact", ResPartner.class,
@@ -25,7 +29,8 @@ public class CRMPhoneCall extends OModel {
 	OColumn duration = new OColumn("Duration", OReal.class);
 	OColumn categ_id = new OColumn("Category", CRMCaseCateg.class,
 			RelationType.ManyToOne);
-	OColumn date = new OColumn("Date", ODateTime.class);
+	OColumn date = new OColumn("Date", ODateTime.class)
+			.setParsePatter(ODate.DEFAULT_FORMAT);
 	OColumn opportunity_id = new OColumn("Lead/Opportunity", CRMLead.class,
 			RelationType.ManyToOne);
 	OColumn call_audio_file = new OColumn("recorded audio file",
@@ -33,6 +38,16 @@ public class CRMPhoneCall extends OModel {
 
 	public CRMPhoneCall(Context context) {
 		super(context, "crm.phonecall");
+		mContext = context;
+	}
+
+	@Override
+	public ODomain defaultDomain() {
+		ODomain domain = new ODomain();
+		domain.add("|");
+		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
+		domain.add("user_id", "=", false);
+		return domain;
 	}
 
 }

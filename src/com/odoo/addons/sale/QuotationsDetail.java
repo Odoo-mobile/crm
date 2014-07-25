@@ -17,6 +17,7 @@ import com.odoo.addons.sale.Sales.Keys;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.model.SaleOrder.SalesOrderLine;
 import com.odoo.crm.R;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
 import com.odoo.support.BaseFragment;
@@ -27,7 +28,6 @@ public class QuotationsDetail extends BaseFragment {
 	private View mView = null;
 	Context mContext = null;
 	private Integer mId = null;
-	private Boolean mLocalRecord = false;
 	private OForm mForm = null;
 	private OForm mFormLine = null;
 	private Boolean mEditMode = false;
@@ -57,12 +57,8 @@ public class QuotationsDetail extends BaseFragment {
 	private void initArgs() {
 		Bundle args = getArguments();
 		mKey = Keys.valueOf(args.getString("key"));
-		if (args.containsKey("id")) {
-			mLocalRecord = args.getBoolean("local_record");
-			if (mLocalRecord) {
-				mId = args.getInt("local_id");
-			} else
-				mId = args.getInt("id");
+		if (args.containsKey(OColumn.ROW_ID)) {
+			mId = args.getInt("local_id");
 		} else
 			mEditMode = true;
 	}
@@ -74,21 +70,22 @@ public class QuotationsDetail extends BaseFragment {
 		// case Archive:
 		// case Reminders:
 		OControls.setVisible(mView, R.id.odooFormQuotations);
-		
+
 		mForm = (OForm) mView.findViewById(R.id.odooFormQuotations);
 		mFormLine = (OForm) mView.findViewById(R.id.odooFormOrderLine);
-		SaleOrder saleOrder = new SaleOrder(getActivity());
+		// SaleOrder saleOrder = new SaleOrder(getActivity());
 		SalesOrderLine saleOrderLine = new SalesOrderLine(getActivity());
 		if (mId != null) {
-			mRecord = saleOrder.select(mId, mLocalRecord);
+			mRecord = db().select(mId);
 			mForm.initForm(mRecord);
-			mRecordLine=saleOrderLine.select(mId, mLocalRecord);
+			mRecordLine = saleOrderLine.select(mId);
 			mFormLine.initForm(mRecordLine);
 		} else {
-			mForm.setModel(saleOrder);
+			mForm.setModel(db());
 			mForm.setEditable(mEditMode);
-			mFormLine.setModel(saleOrder);
-			mFormLine.setEditable(mEditMode);
+//			mFormLine.setVisibility(View.VISIBLE);
+//			mFormLine.setModel(saleOrderLine);
+//			mFormLine.setEditable(mEditMode);
 		}
 		// break;
 		// }
@@ -107,6 +104,7 @@ public class QuotationsDetail extends BaseFragment {
 			mEditMode = !mEditMode;
 			updateMenu(mEditMode);
 			mForm.setEditable(mEditMode);
+			mFormLine.setEditable(mEditMode);
 			break;
 		case R.id.menu_sales_detail_save:
 			mEditMode = false;
@@ -116,14 +114,13 @@ public class QuotationsDetail extends BaseFragment {
 				if (mId != null) {
 					// switch (mKey) {
 					// case Note:
-					new SaleOrder(getActivity()).update(values, mId,
-							mLocalRecord);
+					db().update(values, mId);
 					// break;
 					// }
 				} else {
 					// switch (mKey) {
 					// case Note:
-					new SaleOrder(getActivity()).create(values);
+					db().create(values);
 					// break;
 					// }
 				}
@@ -132,7 +129,7 @@ public class QuotationsDetail extends BaseFragment {
 			break;
 		case R.id.menu_sales_detail_delete:
 			if (mId != null)
-				new SaleOrder(getActivity()).delete(mId);
+				db().delete(mId);
 			Log.e("Delete", mId + "");
 			getActivity().getSupportFragmentManager().popBackStack();
 			break;
@@ -150,7 +147,7 @@ public class QuotationsDetail extends BaseFragment {
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return null;
+		return new SaleOrder(context);
 	}
 
 	@Override

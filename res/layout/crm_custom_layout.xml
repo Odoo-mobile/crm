@@ -37,12 +37,6 @@
             odoo:with_label="false" >
         </odoo.controls.OField>
 
-        <odoo.controls.OField
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            odoo:field_name="create_date"
-            odoo:with_label="false" >
-        </odoo.controls.OField>
     </LinearLayout>
 
 </odoo.controls.OForm>

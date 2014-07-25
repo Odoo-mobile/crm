@@ -60,7 +60,7 @@ public class ResDetail extends BaseFragment {
 		mForm = (OForm) mView.findViewById(R.id.odooFormRes);
 		ResPartner res = new ResPartner(getActivity());
 		if (mId != null) {
-			mRecord = res.select(mId, mLocalRecord);
+			mRecord = res.select(mId);
 			mForm.initForm(mRecord);
 		} else {
 			mForm.setModel(res);

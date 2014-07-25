@@ -1,6 +1,7 @@
 package com.odoo.addons.sale;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import odoo.controls.OList;
@@ -24,7 +25,6 @@ import com.odoo.orm.ODataRow;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
-import com.odoo.support.OUser;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.openerp.OETouchListener;
@@ -46,7 +46,7 @@ public class Sales extends BaseFragment implements OnPullListener,
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.Quotation;
 	Boolean mSyncDone = false;
-
+	HashMap<String, String> mStates = new HashMap<String, String>();
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -60,15 +60,25 @@ public class Sales extends BaseFragment implements OnPullListener,
 
 	@Override
 	public Object databaseHelper(Context context) {
-		return new SaleOrder(getActivity());
+		return new SaleOrder(context);
 	}
 
 	public void init() {
+		mStates.put("draft", "Draft Quotation");
+		mStates.put("sent", "Quotation Sent");
+		mStates.put("cancel", "Cancelled");
+		mStates.put("waiting_date", "Waiting Schedule");
+		mStates.put("progress", "Sales Order");
+		mStates.put("manual", "Sale to Invoice");
+		mStates.put("shipping_except", "Shipping Exception");
+		mStates.put("invoice_except", "Invoice Exception");
+		mStates.put("done", "Done");
 		checkArguments();
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
+		// mListControl.setOnRowClickListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
 	}
@@ -81,6 +91,7 @@ public class Sales extends BaseFragment implements OnPullListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
+
 		menu.add(new DrawerItem(TAG, "Quotation",
 				count(context, Keys.Quotation), 0, object(Keys.Quotation)));
 		menu.add(new DrawerItem(TAG, "Sales Order", count(context,
@@ -90,15 +101,15 @@ public class Sales extends BaseFragment implements OnPullListener,
 
 	private int count(Context context, Keys key) {
 		int count = 0;
-		int uid = OUser.current(getActivity()).getUser_id();
+
 		switch (key) {
 		case Quotation:
-			count = new SaleOrder(context).count("state = ? and user_id = ?",
-					new Object[] { "draft", uid });
+			count = new SaleOrder(context).count("state = ? or state = ?",
+					new String[] { "draft","cancel" });
 			break;
 		case Sale_order:
-			count = new SaleOrder(context).count("state != ? and user_id = ?",
-					new Object[] { "draft", uid });
+			count = new SaleOrder(context).count("state = ? or state = ?",
+					new String[] { "manual","progress" });
 			break;
 		default:
 			break;
@@ -118,17 +129,16 @@ public class Sales extends BaseFragment implements OnPullListener,
 						scope.main().requestSync(SalesProvider.AUTHORITY);
 					}
 					mListRecords.clear();
-					int uid = OUser.current(getActivity()).getUser_id();
+
 					switch (mCurrentKey) {
 					case Quotation:
-						mListRecords.addAll(db().select(
-								"state = ? and user_id=?",
-								new Object[] { "draft", uid }));
+						mListRecords.addAll(db().select("state = ? or state = ?",
+								new String[] { "draft","cancel" }));
 						break;
 					case Sale_order:
 						mListRecords.addAll(db().select(
-								"state != ? and user_id=?",
-								new Object[] { "draft", uid }));
+								"state = ? or state = ?",
+								new String[] { "manual","progress" }));
 						break;
 					}
 				}
