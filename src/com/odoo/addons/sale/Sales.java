@@ -47,6 +47,7 @@ public class Sales extends BaseFragment implements OnPullListener,
 	Keys mCurrentKey = Keys.Quotation;
 	Boolean mSyncDone = false;
 	HashMap<String, String> mStates = new HashMap<String, String>();
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -105,11 +106,12 @@ public class Sales extends BaseFragment implements OnPullListener,
 		switch (key) {
 		case Quotation:
 			count = new SaleOrder(context).count("state = ? or state = ?",
-					new String[] { "draft","cancel" });
+					new String[] { "draft", "cancel" });
 			break;
 		case Sale_order:
-			count = new SaleOrder(context).count("state = ? or state = ?",
-					new String[] { "manual","progress" });
+			count = new SaleOrder(context).count(
+					"state = ? or state = ? or state = ?", new String[] {
+							"manual", "progress", "done" });
 			break;
 		default:
 			break;
@@ -132,13 +134,14 @@ public class Sales extends BaseFragment implements OnPullListener,
 
 					switch (mCurrentKey) {
 					case Quotation:
-						mListRecords.addAll(db().select("state = ? or state = ?",
-								new String[] { "draft","cancel" }));
+						mListRecords.addAll(db().select(
+								"state = ? or state = ?",
+								new String[] { "draft", "cancel" }));
 						break;
 					case Sale_order:
 						mListRecords.addAll(db().select(
-								"state = ? or state = ?",
-								new String[] { "manual","progress" }));
+								"state = ? or state = ? or state = ?",
+								new String[] { "manual", "progress", "done" }));
 						break;
 					}
 				}

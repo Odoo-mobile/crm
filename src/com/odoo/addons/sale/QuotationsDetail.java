@@ -29,7 +29,6 @@ public class QuotationsDetail extends BaseFragment {
 	Context mContext = null;
 	private Integer mId = null;
 	private OForm mForm = null;
-	private OForm mFormLine = null;
 	private Boolean mEditMode = false;
 	private ODataRow mRecord = null;
 	private ODataRow mRecordLine = null;
@@ -65,31 +64,18 @@ public class QuotationsDetail extends BaseFragment {
 
 	private void init() {
 		updateMenu(mEditMode);
-		// switch (mKey) {
-		// case Note:
-		// case Archive:
-		// case Reminders:
 		OControls.setVisible(mView, R.id.odooFormQuotations);
 
 		mForm = (OForm) mView.findViewById(R.id.odooFormQuotations);
-		mFormLine = (OForm) mView.findViewById(R.id.odooFormOrderLine);
-		// SaleOrder saleOrder = new SaleOrder(getActivity());
 		SalesOrderLine saleOrderLine = new SalesOrderLine(getActivity());
 		if (mId != null) {
 			mRecord = db().select(mId);
 			mForm.initForm(mRecord);
 			mRecordLine = saleOrderLine.select(mId);
-			mFormLine.initForm(mRecordLine);
 		} else {
 			mForm.setModel(db());
 			mForm.setEditable(mEditMode);
-//			mFormLine.setVisibility(View.VISIBLE);
-//			mFormLine.setModel(saleOrderLine);
-//			mFormLine.setEditable(mEditMode);
 		}
-		// break;
-		// }
-
 	}
 
 	private void updateMenu(boolean edit_mode) {
@@ -104,7 +90,6 @@ public class QuotationsDetail extends BaseFragment {
 			mEditMode = !mEditMode;
 			updateMenu(mEditMode);
 			mForm.setEditable(mEditMode);
-			mFormLine.setEditable(mEditMode);
 			break;
 		case R.id.menu_sales_detail_save:
 			mEditMode = false;
@@ -112,17 +97,9 @@ public class QuotationsDetail extends BaseFragment {
 			if (values != null) {
 				updateMenu(mEditMode);
 				if (mId != null) {
-					// switch (mKey) {
-					// case Note:
 					db().update(values, mId);
-					// break;
-					// }
 				} else {
-					// switch (mKey) {
-					// case Note:
 					db().create(values);
-					// break;
-					// }
 				}
 				getActivity().getSupportFragmentManager().popBackStack();
 			}

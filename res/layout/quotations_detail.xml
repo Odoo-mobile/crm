@@ -41,15 +41,21 @@
                 odoo:field_name="date_order"
                 odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple" />
-        </odoo.controls.OForm>
 
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:custom_layout="@layout/sale_order_custom_view"
+                odoo:field_name="order_line"
+                odoo:with_label="false" />
+        </odoo.controls.OForm>
+        <!--
         <odoo.controls.OForm
             android:id="@+id/odooFormOrderLine"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:padding="15dp"
-            android:visibility="gone"
             odoo:model="sale.order.line" >
 
             <odoo.controls.OField
@@ -58,17 +64,55 @@
                 android:layout_weight="1"
                 odoo:field_name="product_id"
                 odoo:label_bottom_border_height="0"
-                odoo:label_color="@color/odoo_purple" />
+                odoo:with_label="false" />
 
             <odoo.controls.OField
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 odoo:field_name="name"
-                odoo:field_textAppearance="?android:attr/textAppearanceMedium"
                 odoo:label_bottom_border_height="0"
-                odoo:label_color="@color/odoo_purple" />
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                odoo:field_name="product_uom_qty"
+                odoo:label_bottom_border_height="0"
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                odoo:field_name="price_unit"
+                odoo:label_bottom_border_height="0"
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                odoo:field_name="tax_id"
+                odoo:label_bottom_border_height="0"
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                odoo:field_name="price_subtotal"
+                odoo:label_bottom_border_height="0"
+                odoo:label_color="@color/odoo_purple"
+                odoo:with_label="false" />
         </odoo.controls.OForm>
+        -->
+
     </LinearLayout>
 
 </ScrollView>

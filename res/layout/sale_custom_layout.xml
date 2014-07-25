@@ -43,6 +43,7 @@
             android:layout_width="25dp"
             android:layout_height="25dp"
             odoo:binaryType="image"
+            odoo:defaultImage="@drawable/avatar"
             odoo:field_name="partner_id"
             odoo:ref_column="image_small"
             odoo:with_label="false" />
