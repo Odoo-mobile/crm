@@ -34,5 +34,4 @@ public class OModules extends OModulesHelper {
 	OModule res_partner = new OModule(ResPartners.class);
 	OModule sale = new OModule(Sales.class);
 	OModule crm_phone_call = new OModule(CRMPhoneCalls.class);
-
 }

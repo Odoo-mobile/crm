@@ -3,7 +3,6 @@ package com.odoo.addons.sale.model;
 import odoo.ODomain;
 import android.content.Context;
 
-import com.odoo.addons.res.ResPartners;
 import com.odoo.base.res.ResCurrency;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
@@ -20,9 +19,9 @@ import com.odoo.support.OUser;
 public class SaleOrder extends OModel {
 	Context mContext = null;
 	OColumn name = new OColumn("name", OVarchar.class, 64);
-	OColumn date_order = new OColumn("Date", ODateTime.class).setRequired(true);
+	OColumn date_order = new OColumn("Date", ODateTime.class);
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
-			RelationType.ManyToOne).setRequired(true);
+			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
 			RelationType.ManyToOne);
 	OColumn amount_total = new OColumn("Total", OInteger.class);

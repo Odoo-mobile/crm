@@ -45,9 +45,10 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:custom_layout="@layout/sale_order_custom_view"
+                odoo:customLayout="@layout/sale_order_custom_view"
                 odoo:field_name="order_line"
-                odoo:with_label="false" />
+                odoo:label_bottom_border_height="0"
+                odoo:label_color="@color/odoo_purple" />
         </odoo.controls.OForm>
         <!--
         <odoo.controls.OForm
