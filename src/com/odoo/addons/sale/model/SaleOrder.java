@@ -21,7 +21,7 @@ public class SaleOrder extends OModel {
 	OColumn name = new OColumn("name", OVarchar.class, 64);
 	OColumn date_order = new OColumn("Date", ODateTime.class);
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
-			RelationType.ManyToOne);
+			RelationType.ManyToOne).setRequired(true);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
 			RelationType.ManyToOne);
 	OColumn amount_total = new OColumn("Total", OInteger.class);
@@ -58,11 +58,11 @@ public class SaleOrder extends OModel {
 
 		OColumn product_id = new OColumn("Product Id", ProductProduct.class,
 				RelationType.ManyToOne);
-		OColumn name = new OColumn("Name", OText.class);
+		OColumn name = new OColumn("Description ", OText.class);
 		OColumn product_uom_qty = new OColumn("Quantity", OInteger.class);
 		// OColumn tax_id = new OColumn("Tax Id",,RelationType.ManyToMany);
 		OColumn price_unit = new OColumn("Unit Price", OReal.class);
-		OColumn price_subtotal = new OColumn("Sub Total", OInteger.class);
+		OColumn price_subtotal = new OColumn("Sub Total", OReal.class);
 		// OColumn sequence = new OColumn("Sequence", OInteger.class);
 		OColumn order_id = new OColumn("ID", SaleOrder.class,
 				RelationType.ManyToOne);

@@ -31,16 +31,16 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 
 	public static final String TAG = ResPartners.class.getSimpleName();
 
-	enum Keys {
-		Customer
-	}
+	// enum Keys {
+	// Customer
+	// }
 
 	View mView = null;
 	OList mListControl = null;
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
-	Keys mCurrentKey = Keys.Customer;
+	// Keys mCurrentKey = Keys.Customer;
 	Boolean mSyncDone = false;
 
 	@Override
@@ -59,7 +59,7 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	}
 
 	public void init() {
-		checkArguments();
+		// checkArguments();
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListControl, this);
@@ -68,10 +68,10 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		mDataLoader.execute();
 	}
 
-	private void checkArguments() {
-		Bundle arg = getArguments();
-		mCurrentKey = Keys.valueOf(arg.getString("resPartner"));
-	}
+	// private void checkArguments() {
+	// Bundle arg = getArguments();
+	// mCurrentKey = Keys.valueOf(arg.getString("resPartner"));
+	// }
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
 
@@ -85,11 +85,11 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 						scope.main().requestSync(ResProvider.AUTHORITY);
 					}
 					mListRecords.clear();
-					switch (mCurrentKey) {
-					case Customer:
-						mListRecords.addAll(db().select());
-						break;
-					}
+					// switch (mCurrentKey) {
+					// case Customer:
+					mListRecords.addAll(db().select());
+					// break;
+					// }
 				}
 			});
 			return null;
@@ -98,11 +98,11 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			switch (mCurrentKey) {
-			case Customer:
-				mListControl.setCustomView(R.layout.crm_custom_customer_layout);
-				break;
-			}
+			// switch (mCurrentKey) {
+			// case Customer:
+			mListControl.setCustomView(R.layout.crm_custom_customer_layout);
+			// break;
+			// }
 			mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
@@ -144,27 +144,27 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
 		menu.add(new DrawerItem(TAG, "Sales", true));
-		menu.add(new DrawerItem(TAG, "Customer", count(context, Keys.Customer),
-				0, object(Keys.Customer)));
+		menu.add(new DrawerItem(TAG, "Customer", count(context), 0,
+				object("customer")));
 		return menu;
 	}
 
-	private int count(Context context, Keys key) {
+	private int count(Context context) {
 		int count = 0;
-		switch (key) {
-		case Customer:
-			count = new ResPartner(context).count();
-			break;
-		default:
-			break;
-		}
+		// switch (key) {
+		// case Customer:
+		count = new ResPartner(context).count();
+		// break;
+		// default:
+		// break;
+		// }
 		return count;
 	}
 
-	private Fragment object(Keys value) {
+	private Fragment object(String value) {
 		ResPartners resPartners = new ResPartners();
 		Bundle args = new Bundle();
-		args.putString("resPartner", value.toString());
+		args.putString("resPartner", value);
 		resPartners.setArguments(args);
 		return resPartners;
 	}
@@ -173,7 +173,7 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	public void onRowItemClick(int position, View view, ODataRow row) {
 		ResDetail note = new ResDetail();
 		Bundle bundle = new Bundle();
-		bundle.putString("key", mCurrentKey.toString());
+		// bundle.putString("key", mCurrentKey.toString());
 		bundle.putAll(row.getPrimaryBundleData());
 		note.setArguments(bundle);
 		startFragment(note, true);

@@ -17,7 +17,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="15dp"
-            android:visibility="gone"
             odoo:model="sale.order" >
 
             <odoo.controls.OField
@@ -38,17 +37,64 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                odoo:displayPattern="dd/MM/yyyy HH:mm:ss"
                 odoo:field_name="date_order"
                 odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple" />
+
+            <odoo.controls.OLabel
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                odoo:bottom_border_height="0"
+                odoo:label="Order Line"
+                odoo:color="@color/odoo_purple" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal" >
+
+                <odoo.controls.OLabel
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    odoo:bottom_border_height="0"
+                    odoo:label="Description"
+                    odoo:color="@color/odoo_purple" />
+
+                <odoo.controls.OLabel
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    odoo:bottom_border_height="0"
+                    odoo:label="Quantity"
+                    odoo:color="@color/odoo_purple" />
+
+                <odoo.controls.OLabel
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    odoo:bottom_border_height="0"
+                    odoo:label="Unti Price"
+                    odoo:color="@color/odoo_purple" />
+
+                <odoo.controls.OLabel
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    odoo:bottom_border_height="0"
+                    odoo:label="Sub Total"
+                    odoo:color="@color/odoo_purple" />
+            </LinearLayout>
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 odoo:customLayout="@layout/sale_order_custom_view"
+                odoo:customLayoutOriantation="vertical"
                 odoo:field_name="order_line"
                 odoo:label_bottom_border_height="0"
-                odoo:label_color="@color/odoo_purple" />
+                odoo:with_label="false" />
         </odoo.controls.OForm>
         <!--
         <odoo.controls.OForm

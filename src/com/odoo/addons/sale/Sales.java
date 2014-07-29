@@ -92,7 +92,6 @@ public class Sales extends BaseFragment implements OnPullListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-
 		menu.add(new DrawerItem(TAG, "Quotation",
 				count(context, Keys.Quotation), 0, object(Keys.Quotation)));
 		menu.add(new DrawerItem(TAG, "Sales Order", count(context,
