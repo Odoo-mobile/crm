@@ -30,6 +30,7 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.DragEvent;
@@ -42,18 +43,21 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
+import android.widget.SearchView.OnQueryTextListener;
 import android.widget.TextView;
 
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.listview.OListAdapter;
+import com.odoo.support.listview.OListAdapter.OnSearchChange;
 
 /**
  * The Class OList.
  */
 @SuppressLint("ClickableViewAccessibility")
 public class OList extends ScrollView implements View.OnClickListener,
-		View.OnLongClickListener, View.OnTouchListener, View.OnDragListener {
+		View.OnLongClickListener, View.OnTouchListener, View.OnDragListener,
+		OnSearchChange {
 
 	/** The Constant KEY_DATA_LOADER. */
 	private static final String KEY_DATA_LOADER = "data_loader_status";
@@ -209,7 +213,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 			mAttr.put(KEY_EMPTY_LIST_MESSAGE,
 					mTypedArray.getString(R.styleable.OList_emptyListMessage));
 			mAttr.put(KEY_EMPTY_LIST_ICON, mTypedArray.getResourceId(
-					R.styleable.OList_emptyListIcon, -1));
+					R.styleable.OList_emptyListIcon,
+					R.drawable.ic_action_exclamation_mark));
 			mCustomLayout = mAttr.getResource(KEY_CUSTOM_LAYOUT, 0);
 			mTypedArray.recycle();
 		}
@@ -289,13 +294,33 @@ public class OList extends ScrollView implements View.OnClickListener,
 				return mView;
 			}
 		};
+		mListAdapter.setOnSearchChange(this);
 		addRecordViews();
 	}
 
+	/**
+	 * Sets the empty list message.
+	 * 
+	 * @param message
+	 *            the new empty list message
+	 */
 	public void setEmptyListMessage(String message) {
 		mAttr.put(KEY_EMPTY_LIST_MESSAGE, message);
 	}
 
+	/**
+	 * Sets the empty list icon.
+	 * 
+	 * @param icon
+	 *            the new empty list icon
+	 */
+	public void setEmptyListIcon(Integer icon) {
+		mAttr.put(KEY_EMPTY_LIST_ICON, icon);
+	}
+
+	/**
+	 * Show empty list view.
+	 */
 	private void showEmptyListView() {
 		LinearLayout mEmptyListLayout = new LinearLayout(mContext);
 		mEmptyListLayout.setOrientation(LinearLayout.VERTICAL);
@@ -791,18 +816,72 @@ public class OList extends ScrollView implements View.OnClickListener,
 				loaderLayout.setPadding(15, 15, 15, 15);
 				loaderLayout.setTag(KEY_DATA_LOADER);
 				mInnerLayout.addView(loaderLayout);
+				fullScroll(View.FOCUS_DOWN);
 			}
 			mOnListBottomReachedListener.onBottomReached(mRecordLimit,
 					mRecordOffset);
 		}
 	}
 
+	/**
+	 * Gets the view visiblity diff.
+	 * 
+	 * @return the view visiblity diff
+	 */
 	private Integer getViewVisiblityDiff() {
 		View view = (View) getChildAt(getChildCount() - 1);
 		if (view.findViewWithTag("data_loader_status") != null)
 			return -1;
 		return (view.getBottom() - (getHeight() + getScrollY()));
 	}
+
+	/**
+	 * Gets the query listener.
+	 * 
+	 * @return the query listener
+	 */
+	public OnQueryTextListener getQueryListener() {
+		return mQueryListener;
+	}
+
+	@Override
+	public void onSearchChange(List<Object> newRecords) {
+		if (findViewWithTag(KEY_DATA_LOADER) != null) {
+			removeView(findViewWithTag(KEY_DATA_LOADER));
+		}
+		mRecords.clear();
+		mRecords.addAll(newRecords);
+		addRecordViews();
+		if (mRecords.size() <= 0) {
+			showEmptyListView();
+		}
+	}
+
+	/** The query listener. */
+	private OnQueryTextListener mQueryListener = new OnQueryTextListener() {
+
+		private boolean isSearched = false;
+
+		@Override
+		public boolean onQueryTextChange(String newText) {
+			if (TextUtils.isEmpty(newText)) {
+				newText = "";
+				if (isSearched && mListAdapter != null) {
+					mListAdapter.getFilter().filter(null);
+				}
+			} else {
+				isSearched = true;
+				mListAdapter.getFilter().filter(newText);
+			}
+
+			return false;
+		}
+
+		@Override
+		public boolean onQueryTextSubmit(String query) {
+			return false;
+		}
+	};
 
 	/**
 	 * The listener interface for receiving onListRowViewClick events. The class
@@ -947,4 +1026,5 @@ public class OList extends ScrollView implements View.OnClickListener,
 		 */
 		public Boolean showLoader();
 	}
+
 }

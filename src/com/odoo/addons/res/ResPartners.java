@@ -26,6 +26,7 @@ import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
@@ -98,18 +99,21 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 					if (db().isEmptyTable() && !mSyncDone) {
 						scope.main().requestSync(ResProvider.AUTHORITY);
 					}
-					mListRecords.clear();
+//					mListRecords.clear();
 					OModel model = db();
 					if (mOffset == 0)
 						mListRecords.clear();
 					// switch (mCurrentKey) {
 					// case Customer:
-					mListRecords.addAll(db().select());
+//					mListRecords.addAll(db().select());
 					// break;
 					// }
-					mListRecords.addAll(model.setLimit(mLimit)
-							.setOffset(mOffset).select());
+					List<ODataRow> list = model.setLimit(mLimit)
+							.setOffset(mOffset).select();
+					if(list.size()>0)
+						mListRecords.addAll(list);
 					mListControl.setRecordOffset(model.getNextOffset());
+					OLog.log("Size"+mListRecords.size() +" :  "+list.size());
 				}
 			});
 			return null;
@@ -205,12 +209,14 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		if (mDataLoader != null) {
 			mDataLoader.cancel(true);
 		}
-		mDataLoader = new DataLoader(offset);
-		mDataLoader.execute();
+//		if (mListRecords.size() == offset) {
+			mDataLoader = new DataLoader(offset);
+			mDataLoader.execute();
+//		}
 	}
 
 	@Override
 	public Boolean showLoader() {
-		return true;
+		return false;
 	}
 }

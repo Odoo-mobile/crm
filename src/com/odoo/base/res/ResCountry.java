@@ -8,8 +8,7 @@ import com.odoo.orm.types.OVarchar;
 
 public class ResCountry extends OModel {
 
-	OColumn name = new OColumn("Name", OVarchar.class, 100);
-	OColumn code = new OColumn("Country Code", OVarchar.class, 10);
+	OColumn name = new OColumn("Name", OVarchar.class);
 
 	public ResCountry(Context context) {
 		super(context, "res.country");

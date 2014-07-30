@@ -12,12 +12,14 @@ import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
@@ -50,7 +52,7 @@ public class Sales extends BaseFragment implements OnPullListener,
 	Boolean mSyncDone = false;
 	HashMap<String, String> mStates = new HashMap<String, String>();
 	Integer mLastPosition = -1;
-	Integer mLimit = 3;
+	Integer mLimit = 5;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -142,35 +144,40 @@ public class Sales extends BaseFragment implements OnPullListener,
 					if (db().isEmptyTable() && !mSyncDone) {
 						scope.main().requestSync(SalesProvider.AUTHORITY);
 					}
-					mListRecords.clear();
+					// mListRecords.clear();
 					OModel model = db();
 					if (mOffset == 0)
 						mListRecords.clear();
+					String where = null, args[] = null;
 					switch (mCurrentKey) {
 					case Quotation:
-						mListRecords.addAll(db().select(
-								"state = ? or state = ?",
-								new String[] { "draft", "cancel" }));
-						mListRecords.addAll(model
-								.setLimit(mLimit)
-								.setOffset(mOffset)
-								.select("state = ? or state = ?",
-										new String[] { "draft", "cancel" }));
+						// mListRecords.addAll(db().select(
+						// "state = ? or state = ?",
+						// new String[] { "draft", "cancel" }));
+						// mListRecords.addAll(model
+						// .setLimit(mLimit)
+						// .setOffset(mOffset)
+						// .select("state = ? or state = ?",
+						// new String[] { "draft", "cancel" }));
+						where = "state = ? or state = ?";
+						args = new String[] { "draft", "cancel" };
 						break;
 					case Sale_order:
-						mListRecords.addAll(db().select(
-								"state = ? or state = ? or state = ?",
-								new String[] { "manual", "progress", "done" }));
-						mListRecords.addAll(model
-								.setLimit(mLimit)
-								.setOffset(mOffset)
-								.select("state = ? or state = ? or state = ?",
-										new String[] { "manual", "progress",
-												"done" }));
+						// mListRecords.addAll(db().select(
+						// "state = ? or state = ? or state = ?",
+						// new String[] { "manual", "progress", "done" }));
+						// mListRecords.addAll(model
+						// .setLimit(mLimit)
+						// .setOffset(mOffset)
+						// .select("state = ? or state = ? or state = ?",
+						// new String[] { "manual", "progress",
+						// "done" }));
+						where = "state = ? or state = ? or state = ?";
+						args = new String[] { "manual", "progress", "done" };
 						break;
 					}
-					// mListRecords.addAll(model.setLimit(mLimit)
-					// .setOffset(mOffset).select());
+					mListRecords.addAll(model.setLimit(mLimit)
+							.setOffset(mOffset).select(where, args));
 					mListControl.setRecordOffset(model.getNextOffset());
 				}
 			});
@@ -188,7 +195,7 @@ public class Sales extends BaseFragment implements OnPullListener,
 				mListControl.setCustomView(R.layout.sale_custom_layout);
 				break;
 			}
-			if(mListRecords.size()>0)
+			if (mListRecords.size() > 0)
 				mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
@@ -246,7 +253,12 @@ public class Sales extends BaseFragment implements OnPullListener,
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
 		inflater.inflate(R.menu.menu_sale, menu);
+		SearchView mSearchView = (SearchView) menu.findItem(
+				R.id.menu_sale_search).getActionView();
+		if (mListControl != null)
+			mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
 	}
 
 	@Override
@@ -268,12 +280,14 @@ public class Sales extends BaseFragment implements OnPullListener,
 		if (mDataLoader != null) {
 			mDataLoader.cancel(true);
 		}
-		mDataLoader = new DataLoader(offset);
-		mDataLoader.execute();
+		if (mListRecords.size() == offset) {
+			mDataLoader = new DataLoader(offset);
+			mDataLoader.execute();
+		}
 	}
 
 	@Override
 	public Boolean showLoader() {
-		return true;
+		return false;
 	}
 }
