@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import odoo.controls.OList;
+import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
@@ -22,6 +23,7 @@ import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -31,7 +33,7 @@ import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
 public class Sales extends BaseFragment implements OnPullListener,
-		OnRowClickListener {
+		OnRowClickListener, OnListBottomReachedListener {
 
 	public static final String TAG = Sales.class.getSimpleName();
 
@@ -47,6 +49,8 @@ public class Sales extends BaseFragment implements OnPullListener,
 	Keys mCurrentKey = Keys.Quotation;
 	Boolean mSyncDone = false;
 	HashMap<String, String> mStates = new HashMap<String, String>();
+	Integer mLastPosition = -1;
+	Integer mLimit = 3;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -79,9 +83,13 @@ public class Sales extends BaseFragment implements OnPullListener,
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
+		mListControl.setOnListBottomReachedListener(this);
+		mListControl.setRecordLimit(mLimit);
 		// mListControl.setOnRowClickListener(this);
-		mDataLoader = new DataLoader();
-		mDataLoader.execute();
+		if (mLastPosition == -1) {
+			mDataLoader = new DataLoader(0);
+			mDataLoader.execute();
+		}
 	}
 
 	private void checkArguments() {
@@ -119,6 +127,11 @@ public class Sales extends BaseFragment implements OnPullListener,
 	}
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
+		Integer mOffset = 0;
+
+		public DataLoader(Integer offset) {
+			mOffset = offset;
+		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -130,19 +143,35 @@ public class Sales extends BaseFragment implements OnPullListener,
 						scope.main().requestSync(SalesProvider.AUTHORITY);
 					}
 					mListRecords.clear();
-
+					OModel model = db();
+					if (mOffset == 0)
+						mListRecords.clear();
 					switch (mCurrentKey) {
 					case Quotation:
 						mListRecords.addAll(db().select(
 								"state = ? or state = ?",
 								new String[] { "draft", "cancel" }));
+						mListRecords.addAll(model
+								.setLimit(mLimit)
+								.setOffset(mOffset)
+								.select("state = ? or state = ?",
+										new String[] { "draft", "cancel" }));
 						break;
 					case Sale_order:
 						mListRecords.addAll(db().select(
 								"state = ? or state = ? or state = ?",
 								new String[] { "manual", "progress", "done" }));
+						mListRecords.addAll(model
+								.setLimit(mLimit)
+								.setOffset(mOffset)
+								.select("state = ? or state = ? or state = ?",
+										new String[] { "manual", "progress",
+												"done" }));
 						break;
 					}
+					// mListRecords.addAll(model.setLimit(mLimit)
+					// .setOffset(mOffset).select());
+					mListControl.setRecordOffset(model.getNextOffset());
 				}
 			});
 			return null;
@@ -159,7 +188,8 @@ public class Sales extends BaseFragment implements OnPullListener,
 				mListControl.setCustomView(R.layout.sale_custom_layout);
 				break;
 			}
-			mListControl.initListControl(mListRecords);
+			if(mListRecords.size()>0)
+				mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
 	}
@@ -190,7 +220,7 @@ public class Sales extends BaseFragment implements OnPullListener,
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
-			mDataLoader = new DataLoader();
+			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 			mSyncDone = true;
 		}
@@ -231,5 +261,19 @@ public class Sales extends BaseFragment implements OnPullListener,
 			break;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public void onBottomReached(Integer limit, Integer offset) {
+		if (mDataLoader != null) {
+			mDataLoader.cancel(true);
+		}
+		mDataLoader = new DataLoader(offset);
+		mDataLoader.execute();
+	}
+
+	@Override
+	public Boolean showLoader() {
+		return true;
 	}
 }

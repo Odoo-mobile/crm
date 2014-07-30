@@ -38,10 +38,10 @@ public class SalesService extends OService implements OServiceListener {
 			if (sync.syncWithServer())
 				context.sendBroadcast(intent);
 
-			ResCurrency dbRes = new ResCurrency(context);
-			sync = dbRes.getSyncHelper();
-			if (sync.syncWithServer())
-				context.sendBroadcast(intent);
+//			ResCurrency dbRes = new ResCurrency(context);
+//			sync = dbRes.getSyncHelper();
+//			if (sync.syncWithServer())
+//				context.sendBroadcast(intent);
 
 		} catch (Exception e) {
 			e.printStackTrace();

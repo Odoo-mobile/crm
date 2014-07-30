@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.OList;
+import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import com.odoo.addons.res.providers.res.ResProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
+import com.odoo.orm.OModel;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -27,7 +30,7 @@ import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
 public class ResPartners extends BaseFragment implements OnPullListener,
-		OnRowClickListener {
+		OnRowClickListener, OnListBottomReachedListener {
 
 	public static final String TAG = ResPartners.class.getSimpleName();
 
@@ -42,6 +45,8 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	DataLoader mDataLoader = null;
 	// Keys mCurrentKey = Keys.Customer;
 	Boolean mSyncDone = false;
+	Integer mLastPosition = -1;
+	Integer mLimit = 5;
 
 	@Override
 	public Object databaseHelper(Context context) {
@@ -64,8 +69,12 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		mTouchListener = scope.main().getTouchAttacher();
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
-		mDataLoader = new DataLoader();
-		mDataLoader.execute();
+		mListControl.setOnListBottomReachedListener(this);
+		mListControl.setRecordLimit(mLimit);
+		if (mLastPosition == -1) {
+			mDataLoader = new DataLoader(0);
+			mDataLoader.execute();
+		}
 	}
 
 	// private void checkArguments() {
@@ -74,6 +83,11 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	// }
 
 	class DataLoader extends AsyncTask<Void, Void, Void> {
+		Integer mOffset = 0;
+
+		public DataLoader(Integer offset) {
+			mOffset = offset;
+		}
 
 		@Override
 		protected Void doInBackground(Void... params) {
@@ -85,11 +99,17 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 						scope.main().requestSync(ResProvider.AUTHORITY);
 					}
 					mListRecords.clear();
+					OModel model = db();
+					if (mOffset == 0)
+						mListRecords.clear();
 					// switch (mCurrentKey) {
 					// case Customer:
 					mListRecords.addAll(db().select());
 					// break;
 					// }
+					mListRecords.addAll(model.setLimit(mLimit)
+							.setOffset(mOffset).select());
+					mListControl.setRecordOffset(model.getNextOffset());
 				}
 			});
 			return null;
@@ -103,7 +123,8 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 			mListControl.setCustomView(R.layout.crm_custom_customer_layout);
 			// break;
 			// }
-			mListControl.initListControl(mListRecords);
+			if (mListRecords.size() > 0)
+				mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
 		}
 	}
@@ -134,7 +155,7 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
-			mDataLoader = new DataLoader();
+			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 			mSyncDone = true;
 		}
@@ -177,5 +198,19 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		bundle.putAll(row.getPrimaryBundleData());
 		note.setArguments(bundle);
 		startFragment(note, true);
+	}
+
+	@Override
+	public void onBottomReached(Integer limit, Integer offset) {
+		if (mDataLoader != null) {
+			mDataLoader.cancel(true);
+		}
+		mDataLoader = new DataLoader(offset);
+		mDataLoader.execute();
+	}
+
+	@Override
+	public Boolean showLoader() {
+		return true;
 	}
 }
