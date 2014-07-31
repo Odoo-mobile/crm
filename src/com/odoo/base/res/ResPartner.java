@@ -47,7 +47,7 @@ public class ResPartner extends OModel {
 	OColumn mobile = new OColumn("Mobile", OText.class);
 	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
-			RelationType.ManyToOne);
+			RelationType.ManyToOne).addDomain("is_company", "=", true);
 
 	public ResPartner(Context context) {
 		super(context, "res.partner");
