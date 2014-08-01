@@ -25,13 +25,13 @@
             android:id="@+id/imgConfirmCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_action_user" />
+            android:background="@drawable/ic_action_exclamation_mark" />
 
         <ImageView
             android:id="@+id/imgCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_action_user" />
+            android:background="@drawable/ic_action_exclamation_mark" />
     </LinearLayout>
 
     <LinearLayout

@@ -10,8 +10,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.addons.sale.model.SaleOrder;
-import com.odoo.base.res.ResCurrency;
-import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.service.OService;

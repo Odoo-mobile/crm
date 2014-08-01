@@ -6,13 +6,13 @@ import java.util.List;
 
 import odoo.controls.OList;
 import odoo.controls.OList.OnListBottomReachedListener;
+import odoo.controls.OList.OnListRowViewClickListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,12 +20,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OValues;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
 import com.odoo.support.BaseFragment;
@@ -35,7 +37,8 @@ import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
 public class Sales extends BaseFragment implements OnPullListener,
-		OnRowClickListener, OnListBottomReachedListener {
+		OnRowClickListener, OnListBottomReachedListener,
+		OnListRowViewClickListener {
 
 	public static final String TAG = Sales.class.getSimpleName();
 
@@ -86,6 +89,8 @@ public class Sales extends BaseFragment implements OnPullListener,
 		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
 		mListControl.setOnListBottomReachedListener(this);
+		mListControl.setOnListRowViewClickListener(R.id.imgCancel, this);
+		mListControl.setOnListRowViewClickListener(R.id.imgConfirmCreate, this);
 		mListControl.setRecordLimit(mLimit);
 		// mListControl.setOnRowClickListener(this);
 		if (mLastPosition == -1) {
@@ -289,5 +294,41 @@ public class Sales extends BaseFragment implements OnPullListener,
 	@Override
 	public Boolean showLoader() {
 		return false;
+	}
+
+	@Override
+	public void onRowViewClick(ViewGroup view_group, View view, int position,
+			ODataRow row) {
+		OValues values = null;
+		switch (view.getId()) {
+		case R.id.imgCancel:
+			if (row.getString("state").equals("cancel"))
+				Toast.makeText(getActivity(), "new Copy of Quotations",
+						Toast.LENGTH_SHORT).show();
+			else {
+				values = new OValues();
+				values.put("state", "cancel");
+				db().update(values, row.getInt("local_id"));
+				Toast.makeText(getActivity(), "Cancel", Toast.LENGTH_SHORT)
+						.show();
+			}
+			break;
+		case R.id.imgConfirmCreate:
+			if (mCurrentKey.equals(Keys.Quotation)
+					&& row.getString("state").equals("cancel"))
+				Toast.makeText(getActivity(), "new Copy of Quotations",
+						Toast.LENGTH_SHORT).show();
+			else {
+				if (Double.parseDouble(row.getString("amount_total")) > 0) {
+					values = new OValues();
+					values.put("state", "manual");
+					new SaleOrder(getActivity()).update(values,
+							row.getInt("local_id"));
+				} else
+					Toast.makeText(getActivity(), "No Order Line",
+							Toast.LENGTH_SHORT).show();
+				break;
+			}
+		}
 	}
 }

@@ -21,7 +21,7 @@ public class SaleOrder extends OModel {
 	OColumn name = new OColumn("name", OVarchar.class, 64);
 	OColumn date_order = new OColumn("Date", ODateTime.class);
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
-			RelationType.ManyToOne).setRequired(true);
+			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
 			RelationType.ManyToOne);
 	OColumn amount_total = new OColumn("Total", OInteger.class);
@@ -38,7 +38,7 @@ public class SaleOrder extends OModel {
 	OColumn state = new OColumn("status", OVarchar.class, 10)
 			.setDefault("draft");
 	OColumn currency_id = new OColumn("currency", ResCurrency.class,
-			RelationType.ManyToOne).setRequired(true);
+			RelationType.ManyToOne);
 	OColumn order_line = new OColumn("Order Lines", SalesOrderLine.class,
 			RelationType.OneToMany).setRelatedColumn("order_id");
 

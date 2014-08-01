@@ -5,13 +5,13 @@ import java.util.List;
 import odoo.controls.OForm;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.odoo.addons.sale.Sales.Keys;
 import com.odoo.addons.sale.model.SaleOrder;
@@ -29,10 +29,8 @@ public class QuotationsDetail extends BaseFragment {
 	Context mContext = null;
 	private Integer mId = null;
 	private OForm mForm = null;
-	private Boolean mEditMode = false;
 	private ODataRow mRecord = null;
 	private ODataRow mRecordLine = null;
-	Menu mMenu = null;
 	private Keys mKey = null;
 
 	@Override
@@ -42,8 +40,6 @@ public class QuotationsDetail extends BaseFragment {
 		mContext = getActivity();
 		setHasOptionsMenu(true);
 		mView = inflater.inflate(R.layout.quotations_detail, container, false);
-		mContext = getActivity();
-
 		return mView;
 	}
 
@@ -58,12 +54,11 @@ public class QuotationsDetail extends BaseFragment {
 		mKey = Keys.valueOf(args.getString("key"));
 		if (args.containsKey(OColumn.ROW_ID)) {
 			mId = args.getInt("local_id");
-		} else
-			mEditMode = true;
+		}
+
 	}
 
 	private void init() {
-		updateMenu(mEditMode);
 		OControls.setVisible(mView, R.id.odooFormQuotations);
 
 		mForm = (OForm) mView.findViewById(R.id.odooFormQuotations);
@@ -72,45 +67,54 @@ public class QuotationsDetail extends BaseFragment {
 			mRecord = db().select(mId);
 			mForm.initForm(mRecord);
 			mRecordLine = saleOrderLine.select(mId);
+			if (mRecord.getString("state").equals("draft"))
+				mForm.setEditable(true);
+			else
+				mForm.setEditable(false);
 		} else {
 			mForm.setModel(db());
-			mForm.setEditable(mEditMode);
+			mForm.setEditable(true);
 		}
-	}
 
-	private void updateMenu(boolean edit_mode) {
-		mMenu.findItem(R.id.menu_sales_detail_save).setVisible(edit_mode);
-		mMenu.findItem(R.id.menu_sales_detail_edit).setVisible(!edit_mode);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_sales_detail_edit:
-			mEditMode = !mEditMode;
-			updateMenu(mEditMode);
-			mForm.setEditable(mEditMode);
-			break;
+
 		case R.id.menu_sales_detail_save:
-			mEditMode = false;
-			OValues values = mForm.getFormValues();
-			if (values != null) {
-				updateMenu(mEditMode);
-				if (mId != null) {
-					db().update(values, mId);
-				} else {
-					db().create(values);
-				}
-				getActivity().getSupportFragmentManager().popBackStack();
+			// OValues values = mForm.getFormValues();
+			// if (values != null) {
+			OValues values = new OValues();
+			if (mId != null && mRecord.getString("state").equals("draft")) {
+				values = mForm.getFormValues();
+				db().update(values, mId);
+			} else if (mId == null) {
+				values = new OValues();
+				if (mForm.getFormValues().getString("date_order") == "false")
+					values.put("date_order", "false");
+				else
+					values.put("date_order",
+							mForm.getFormValues().getString("date_order"));
+				values.put("name", "new");
+				values.put("partner_id",
+						mForm.getFormValues().getInt("partner_id"));
+				values.put("is_dirty", true);
+				values.put("id", 0);
+				values.put("state", "draft");
+				values.put("currency_id", 1);
+				db().create(values);
 			}
+			// }
 			break;
 		case R.id.menu_sales_detail_delete:
-			if (mId != null)
+			if (mId != null && mKey.toString() == "Quotation")
 				db().delete(mId);
-			Log.e("Delete", mId + "");
-			getActivity().getSupportFragmentManager().popBackStack();
+			else
+				Toast.makeText(mContext, "No Delete", Toast.LENGTH_LONG).show();
 			break;
 		}
+		getActivity().getSupportFragmentManager().popBackStack();
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -118,8 +122,10 @@ public class QuotationsDetail extends BaseFragment {
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
 		inflater.inflate(R.menu.menu_quotations_detail, menu);
-		mMenu = menu;
-		updateMenu(mEditMode);
+		if (mKey.toString() == "Quotation")
+			menu.findItem(R.id.menu_sales_detail_delete).setVisible(true);
+		else
+			menu.findItem(R.id.menu_sales_detail_delete).setVisible(false);
 	}
 
 	@Override

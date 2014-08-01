@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 
 import com.odoo.base.res.ResPartner;
 import com.odoo.crm.R;
+import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.BaseFragment;
 import com.odoo.util.OControls;
@@ -20,7 +21,6 @@ public class ResDetail extends BaseFragment {
 	private View mView = null;
 	Context mContext = null;
 	private Integer mId = null;
-	private Boolean mLocalRecord = false;
 	private OForm mForm = null;
 	private Boolean mEditMode = false;
 	private ODataRow mRecord = null;
@@ -46,11 +46,7 @@ public class ResDetail extends BaseFragment {
 	private void initArgs() {
 		Bundle args = getArguments();
 		if (args.containsKey("id")) {
-			mLocalRecord = args.getBoolean("local_record");
-			if (mLocalRecord) {
-				mId = args.getInt("local_id");
-			} else
-				mId = args.getInt("id");
+			mId = args.getInt(OColumn.ROW_ID);
 		} else
 			mEditMode = true;
 	}

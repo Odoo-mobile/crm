@@ -21,9 +21,13 @@ package com.odoo.base.res;
 
 import android.content.Context;
 
+import com.odoo.addons.crm.model.CRMLead;
+import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.OText;
@@ -33,6 +37,7 @@ import com.odoo.orm.types.OVarchar;
  * The Class Res_PartnerDBHelper.
  */
 public class ResPartner extends OModel {
+	Context mContext = null;
 
 	OColumn name = new OColumn("Name", OText.class);
 	OColumn is_company = new OColumn("Is Company", OBoolean.class)
@@ -48,9 +53,34 @@ public class ResPartner extends OModel {
 	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
+	@Functional(method = "getSaleOrdersCount")
+	OColumn salesOrdersCount = new OColumn("Total Sale Orders", OVarchar.class);
+	@Functional(method = "getcrmLeadCount")
+	OColumn crmLeadCount = new OColumn("Total Opportunities", OVarchar.class);
 
 	public ResPartner(Context context) {
 		super(context, "res.partner");
+		mContext = context;
+	}
+
+	public String getSaleOrdersCount(ODataRow row) {
+		SaleOrder sale = new SaleOrder(mContext);
+		int count = sale.count("partner_id = ? ",
+				new Object[] { row.getInt(OColumn.ROW_ID) });
+		if (count > 0)
+			return count + " Sales";
+		else
+			return "";
+	}
+
+	public String getcrmLeadCount(ODataRow row) {
+		CRMLead sale = new CRMLead(mContext);
+		int count = sale.count("partner_id = ? ",
+				new Object[] { row.getInt(OColumn.ROW_ID) });
+		if (count > 0)
+			return count + " Opportunities";
+		else
+			return "";
 	}
 
 }

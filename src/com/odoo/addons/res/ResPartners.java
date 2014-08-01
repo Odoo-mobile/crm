@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.OList;
+import odoo.controls.OList.BeforeListRowCreateListener;
 import odoo.controls.OList.OnListBottomReachedListener;
+import odoo.controls.OList.OnListRowViewClickListener;
 import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,8 @@ import com.openerp.OETouchListener;
 import com.openerp.OETouchListener.OnPullListener;
 
 public class ResPartners extends BaseFragment implements OnPullListener,
-		OnRowClickListener, OnListBottomReachedListener {
+		OnRowClickListener, OnListBottomReachedListener,
+		BeforeListRowCreateListener, OnListRowViewClickListener {
 
 	public static final String TAG = ResPartners.class.getSimpleName();
 
@@ -72,6 +74,11 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		mListControl.setOnRowClickListener(this);
 		mListControl.setOnListBottomReachedListener(this);
 		mListControl.setRecordLimit(mLimit);
+		mListControl.setBeforeListRowCreateListener(this);
+		mListControl.setOnListRowViewClickListener(R.id.imgMail, this);
+		mListControl.setOnListRowViewClickListener(R.id.imgCall, this);
+		mListControl.setOnListRowViewClickListener(R.id.oCrmLeadCount, this);
+		mListControl.setOnListRowViewClickListener(R.id.oSaleOrderCount, this);
 		if (mLastPosition == -1) {
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
@@ -99,21 +106,27 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 					if (db().isEmptyTable() && !mSyncDone) {
 						scope.main().requestSync(ResProvider.AUTHORITY);
 					}
-//					mListRecords.clear();
+					// mListRecords.clear();
 					OModel model = db();
 					if (mOffset == 0)
 						mListRecords.clear();
 					// switch (mCurrentKey) {
 					// case Customer:
-//					mListRecords.addAll(db().select());
+					// mListRecords.addAll(db().select());
 					// break;
 					// }
 					List<ODataRow> list = model.setLimit(mLimit)
 							.setOffset(mOffset).select();
-					if(list.size()>0)
+					if (list.size() > 0)
 						mListRecords.addAll(list);
 					mListControl.setRecordOffset(model.getNextOffset());
-					OLog.log("Size"+mListRecords.size() +" :  "+list.size());
+
+					/*
+					 * int leads = crmDB.count("partner_id = ? and type = ?",
+					 * new String[] { row.getString("id"), "lead" }); int
+					 * opportunity = crmDB.count("partner_id = ? and type = ?",
+					 * new String[] { row.getString("id"), "opportunity" });
+					 */
 				}
 			});
 			return null;
@@ -209,14 +222,47 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		if (mDataLoader != null) {
 			mDataLoader.cancel(true);
 		}
-//		if (mListRecords.size() == offset) {
-			mDataLoader = new DataLoader(offset);
-			mDataLoader.execute();
-//		}
+		// if (mListRecords.size() == offset) {
+		mDataLoader = new DataLoader(offset);
+		mDataLoader.execute();
+		// }
 	}
 
 	@Override
 	public Boolean showLoader() {
 		return false;
+	}
+
+	@Override
+	public void beforeListRowCreate(int position, ODataRow row, View view) {
+		OControls.toggleViewVisibility(view, R.id.oSaleOrderCount, !row
+				.getString("salesOrdersCount").equals(""));
+		OControls.toggleViewVisibility(view, R.id.oCrmLeadCount, !row
+				.getString("crmLeadCount").equals(""));
+	}
+
+	@Override
+	public void onRowViewClick(ViewGroup view_group, View view, int position,
+			ODataRow row) {
+		switch (view.getId()) {
+		case R.id.oSaleOrderCount:
+			OLog.log("Sale");
+			break;
+		case R.id.oCrmLeadCount:
+			OLog.log("Crm");
+			break;
+		case R.id.imgCall:
+			if (!row.getString("phone").equals(false))
+				OLog.log("Call");
+			else
+				OLog.log("Not Call");
+			break;
+		case R.id.imgMail:
+			if (!row.getString("email").equals(false))
+				OLog.log("Mail");
+			else
+				OLog.log("Note Mail");
+			break;
+		}
 	}
 }
