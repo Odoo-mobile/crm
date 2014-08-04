@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.SearchView;
 
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
@@ -190,7 +191,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_crm_detail_create) {
-			CrmDeatail crmDetail = new CrmDeatail();
+			CrmDetail crmDetail = new CrmDetail();
 			Bundle bundle = new Bundle();
 			bundle.putString("key", mCurrentKey.toString());
 			crmDetail.setArguments(bundle);
@@ -203,11 +204,14 @@ public class CRM extends BaseFragment implements OnPullListener,
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
 		inflater.inflate(R.menu.menu_crm, menu);
+		SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+		if(mListControl!=null)
+				mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
 	}
 
 	@Override
 	public void onRowItemClick(int position, View view, ODataRow row) {
-		CrmDeatail crmDetail = new CrmDeatail();
+		CrmDetail crmDetail = new CrmDetail();
 		Bundle bundle = new Bundle();
 		bundle.putString("key", mCurrentKey.toString());
 		bundle.putAll(row.getPrimaryBundleData());

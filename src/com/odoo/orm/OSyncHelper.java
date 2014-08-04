@@ -1,3 +1,21 @@
+/*
+ * Odoo, Open Source Management Solution
+ * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
+ * 
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version
+ * 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http:www.gnu.org/licenses/>
+ * 
+ */
 package com.odoo.orm;
 
 import java.util.ArrayList;
@@ -25,21 +43,57 @@ import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.StringUtils;
 
+/**
+ * The Class OSyncHelper.
+ */
 public class OSyncHelper {
 
+	/** The Constant TAG. */
 	public static final String TAG = OSyncHelper.class.getSimpleName();
 
+	/** The context. */
 	private Context mContext = null;
+
+	/** The user. */
 	private OUser mUser = null;
+
+	/** The model. */
 	private OModel mModel = null;
+
+	/** The odoo. */
 	private Odoo mOdoo = null;
+
+	/** The app. */
 	private App mApp = null;
+
+	/** The relation record list. */
 	private ORelationRecordList mRelationRecordList = new ORelationRecordList();
+
+	/** The finished models. */
 	private List<String> mFinishedModels = new ArrayList<String>();
+
+	/** The finished rel models. */
 	private List<String> mFinishedRelModels = new ArrayList<String>();
+
+	/** The pref. */
 	private PreferenceManager mPref = null;
+
+	/** The affected ids. */
 	private List<Integer> mAffectedIds = new ArrayList<Integer>();
 
+	/** The sync data limit. */
+	private Integer mSyncDataLimit = 0;
+
+	/**
+	 * Instantiates a new o sync helper.
+	 * 
+	 * @param context
+	 *            the context
+	 * @param user
+	 *            the user
+	 * @param model
+	 *            the model
+	 */
 	public OSyncHelper(Context context, OUser user, OModel model) {
 		mContext = context;
 		mUser = user;
@@ -50,24 +104,65 @@ public class OSyncHelper {
 		}
 	}
 
+	/**
+	 * Sync with server.
+	 * 
+	 * @return true, if successful
+	 */
 	public boolean syncWithServer() {
 		return syncWithServer(null);
 	}
 
+	/**
+	 * Sync with server.
+	 * 
+	 * @param domain
+	 *            the domain
+	 * @return true, if successful
+	 */
 	public boolean syncWithServer(ODomain domain) {
 		return syncWithServer(mModel, domain);
 	}
 
+	/**
+	 * Sync with server.
+	 * 
+	 * @param domain
+	 *            the domain
+	 * @param checkForWriteCreateDate
+	 *            the check for write create date
+	 * @return true, if successful
+	 */
 	public boolean syncWithServer(ODomain domain,
 			Boolean checkForWriteCreateDate) {
 		return syncWithServer(mModel, domain, checkForWriteCreateDate);
 	}
 
+	/**
+	 * Sync with server.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param domain
+	 *            the domain
+	 * @return true, if successful
+	 */
 	public boolean syncWithServer(OModel model, ODomain domain) {
 		return syncWithServer(model, domain, true);
 	}
 
-	public boolean syncWithServer(OModel model, ODomain domain,
+	/**
+	 * Sync with server.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param domain_filter
+	 *            the domain_filter
+	 * @param checkForCreateWriteDate
+	 *            the check for create write date
+	 * @return true, if successful
+	 */
+	public boolean syncWithServer(OModel model, ODomain domain_filter,
 			Boolean checkForCreateWriteDate) {
 		Log.v(TAG, "syncWithServer():" + model.getModelName());
 		Log.v(TAG, "User : " + mUser.getAndroidName());
@@ -75,9 +170,8 @@ public class OSyncHelper {
 				|| !checkForCreateWriteDate) {
 			mFinishedModels.add(model.getModelName());
 			try {
-				if (domain == null)
-					domain = new ODomain();
 
+				ODomain domain = new ODomain();
 				// Adding default domain to domain
 				domain.append(model.defaultDomain());
 				if (checkForCreateWriteDate) {
@@ -85,8 +179,17 @@ public class OSyncHelper {
 						// Adding Old data limit
 						mPref = new PreferenceManager(mContext);
 						int data_limit = mPref.getInt("sync_data_limit", 60);
+						List<Integer> ids = model.ids();
+						if (ids.size() > 0 && model.checkForWriteDate()
+								&& !model.isEmptyTable())
+							domain.add("|");
+						if (ids.size() > 0)
+							domain.add("&");
 						domain.add("create_date", ">=",
 								ODate.getDateBefore(data_limit));
+						if (ids.size() > 0)
+							domain.add("id", "not in",
+									new JSONArray(ids.toString()));
 					}
 					// Adding Last sync date comparing with write_date of record
 					if (model.checkForWriteDate() && !model.isEmptyTable()) {
@@ -94,18 +197,31 @@ public class OSyncHelper {
 						domain.add("write_date", ">", last_sync_date);
 					}
 				}
+				if (domain_filter != null)
+					domain.append(domain_filter);
 				JSONObject result = mOdoo.search_read(model.getModelName(),
-						getFields(model), domain.get());
-				if (checkForCreateWriteDate)
+						getFields(model), domain.get(), 0, mSyncDataLimit,
+						null, null);
+				if (checkForCreateWriteDate
+						&& model.checkForLocalLatestUpdate()) {
 					handleResult(model,
 							checkForLocalLatestUpdate(model, result));
-				else
+				} else {
 					handleResult(model, result);
+				}
 				handleRelationRecords(model);
-				createRecordOnserver(model);
-				updateToServer(model);
-				deleteRecordFromServer(model);
-				deleteRecordInLocal(model);
+				// Creating record on server if model allows true
+				if (model.canCreateOnServer())
+					createRecordOnserver(model);
+				// Updating dirty record on server if model allows true
+				if (model.canUpdateToServer())
+					updateToServer(model);
+				// Deleting record from server if model allows true
+				if (model.canDeleteFromServer())
+					deleteRecordFromServer(model);
+				// Deleting record from local if model allows true
+				if (model.canDeleteFromLocal())
+					deleteRecordInLocal(model);
 				return syncFinish(model);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -116,6 +232,12 @@ public class OSyncHelper {
 		return false;
 	}
 
+	/**
+	 * Delete record in local.
+	 * 
+	 * @param model
+	 *            the model
+	 */
 	private void deleteRecordInLocal(OModel model) {
 		try {
 			List<Integer> ids = model.ids();
@@ -142,9 +264,10 @@ public class OSyncHelper {
 	}
 
 	/**
-	 * Check for dirty record in local and update to server
+	 * Check for dirty record in local and update to server.
 	 * 
 	 * @param model
+	 *            the model
 	 */
 	private void updateToServer(OModel model) {
 		try {
@@ -169,7 +292,9 @@ public class OSyncHelper {
 	 * ignoring it.
 	 * 
 	 * @param model
+	 *            the model
 	 * @param result
+	 *            the result
 	 * @return records object, which are new on server or latest updated on
 	 *         server
 	 */
@@ -232,6 +357,14 @@ public class OSyncHelper {
 		return newResult;
 	}
 
+	/**
+	 * Update record on server.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param records
+	 *            the records
+	 */
 	private void updateRecordOnServer(OModel model, List<ODataRow> records) {
 		try {
 			for (ODataRow row : records) {
@@ -249,6 +382,12 @@ public class OSyncHelper {
 		}
 	}
 
+	/**
+	 * Delete record from server.
+	 * 
+	 * @param model
+	 *            the model
+	 */
 	private void deleteRecordFromServer(OModel model) {
 		try {
 			model.checkInActiveRecord(true);
@@ -265,6 +404,12 @@ public class OSyncHelper {
 		}
 	}
 
+	/**
+	 * Creates the record onserver.
+	 * 
+	 * @param model
+	 *            the model
+	 */
 	private void createRecordOnserver(OModel model) {
 		try {
 			for (ODataRow row : model.select("id = ? ", new Object[] { 0 })) {
@@ -286,6 +431,15 @@ public class OSyncHelper {
 		}
 	}
 
+	/**
+	 * Creates the json values.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param row
+	 *            the row
+	 * @return the JSON object
+	 */
 	private JSONObject createJSONValues(OModel model, ODataRow row) {
 		JSONObject values = null;
 		try {
@@ -306,8 +460,10 @@ public class OSyncHelper {
 							values.put(col.getName(), m2o.getInt("id"));
 						break;
 					case OneToMany:
+						// FIXME : ?
 						break;
 					case ManyToMany:
+						// FIXME : ?
 						break;
 					}
 				}
@@ -318,6 +474,15 @@ public class OSyncHelper {
 		return values;
 	}
 
+	/**
+	 * Sync with method.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param args
+	 *            the args
+	 * @return true, if successful
+	 */
 	public boolean syncWithMethod(String method, OArguments args) {
 		boolean synced = false;
 		try {
@@ -331,6 +496,13 @@ public class OSyncHelper {
 		return synced;
 	}
 
+	/**
+	 * Gets the last sync date.
+	 * 
+	 * @param model
+	 *            the model
+	 * @return the last sync date
+	 */
 	public String getLastSyncDate(OModel model) {
 		String last_sync_date = "false";
 		IrModel irModel = new IrModel(mContext);
@@ -345,6 +517,12 @@ public class OSyncHelper {
 
 	}
 
+	/**
+	 * Handle relation records.
+	 * 
+	 * @param model
+	 *            the model
+	 */
 	private void handleRelationRecords(OModel model) {
 
 		List<String> keys = new ArrayList<String>();
@@ -354,7 +532,9 @@ public class OSyncHelper {
 				mFinishedRelModels.add(key);
 				ORelationRecords rel = mRelationRecordList.get(key);
 				OModel base_model = rel.getBaseModel();
+				base_model.setSyncingDataFlag(true);
 				OModel rel_model = rel.getRelModel();
+				rel_model.setSyncingDataFlag(true);
 				ODomain rel_domain = new ODomain();
 				boolean syncFlag = false;
 				if (rel.getRelIds().size() > 0) {
@@ -412,6 +592,13 @@ public class OSyncHelper {
 		}
 	}
 
+	/**
+	 * Sync finish.
+	 * 
+	 * @param model
+	 *            the model
+	 * @return true, if successful
+	 */
 	private boolean syncFinish(OModel model) {
 		String finish_date_time = ODate.getDate();
 		Log.v(TAG, model.getModelName() + " sync finished at "
@@ -424,6 +611,17 @@ public class OSyncHelper {
 		return true;
 	}
 
+	/**
+	 * Creates the value row.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param columns
+	 *            the columns
+	 * @param original_record
+	 *            the original_record
+	 * @return the o values
+	 */
 	private OValues createValueRow(OModel model, List<OColumn> columns,
 			JSONObject original_record) {
 		OValues values = new OValues();
@@ -502,7 +700,6 @@ public class OSyncHelper {
 						mrel_record.setRefColumn(column.getName());
 						mrel_record.setRelationType(column.getRelationType());
 						// Creating relation ids list for relation model
-						List<Integer> mRelationIds = new ArrayList<Integer>();
 						mRelationRecordList.add(rel_key, mrel_record);
 						break;
 					case OneToMany:
@@ -541,6 +738,14 @@ public class OSyncHelper {
 		return values;
 	}
 
+	/**
+	 * Handle result.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param result
+	 *            the result
+	 */
 	private void handleResult(OModel model, JSONObject result) {
 		try {
 			JSONArray records = (result.has("result")) ? result
@@ -561,10 +766,22 @@ public class OSyncHelper {
 		}
 	}
 
+	/**
+	 * Gets the affected ids.
+	 * 
+	 * @return the affected ids
+	 */
 	public List<Integer> getAffectedIds() {
 		return mAffectedIds;
 	}
 
+	/**
+	 * Gets the fields.
+	 * 
+	 * @param model
+	 *            the model
+	 * @return the fields
+	 */
 	public JSONObject getFields(OModel model) {
 		JSONObject fields = new JSONObject();
 		try {
@@ -576,6 +793,13 @@ public class OSyncHelper {
 		return fields;
 	}
 
+	/**
+	 * Model info.
+	 * 
+	 * @param models
+	 *            the models
+	 * @return the list
+	 */
 	public List<OValues> modelInfo(List<String> models) {
 		List<OValues> models_list = new ArrayList<OValues>();
 		try {
@@ -596,6 +820,13 @@ public class OSyncHelper {
 		return models_list;
 	}
 
+	/**
+	 * Gets the context.
+	 * 
+	 * @param obj
+	 *            the obj
+	 * @return the context
+	 */
 	public JSONObject getContext(JSONObject obj) {
 		try {
 			return mOdoo.updateContext((obj != null) ? obj : new JSONObject());
@@ -605,6 +836,15 @@ public class OSyncHelper {
 		}
 	}
 
+	/**
+	 * Gets the write date.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param ids
+	 *            the ids
+	 * @return the write date
+	 */
 	private HashMap<String, String> getWriteDate(OModel model, List<Integer> ids) {
 		HashMap<String, String> map = new HashMap<String, String>();
 		try {
@@ -634,6 +874,27 @@ public class OSyncHelper {
 		return map;
 	}
 
+	/**
+	 * Sync data limit.
+	 * 
+	 * @param dataLimit
+	 *            the data limit
+	 * @return the o sync helper
+	 */
+	public OSyncHelper syncDataLimit(Integer dataLimit) {
+		mSyncDataLimit = dataLimit;
+		return this;
+	}
+
+	/**
+	 * Perm_read.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param ids
+	 *            the ids
+	 * @return the JSON object
+	 */
 	private JSONObject perm_read(OModel model, List<Integer> ids) {
 		try {
 			return mOdoo.perm_read(model.getModelName(), ids);
@@ -641,5 +902,63 @@ public class OSyncHelper {
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * Call method.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param args
+	 *            the args
+	 * @return the object
+	 */
+	public Object callMethod(String method, OArguments args) {
+		return callMethod(method, args, null, null);
+	}
+
+	/**
+	 * Call method.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param args
+	 *            the args
+	 * @param context
+	 *            the context
+	 * @return the object
+	 */
+	public Object callMethod(String method, OArguments args, JSONObject context) {
+		return callMethod(method, args, context, null);
+	}
+
+	/**
+	 * Call method.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param args
+	 *            the args
+	 * @param context
+	 *            the context
+	 * @param kwargs
+	 *            the kwargs
+	 * @return the object
+	 */
+	public Object callMethod(String method, OArguments args,
+			JSONObject context, JSONObject kwargs) {
+		try {
+			if (kwargs == null)
+				kwargs = new JSONObject();
+			if (context != null) {
+				args.add(mOdoo.updateContext(context));
+			}
+			JSONObject result = mOdoo.call_kw(mModel.getModelName(), method,
+					args.getArray(), kwargs);
+			return result.has("result");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }

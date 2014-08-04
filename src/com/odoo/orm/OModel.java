@@ -62,32 +62,41 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	/** The Constant TAG. */
 	public static final String TAG = OModel.class.getSimpleName();
 
-	/** The m context. */
+	/** The context. */
 	private Context mContext = null;
 
 	/** The _name. */
 	private String _name = null;
 
-	/** The m columns. */
+	/** The columns. */
 	private List<OColumn> mColumns = new ArrayList<OColumn>();
 
-	/** The m functional columns. */
+	/** The functional columns. */
 	private List<OColumn> mFunctionalColumns = new ArrayList<OColumn>();
 
-	/** The m user. */
+	/** The user. */
 	private OUser mUser = null;
 
-	/** The m sync helper. */
+	/** The sync helper. */
 	private OSyncHelper mSyncHelper = null;
 
-	/** The m check in active record. */
+	/** The syncing data. */
+	private Boolean mSyncingData = false;
+
+	/** The check in active record. */
 	private Boolean mCheckInActiveRecord = false;
 
-	/** The m app. */
+	/** The app. */
 	private App mApp = null;
 
-	/** The m odoo version. */
+	/** The odoo version. */
 	private OdooVersion mOdooVersion = null;
+
+	/** The offset. */
+	private Integer mOffset = 0;
+
+	/** The limit. */
+	private Integer mLimit = -1;
 
 	/**
 	 * The Enum Command.
@@ -290,10 +299,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			createFieldList();
 		for (String key : mDeclaredFields.keySet()) {
 			OColumn column = getColumn(key);
-			if (column.isFunctionalColumn()) {
-				mFunctionalColumns.add(column);
-			} else {
-				mColumns.add(column);
+			if (column != null) {
+				if (column.isFunctionalColumn()) {
+					mFunctionalColumns.add(column);
+				} else {
+					mColumns.add(column);
+				}
 			}
 		}
 	}
@@ -312,6 +323,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			if (field != null) {
 				field.setAccessible(true);
 				column = (OColumn) field.get(this);
+				column.setName(field.getName());
 				Boolean validField = (column.isAccessible()) ? validateFieldVersion(field)
 						: true;
 				if (validField) {
@@ -320,7 +332,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					if (method != null) {
 						column.setFunctionalMethod(method);
 					}
-				}
+				} else
+					return null;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -379,7 +392,6 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			if (annotations.length > 0) {
 				int versions = 0;
 				for (Annotation annotation : annotations) {
-					versions = 0;
 					if (annotation.annotationType().getDeclaringClass()
 							.isAssignableFrom(Odoo.api.class)) {
 						switch (mOdooVersion.getVersion_number()) {
@@ -522,9 +534,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			String groupBy, String having, String orderBy) {
 		List<ODataRow> records = new ArrayList<ODataRow>();
 		SQLiteDatabase db = getReadableDatabase();
+		String limit = null;
+		if (mLimit > 0) {
+			limit = mOffset + ", " + mLimit;
+		}
 		Cursor cr = db.query(getTableName(), new String[] { "*" },
 				getWhereClause(where), getWhereArgs(where, whereArgs), groupBy,
-				having, orderBy);
+				having, orderBy, limit);
 		if (cr.moveToFirst()) {
 			do {
 				ODataRow row = new ODataRow();
@@ -551,10 +567,19 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 						}
 					}
 				}
-				if (row.getInt("id") == 0
-						|| row.getString("id").equals("false")) {
-					row.put("id", 0);
+				/*
+				 * Adding functional column values to record values if not
+				 * syncing
+				 */
+				if (!mSyncingData) {
+					for (OColumn col : mFunctionalColumns) {
+						row.put(col.getName(),
+								getFunctionalMethodValue(col, row));
+					}
 				}
+				if (row.getInt("id") == 0
+						|| row.getString("id").equals("false"))
+					row.put("id", 0);
 				records.add(row);
 			} while (cr.moveToNext());
 		}
@@ -1021,7 +1046,20 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	public OSyncHelper getSyncHelper() {
 		if (mSyncHelper == null)
 			mSyncHelper = new OSyncHelper(mContext, mUser, this);
+		mSyncingData = true;
 		return mSyncHelper;
+	}
+
+	/**
+	 * Sets the syncing data flag.
+	 * 
+	 * @param syncingData
+	 *            the syncing data
+	 * @return the o model
+	 */
+	public OModel setSyncingDataFlag(Boolean syncingData) {
+		mSyncingData = syncingData;
+		return this;
 	}
 
 	/**
@@ -1123,6 +1161,51 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	}
 
 	/**
+	 * Check for local update.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean checkForLocalUpdate() {
+		return true;
+	}
+
+	/**
+	 * Can update to server.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canUpdateToServer() {
+		return true;
+	}
+
+	/**
+	 * Can delete from server.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canDeleteFromServer() {
+		return true;
+	}
+
+	/**
+	 * Can delete from local.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canDeleteFromLocal() {
+		return true;
+	}
+
+	/**
+	 * Can create on server.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean canCreateOnServer() {
+		return true;
+	}
+
+	/**
 	 * Check for write date.
 	 * 
 	 * @return the boolean
@@ -1140,8 +1223,26 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		return true;
 	}
 
+	public Boolean checkForLocalLatestUpdate() {
+		return true;
+	}
+
 	public OUser user() {
 		return mUser;
+	}
+
+	public OModel setLimit(Integer limit) {
+		mLimit = limit;
+		return this;
+	}
+
+	public OModel setOffset(Integer offset_index) {
+		mOffset = offset_index;
+		return this;
+	}
+
+	public Integer getNextOffset() {
+		return mOffset + mLimit;
 	}
 
 	public void setCreateWriteLocal(Boolean make_local) {
