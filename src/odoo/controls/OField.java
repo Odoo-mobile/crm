@@ -19,10 +19,13 @@
 package odoo.controls;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
+import odoo.controls.MultiTagsTextView.TokenListener;
 import odoo.controls.OManyToOneWidget.ManyToOneItemChangeListener;
+import odoo.controls.OTagsView.CustomTagViewListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -35,7 +38,10 @@ import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebView;
+import android.widget.AbsListView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -53,7 +59,10 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OModel.Command;
+import com.odoo.orm.ORelIds;
 import com.odoo.orm.types.ODateTime;
+import com.odoo.support.listview.OListAdapter;
 import com.odoo.util.Base64Helper;
 import com.odoo.util.ODate;
 import com.odoo.util.StringUtils;
@@ -61,7 +70,8 @@ import com.odoo.util.StringUtils;
 /**
  * The Class OField.
  */
-public class OField extends LinearLayout implements ManyToOneItemChangeListener {
+public class OField extends LinearLayout implements
+		ManyToOneItemChangeListener, TokenListener, CustomTagViewListener {
 	/** The Constant TAG. */
 	public static final String TAG = OField.class.getSimpleName();
 
@@ -140,6 +150,17 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	/**
+	 * The Enum TextStyle.
+	 */
+	public enum TextStyle {
+
+		/** The bold. */
+		BOLD,
+		/** The normal. */
+		NORMAL
+	}
+
+	/**
 	 * The Enum OFieldType.
 	 */
 	enum OFieldType {
@@ -170,57 +191,86 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	/** The context. */
-	Context mContext = null;
+	private Context mContext = null;
 
 	/** The typed array. */
-	TypedArray mTypedArray = null;
+	private TypedArray mTypedArray = null;
 
-	/** The m field value. */
-	Object mFieldValue = null;
+	/** The field value. */
+	private Object mFieldValue = null;
 
 	/** The model used with widget controls. */
-	OModel mModel = null;
+	private OModel mModel = null;
 
-	/** The m control record. */
-	ODataRow mControlRecord = null;
+	/** The control record. */
+	private ODataRow mControlRecord = null;
 
 	/** The column object. */
-	OColumn mColumn = null;
+	private OColumn mColumn = null;
 
 	/** The control attributes. */
-	OControlAttributes mAttributes = new OControlAttributes();
+	private OControlAttributes mAttributes = new OControlAttributes();
 
 	/** The control field type. */
-	OFieldMode mFieldType = OFieldMode.READONLY;
+	private OFieldMode mFieldType = OFieldMode.READONLY;
 
 	/** The field widget if any. */
-	OFieldType mFieldWidget = null;
+	private OFieldType mFieldWidget = null;
 
 	/** The layout params. */
-	LayoutParams mLayoutParams = null;
+	private LayoutParams mLayoutParams = null;
 
 	/** The field label. */
-	OLabel mFieldLabel = null;
+	private OLabel mFieldLabel = null;
 
 	/** The field text view. */
-	TextView mFieldTextView = null;
+	private TextView mFieldTextView = null;
 
 	/** The field edit text. */
-	EditText mFieldEditText = null;
+	private EditText mFieldEditText = null;
 
 	/** The many to one widget. */
-	OManyToOneWidget mManyToOne = null;
-	RadioGroup mRadioGroup = null;
-	RadioButton mTrueRadioButton = null;
-	RadioButton mFalseRadioButton = null;
-	CheckBox mCheckBox = null;
-	Switch mSwitch = null;
-	WebView mWebView = null;
+	private OManyToOneWidget mManyToOne = null;
+
+	/** The many to many tags. */
+	private OTagsView mManyToManyTags = null;
+
+	/** The many to many adapter. */
+	private OListAdapter mManyToManyAdapter = null;
+
+	/** The many to many records. */
+	private List<Object> mM2MRecords = new ArrayList<Object>();
+
+	/** The new added records. */
+	private HashMap<String, ODataRow> mM2MAddedRecords = new HashMap<String, ODataRow>();
+	/** The removed records. */
+	private HashMap<String, ODataRow> mM2MRemovedRecords = new HashMap<String, ODataRow>();
+
+	/** The m many to many object editable. */
+	private Boolean mManyToManyObjectEditable = true;
+	/** The radio group. */
+	private RadioGroup mRadioGroup = null;
+
+	/** The true radio button. */
+	private RadioButton mTrueRadioButton = null;
+
+	/** The false radio button. */
+	private RadioButton mFalseRadioButton = null;
+
+	/** The check box. */
+	private CheckBox mCheckBox = null;
+
+	/** The switch. */
+	private Switch mSwitch = null;
+
+	/** The web view. */
+	private WebView mWebView = null;
+
 	/** The display metrics. */
-	DisplayMetrics mMetrics = null;
+	private DisplayMetrics mMetrics = null;
 
 	/** The scale factor. */
-	Float mScaleFactor = 0F;
+	private Float mScaleFactor = 0F;
 
 	/**
 	 * Instantiates a new field.
@@ -341,41 +391,84 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		}
 	}
 
-	private void createManyToManyTags() {
-		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+	/**
+	 * Sets the object editable.
+	 * 
+	 * @param editable
+	 *            the editable
+	 * @return the o field
+	 */
+	public OField setObjectEditable(Boolean editable) {
+		mManyToManyObjectEditable = editable;
+		return this;
+	}
 
+	/**
+	 * Creates the many to many tags.
+	 */
+	private void createManyToManyTags() {
+		List<ODataRow> records = new ArrayList<ODataRow>();
+		if (mControlRecord != null) {
+			if (mColumn.getRelationType() == RelationType.OneToMany) {
+				records.addAll(mControlRecord.getO2MRecord(mColumn.getName())
+						.browseEach());
+			} else {
+				records.addAll(mControlRecord.getM2MRecord(mColumn.getName())
+						.browseEach());
+			}
+		}
+		String ref_column = mAttributes.getString(KEY_REF_COLUMN, "name");
+		int customLayoutOriantation = mAttributes.getResource(
+				KEY_CUSTOM_LAYOUT_ORIANTATION, -1);
+		int custom_layout = mAttributes.getResource(KEY_CUSTOM_LAYOUT, -1);
+		mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+				LayoutParams.WRAP_CONTENT);
+		LinearLayout mlayout = new LinearLayout(mContext);
+		mlayout.setLayoutParams(mLayoutParams);
+		if (customLayoutOriantation == 1)
+			mlayout.setOrientation(LinearLayout.VERTICAL);
+		else
+			mlayout.setOrientation(LinearLayout.HORIZONTAL);
+		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+			// TODO
+			List<ODataRow> mSelectedObjects = new ArrayList<ODataRow>();
+			mSelectedObjects.addAll(records);
+			List<Integer> ids = new ArrayList<Integer>();
+			for (ODataRow r : mSelectedObjects) {
+				ids.add(r.getInt(OColumn.ROW_ID));
+			}
+			records.clear();
+			String whr = null;
+			Object[] args = null;
+			if (ids.size() > 0) {
+				whr = OColumn.ROW_ID + " NOT IN ("
+						+ StringUtils.repeat(" ?, ", ids.size() - 1) + "?)";
+				args = new Object[] { ids };
+			}
+			if (mManyToManyObjectEditable)
+				records.addAll(mModel.select(whr, args));
+			records.addAll(mSelectedObjects);
+			mManyToManyTags = new OTagsView(mContext);
+			mManyToManyTags.setCustomTagView(this);
+			mManyToManyTags
+					.setAdapter(getManyToManyAdapter(records, ref_column));
+			mManyToManyTags.setTokenListener(this);
+			mManyToManyTags.allowDuplicates(false);
+			mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
+					LayoutParams.WRAP_CONTENT);
+			mManyToManyTags.setLayoutParams(mLayoutParams);
+			mManyToManyTags.setNewTokenCreateListener(null);
+			for (ODataRow row : mSelectedObjects) {
+				mManyToManyTags.addObject(row);
+			}
+			mlayout.addView(mManyToManyTags);
+			addView(mlayout);
 		} else {
 			if (mControlRecord != null) {
-
-				List<ODataRow> records = new ArrayList<ODataRow>();
-				if (mColumn.getRelationType() == RelationType.OneToMany) {
-					records.addAll(mControlRecord.getO2MRecord(
-							mColumn.getName()).browseEach());
-				} else {
-					records.addAll(mControlRecord.getM2MRecord(
-							mColumn.getName()).browseEach());
-				}
-				int customLayoutOriantation = mAttributes.getResource(
-						KEY_CUSTOM_LAYOUT_ORIANTATION, -1);
-				mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
-						LayoutParams.WRAP_CONTENT);
-				LinearLayout mlayout = new LinearLayout(mContext);
-				mlayout.setLayoutParams(mLayoutParams);
-				if (customLayoutOriantation == 1)
-					mlayout.setOrientation(LinearLayout.VERTICAL);
-				else
-					mlayout.setOrientation(LinearLayout.HORIZONTAL);
 				if (records.size() > 0) {
-					int custom_layout = mAttributes.getResource(
-							KEY_CUSTOM_LAYOUT, -1);
 					for (ODataRow row : records) {
 						if (custom_layout > -1) {
-							LayoutInflater inflater = LayoutInflater
-									.from(mContext);
-							OForm form = (OForm) inflater.inflate(
-									custom_layout, null);
-							form.initForm(row);
-							mlayout.addView(form);
+							mlayout = (LinearLayout) getManyToManyRowView(row);
 						} else {
 							TextView mtag = new TextView(mContext);
 							mLayoutParams = new LayoutParams(
@@ -385,8 +478,6 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 							mtag.setLayoutParams(mLayoutParams);
 							mtag.setPadding(5, 8, 5, 8);
 							mtag.setSingleLine(true);
-							String ref_column = mAttributes.getString(
-									KEY_REF_COLUMN, "name");
 							mtag.setText(row.getString(ref_column));
 							mtag.setBackgroundColor(Color.LTGRAY);
 							mtag.setTypeface(OControlHelper.boldFont());
@@ -421,6 +512,95 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		}
 	}
 
+	private View getManyToManyRowView(ODataRow row) {
+		int customLayoutOriantation = mAttributes.getResource(
+				KEY_CUSTOM_LAYOUT_ORIANTATION, -1);
+		int custom_layout = mAttributes.getResource(KEY_CUSTOM_LAYOUT, -1);
+		AbsListView.LayoutParams params = new AbsListView.LayoutParams(
+				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		LinearLayout mlayout = new LinearLayout(mContext);
+		mlayout.setLayoutParams(params);
+		if (customLayoutOriantation == 1)
+			mlayout.setOrientation(LinearLayout.VERTICAL);
+		else
+			mlayout.setOrientation(LinearLayout.HORIZONTAL);
+		if (custom_layout > -1) {
+			LayoutInflater inflater = LayoutInflater.from(mContext);
+			OForm form = (OForm) inflater.inflate(custom_layout, null);
+			form.initForm(row);
+			mlayout.addView(form);
+		} else {
+			throw new NullPointerException("No Custom layout found for field "
+					+ mColumn.getName() + " (" + mColumn.getLabel() + ")");
+		}
+		return mlayout;
+	}
+
+	@Override
+	public View getViewForTags(LayoutInflater layoutInflater, Object object,
+			ViewGroup tagsViewGroup) {
+		return getManyToManyRowView((ODataRow) object);
+	}
+
+	private OListAdapter getManyToManyAdapter(List<ODataRow> records,
+			final String ref_column) {
+		mM2MRecords.clear();
+		mM2MRecords.addAll(records);
+		mManyToManyAdapter = new OListAdapter(mContext, 0, mM2MRecords) {
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				View v = getManyToManyRowView((ODataRow) mM2MRecords
+						.get(position));
+				return (v != null) ? v : super.getView(position, convertView,
+						parent);
+			}
+		};
+		mManyToManyAdapter
+				.setRowFilterTextListener(new OListAdapter.RowFilterTextListener() {
+
+					@Override
+					public String filterCompareWith(Object object) {
+						ODataRow row = (ODataRow) object;
+						return row.getString(ref_column);
+					}
+				});
+		return mManyToManyAdapter;
+	}
+
+	@Override
+	public void onTokenAdded(Object token, View view) {
+		if (token != null && mManyToManyObjectEditable) {
+			ODataRow row = (ODataRow) token;
+			String key = "KEY_" + row.getString(OColumn.ROW_ID);
+			mM2MAddedRecords.put(key, row);
+			if (mM2MRemovedRecords.containsKey(key)) {
+				mM2MRemovedRecords.remove(key);
+			}
+		}
+	}
+
+	@Override
+	public void onTokenSelected(Object token, View view) {
+
+	}
+
+	@Override
+	public void onTokenRemoved(Object token) {
+		if (token != null && mManyToManyObjectEditable) {
+			ODataRow row = (ODataRow) token;
+			String key = "KEY_" + row.getString(OColumn.ROW_ID);
+			if (mM2MAddedRecords.containsKey(key)) {
+				mM2MAddedRecords.remove(key);
+			}
+			mM2MRemovedRecords.put(key, row);
+		} else {
+			mManyToManyTags.addObject(token);
+		}
+	}
+
+	/**
+	 * Creates the web view.
+	 */
 	private void createWebView() {
 		boolean showAsText = mAttributes.getBoolean(KEY_SHOW_AS_TEXT, false);
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
@@ -524,6 +704,7 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	 * @param binary_type
 	 *            the binary_type
 	 * @param roundedImage
+	 *            the rounded image
 	 */
 	private void createBinaryControl(OFieldType binary_type,
 			boolean roundedImage) {
@@ -596,6 +777,9 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 					LayoutParams.WRAP_CONTENT);
 			mManyToOne.setLayoutParams(mLayoutParams);
 			mManyToOne.setModel(mModel, ref_column, mColumn.getDomains());
+			int custom_layout = mAttributes.getResource(KEY_CUSTOM_LAYOUT, -1);
+			if (custom_layout != -1)
+				mManyToOne.setCustomLayout(custom_layout);
 			if (mControlRecord != null)
 				mManyToOne.setRecordId((Integer) mControlRecord.getM2ORecord(
 						mColumn.getName()).getId());
@@ -641,6 +825,12 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 			mLayoutParams.setMargins(0, 5, 0, 5);
 	}
 
+	/**
+	 * Sets the column.
+	 * 
+	 * @param column
+	 *            the new column
+	 */
 	public void setColumn(OColumn column) {
 		mColumn = column;
 	}
@@ -900,17 +1090,47 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 	}
 
 	/**
-	 * Sets the text style.
+	 * Sets the text size.
 	 * 
 	 * @param size
-	 *            the new text style
+	 *            the new text size
 	 */
-	public void setTextStyle(float size) {
+	public void setTextSize(float size) {
 		size = size * mScaleFactor;
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mFieldEditText.setTextSize(size);
 		} else {
 			mFieldTextView.setTextSize(size);
+		}
+	}
+
+	/**
+	 * Sets the text appearance.
+	 * 
+	 * @param appearance
+	 *            the new text appearance
+	 */
+	public void setTextAppearance(int appearance) {
+		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+			mFieldEditText.setTextAppearance(mContext, appearance);
+		} else {
+			mFieldTextView.setTextAppearance(mContext, appearance);
+		}
+	}
+
+	/**
+	 * Sets the text style.
+	 * 
+	 * @param style
+	 *            the new text style
+	 */
+	public void setTextStyle(TextStyle style) {
+		Typeface tf = (style == TextStyle.BOLD) ? OControlHelper.boldFont()
+				: OControlHelper.lightFont();
+		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
+			mFieldEditText.setTypeface(tf);
+		} else {
+			mFieldTextView.setTypeface(tf);
 		}
 	}
 
@@ -992,6 +1212,30 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 				return mSwitch.isChecked();
 			case MANY_TO_ONE:
 				return mFieldValue;
+			case MANY_TO_MANY_TAGS:
+				List<Integer> rIds = new ArrayList<Integer>();
+				Integer base_record_id = (mControlRecord != null) ? mControlRecord
+						.getInt(OColumn.ROW_ID) : null;
+
+				ORelIds rel_obj = new ORelIds(base_record_id);
+				for (String key : mM2MAddedRecords.keySet()) {
+					ODataRow row = mM2MAddedRecords.get(key);
+					rIds.add(row.getInt(OColumn.ROW_ID));
+				}
+				// Added list
+				Command command = Command.Add;
+				rel_obj.add(rIds, command);
+				rIds.clear();
+				for (String key : mM2MRemovedRecords.keySet()) {
+					ODataRow row = mM2MRemovedRecords.get(key);
+					rIds.add(row.getInt(OColumn.ROW_ID));
+				}
+				// Removed list
+				command = Command.Delete;
+				rel_obj.add(rIds, command);
+
+				return rel_obj;
+
 			default:
 				return getText();
 			}
@@ -1028,7 +1272,13 @@ public class OField extends LinearLayout implements ManyToOneItemChangeListener 
 		mFieldValue = row.get(OColumn.ROW_ID);
 	}
 
+	/**
+	 * Gets the ref column.
+	 * 
+	 * @return the ref column
+	 */
 	public String getRefColumn() {
 		return mAttributes.getString(KEY_REF_COLUMN, null);
 	}
+
 }
