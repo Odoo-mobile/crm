@@ -59,8 +59,8 @@ import com.odoo.base.ir.IrModel;
 import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
 import com.odoo.crm.R;
-import com.odoo.support.BaseFragment;
 import com.odoo.support.OUser;
+import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.Base64Helper;
 import com.odoo.util.OAppRater;
@@ -100,7 +100,6 @@ public class MainActivity extends FragmentActivity implements
 	private OETouchListener mTouchAttacher;
 	private boolean mTwoPane;
 
-	private App mApp = null;
 	private OUser mAccount = null;
 
 	@Override
@@ -110,22 +109,26 @@ public class MainActivity extends FragmentActivity implements
 		getActionBar().setIcon(R.drawable.ic_odoo_o);
 		mContext = this;
 		mFragment = getSupportFragmentManager();
-		mApp = (App) getApplication();
-		IrModel models = new IrModel(mContext);
-		if (mApp.inNetwork()
-				&& OUser.current(mContext) != null
-				&& ((mApp.getOdoo() == null && savedInstanceState == null) || models
-						.count() <= 0)) {
-			// Recreating model fields
-			AccountCreate account = new AccountCreate();
-			Bundle args = new Bundle();
-			args.putBoolean("no_config_wizard", true);
-			args.putAll(OUser.current(mContext).getAsBundle());
-			account.setArguments(args);
-			startMainFragment(account, false);
+		if (OUser.current(mContext) != null && savedInstanceState == null) {
+			IrModel models = new IrModel(mContext);
+			if (models.count() <= 0) {
+				// Database cleaned so re-creating database
+				updateAccount();
+			} else {
+				onTaskDone(savedInstanceState);
+			}
 		} else {
 			onTaskDone(savedInstanceState);
 		}
+	}
+
+	private void updateAccount() {
+		AccountCreate account = new AccountCreate();
+		Bundle args = new Bundle();
+		args.putBoolean("no_config_wizard", true);
+		args.putAll(OUser.current(mContext).getAsBundle());
+		account.setArguments(args);
+		startMainFragment(account, false);
 	}
 
 	public void onTaskDone(Bundle savedInstanceState) {
@@ -726,6 +729,7 @@ public class MainActivity extends FragmentActivity implements
 		}
 		FragmentTransaction tran = mFragment.beginTransaction().replace(
 				container_id, fragment, "main_fragment");
+		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		if (addToBackState) {
 			tran.addToBackStack(null);
 		}
@@ -739,6 +743,7 @@ public class MainActivity extends FragmentActivity implements
 				: R.id.fragment_container;
 		FragmentTransaction tran = mFragment.beginTransaction().replace(
 				container_id, fragment, "detail_fragment");
+		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
 		if (!isTwoPane()) {
 			tran.addToBackStack(null);
 			tran.commit();
