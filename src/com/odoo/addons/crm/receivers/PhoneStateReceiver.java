@@ -6,6 +6,7 @@ import java.util.regex.Pattern;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.PhoneStateListener;
@@ -14,7 +15,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.odoo.MainActivity;
-import com.odoo.addons.crm.receivers.CRMPartnerFinder.onPartnerResult;
 import com.odoo.orm.ODataRow;
 
 public class PhoneStateReceiver extends BroadcastReceiver {
@@ -23,8 +23,10 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 
 	Context mContext = null;
 	public static CRMPartnerFinder mPartnerFinder = null;
+	public static CRMCallRecorder mCallRecorder = null;
 	public static CRMCallerWindow mCallerWindow = null;
-
+	private static String mMediaFile = "";
+	private static float mRecodingDuration = 0.0F;
 	Boolean isCallReceived = false;
 	Boolean incommingCall = false;
 	Boolean outgoingCall = false;
@@ -37,6 +39,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 		mContext = context;
 		if (mCallerWindow == null)
 			mCallerWindow = new CRMCallerWindow(context);
+		if (mCallRecorder == null)
+			mCallRecorder = new CRMCallRecorder();
 		if (mPartnerFinder == null)
 			mPartnerFinder = new CRMPartnerFinder(mContext);
 		Bundle bundle = intent.getExtras();
@@ -111,13 +115,27 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 		incommingCall = true;
 		if (!mPartnerFinder.isFinding())
 			mPartnerFinder.findPartnerByNumber(incomingNumber, mPartnerResults);
+		mCallRecorder.createFile(incomingNumber);
 	}
 
 	private void phoneStateOffHook(String outGoingNumber, String incomingNumber) {
-		// Call Started
+		// Call started
 		if (outgoingNumber != null) {
+			if (!mPartnerFinder.isFinding())
+				mPartnerFinder.findPartnerByNumber(outgoingNumber,
+						mPartnerResults);
+			mCallRecorder.createFile(outgoingNumber);
 			outgoingCall = true;
+		} else {
+			mCallRecorder.createFile(incomingNumber);
 		}
+		try {
+			if (!mCallRecorder.isRecording())
+				mCallRecorder.startRecording();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		isCallReceived = true;
 	}
 
 	CRMPartnerFinder.onPartnerResult mPartnerResults = new CRMPartnerFinder.onPartnerResult() {
@@ -138,6 +156,15 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 		if (mCallerWindow.isActive()) {
 			mCallerWindow.removeCallerWindow();
 			outgoingNumber = null;
+			if (mCallRecorder != null) {
+				mMediaFile = mCallRecorder.stopRecording();
+				MediaPlayer mp = MediaPlayer.create(mContext,
+						Uri.parse(mMediaFile));
+				if (mp != null) {
+					mRecodingDuration = mp.getDuration();
+					mp.release();
+				}
+			}
 		}
 		if (isCallReceived) {
 			Log.v(TAG, "LogCallActivity()");
@@ -154,8 +181,8 @@ public class PhoneStateReceiver extends BroadcastReceiver {
 		Intent log_call = new Intent(mContext, MainActivity.class);
 		log_call.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		log_call.setAction(ACTION_LOG_SCHEDULE_CALL);
-		// log_call.putExtra("call_duration", mRecodingDuration);
-		// log_call.putExtra("media_file", mMediaFile);
+		log_call.putExtra("call_duration", mRecodingDuration);
+		log_call.putExtra("media_file", mMediaFile);
 		if (mPartner != null) {
 			log_call.putExtra("partner_id", mPartner.getInt("id"));
 			Log.v(TAG, "Call Duration sending : "

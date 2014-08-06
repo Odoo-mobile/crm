@@ -36,12 +36,14 @@ import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.base.ir.IrModel;
+import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelationRecordList.ORelationRecords;
 import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.StringUtils;
+import com.odoo.util.logger.OLog;
 
 /**
  * The Class OSyncHelper.
@@ -987,12 +989,24 @@ public class OSyncHelper {
 			}
 			JSONObject result = mOdoo.call_kw(mModel.getModelName(), method,
 					args.getArray(), kwargs);
-			if(result.has("result")){
+			if (result.has("result")) {
 				return result.get("result");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public ODataRow getServerData(OModel model, ODomain domain) {
+		try {
+			JSONObject result = mOdoo.search_read(model.getModelName(),
+					getFields(model), domain.get());
+			handleResult(model, result);
+			handleRelationRecords(model);
+		} catch (Exception e) {
+
+		}
+		return null;
 	}
 }

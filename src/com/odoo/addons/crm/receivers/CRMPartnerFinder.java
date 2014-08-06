@@ -4,9 +4,6 @@ import java.util.List;
 
 import odoo.ODomain;
 import odoo.Odoo;
-
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -14,10 +11,8 @@ import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.base.res.ResPartner;
-import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
-import com.odoo.orm.OFieldsHelper;
-import com.odoo.util.logger.OLog;
+import com.odoo.orm.OSyncHelper;
 
 public class CRMPartnerFinder {
 
@@ -67,26 +62,19 @@ public class CRMPartnerFinder {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-			OLog.log(">>>>>>>>>>>");
 			ResPartner mPartner = new ResPartner(mContext);
+			String where = "phone like ? or phone like ? or mobile like ? or mobile like ?";
+			String[] args = new String[] { "%" + mcontactLast2Chars,
+					"%" + mcontactLast3Chars, "%" + mcontactLast2Chars,
+					"%" + mcontactLast3Chars };
 			// getting from Local DB
-			OLog.log(">> " + mcontactLast2Chars + " : " + mcontactLast3Chars);
-			List<ODataRow> partners = mPartner
-					.select("phone like ? or phone like ? or mobile like ? or mobile like ?",
-							new String[] { "%" + mcontactLast2Chars,
-									"%" + mcontactLast3Chars,
-									"%" + mcontactLast2Chars,
-									"%" + mcontactLast3Chars });
+			List<ODataRow> partners = mPartner.select(where, args);
 			if (partners != null && partners.size() > 0) {
 				mPartnerInfo = partners.get(0);
-				OLog.log(partners.size() + " got from local");
-			}
-
-			// getting from server
-			if (mPartnerInfo == null) {
+			} else {
+				// getting from server
 				App app = (App) mContext.getApplicationContext();
 				Odoo odoo = app.getOdoo();
-				OFieldsHelper fields = new OFieldsHelper(mPartner.getColumns());
 				ODomain domain = new ODomain();
 				domain.add("|");
 				domain.add("|");
@@ -96,34 +84,21 @@ public class CRMPartnerFinder {
 				domain.add("mobile", "=like", "%" + mcontactLast2Chars);
 				domain.add("mobile", "=like", "%" + mcontactLast3Chars);
 				try {
-					odoo.debug(true);
-					JSONObject result = odoo
-							.search_read(mPartner.getModelName(), fields.get(),
-									domain.get());
-					for (int i = 0; i < result.getJSONArray("records").length(); i++) {
-						JSONObject row = result.getJSONArray("records")
-								.getJSONObject(i);
+					OSyncHelper sync = mPartner.getSyncHelper();
+					sync.getServerData(mPartner, domain);
+					List<ODataRow> partner = mPartner
+							.select(where,args);
+					for (ODataRow row : partner) {
 						String phone = row.getString("phone").trim();
 						String mobile = row.getString("mobile").trim();
 						String contact = (phone.equals("false") || TextUtils
 								.isEmpty(phone)) ? mobile : phone;
-						OLog.log(contact);
-						OLog.log(contact.replaceAll(" ", "").contains(
-								mContactNumber)
-								+ " || "
-								+ mContactNumber.contains(contact.replaceAll(
-										" ", "")));
 						if (contact.replaceAll(" ", "")
 								.contains(mContactNumber)
 								|| mContactNumber.contains(contact.replaceAll(
 										" ", ""))) {
-							// Fixing
-
-							// Log.e("fields",
-							// "$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-							// mPartnerInfo = new ODataRow();
-							// List<OColumn> columns = (List<OColumn>) row;
-							// fields.addAll(columns);
+							mPartnerInfo = new ODataRow();
+							mPartnerInfo = row;
 						}
 					}
 				} catch (Exception e) {
