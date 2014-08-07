@@ -1,5 +1,7 @@
 package com.odoo.addons.sale.services;
 
+import odoo.Odoo;
+import odoo.controls.OList;
 import android.accounts.Account;
 import android.app.Service;
 import android.content.ContentProviderClient;
@@ -36,12 +38,10 @@ public class SalesService extends OService implements OServiceListener {
 			sync = db.getSyncHelper();
 			if (sync.syncWithServer())
 				context.sendBroadcast(intent);
-			
-//			ResCurrency dbRes = new ResCurrency(context);
-//			sync = dbRes.getSyncHelper();
-//			if (sync.syncWithServer())
-//				context.sendBroadcast(intent);
-
+			// ResCurrency dbRes = new ResCurrency(context);
+			// sync = dbRes.getSyncHelper();
+			// if (sync.syncWithServer())
+			// context.sendBroadcast(intent);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

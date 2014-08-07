@@ -36,9 +36,9 @@ public class CRMLead extends OModel {
 	OColumn type = new OColumn("Type", OVarchar.class, 64).setDefault("lead");
 	OColumn priority = new OColumn("Priority", OVarchar.class, 10);
 	OColumn date_open = new OColumn("Assigned", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn date_closed = new OColumn("Closed", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn stage_id = new OColumn("Stage", CRMCaseStage.class,
 			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
@@ -58,9 +58,9 @@ public class CRMLead extends OModel {
 	OColumn ref = new OColumn("Reference", OVarchar.class, 64);
 	OColumn ref2 = new OColumn("Reference 2", OVarchar.class, 64);
 	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn date_action = new OColumn("Next Action Date", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn title_action = new OColumn("Next Action", OVarchar.class, 64);
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);

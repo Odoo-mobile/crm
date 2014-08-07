@@ -25,13 +25,13 @@
             android:id="@+id/imgConfirmCreate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_action_exclamation_mark" />
+            android:background="@drawable/ic_action_confirm_sale" />
 
         <ImageView
             android:id="@+id/imgCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_action_exclamation_mark" />
+            android:background="@drawable/ic_action_cancel" />
     </LinearLayout>
 
     <LinearLayout
@@ -40,9 +40,9 @@
         android:orientation="horizontal" >
 
         <odoo.controls.OField
-            android:layout_width="25dp"
-            android:layout_height="25dp"
-            odoo:binaryType="image"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            odoo:binaryType="round_image"
             odoo:defaultImage="@drawable/avatar"
             odoo:field_name="partner_id"
             odoo:ref_column="image_small"
@@ -63,11 +63,10 @@
         android:orientation="horizontal" >
 
         <odoo.controls.OField
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             odoo:field_color="@color/odoo_purple"
-            odoo:field_name="state"
+            odoo:field_name="stateChange"
             odoo:with_label="false" />
 
         <odoo.controls.OField
@@ -79,22 +78,11 @@
             odoo:with_label="false" />
 
         <odoo.controls.OField
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:layout_weight="0.7"
-            odoo:field_name="amount_total"
+            odoo:field_name="amountTotalSymbol"
             odoo:with_label="false" />
-
-        <odoo.controls.OField
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            android:layout_weight="0.3"
-            odoo:field_name="currency_id"
-            odoo:ref_column="symbol"
-            odoo:with_label="false" >
-        </odoo.controls.OField>
     </LinearLayout>
 
 </odoo.controls.OForm>

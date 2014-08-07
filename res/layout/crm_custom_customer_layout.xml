@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="5dp"
+    android:padding="10dp"
     odoo:background_selector="@drawable/oe_listview_background_selector"
     odoo:model="res.partner" >
 
@@ -16,7 +16,7 @@
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_gravity="center_vertical"
-            odoo:binaryType="image"
+            odoo:binaryType="round_image"
             odoo:defaultImage="@drawable/avatar"
             odoo:field_name="image_small"
             odoo:with_label="false" >
@@ -46,19 +46,24 @@
                     odoo:with_label="false" />
 
                 <ImageView
-                    android:id="@+id/imgMail"
-                    android:layout_width="25dp"
+                    android:id="@+id/imgLocation"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:layout_weight="1"
+                    android:src="@drawable/ic_action_location_place" />
+
+                <ImageView
+                    android:id="@+id/imgMail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
                     android:src="@drawable/ic_action_mark_unread" />
 
                 <ImageView
                     android:id="@+id/imgCall"
-                    android:layout_width="25dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
-                    android:layout_weight="1"
                     android:src="@drawable/ic_action_device_access_call" />
             </LinearLayout>
 
@@ -66,7 +71,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="0dp"
-                odoo:field_name="email"
+                odoo:field_name="resEmail"
                 odoo:textLines="1"
                 odoo:with_label="false" />
 
@@ -74,7 +79,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="0dp"
-                odoo:field_name="phone"
+                odoo:field_name="resPhone"
                 odoo:textLines="1"
                 odoo:with_label="false" />
 
@@ -96,9 +101,8 @@
 
                 <odoo.controls.OField
                     android:id="@+id/oSaleOrderCount"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:background="@drawable/oe_listview_background_selector"
                     odoo:customLayoutOriantation="horizontal"
                     odoo:field_color="@color/odoo_purple"

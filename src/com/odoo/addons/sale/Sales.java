@@ -1,7 +1,6 @@
 package com.odoo.addons.sale;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import odoo.controls.OList;
@@ -30,7 +29,7 @@ import com.odoo.orm.OModel;
 import com.odoo.orm.OValues;
 import com.odoo.receivers.SyncFinishReceiver;
 import com.odoo.support.AppScope;
-import com.odoo.support.BaseFragment;
+import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.openerp.OETouchListener;
@@ -53,7 +52,6 @@ public class Sales extends BaseFragment implements OnPullListener,
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.Quotation;
 	Boolean mSyncDone = false;
-	HashMap<String, String> mStates = new HashMap<String, String>();
 	Integer mLastPosition = -1;
 	Integer mLimit = 5;
 
@@ -74,15 +72,6 @@ public class Sales extends BaseFragment implements OnPullListener,
 	}
 
 	public void init() {
-		mStates.put("draft", "Draft Quotation");
-		mStates.put("sent", "Quotation Sent");
-		mStates.put("cancel", "Cancelled");
-		mStates.put("waiting_date", "Waiting Schedule");
-		mStates.put("progress", "Sales Order");
-		mStates.put("manual", "Sale to Invoice");
-		mStates.put("shipping_except", "Shipping Exception");
-		mStates.put("invoice_except", "Invoice Exception");
-		mStates.put("done", "Done");
 		checkArguments();
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
@@ -92,7 +81,6 @@ public class Sales extends BaseFragment implements OnPullListener,
 		mListControl.setOnListRowViewClickListener(R.id.imgCancel, this);
 		mListControl.setOnListRowViewClickListener(R.id.imgConfirmCreate, this);
 		mListControl.setRecordLimit(mLimit);
-		// mListControl.setOnRowClickListener(this);
 		if (mLastPosition == -1) {
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
@@ -156,29 +144,18 @@ public class Sales extends BaseFragment implements OnPullListener,
 					String where = null, args[] = null;
 					switch (mCurrentKey) {
 					case Quotation:
-						// mListRecords.addAll(db().select(
-						// "state = ? or state = ?",
-						// new String[] { "draft", "cancel" }));
-						// mListRecords.addAll(model
-						// .setLimit(mLimit)
-						// .setOffset(mOffset)
-						// .select("state = ? or state = ?",
-						// new String[] { "draft", "cancel" }));
 						where = "state = ? or state = ?";
 						args = new String[] { "draft", "cancel" };
 						break;
 					case Sale_order:
-						// mListRecords.addAll(db().select(
-						// "state = ? or state = ? or state = ?",
-						// new String[] { "manual", "progress", "done" }));
-						// mListRecords.addAll(model
-						// .setLimit(mLimit)
-						// .setOffset(mOffset)
-						// .select("state = ? or state = ? or state = ?",
-						// new String[] { "manual", "progress",
-						// "done" }));
-						where = "state = ? or state = ? or state = ?";
-						args = new String[] { "manual", "progress", "done" };
+						if (getArguments().containsKey("id")) {
+							where = "partner_id = ?";
+							args = new String[] { getArguments()
+									.getString("id") };
+						} else {
+							where = "state = ? or state = ? or state = ?";
+							args = new String[] { "manual", "progress", "done" };
+						}
 						break;
 					}
 					mListRecords.addAll(model.setLimit(mLimit)
@@ -324,6 +301,8 @@ public class Sales extends BaseFragment implements OnPullListener,
 					values.put("state", "manual");
 					new SaleOrder(getActivity()).update(values,
 							row.getInt("local_id"));
+					Toast.makeText(getActivity(), "Confirm to Sale",
+							Toast.LENGTH_SHORT).show();
 				} else
 					Toast.makeText(getActivity(), "No Order Line",
 							Toast.LENGTH_SHORT).show();

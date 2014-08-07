@@ -13,7 +13,7 @@ import com.odoo.base.res.ResPartner;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
-import com.odoo.support.BaseFragment;
+import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 

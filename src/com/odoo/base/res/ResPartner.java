@@ -53,14 +53,37 @@ public class ResPartner extends OModel {
 	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
+
+	@Functional(method = "validationPhone")
+	OColumn resPhone = new OColumn("Phone no", OText.class);
+	@Functional(method = "validationEmail")
+	OColumn resEmail = new OColumn("Email Id", OText.class);
 	@Functional(method = "getSaleOrdersCount")
 	OColumn salesOrdersCount = new OColumn("Total Sale Orders", OVarchar.class);
 	@Functional(method = "getcrmLeadCount")
 	OColumn crmLeadCount = new OColumn("Total Opportunities", OVarchar.class);
+	@Functional(method = "resAddressFull")
+	OColumn resAddress = new OColumn("Address", OText.class);
 
 	public ResPartner(Context context) {
 		super(context, "res.partner");
 		mContext = context;
+	}
+
+	public String validationPhone(ODataRow row) {
+		if (row.getString("phone") != null
+				|| !row.getString("phone").equals(false))
+			return row.getString("phone");
+		else
+			return "";
+	}
+
+	public String validationEmail(ODataRow row) {
+		if (row.getString("email") != null
+				|| !row.getString("email").equals(false))
+			return row.getString("email");
+		else
+			return "";
 	}
 
 	public String getSaleOrdersCount(ODataRow row) {
@@ -83,4 +106,16 @@ public class ResPartner extends OModel {
 			return "";
 	}
 
+	public String resAddressFull(ODataRow row) {
+		String add = "";
+		if (!row.getBoolean("street").equals(false))
+			add = row.getString("street");
+		if (!row.getBoolean("street2").equals(false))
+			add = add + "\n" + row.getString("street2");
+		if (!row.getBoolean("city").equals(false))
+			add = add + row.getString("city");
+		if (!row.getBoolean("zip").equals(false))
+			add = add + row.getString("zip");
+		return add;
+	}
 }

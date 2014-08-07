@@ -5,6 +5,7 @@ import java.util.List;
 import odoo.controls.OForm;
 import android.content.Context;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,9 +21,11 @@ import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
-import com.odoo.support.BaseFragment;
+import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
+import com.odoo.util.ODate;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 
 public class QuotationsDetail extends BaseFragment {
 	private View mView = null;
@@ -91,18 +94,12 @@ public class QuotationsDetail extends BaseFragment {
 				db().update(values, mId);
 			} else if (mId == null) {
 				values = new OValues();
-				if (mForm.getFormValues().getString("date_order") == "false")
-					values.put("date_order", "false");
-				else
-					values.put("date_order",
-							mForm.getFormValues().getString("date_order"));
-				values.put("name", "new");
+				values.put("date_order", ODate.getUTCDate(ODate.DEFAULT_FORMAT));
 				values.put("partner_id",
 						mForm.getFormValues().getInt("partner_id"));
 				values.put("is_dirty", true);
-				values.put("id", 0);
+				values.put("name", "SO");
 				values.put("state", "draft");
-				values.put("currency_id", 1);
 				db().create(values);
 			}
 			// }

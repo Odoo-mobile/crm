@@ -60,10 +60,11 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                odoo:field_name="street"
+                odoo:field_name="resAddress"
                 odoo:label_bottom_border_height="1"
                 odoo:label_color="@color/odoo_purple" />
 
+            <!--
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -87,6 +88,7 @@
                 odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple"
                 odoo:with_label="false" />
+            -->
 
             <odoo.controls.OField
                 android:layout_width="match_parent"

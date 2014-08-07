@@ -30,7 +30,7 @@ public class CRMPhoneCall extends OModel {
 	OColumn categ_id = new OColumn("Category", CRMCaseCateg.class,
 			RelationType.ManyToOne);
 	OColumn date = new OColumn("Date", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn opportunity_id = new OColumn("Lead/Opportunity", CRMLead.class,
 			RelationType.ManyToOne);
 	OColumn call_audio_file = new OColumn("recorded audio file",
