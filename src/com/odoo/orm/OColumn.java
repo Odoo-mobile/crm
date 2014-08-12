@@ -19,7 +19,10 @@
 package com.odoo.orm;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 /**
  * The Class OColumn.
@@ -92,6 +95,15 @@ public class OColumn {
 
 	/** The functional_store. */
 	private Boolean functional_store = false;
+
+	/** The functional_store_depends. */
+	private String[] functional_store_depends = null;
+
+	/** The sync limit. */
+	private Integer mSyncLimit = -1;
+
+	/** The check row id. */
+	private Boolean checkRowId = true;
 
 	/*
 	 * (non-Javadoc)
@@ -340,7 +352,7 @@ public class OColumn {
 	 *            the pattern
 	 * @return the o column
 	 */
-	public OColumn setParsePatter(String pattern) {
+	public OColumn setParsePattern(String pattern) {
 		this.parse_pattern = pattern;
 		return this;
 	}
@@ -439,7 +451,16 @@ public class OColumn {
 	public void setFunctionalMethod(Method method) {
 		functional_method = method;
 		is_functional_column = true;
-		setLocalColumn();
+	}
+
+	/**
+	 * Sets the local column.
+	 * 
+	 * @param local
+	 *            the new local column
+	 */
+	public void setLocalColumn(Boolean local) {
+		local_column = local;
 	}
 
 	/**
@@ -531,6 +552,73 @@ public class OColumn {
 	 */
 	public Boolean canFunctionalStore() {
 		return functional_store;
+	}
+
+	/**
+	 * Sets the functional store depends.
+	 * 
+	 * @param depends
+	 *            the depends
+	 * @return the o column
+	 */
+	public OColumn setFunctionalStoreDepends(String[] depends) {
+		functional_store_depends = depends;
+		return this;
+	}
+
+	/**
+	 * Gets the functional store depends.
+	 * 
+	 * @return the functional store depends
+	 */
+	public List<String> getFunctionalStoreDepends() {
+		if (functional_store_depends != null)
+			return Arrays.asList(functional_store_depends);
+		return new ArrayList<String>();
+	}
+
+	/**
+	 * Sets the record sync limit.
+	 * 
+	 * 
+	 * @default -1
+	 * @param limit
+	 *            the limit
+	 * @return the column
+	 */
+	public OColumn setRecordSyncLimit(Integer limit) {
+		mSyncLimit = limit;
+		return this;
+	}
+
+	/**
+	 * Gets the record sync limit.
+	 * 
+	 * @return the record sync limit
+	 */
+	public Integer getRecordSyncLimit() {
+		return mSyncLimit;
+	}
+
+	/**
+	 * Check row id.
+	 * 
+	 * @param check
+	 *            the check
+	 * @return the o column
+	 */
+	public OColumn checkRowId(Boolean check) {
+		checkRowId = check;
+		return this;
+	}
+
+	/**
+	 * Check row id.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean checkRowId() {
+		return checkRowId;
 	}
 
 	/**

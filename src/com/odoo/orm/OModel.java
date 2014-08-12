@@ -122,13 +122,13 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	@Odoo.api.v8
 	@Odoo.api.v9alpha
 	public OColumn create_date = new OColumn("Created On", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 
 	/** The write_date. */
 	@Odoo.api.v8
 	@Odoo.api.v9alpha
 	public OColumn write_date = new OColumn("Last Updated On", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 
 	// Local Base Columns
 	/** The local_id. */
@@ -344,6 +344,12 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					if (method != null) {
 						column.setFunctionalMethod(method);
 						column.setFunctionalStore(checkForFunctionalStore(field));
+						column.checkRowId(checkForFunctionalRowIdCheck(field));
+						if (column.canFunctionalStore()) {
+							column.setFunctionalStoreDepends(getFunctionalDepends(field));
+						} else {
+							column.setLocalColumn();
+						}
 					}
 				} else
 					return null;
@@ -367,6 +373,9 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 					if (method != null) {
 						column.setFunctionalMethod(method);
 						column.setFunctionalStore(checkForFunctionalStore(field));
+						if (column.canFunctionalStore()) {
+							column.setFunctionalStoreDepends(getFunctionalDepends(field));
+						}
 					}
 				}
 			}
@@ -414,6 +423,40 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			return functional.store();
 		}
 		return false;
+	}
+
+	/**
+	 * Check for functional row id check.
+	 * 
+	 * @param field
+	 *            the field
+	 * @return the boolean
+	 */
+	private Boolean checkForFunctionalRowIdCheck(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+		if (annotation != null) {
+			Odoo.Functional functional = (Functional) annotation;
+			return functional.checkRowId();
+		}
+		return true;
+	}
+
+	/**
+	 * Gets the functional depends.
+	 * 
+	 * @param field
+	 *            the field
+	 * @return the functional depends
+	 */
+	private String[] getFunctionalDepends(Field field) {
+		Annotation annotation = field.getAnnotation(Odoo.Functional.class);
+		if (annotation != null) {
+			Odoo.Functional functional = (Functional) annotation;
+			if (functional.store()) {
+				return functional.depends();
+			}
+		}
+		return null;
 	}
 
 	public OdooVersion getOdooVersion() {
@@ -595,7 +638,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 							break;
 						case ManyToOne:
 							row.put(col.getName(),
-									new OM2ORecord(this, col, cr.getString(cr
+									new OM2ORecord(this, col, cr.getInt(cr
 											.getColumnIndex(col.getName()))));
 							break;
 						}
@@ -622,6 +665,94 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		cr.close();
 		db.close();
 		return records;
+	}
+
+	/**
+	 * Gets the name.
+	 * 
+	 * @param model
+	 *            the model
+	 * @param row_id
+	 *            the row_id
+	 * @return the name
+	 */
+	public String getName(int row_id) {
+		String name = "false";
+		if (getColumn("name") != null) {
+			SQLiteDatabase db = getReadableDatabase();
+			Cursor cr = db.query(getTableName(), new String[] { "name" },
+					OColumn.ROW_ID + " = ?", new String[] { row_id + "" },
+					null, null, null);
+			if (cr.moveToFirst()) {
+				name = cr.getString(cr.getColumnIndex("name"));
+			}
+			cr.close();
+			db.close();
+		}
+		return name;
+	}
+
+	/**
+	 * Select one to many rel ids.
+	 * 
+	 * @param base
+	 *            the base
+	 * @param rel
+	 *            the rel
+	 * @param base_id
+	 *            the base_id
+	 * @param ref_column
+	 *            the ref_column
+	 * @return the list
+	 */
+	public List<Integer> selecto2MRelIds(OModel base, OModel rel, int base_id,
+			String ref_column) {
+		List<Integer> ids = new ArrayList<Integer>();
+		SQLiteDatabase db = getReadableDatabase();
+		Cursor cr = db.query(rel.getTableName(), new String[] { "id" },
+				ref_column + " = ?", new String[] { base_id + "" }, null, null,
+				null);
+		if (cr.moveToFirst()) {
+			do {
+				ids.add(cr.getInt(cr.getColumnIndex("id")));
+			} while (cr.moveToNext());
+		}
+		cr.close();
+		db.close();
+		return ids;
+	}
+
+	/**
+	 * Select many to many rel ids.
+	 * 
+	 * @param base
+	 *            the base
+	 * @param rel
+	 *            the rel
+	 * @param base_id
+	 *            the base_id
+	 * @return the list
+	 */
+	public List<Integer> selectM2MRelIds(OModel base, OModel rel, int base_id) {
+		List<Integer> ids = new ArrayList<Integer>();
+		String table = base.getTableName() + "_" + rel.getTableName() + "_rel";
+		String base_col = base.getTableName() + "_id";
+		String rel_col = rel.getTableName() + "_id";
+		SQLiteDatabase db = getReadableDatabase();
+		String where = base_col + " = ? and odoo_name = ?";
+		Object[] whereArgs = new Object[] { base_id, mUser.getAndroidName() };
+		Cursor cr = db.query(table, new String[] { "*" },
+				getWhereClause(where), getWhereArgs(where, whereArgs), null,
+				null, null);
+		if (cr.moveToFirst()) {
+			do {
+				int rel_id = cr.getInt(cr.getColumnIndex(rel_col));
+				ids.add(rel_id);
+			} while (cr.moveToNext());
+		}
+		cr.close();
+		db.close();
+		return ids;
 	}
 
 	/**
@@ -1029,11 +1160,22 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 	private ContentValues createValues(OValues values) {
 		ContentValues vals = new ContentValues();
 		for (OColumn column : getColumns()) {
-			if (values.contains(OColumn.ROW_ID) && column.isFunctionalColumn()
-					&& column.canFunctionalStore()) {
-				// Getting functional value before create or update
-				vals.put(column.getName(),
-						getFunctionalMethodValue(column, values).toString());
+			// Checking for functional store column
+			if (column.isFunctionalColumn() && column.canFunctionalStore()) {
+				if ((column.checkRowId() && values.contains(OColumn.ROW_ID) || !column
+						.checkRowId())) {
+					int contains = 0;
+					// getting depends column from values
+					for (String col : column.getFunctionalStoreDepends())
+						if (values.contains(col))
+							contains++;
+					if (contains == column.getFunctionalStoreDepends().size()) {
+						// Getting functional value before create or update
+						vals.put(column.getName(),
+								getFunctionalMethodValue(column, values)
+										.toString());
+					}
+				}
 			}
 			if (values.contains(column.getName())) {
 				if (column.getRelationType() == null) {
@@ -1079,10 +1221,28 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 
 		switch (command) {
 		case Add:
+			// Adding records to relation model
+			if (ids.size() > 0) {
+				for (int id : ids) {
+					ContentValues values = new ContentValues();
+					values.put(base_column, base_id);
+					values.put(rel_column, id);
+					values.put("odoo_name", mUser.getAndroidName());
+					values.put("local_write_date", ODate.getDate());
+					db.insert(table, null, values);
+				}
+			}
 			break;
 		case Update:
 			break;
 		case Delete:
+			// Deleting records to relation model
+			if (ids.size() > 0) {
+				for (int id : ids) {
+					db.delete(table, base_column + " = ? AND  " + rel_column
+							+ " = ?", new String[] { base_id + "", id + "" });
+				}
+			}
 			break;
 		case Replace:
 			// Removing old entries
@@ -1092,14 +1252,8 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 				db.delete(table, getWhereClause(where),
 						getWhereArgs(where, args));
 				// Creating new entries
-				for (int id : ids) {
-					ContentValues values = new ContentValues();
-					values.put(base_column, base_id);
-					values.put(rel_column, id);
-					values.put("odoo_name", mUser.getAndroidName());
-					values.put("local_write_date", ODate.getDate());
-					db.insert(table, null, values);
-				}
+				manageManyToManyRecords(db, rel_model, ids, base_id,
+						Command.Add);
 			}
 			break;
 		}
@@ -1387,7 +1541,6 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			getSyncHelper().syncWithServer();
 			return null;
 		}
-
 	}
 }
 

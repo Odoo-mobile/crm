@@ -5,13 +5,25 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
     <string name="create_new">Create New</string>
-     <string name="edit">Edit</string>
-      <string name="delete">Delete</string>
-       <string name="save">Save</string>
-       
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
 
-    <!--  Labels -->
+    <!-- Labels -->
     <string name="label_save">Save</string>
     <string name="label_edit">Edit</string>
     <string name="label_create">Create New</string>
+    <string name="label_create_opportunity">Create Opportunity</string>
+    <string name="label_convert_to_opp">Convert To Opportunity</string>
+    <string name="label_merge_with_opp">Merge with existing opportunities</string>
+
+    <!-- Toast Messages -->
+    <string name="toast_sync_before">Sync Before Converting</string>
+    <string name="toast_no_netowrk">No Network</string>
+    <string name="toast_converted_to_opp">Converted To Opportunity</string>
+    
+
+    <!-- Progressbar Messages -->
+    <string name="process_converting_to_opp">converting to opportunity</string>
+
 </resources>

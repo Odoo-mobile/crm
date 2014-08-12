@@ -26,6 +26,7 @@ import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
+import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 
@@ -48,6 +49,7 @@ public class ResPartner extends OModel {
 	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
+	OColumn parent_id = new OColumn("Related Company", ResPartner.class, RelationType.ManyToOne);
 
 	public ResPartner(Context context) {
 		super(context, "res.partner");

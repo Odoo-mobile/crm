@@ -36,14 +36,12 @@ import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.base.ir.IrModel;
-import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ORelationRecordList.ORelationRecords;
 import com.odoo.support.OUser;
 import com.odoo.util.ODate;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.StringUtils;
-import com.odoo.util.logger.OLog;
 
 /**
  * The Class OSyncHelper.
@@ -407,7 +405,7 @@ public class OSyncHelper {
 	}
 
 	/**
-	 * Creates the record onserver.
+	 * Creates the record on server.
 	 * 
 	 * @param model
 	 *            the model
@@ -415,18 +413,44 @@ public class OSyncHelper {
 	private void createRecordOnserver(OModel model) {
 		try {
 			for (ODataRow row : model.select("id = ? ", new Object[] { 0 })) {
+				create(model, row);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * Creates record on server
+	 * 
+	 * @param data_row
+	 *            the data_row
+	 */
+	public void create(ODataRow data_row) {
+		create(mModel, data_row);
+	}
+
+	/**
+	 * Creates record on server
+	 * 
+	 * @param model
+	 *            the model
+	 * @param data_row
+	 *            the data_row
+	 */
+	public void create(OModel model, ODataRow data_row) {
+		try {
+			JSONObject values = createJSONValues(model, data_row);
+			if (values != null) {
 				Integer newId = 0;
-				JSONObject values = createJSONValues(model, row);
-				if (values != null) {
-					values.remove("id");
-					JSONObject result = mOdoo.createNew(model.getModelName(),
-							values);
-					newId = result.getInt("result");
-					OValues vals = new OValues();
-					vals.put("id", newId);
-					vals.put("is_dirty", "false");
-					model.update(vals, row.getInt(OColumn.ROW_ID));
-				}
+				values.remove("id");
+				JSONObject result = mOdoo.createNew(model.getModelName(),
+						values);
+				newId = result.getInt("result");
+				OValues vals = new OValues();
+				vals.put("id", newId);
+				vals.put("is_dirty", "false");
+				model.update(vals, data_row.getInt(OColumn.ROW_ID));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -719,7 +743,12 @@ public class OSyncHelper {
 						rel_key = m2m.getTableName() + "_" + column.getName();
 						JSONArray ids_list = record.getJSONArray(column
 								.getName());
-						for (int i = 0; i < ids_list.length(); i++) {
+						int len = ids_list.length();
+						// limiting sync limit for many to many
+						int record_len = column.getRecordSyncLimit();
+						if (record_len != -1 && len > record_len)
+							len = record_len;
+						for (int i = 0; i < len; i++) {
 							r_ids.add(ids_list.getInt(i));
 						}
 						values.put(column.getName(), r_ids);
@@ -981,6 +1010,24 @@ public class OSyncHelper {
 	 */
 	public Object callMethod(String method, OArguments args,
 			JSONObject context, JSONObject kwargs) {
+		return callMethod(mModel.getModelName(), method, args, context, kwargs);
+	}
+
+	/**
+	 * Call method.
+	 * 
+	 * @param method
+	 *            the method
+	 * @param args
+	 *            the args
+	 * @param context
+	 *            the context
+	 * @param kwargs
+	 *            the kwargs
+	 * @return the object
+	 */
+	public Object callMethod(String model, String method, OArguments args,
+			JSONObject context, JSONObject kwargs) {
 		try {
 			if (kwargs == null)
 				kwargs = new JSONObject();
@@ -989,6 +1036,7 @@ public class OSyncHelper {
 			}
 			JSONObject result = mOdoo.call_kw(mModel.getModelName(), method,
 					args.getArray(), kwargs);
+
 			if (result.has("result")) {
 				return result.get("result");
 			}

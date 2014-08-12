@@ -27,7 +27,7 @@ public class CRMLead extends OModel {
 			RelationType.ManyToOne);
 	OColumn name = new OColumn("Subject", OVarchar.class, 64).setRequired(true);
 	OColumn email_from = new OColumn("Email", OVarchar.class, 128);
-	OColumn create_date = new OColumn("Creation Date", ODateTime.class).setParsePatter(ODate.DEFAULT_FORMAT);
+	OColumn create_date = new OColumn("Creation Date", ODateTime.class).setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn description = new OColumn("Note", OText.class);
 	OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
 			RelationType.ManyToMany);
@@ -36,8 +36,8 @@ public class CRMLead extends OModel {
 	OColumn opt_out = new OColumn("Opt-Out", OBoolean.class);
 	OColumn type = new OColumn("Type", OVarchar.class, 64).setDefault("lead");
 	OColumn priority = new OColumn("Priority", OVarchar.class, 10);
-	OColumn date_open = new OColumn("Assigned", ODateTime.class).setParsePatter(ODate.DEFAULT_FORMAT);
-	OColumn date_closed = new OColumn("Closed", ODateTime.class).setParsePatter(ODate.DEFAULT_FORMAT);
+	OColumn date_open = new OColumn("Assigned", ODateTime.class).setParsePattern(ODate.DEFAULT_FORMAT);
+	OColumn date_closed = new OColumn("Closed", ODateTime.class).setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn stage_id = new OColumn("Stage", CRMCaseStage.class,
 			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
@@ -57,9 +57,9 @@ public class CRMLead extends OModel {
 	OColumn ref = new OColumn("Reference", OVarchar.class, 64);
 	OColumn ref2 = new OColumn("Reference 2", OVarchar.class, 64);
 	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn date_action = new OColumn("Next Action Date", ODateTime.class)
-			.setParsePatter(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn title_action = new OColumn("Next Action", OVarchar.class, 64);
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);

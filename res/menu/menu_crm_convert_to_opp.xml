@@ -1,0 +1,16 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_crm_convert"
+        android:icon="@drawable/ic_action_done"
+        android:showAsAction="always"
+        android:title="@string/label_create_opportunity">
+    </item>
+    <item
+        android:id="@+id/menu_crm_convert_cancel"
+        android:icon="@drawable/ic_action_remove"
+        android:showAsAction="always"
+        android:title="@string/label_cancel">
+    </item>
+
+</menu>

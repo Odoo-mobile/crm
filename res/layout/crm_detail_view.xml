@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:clipToPadding="false"
     android:fillViewport="true"
-    android:paddingTop="?android:attr/actionBarSize">
+    android:paddingTop="?android:attr/actionBarSize" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,6 +19,40 @@
             android:padding="15dp"
             android:visibility="gone"
             odoo:model="crm.lead" >
+
+            <LinearLayout
+                android:id="@+id/btnLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:gravity="center_vertical" >
+
+                <Button
+                    android:id="@+id/btnConvertToOpportunity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Convert to Opportunity"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <Button
+                    android:id="@+id/btnCancelCase"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Cancel Case"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+
+                <Button
+                    android:id="@+id/btnLeadReset"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Reset"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:visibility="gone" />
+
+            </LinearLayout>
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
@@ -80,6 +114,21 @@
             android:visibility="gone"
             odoo:model="crm.lead" >
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:gravity="center_vertical" >
+
+                <Button
+                    android:id="@+id/btnConvertToQuotation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Convert to Quotation"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
+
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -134,7 +183,7 @@
                 android:orientation="horizontal" >
 
                 <odoo.controls.OField
-                   android:layout_width="0dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     odoo:field_name="date_action"
