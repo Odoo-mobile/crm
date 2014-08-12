@@ -98,8 +98,8 @@ public class ResPartner extends OModel {
 
 	public String getcrmLeadCount(ODataRow row) {
 		CRMLead sale = new CRMLead(mContext);
-		int count = sale.count("partner_id = ? ",
-				new Object[] { row.getInt(OColumn.ROW_ID) });
+		int count = sale.count("partner_id = ? and type = ?", new Object[] {
+				row.getInt(OColumn.ROW_ID), "opportunity" });
 		if (count > 0)
 			return count + " Opportunities";
 		else

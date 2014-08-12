@@ -41,7 +41,7 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		BeforeListRowCreateListener, OnListRowViewClickListener {
 
 	public static final String TAG = ResPartners.class.getSimpleName();
-
+	public static final String KEY_DRAWER = "Sales";
 	View mView = null;
 	OList mListControl = null;
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
@@ -49,7 +49,7 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	DataLoader mDataLoader = null;
 	Boolean mSyncDone = false;
 	Integer mLastPosition = -1;
-	Integer mLimit = 10;
+	Integer mLimit = 4;
 
 	@Override
 	public Object databaseHelper(Context context) {
@@ -106,7 +106,6 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 					if (mOffset == 0)
 						mListRecords.clear();
 					List<ODataRow> list = null;
-
 					list = model.setLimit(mLimit).setOffset(mOffset).select();
 					if (list.size() > 0)
 						mListRecords.addAll(list);
@@ -147,7 +146,7 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
-			scope.main().refreshDrawer(TAG);
+			scope.main().refreshDrawer(KEY_DRAWER);
 			mTouchListener.setPullComplete();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
@@ -161,8 +160,8 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(TAG, "Sales", true));
-		menu.add(new DrawerItem(TAG, "Customer", count(context), 0,
+		menu.add(new DrawerItem(KEY_DRAWER, "Sales", true));
+		menu.add(new DrawerItem(KEY_DRAWER, "Customer", count(context), 0,
 				object("customer")));
 		return menu;
 	}
@@ -196,8 +195,10 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		if (mDataLoader != null) {
 			mDataLoader.cancel(true);
 		}
-		mDataLoader = new DataLoader(offset);
-		mDataLoader.execute();
+		if (mListRecords.size() == offset) {
+			mDataLoader = new DataLoader(offset);
+			mDataLoader.execute();
+		}
 	}
 
 	@Override
@@ -258,7 +259,7 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 				OLog.log("Note Mail");
 			else {
 				boolean installed = appInstalledOrNot("com.openerp");
-				OLog.log("Mail Installed messaging :"+installed);
+				OLog.log("Mail Installed messaging :" + installed);
 				if (installed) {
 					Intent LaunchIntent = getActivity().getPackageManager()
 							.getLaunchIntentForPackage("com.openerp");

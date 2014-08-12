@@ -2,7 +2,6 @@ package com.odoo.addons.sale;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import odoo.controls.OList;
 import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnListRowViewClickListener;
@@ -20,7 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 import android.widget.Toast;
-
+import com.odoo.addons.res.ResPartners;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
@@ -95,16 +94,15 @@ public class Sales extends BaseFragment implements OnPullListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(TAG, "Quotation",
-				count(context, Keys.Quotation), 0, object(Keys.Quotation)));
-		menu.add(new DrawerItem(TAG, "Sales Order", count(context,
-				Keys.Sale_order), 0, object(Keys.Sale_order)));
+		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Quotation", count(
+				context, Keys.Quotation), 0, object(Keys.Quotation)));
+		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Sales Order", count(
+				context, Keys.Sale_order), 0, object(Keys.Sale_order)));
 		return menu;
 	}
 
 	private int count(Context context, Keys key) {
 		int count = 0;
-
 		switch (key) {
 		case Quotation:
 			count = new SaleOrder(context).count("state = ? or state = ?",
@@ -204,7 +202,7 @@ public class Sales extends BaseFragment implements OnPullListener,
 	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
-			scope.main().refreshDrawer(TAG);
+			scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
 			mTouchListener.setPullComplete();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
@@ -309,5 +307,6 @@ public class Sales extends BaseFragment implements OnPullListener,
 				break;
 			}
 		}
+		scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
 	}
 }

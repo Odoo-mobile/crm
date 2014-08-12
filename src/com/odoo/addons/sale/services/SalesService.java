@@ -1,7 +1,5 @@
 package com.odoo.addons.sale.services;
 
-import odoo.Odoo;
-import odoo.controls.OList;
 import android.accounts.Account;
 import android.app.Service;
 import android.content.ContentProviderClient;

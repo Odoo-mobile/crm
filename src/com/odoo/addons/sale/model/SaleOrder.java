@@ -24,8 +24,7 @@ import com.odoo.util.ODate;
 public class SaleOrder extends OModel {
 	Context mContext = null;
 	OColumn name = new OColumn("name", OVarchar.class, 64);
-	OColumn date_order = new OColumn("Date", ODateTime.class)
-			.setParsePattern(ODate.DEFAULT_FORMAT);
+	OColumn date_order = new OColumn("Date", ODateTime.class);
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
 			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
@@ -55,6 +54,9 @@ public class SaleOrder extends OModel {
 	public SaleOrder(Context context) {
 		super(context, "sale.order");
 		mContext = context;
+		if (user().getVersion_number() == 7) {
+			date_order.setParsePattern(ODate.DEFAULT_DATE_FORMAT);
+		}
 	}
 
 	public String stateChange(ODataRow row) {

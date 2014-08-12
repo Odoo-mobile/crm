@@ -5,7 +5,6 @@ import java.util.List;
 import odoo.controls.OForm;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,13 +24,13 @@ import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.ODate;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.logger.OLog;
 
 public class QuotationsDetail extends BaseFragment {
 	private View mView = null;
 	Context mContext = null;
 	private Integer mId = null;
 	private OForm mForm = null;
+	private OForm mFormLine = null;
 	private ODataRow mRecord = null;
 	private ODataRow mRecordLine = null;
 	private Keys mKey = null;
@@ -63,20 +62,25 @@ public class QuotationsDetail extends BaseFragment {
 
 	private void init() {
 		OControls.setVisible(mView, R.id.odooFormQuotations);
-
 		mForm = (OForm) mView.findViewById(R.id.odooFormQuotations);
+		mFormLine = (OForm) mView.findViewById(R.id.odooFormOrderLine);
 		SalesOrderLine saleOrderLine = new SalesOrderLine(getActivity());
 		if (mId != null) {
 			mRecord = db().select(mId);
 			mForm.initForm(mRecord);
 			mRecordLine = saleOrderLine.select(mId);
-			if (mRecord.getString("state").equals("draft"))
+			// mFormLine.initForm(mRecordLine);
+			if (mRecord.getString("state").equals("draft")) {
 				mForm.setEditable(true);
-			else
+				// mFormLine.setEditable(true);
+			} else {
 				mForm.setEditable(false);
+				// mFormLine.setEditable(false);
+			}
 		} else {
 			mForm.setModel(db());
-			mForm.setEditable(true);
+			mForm.setEditable(false);
+			// mFormLine.setEditable(false);
 		}
 
 	}

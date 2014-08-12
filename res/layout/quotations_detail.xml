@@ -84,7 +84,6 @@
 
         </odoo.controls.OForm>
 
-        <!--
         <odoo.controls.OForm
             android:id="@+id/odooFormOrderLine"
             android:layout_width="match_parent"
@@ -99,15 +98,6 @@
                 android:layout_weight="1"
                 odoo:field_name="product_id"
                 odoo:label_bottom_border_height="0"
-                odoo:with_label="false" />
-
-            <odoo.controls.OField
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                odoo:field_name="name"
-                odoo:label_bottom_border_height="0"
-                odoo:label_color="@color/odoo_purple"
                 odoo:with_label="false" />
 
             <odoo.controls.OField
@@ -132,22 +122,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                odoo:field_name="tax_id"
-                odoo:label_bottom_border_height="0"
-                odoo:label_color="@color/odoo_purple"
-                odoo:with_label="false" />
-
-            <odoo.controls.OField
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
                 odoo:field_name="price_subtotal"
                 odoo:label_bottom_border_height="0"
                 odoo:label_color="@color/odoo_purple"
                 odoo:with_label="false" />
         </odoo.controls.OForm>
-        -->
-
     </LinearLayout>
 
 </ScrollView>
