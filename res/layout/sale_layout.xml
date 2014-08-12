@@ -1,0 +1,14 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/oe_listview_background_selector"
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <odoo.controls.OList
+        android:id="@+id/sales_listRecords"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+    </odoo.controls.OList>
+
+</LinearLayout>

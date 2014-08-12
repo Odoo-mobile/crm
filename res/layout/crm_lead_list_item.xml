@@ -1,0 +1,32 @@
+<odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res/com.odoo.crm"
+    android:id="@+id/crmLeadOppListItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="15dp"
+    odoo:model="crm.lead" >
+
+    <odoo.controls.OLabel
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:bottom_border_height="2"
+        app:label="Leads / Opportunities"
+        app:color="@color/odoo_purple" >
+    </odoo.controls.OLabel>
+
+    <odoo.controls.OField
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:field_name="contact_name" >
+    </odoo.controls.OField>
+
+    <odoo.controls.OField
+        android:id="@+id/type"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:field_name="email_from" >
+    </odoo.controls.OField>
+
+</odoo.controls.OForm>
