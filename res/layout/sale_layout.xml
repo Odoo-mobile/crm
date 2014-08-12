@@ -3,7 +3,14 @@
     android:layout_height="match_parent"
     android:background="@drawable/oe_listview_background_selector"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:padding="10dp"
+    android:paddingTop="?android:attr/actionBarSize" >
+
+    <include
+        android:id="@+id/loadingProgress"
+        layout="@layout/listview_data_loading_progress"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" />
 
     <odoo.controls.OList
         android:id="@+id/sales_listRecords"

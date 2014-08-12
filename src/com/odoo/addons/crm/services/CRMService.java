@@ -32,18 +32,18 @@ public class CRMService extends OService {
 			OSyncHelper sync = null;
 			Intent intent = new Intent();
 			intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-
 			if (extras != null) {
-				if (extras.containsKey("crmphone")) {
+				if (extras.containsKey("crmcall")) {
 					CRMPhoneCall db = new CRMPhoneCall(context);
 					sync = db.getSyncHelper();
 				} else {
 					CRMLead db = new CRMLead(context);
 					sync = db.getSyncHelper();
 				}
-				if (sync.syncWithServer())
-					context.sendBroadcast(intent);
 			}
+			if (sync.syncWithServer())
+				context.sendBroadcast(intent);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

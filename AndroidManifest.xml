@@ -125,7 +125,6 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_sale_data" />
         </service>
-
         <!-- Res service -->
         <provider
             android:name="com.odoo.addons.res.providers.res.ResProvider"

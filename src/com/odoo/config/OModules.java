@@ -19,7 +19,6 @@
 package com.odoo.config;
 
 import com.odoo.addons.crm.CRM;
-import com.odoo.addons.crm.CRMPhoneCalls;
 import com.odoo.addons.res.ResPartners;
 import com.odoo.addons.sale.Sales;
 import com.odoo.support.OModule;
@@ -30,9 +29,8 @@ import com.odoo.support.OModulesHelper;
  */
 public class OModules extends OModulesHelper {
 
-	OModule crm = new OModule(CRM.class).setDefault();
-	OModule res_partner = new OModule(ResPartners.class);
+	OModule res_partner = new OModule(ResPartners.class).setDefault();
+	OModule crm = new OModule(CRM.class);
 	OModule sale = new OModule(Sales.class);
-	OModule crm_phone_call = new OModule(CRMPhoneCalls.class);
-
+	// OModule crm_phone_call = new OModule(CRMPhoneCalls.class);
 }

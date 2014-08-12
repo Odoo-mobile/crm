@@ -8,7 +8,9 @@ import com.odoo.base.res.ResCountry;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
@@ -27,7 +29,8 @@ public class CRMLead extends OModel {
 			RelationType.ManyToOne);
 	OColumn name = new OColumn("Subject", OVarchar.class, 64).setRequired(true);
 	OColumn email_from = new OColumn("Email", OVarchar.class, 128);
-	OColumn create_date = new OColumn("Creation Date", ODateTime.class).setParsePattern(ODate.DEFAULT_FORMAT);
+	OColumn create_date = new OColumn("Creation Date", ODateTime.class)
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn description = new OColumn("Note", OText.class);
 	OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
 			RelationType.ManyToMany);
@@ -36,8 +39,10 @@ public class CRMLead extends OModel {
 	OColumn opt_out = new OColumn("Opt-Out", OBoolean.class);
 	OColumn type = new OColumn("Type", OVarchar.class, 64).setDefault("lead");
 	OColumn priority = new OColumn("Priority", OVarchar.class, 10);
-	OColumn date_open = new OColumn("Assigned", ODateTime.class).setParsePattern(ODate.DEFAULT_FORMAT);
-	OColumn date_closed = new OColumn("Closed", ODateTime.class).setParsePattern(ODate.DEFAULT_FORMAT);
+	OColumn date_open = new OColumn("Assigned", ODateTime.class)
+			.setParsePattern(ODate.DEFAULT_FORMAT);
+	OColumn date_closed = new OColumn("Closed", ODateTime.class)
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn stage_id = new OColumn("Stage", CRMCaseStage.class,
 			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
@@ -64,10 +69,21 @@ public class CRMLead extends OModel {
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);
 	OColumn planned_cost = new OColumn("Planned Cost", OReal.class, 20);
+	@Functional(method = "plannedProbability")
+	OColumn plannedProbabilityTotal = new OColumn("Total Amount", OText.class);
 
 	public CRMLead(Context context) {
 		super(context, "crm.lead");
 		mContext = context;
+	}
+
+	public String plannedProbability(ODataRow row) {
+		if (!row.getString("planned_revenue").equals("false")
+				&& Double.parseDouble(row.getString("planned_revenue")) > 0)
+			return row.getString("planned_revenue") + " at "
+					+ row.getString("probability") + "%";
+		else
+			return "";
 	}
 
 	@Override
@@ -75,7 +91,7 @@ public class CRMLead extends OModel {
 		ODomain domain = new ODomain();
 		domain.add("|");
 		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
-		domain.add("user_id", "=", false);
+		// domain.add("user_id", "=", false);
 		return domain;
 	}
 

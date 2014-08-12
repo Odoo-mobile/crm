@@ -34,7 +34,8 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 
 	public static final String TAG = CRMPhoneCalls.class.getSimpleName();
 
-	enum PhoneKeys {
+	enum Keys {
+
 		SchduledLoggedcalls
 	}
 
@@ -43,15 +44,14 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
-	PhoneKeys mCurrentKey = PhoneKeys.SchduledLoggedcalls;
+	Keys mCurrentKey = Keys.SchduledLoggedcalls;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		setHasOptionsMenu(true);
 		scope = new AppScope(this);
-		mView = inflater
-				.inflate(R.layout.common_list_control, container, false);
+		mView = inflater.inflate(R.layout.common_list_control, container, false);
+		setHasOptionsMenu(true);
 		init();
 		return mView;
 	}
@@ -60,15 +60,15 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 		checkArguments();
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
 		mTouchListener = scope.main().getTouchAttacher();
-		mTouchListener.setPullableView(mListControl, this);
-		mListControl.setOnRowClickListener(this);
+		 mTouchListener.setPullableView(mListControl, this);
+		 mListControl.setOnRowClickListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
 	}
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		mCurrentKey = PhoneKeys.valueOf(arg.getString("crmphone"));
+		mCurrentKey = Keys.valueOf(arg.getString("crmcall"));
 	}
 
 	@Override
@@ -82,21 +82,26 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 
 		menu.add(new DrawerItem(TAG, "Phone Call", true));
 		menu.add(new DrawerItem(TAG, "Logged Calls", count(context,
-				PhoneKeys.SchduledLoggedcalls), 0,
-				object(PhoneKeys.SchduledLoggedcalls)));
+				Keys.SchduledLoggedcalls), 0, object(Keys.SchduledLoggedcalls)));
 		return menu;
 	}
 
-	private int count(Context context, PhoneKeys key) {
+	private int count(Context context, Keys key) {
 		int count = 0;
-		count = new CRMPhoneCall(context).count();
+		switch (key) {
+		case SchduledLoggedcalls:
+			count = new CRMPhoneCall(context).count();
+			break;
+		default:
+			break;
+		}
 		return count;
 	}
 
-	private Fragment object(PhoneKeys value) {
+	private Fragment object(Keys value) {
 		CRMPhoneCalls crmCalls = new CRMPhoneCalls();
 		Bundle args = new Bundle();
-		args.putString("crmphone", value.toString());
+		args.putString("crmcall", value.toString());
 		crmCalls.setArguments(args);
 		return crmCalls;
 	}
@@ -128,12 +133,14 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 				@Override
 				public void run() {
 					if (db().isEmptyTable()) {
-						Bundle args = new Bundle();
-						args.putString("crmphone", "pull_callLog");
-						scope.main().requestSync(CRMProvider.AUTHORITY, args);
+						scope.main().requestSync(CRMProvider.AUTHORITY);
 					}
 					mListRecords.clear();
-					mListRecords.addAll(db().select());
+					switch (mCurrentKey) {
+					case SchduledLoggedcalls:
+						mListRecords.addAll(db().select());
+						break;
+					}
 				}
 			});
 			return null;
@@ -142,6 +149,11 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
+			switch (mCurrentKey) {
+			case SchduledLoggedcalls:
+				mListControl.setCustomView(R.layout.crm_custom_lead_layout);
+				break;
+			}
 			mListControl.setCustomView(R.layout.crm_phone_custom_layout);
 			mListControl.initListControl(mListRecords);
 			OControls.setGone(mView, R.id.loadingProgress);
@@ -152,7 +164,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	@Override
 	public void onPullStarted(View arg0) {
 		Bundle args = new Bundle();
-		args.putString("crmphone", "pull_callLog");
+		args.putString("crmcall", "pull_callLog");
 		scope.main().requestSync(CRMProvider.AUTHORITY, args);
 	}
 

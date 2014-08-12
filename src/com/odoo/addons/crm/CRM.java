@@ -20,6 +20,7 @@ import android.widget.SearchView;
 
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
+import com.odoo.addons.res.ResPartners;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.receivers.SyncFinishReceiver;
@@ -80,12 +81,10 @@ public class CRM extends BaseFragment implements OnPullListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-
-		menu.add(new DrawerItem(TAG, "CRM", true));
-		menu.add(new DrawerItem(TAG, "Leads", count(context, Keys.Leads), 0,
-				object(Keys.Leads)));
-		menu.add(new DrawerItem(TAG, "Opportunities", count(context,
-				Keys.Opportunities), 0, object(Keys.Opportunities)));
+		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Leads", count(context,
+				Keys.Leads), 0, object(Keys.Leads)));
+		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Opportunities", count(
+				context, Keys.Opportunities), 0, object(Keys.Opportunities)));
 		return menu;
 	}
 
@@ -123,8 +122,20 @@ public class CRM extends BaseFragment implements OnPullListener,
 								new String[] { "lead" }));
 						break;
 					case Opportunities:
-						mListRecords.addAll(db().select("type = ?",
-								new String[] { "opportunity" }));
+						// if true filter opportunity
+						if (getArguments().containsKey("id")) {
+							mListRecords
+									.addAll(db().select(
+											"partner_id = ? AND type = ?",
+											new String[] {
+													getArguments().getString(
+															"id"),
+													getArguments().getString(
+															"type") }));
+						} else {
+							mListRecords.addAll(db().select("type = ?",
+									new String[] { "opportunity" }));
+						}
 						break;
 					}
 				}
@@ -137,10 +148,11 @@ public class CRM extends BaseFragment implements OnPullListener,
 			super.onPostExecute(result);
 			switch (mCurrentKey) {
 			case Leads:
-				mListControl.setCustomView(R.layout.crm_custom_layout);
+				mListControl.setCustomView(R.layout.crm_custom_lead_layout);
 				break;
 			case Opportunities:
-				mListControl.setCustomView(R.layout.crm_custom_layout);
+				mListControl
+						.setCustomView(R.layout.crm_custom_opportunties_layout);
 				break;
 			}
 			mListControl.initListControl(mListRecords);
@@ -170,7 +182,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
-			scope.main().refreshDrawer(TAG);
+			scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
 			mTouchListener.setPullComplete();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
@@ -188,7 +200,6 @@ public class CRM extends BaseFragment implements OnPullListener,
 		return crm;
 	}
 
-	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		if (item.getItemId() == R.id.menu_crm_detail_create) {
 			CrmDetail crmDetail = new CrmDetail();
@@ -204,9 +215,10 @@ public class CRM extends BaseFragment implements OnPullListener,
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
 		inflater.inflate(R.menu.menu_crm, menu);
-		SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-		if(mListControl!=null)
-				mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
+		SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search)
+				.getActionView();
+		if (mListControl != null)
+			mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
 	}
 
 	@Override

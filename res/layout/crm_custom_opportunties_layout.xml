@@ -5,7 +5,7 @@
     android:orientation="vertical"
     android:padding="15dp"
     odoo:background_selector="@drawable/oe_listview_background_selector"
-    odoo:model="sale.order" >
+    odoo:model="crm.lead" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,19 +19,16 @@
             odoo:fieldTextStyle="bold"
             odoo:field_name="name"
             odoo:field_textAppearance="?android:attr/textAppearanceLarge"
+            odoo:singleLine="true"
             odoo:with_label="false" />
 
-        <ImageView
-            android:id="@+id/imgConfirmCreate"
+        <odoo.controls.OField
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_action_confirm_sale" />
-
-        <ImageView
-            android:id="@+id/imgCancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/ic_action_cancel" />
+            android:layout_gravity="right"
+            odoo:field_color="@color/odoo_purple"
+            odoo:field_name="stage_id"
+            odoo:with_label="false" />
     </LinearLayout>
 
     <LinearLayout
@@ -49,39 +46,18 @@
             odoo:with_label="false" />
 
         <odoo.controls.OField
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            odoo:field_name="partner_id"
-            odoo:with_label="false" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="#aaa"
-        android:dividerPadding="8dp"
-        android:orientation="horizontal" >
-
-        <odoo.controls.OField
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            odoo:field_color="@color/odoo_purple"
-            odoo:field_name="stateChange"
-            odoo:with_label="false" />
-
-        <odoo.controls.OField
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            odoo:displayPattern="MMM dd, yyyy"
-            odoo:field_name="date_order"
+            odoo:field_name="partner_id"
+            odoo:singleLine="true"
             odoo:with_label="false" />
 
         <odoo.controls.OField
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            odoo:field_name="amountTotalSymbol"
+            odoo:field_name="plannedProbabilityTotal"
             odoo:with_label="false" />
     </LinearLayout>
 
