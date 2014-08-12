@@ -77,31 +77,31 @@ public class OList extends ScrollView implements View.OnClickListener,
 	public static final String KEY_SHOW_AS_CARD = "showAsCard";
 
 	/** The context. */
-	Context mContext = null;
+	private Context mContext = null;
 
 	/** The typed array. */
-	TypedArray mTypedArray = null;
+	private TypedArray mTypedArray = null;
 
 	/** The list adapter. */
-	OListAdapter mListAdapter = null;
+	private OListAdapter mListAdapter = null;
 
 	/** The records. */
-	List<Object> mRecords = new ArrayList<Object>();
+	private List<Object> mRecords = new ArrayList<Object>();
 
 	/** The attr. */
-	OControlAttributes mAttr = new OControlAttributes();
+	private OControlAttributes mAttr = new OControlAttributes();
 
 	/** The custom layout. */
-	Integer mCustomLayout = 0;
+	private Integer mCustomLayout = 0;
 
 	/** The inner layout. */
-	LinearLayout mInnerLayout = null;
+	private LinearLayout mInnerLayout = null;
 
 	/** The layout params. */
-	LayoutParams mLayoutParams = null;
+	private LayoutParams mLayoutParams = null;
 
 	/** The on row click listener. */
-	OnRowClickListener mOnRowClickListener = null;
+	private OnRowClickListener mOnRowClickListener = null;
 
 	/** The row draggable. */
 	private Boolean mRowDraggable = false;
@@ -155,6 +155,9 @@ public class OList extends ScrollView implements View.OnClickListener,
 
 	/** The m load new records. */
 	private Boolean mLoadNewRecords = true;
+
+	/** The adapter created. */
+	private Boolean mAdapterCreated = false;
 
 	/**
 	 * Instantiates a new list control.
@@ -265,13 +268,16 @@ public class OList extends ScrollView implements View.OnClickListener,
 				mRecords.clear();
 				mRecords.addAll(records);
 				createAdapter();
-				if (mRecords.size() <= 0) {
-					showEmptyListView();
-				}
 			} else {
 				mLoadNewRecords = false;
 				removeDataLoaderProgress();
 			}
+		}
+		if (!mAdapterCreated) {
+			createAdapter();
+		}
+		if (mRecords.size() <= 0) {
+			showEmptyListView();
 		}
 	}
 
@@ -294,7 +300,26 @@ public class OList extends ScrollView implements View.OnClickListener,
 			int lastPosition = mRecords.size();
 			mRecords.addAll(lastPosition, newRecords);
 			mListAdapter.notifiyDataChange(mRecords);
-			addRecordViews(lastPosition);
+			addRecordViews(lastPosition, -1);
+		} else {
+			mLoadNewRecords = false;
+			removeDataLoaderProgress();
+		}
+	}
+
+	/**
+	 * Append records at position.
+	 * 
+	 * @param index
+	 *            the index
+	 * @param newRecords
+	 *            the new records
+	 */
+	public void appendRecords(Integer index, List<ODataRow> newRecords) {
+		if (newRecords.size() > 0) {
+			mRecords.addAll(index, newRecords);
+			mListAdapter.notifiyDataChange(mRecords);
+			addRecordViews(index, newRecords.size() + 1);
 		} else {
 			mLoadNewRecords = false;
 			removeDataLoaderProgress();
@@ -341,7 +366,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 			}
 		};
 		mListAdapter.setOnSearchChange(this);
-		addRecordViews(0);
+		mAdapterCreated = true;
+		addRecordViews(0, -1);
 	}
 
 	/**
@@ -368,6 +394,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 	 * Show empty list view.
 	 */
 	private void showEmptyListView() {
+		mInnerLayout.removeAllViews();
 		LinearLayout mEmptyListLayout = new LinearLayout(mContext);
 		mEmptyListLayout.setOrientation(LinearLayout.VERTICAL);
 		Integer padding = (int) (20 * mScaleFactor);
@@ -408,8 +435,8 @@ public class OList extends ScrollView implements View.OnClickListener,
 	/**
 	 * Adds the record views.
 	 */
-	private void addRecordViews(Integer position) {
-		if (position == 0) {
+	private void addRecordViews(Integer start, Integer end) {
+		if (start == 0 && end == -1) {
 			removeAllViews();
 			mInnerLayout.removeAllViews();
 			addView(mInnerLayout);
@@ -417,7 +444,11 @@ public class OList extends ScrollView implements View.OnClickListener,
 			mInnerLayout = (LinearLayout) findViewWithTag("list_parent_view");
 			removeDataLoaderProgress();
 		}
-		for (int i = position; i < mListAdapter.getCount(); i++) {
+		if (end == -1) {
+			end = mListAdapter.getCount();
+		}
+		int listLen = mListAdapter.getCount();
+		for (int i = start; i < end; i++) {
 			OForm view = (OForm) mListAdapter.getView(i, null, null);
 			view.setTag(i);
 			if (mOnRowClickListener != null) {
@@ -434,14 +465,21 @@ public class OList extends ScrollView implements View.OnClickListener,
 			if (mAttr.getBoolean(KEY_SHOW_AS_CARD, false)) {
 				ViewGroup card = cardOuterView(i);
 				card.addView(view);
-				mInnerLayout.addView(card);
+				if (end == listLen)
+					mInnerLayout.addView(card);
+				else
+					mInnerLayout.addView(card, i);
 				mInnerLayout
 						.setBackgroundResource(R.color.card_view_parent_background);
 				setBackgroundResource(R.color.card_view_parent_background);
 			} else {
 				mInnerLayout.addView(view);
-				if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true))
-					mInnerLayout.addView(divider());
+				if (mAttr.getBoolean(KEY_SHOW_DIVIDER, true)) {
+					if (end == listLen)
+						mInnerLayout.addView(divider());
+					else
+						mInnerLayout.addView(divider(), i);
+				}
 			}
 		}
 	}
@@ -956,7 +994,7 @@ public class OList extends ScrollView implements View.OnClickListener,
 		}
 		mRecords.clear();
 		mRecords.addAll(newRecords);
-		addRecordViews(0);
+		addRecordViews(0, -1);
 		if (mRecords.size() <= 0) {
 			showEmptyListView();
 		}

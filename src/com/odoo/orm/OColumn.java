@@ -99,6 +99,12 @@ public class OColumn {
 	/** The functional_store_depends. */
 	private String[] functional_store_depends = null;
 
+	/** The sync limit. */
+	private Integer mSyncLimit = -1;
+
+	/** The check row id. */
+	private Boolean checkRowId = true;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -445,7 +451,6 @@ public class OColumn {
 	public void setFunctionalMethod(Method method) {
 		functional_method = method;
 		is_functional_column = true;
-		setLocalColumn();
 	}
 
 	/**
@@ -570,6 +575,50 @@ public class OColumn {
 		if (functional_store_depends != null)
 			return Arrays.asList(functional_store_depends);
 		return new ArrayList<String>();
+	}
+
+	/**
+	 * Sets the record sync limit.
+	 * 
+	 * 
+	 * @default -1
+	 * @param limit
+	 *            the limit
+	 * @return the column
+	 */
+	public OColumn setRecordSyncLimit(Integer limit) {
+		mSyncLimit = limit;
+		return this;
+	}
+
+	/**
+	 * Gets the record sync limit.
+	 * 
+	 * @return the record sync limit
+	 */
+	public Integer getRecordSyncLimit() {
+		return mSyncLimit;
+	}
+
+	/**
+	 * Check row id.
+	 * 
+	 * @param check
+	 *            the check
+	 * @return the o column
+	 */
+	public OColumn checkRowId(Boolean check) {
+		checkRowId = check;
+		return this;
+	}
+
+	/**
+	 * Check row id.
+	 * 
+	 * @return the boolean
+	 */
+	public Boolean checkRowId() {
+		return checkRowId;
 	}
 
 	/**
