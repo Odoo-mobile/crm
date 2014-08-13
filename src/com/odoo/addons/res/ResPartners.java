@@ -205,7 +205,7 @@ public class ResPartners extends BaseFragment implements OnRowClickListener,
 
 	@Override
 	public Boolean showLoader() {
-		return false;
+		return true;
 	}
 
 	@Override

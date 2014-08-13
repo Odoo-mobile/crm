@@ -30,7 +30,7 @@
     <uses-permission android:name="android.permission.CALL_PHONE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-    
+
     <application
         android:name="com.odoo.App"
         android:allowBackup="true"
@@ -126,17 +126,17 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_sale_data" />
         </service>
-        <!-- Res service -->
+        <!-- ResPartner service -->
         <provider
             android:name="com.odoo.addons.res.providers.res.ResProvider"
-            android:authorities="com.odoo.addons.res.providers.res"
+            android:authorities="com.odoo.addons.res.providers"
             android:enabled="true"
             android:exported="true"
-            android:label="Res"
+            android:label="Partner"
             android:syncable="true" />
 
         <service
-            android:name="com.odoo.base.res.services.ResService"
+            android:name="com.odoo.addons.res.services.ResService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -147,6 +147,7 @@
                 android:resource="@xml/sync_res_data" />
         </service>
 
+        <!-- Phone state receiver -->
         <receiver android:name="com.odoo.addons.crm.receivers.PhoneStateReceiver" >
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />

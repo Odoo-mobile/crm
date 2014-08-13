@@ -42,7 +42,7 @@
                     odoo:field_color="@color/odoo_purple"
                     odoo:field_name="name"
                     odoo:field_textAppearance="?android:attr/textAppearanceMedium"
-                    odoo:textLines="1"
+                    odoo:singleLine="true"
                     odoo:with_label="false" />
 
                 <ImageView

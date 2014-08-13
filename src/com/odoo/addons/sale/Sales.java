@@ -2,6 +2,7 @@ package com.odoo.addons.sale;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import odoo.controls.OList;
 import odoo.controls.OList.OnListBottomReachedListener;
 import odoo.controls.OList.OnListRowViewClickListener;
@@ -22,6 +23,7 @@ import android.widget.SearchView;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
+
 import com.odoo.addons.res.ResPartners;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
@@ -269,7 +271,7 @@ public class Sales extends BaseFragment implements OnRowClickListener,
 
 	@Override
 	public Boolean showLoader() {
-		return false;
+		return true;
 	}
 
 	@Override
