@@ -15,10 +15,14 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+import android.widgets.SwipeRefreshLayout;
+import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.crm.CRM;
 import com.odoo.addons.res.providers.res.ResProvider;
@@ -33,23 +37,21 @@ import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.odoo.util.logger.OLog;
-import com.openerp.OETouchListener;
-import com.openerp.OETouchListener.OnPullListener;
 
-public class ResPartners extends BaseFragment implements OnPullListener,
-		OnRowClickListener, OnListBottomReachedListener,
-		BeforeListRowCreateListener, OnListRowViewClickListener {
+public class ResPartners extends BaseFragment implements OnRowClickListener,
+		OnListBottomReachedListener, BeforeListRowCreateListener,
+		OnListRowViewClickListener, OnRefreshListener {
 
 	public static final String TAG = ResPartners.class.getSimpleName();
 	public static final String KEY_DRAWER = "Sales";
 	View mView = null;
 	OList mListControl = null;
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	Boolean mSyncDone = false;
 	Integer mLastPosition = -1;
 	Integer mLimit = 4;
+	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	@Override
 	public Object databaseHelper(Context context) {
@@ -69,8 +71,6 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 
 	public void init() {
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
-		mTouchListener = scope.main().getTouchAttacher();
-		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
 		mListControl.setOnListBottomReachedListener(this);
 		mListControl.setRecordLimit(mLimit);
@@ -80,6 +80,13 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		mListControl.setOnListRowViewClickListener(R.id.imgCall, this);
 		mListControl.setOnListRowViewClickListener(R.id.oCrmLeadCount, this);
 		mListControl.setOnListRowViewClickListener(R.id.oSaleOrderCount, this);
+		mSwipeRefresh = (SwipeRefreshLayout) mView
+				.findViewById(R.id.swipe_container);
+		mSwipeRefresh.setOnRefreshListener(this);
+		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
+				android.R.color.holo_green_light,
+				android.R.color.holo_orange_light,
+				android.R.color.holo_red_light);
 		if (mLastPosition == -1) {
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
@@ -126,11 +133,6 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 	}
 
 	@Override
-	public void onPullStarted(View arg0) {
-		scope.main().requestSync(ResProvider.AUTHORITY);
-	}
-
-	@Override
 	public void onResume() {
 		super.onResume();
 		scope.main().registerReceiver(mSyncFinishReceiver,
@@ -147,13 +149,13 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
 			scope.main().refreshDrawer(KEY_DRAWER);
-			mTouchListener.setPullComplete();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
 			mDataLoader = new DataLoader(0);
 			mDataLoader.execute();
 			mSyncDone = true;
+			hideRefreshingProgress();
 		}
 	};
 
@@ -295,5 +297,25 @@ public class ResPartners extends BaseFragment implements OnPullListener,
 			app_installed = false;
 		}
 		return app_installed;
+	}
+
+	@Override
+	public void onRefresh() {
+		if (app().inNetwork()) {
+			scope.main().requestSync(ResProvider.AUTHORITY);
+		} else {
+			hideRefreshingProgress();
+			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
+					.show();
+		}
+	}
+
+	private void hideRefreshingProgress() {
+		new Handler().postDelayed(new Runnable() {
+			@Override
+			public void run() {
+				mSwipeRefresh.setRefreshing(false);
+			}
+		}, 1000);
 	}
 }
