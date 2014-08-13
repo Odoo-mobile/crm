@@ -121,6 +121,27 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_sale_data" />
         </service>
+
+        <!-- ResPartner service -->
+        <provider
+            android:name="com.odoo.addons.res.providers.res.ResProvider"
+            android:authorities="com.odoo.addons.res.providers"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Partner"
+            android:syncable="true" />
+
+        <service
+            android:name="com.odoo.addons.res.services.ResService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_res_data" />
+        </service>
     </application>
 
 </manifest>
