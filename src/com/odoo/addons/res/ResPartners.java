@@ -253,8 +253,14 @@ public class ResPartners extends BaseFragment implements OnRowClickListener,
 
 			if (row.getString("phone").equals("false"))
 				OLog.log("Not Call");
-			else
-				OLog.log("Call");
+			else {
+
+				String phoneNo = (row.getString("phone").replace(" ", "")
+						.replace("+", ""));
+				Intent callIntent = new Intent(Intent.ACTION_CALL);
+				callIntent.setData(Uri.parse("tel:" + phoneNo));
+				startActivity(callIntent);
+			}
 			break;
 		case R.id.imgMail:
 			if (row.getString("email").equals("false"))
