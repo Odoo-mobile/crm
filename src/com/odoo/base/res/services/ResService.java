@@ -12,6 +12,7 @@ import android.util.Log;
 import com.odoo.base.res.ResPartner;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OService;
 
 public class ResService extends OService {
@@ -24,8 +25,8 @@ public class ResService extends OService {
 	}
 
 	@Override
-	public void performSync(Context context, Account account, Bundle extras,
-			String authority, ContentProviderClient provider,
+	public void performSync(Context context, OUser user, Account account,
+			Bundle extras, String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		Log.v(TAG, "ResPartnerService:performSync()");
 		try {
@@ -39,7 +40,6 @@ public class ResService extends OService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 }

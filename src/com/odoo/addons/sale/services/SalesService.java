@@ -12,6 +12,7 @@ import android.util.Log;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OService;
 import com.odoo.support.service.OServiceListener;
 
@@ -24,8 +25,8 @@ public class SalesService extends OService implements OServiceListener {
 	}
 
 	@Override
-	public void performSync(Context context, Account account, Bundle extras,
-			String authority, ContentProviderClient provider,
+	public void performSync(Context context, OUser user, Account account,
+			Bundle extras, String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		Log.v(TAG, "SalesService:performSync()");
 		try {

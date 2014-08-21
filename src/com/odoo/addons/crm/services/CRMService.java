@@ -12,6 +12,7 @@ import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.orm.OSyncHelper;
 import com.odoo.receivers.SyncFinishReceiver;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OService;
 
 public class CRMService extends OService {
@@ -24,8 +25,8 @@ public class CRMService extends OService {
 	}
 
 	@Override
-	public void performSync(Context context, Account account, Bundle extras,
-			String authority, ContentProviderClient provider,
+	public void performSync(Context context, OUser user, Account account,
+			Bundle extras, String authority, ContentProviderClient provider,
 			SyncResult syncResult) {
 		Log.v(TAG, "CRMService:performSync()");
 		try {
@@ -48,4 +49,5 @@ public class CRMService extends OService {
 			e.printStackTrace();
 		}
 	}
+
 }

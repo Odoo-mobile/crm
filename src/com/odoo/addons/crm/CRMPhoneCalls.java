@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.odoo.OTouchListener.OnPullListener;
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.crm.R;
@@ -26,8 +27,6 @@ import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.openerp.OETouchListener;
-import com.openerp.OETouchListener.OnPullListener;
 
 public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 		OnRowClickListener {
@@ -35,14 +34,12 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	public static final String TAG = CRMPhoneCalls.class.getSimpleName();
 
 	enum Keys {
-
 		SchduledLoggedcalls
 	}
 
 	View mView = null;
 	OList mListControl = null;
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.SchduledLoggedcalls;
 
@@ -50,7 +47,8 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		scope = new AppScope(this);
-		mView = inflater.inflate(R.layout.common_list_control, container, false);
+		mView = inflater
+				.inflate(R.layout.common_list_control, container, false);
 		setHasOptionsMenu(true);
 		init();
 		return mView;
@@ -59,9 +57,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	public void init() {
 		checkArguments();
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
-		mTouchListener = scope.main().getTouchAttacher();
-		 mTouchListener.setPullableView(mListControl, this);
-		 mListControl.setOnRowClickListener(this);
+		mListControl.setOnRowClickListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
 	}
@@ -185,7 +181,6 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
 			scope.main().refreshDrawer(TAG);
-			mTouchListener.setPullComplete();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
