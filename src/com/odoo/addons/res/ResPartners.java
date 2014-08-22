@@ -50,7 +50,7 @@ public class ResPartners extends BaseFragment implements OnRowClickListener,
 	DataLoader mDataLoader = null;
 	Boolean mSyncDone = false;
 	Integer mLastPosition = -1;
-	Integer mLimit = 4;
+	Integer mLimit = 10;
 	private SwipeRefreshLayout mSwipeRefresh = null;
 
 	@Override
@@ -162,7 +162,7 @@ public class ResPartners extends BaseFragment implements OnRowClickListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(KEY_DRAWER, "Sales", true));
+		// menu.add(new DrawerItem(KEY_DRAWER, "Sales", true));
 		menu.add(new DrawerItem(KEY_DRAWER, "Customer", count(context), 0,
 				object("customer")));
 		return menu;
@@ -253,8 +253,14 @@ public class ResPartners extends BaseFragment implements OnRowClickListener,
 
 			if (row.getString("phone").equals("false"))
 				OLog.log("Not Call");
-			else
-				OLog.log("Call");
+			else {
+
+				String phoneNo = (row.getString("phone").replace(" ", "")
+						.replace("+", ""));
+				Intent callIntent = new Intent(Intent.ACTION_CALL);
+				callIntent.setData(Uri.parse("tel:" + phoneNo));
+				startActivity(callIntent);
+			}
 			break;
 		case R.id.imgMail:
 			if (row.getString("email").equals("false"))

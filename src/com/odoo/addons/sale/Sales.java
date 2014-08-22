@@ -102,7 +102,7 @@ public class Sales extends BaseFragment implements OnRowClickListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Quotation", count(
+		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Quotations", count(
 				context, Keys.Quotation), 0, object(Keys.Quotation)));
 		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Sales Order", count(
 				context, Keys.Sale_order), 0, object(Keys.Sale_order)));

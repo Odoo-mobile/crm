@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
 
+import com.odoo.OTouchListener.OnPullListener;
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.addons.res.ResPartners;
@@ -28,8 +29,6 @@ import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.openerp.OETouchListener;
-import com.openerp.OETouchListener.OnPullListener;
 
 public class CRM extends BaseFragment implements OnPullListener,
 		OnRowClickListener {
@@ -43,7 +42,6 @@ public class CRM extends BaseFragment implements OnPullListener,
 	View mView = null;
 	OList mListControl = null;
 	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.Leads;
 
@@ -61,8 +59,6 @@ public class CRM extends BaseFragment implements OnPullListener,
 	public void init() {
 		checkArguments();
 		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
-		mTouchListener = scope.main().getTouchAttacher();
-		mTouchListener.setPullableView(mListControl, this);
 		mListControl.setOnRowClickListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();
@@ -81,10 +77,11 @@ public class CRM extends BaseFragment implements OnPullListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Leads", count(context,
-				Keys.Leads), 0, object(Keys.Leads)));
-		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Opportunities", count(
-				context, Keys.Opportunities), 0, object(Keys.Opportunities)));
+		// menu.add(new DrawerItem(TAG, "CRM", true));
+		menu.add(new DrawerItem(TAG, "Leads", count(context, Keys.Leads), 0,
+				object(Keys.Leads)));
+		menu.add(new DrawerItem(TAG, "Opportunities", count(context,
+				Keys.Opportunities), 0, object(Keys.Opportunities)));
 		return menu;
 	}
 
@@ -183,7 +180,6 @@ public class CRM extends BaseFragment implements OnPullListener,
 		@Override
 		public void onReceive(Context context, android.content.Intent intent) {
 			scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
-			mTouchListener.setPullComplete();
 			if (mDataLoader != null) {
 				mDataLoader.cancel(true);
 			}
