@@ -25,5 +25,6 @@ import com.odoo.support.OModulesHelper;
  */
 public class OModules extends OModulesHelper {
 
-	// OModule partners = new OModule(Partners.class).setDefault();
+	// OModule partners = new OModule(PartnersCursorLoader.class).setDefault();
+
 }

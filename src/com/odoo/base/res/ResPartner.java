@@ -21,6 +21,7 @@ package com.odoo.base.res;
 
 import android.content.Context;
 
+import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.OModel;
@@ -28,6 +29,7 @@ import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 /**
  * The Class Res_PartnerDBHelper.
@@ -53,4 +55,8 @@ public class ResPartner extends OModel {
 		super(context, "res.partner");
 	}
 
+	@Override
+	public OContentProvider getContentProvider() {
+		return new PartnersProvider();
+	}
 }
