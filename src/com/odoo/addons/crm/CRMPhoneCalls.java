@@ -56,7 +56,7 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 
 	public void init() {
 		checkArguments();
-		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
+		mListControl = (OList) mView.findViewById(R.id.listRecords);
 		mListControl.setOnRowClickListener(this);
 		mDataLoader = new DataLoader();
 		mDataLoader.execute();

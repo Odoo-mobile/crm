@@ -32,8 +32,6 @@ public class ResDetail extends BaseFragment {
 		mContext = getActivity();
 		setHasOptionsMenu(true);
 		mView = inflater.inflate(R.layout.res_detail, container, false);
-		mContext = getActivity();
-
 		return mView;
 	}
 
@@ -45,7 +43,7 @@ public class ResDetail extends BaseFragment {
 
 	private void initArgs() {
 		Bundle args = getArguments();
-		if (args.containsKey("id")) {
+		if (args.containsKey(OColumn.ROW_ID)) {
 			mId = args.getInt(OColumn.ROW_ID);
 		} else
 			mEditMode = true;

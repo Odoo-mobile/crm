@@ -19,8 +19,15 @@
 
 package com.odoo.base.ir;
 
+import odoo.ODomain;
+import odoo.Odoo;
+
+import org.json.JSONObject;
+
 import android.content.Context;
 
+import com.odoo.App;
+import com.odoo.base.ir.providers.attachments.AttachmentProvider;
 import com.odoo.base.res.ResCompany;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
@@ -28,9 +35,10 @@ import com.odoo.orm.OModel;
 import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 /**
- * The Class Ir_AttachmentDBHelper.
+ * The Class IrAttachment
  */
 public class IrAttachment extends OModel {
 
@@ -45,11 +53,36 @@ public class IrAttachment extends OModel {
 	OColumn res_id = new OColumn("Resource id", OInteger.class);
 
 	// Local Column
-	OColumn file_uri = new OColumn("File URI", OVarchar.class, 100)
-			.setLocalColumn();
+	OColumn file_uri = new OColumn("File URI", OVarchar.class, 150)
+			.setLocalColumn().setDefault(false);
 
 	public IrAttachment(Context context) {
 		super(context, "ir.attachment");
 	}
 
+	public String getBase64Data(int server_id, App app) {
+		String data = "false";
+		try {
+			Odoo odoo = app.getOdoo();
+			ODomain domain = new ODomain();
+			domain.add("id", "=", server_id);
+			JSONObject fields = new JSONObject();
+			fields.accumulate("fields", "datas");
+			JSONObject result = odoo.search_read(getModelName(), fields,
+					domain.get());
+			if (result.getJSONArray("records").length() > 0) {
+				JSONObject row = result.getJSONArray("records")
+						.getJSONObject(0);
+				data = row.getString("datas");
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return data;
+	}
+
+	@Override
+	public OContentProvider getContentProvider() {
+		return new AttachmentProvider();
+	}
 }

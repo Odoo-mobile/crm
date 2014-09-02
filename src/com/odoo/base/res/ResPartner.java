@@ -23,6 +23,7 @@ import android.content.Context;
 
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.sale.model.SaleOrder;
+import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
@@ -30,9 +31,9 @@ import com.odoo.orm.OModel;
 import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
-import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 /**
  * The Class Res_PartnerDBHelper.
@@ -54,7 +55,8 @@ public class ResPartner extends OModel {
 	OColumn email = new OColumn("Email", OText.class);
 	OColumn company_id = new OColumn("Company", ResCompany.class,
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
-	OColumn parent_id = new OColumn("Related Company", ResPartner.class, RelationType.ManyToOne);
+	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
+			RelationType.ManyToOne);
 
 	@Functional(method = "validationPhone")
 	OColumn resPhone = new OColumn("Phone no", OText.class);
@@ -119,5 +121,10 @@ public class ResPartner extends OModel {
 		if (!row.getBoolean("zip").equals(false))
 			add = add + row.getString("zip");
 		return add;
+	}
+
+	@Override
+	public OContentProvider getContentProvider() {
+		return new PartnersProvider();
 	}
 }

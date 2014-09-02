@@ -21,9 +21,9 @@
     <string name="toast_sync_before">Sync Before Converting</string>
     <string name="toast_no_netowrk">No Network</string>
     <string name="toast_converted_to_opp">Converted To Opportunity</string>
-    
 
     <!-- Progressbar Messages -->
     <string name="process_converting_to_opp">converting to opportunity</string>
+    <string name="no_connection">No Connection</string>
 
 </resources>

@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp"
-    odoo:background_selector="@drawable/oe_listview_background_selector"
+    odoo:background_selector="?android:attr/listSelector"
     odoo:model="res.partner" >
 
     <LinearLayout

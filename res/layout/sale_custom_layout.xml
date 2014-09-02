@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="15dp"
-    odoo:background_selector="@drawable/oe_listview_background_selector"
+    odoo:background_selector="?android:attr/listSelector"
     odoo:model="sale.order" >
 
     <LinearLayout
@@ -44,14 +44,13 @@
             android:layout_height="28dp"
             odoo:binaryType="round_image"
             odoo:defaultImage="@drawable/avatar"
-            odoo:field_name="partner_id"
-            odoo:ref_column="image_small"
+            odoo:field_name="partner_id_image_small"
             odoo:with_label="false" />
 
         <odoo.controls.OField
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            odoo:field_name="partner_id"
+            odoo:field_name="partner_id_name"
             odoo:with_label="false" />
     </LinearLayout>
 
@@ -62,12 +61,14 @@
         android:dividerPadding="8dp"
         android:orientation="horizontal" >
 
-        <odoo.controls.OField
+        <!--
+             <odoo.controls.OField
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             odoo:field_color="@color/odoo_purple"
             odoo:field_name="stateChange"
             odoo:with_label="false" />
+        -->
 
         <odoo.controls.OField
             android:layout_width="0dp"
@@ -77,12 +78,14 @@
             odoo:field_name="date_order"
             odoo:with_label="false" />
 
-        <odoo.controls.OField
+        <!--
+             <odoo.controls.OField
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             odoo:field_name="amountTotalSymbol"
             odoo:with_label="false" />
+        -->
     </LinearLayout>
 
 </odoo.controls.OForm>

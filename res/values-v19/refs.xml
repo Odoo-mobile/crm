@@ -1,0 +1,5 @@
+<resources>
+
+    <item name="window_title_bar_height" type="dimen">25dip</item>
+
+</resources>

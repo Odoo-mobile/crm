@@ -55,7 +55,7 @@ public class QuotationsDetail extends BaseFragment {
 		Bundle args = getArguments();
 		mKey = Keys.valueOf(args.getString("key"));
 		if (args.containsKey(OColumn.ROW_ID)) {
-			mId = args.getInt("local_id");
+			mId = args.getInt(OColumn.ROW_ID);
 		}
 
 	}
@@ -70,6 +70,7 @@ public class QuotationsDetail extends BaseFragment {
 			mForm.initForm(mRecord);
 			mRecordLine = saleOrderLine.select(mId);
 			// mFormLine.initForm(mRecordLine);
+			// Log.e("Quotations", ":>>>> " + mRecord);
 			if (mRecord.getString("state").equals("draft")) {
 				mForm.setEditable(true);
 				// mFormLine.setEditable(true);

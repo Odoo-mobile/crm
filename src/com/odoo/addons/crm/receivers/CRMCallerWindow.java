@@ -2,12 +2,6 @@ package com.odoo.addons.crm.receivers;
 
 import java.util.List;
 
-import com.odoo.addons.crm.model.CRMLead;
-import com.odoo.crm.R;
-import com.odoo.orm.ODataRow;
-import com.odoo.util.Base64Helper;
-import com.odoo.util.OControls;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
@@ -18,8 +12,14 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
-import android.view.WindowManager.LayoutParams;
 import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
+
+import com.odoo.addons.crm.model.CRMLead;
+import com.odoo.crm.R;
+import com.odoo.orm.ODataRow;
+import com.odoo.util.Base64Helper;
+import com.odoo.util.OControls;
 
 public class CRMCallerWindow implements OnTouchListener {
 

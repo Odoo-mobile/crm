@@ -5,6 +5,9 @@ import java.util.HashMap;
 import odoo.ODomain;
 import android.content.Context;
 
+import com.odoo.addons.sale.providers.sale.ProductProvider;
+import com.odoo.addons.sale.providers.sale.SalesOrderLineProvider;
+import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.base.res.ResCurrency;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
@@ -19,6 +22,7 @@ import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.support.OUser;
+import com.odoo.support.provider.OContentProvider;
 import com.odoo.util.ODate;
 
 public class SaleOrder extends OModel {
@@ -54,9 +58,14 @@ public class SaleOrder extends OModel {
 	public SaleOrder(Context context) {
 		super(context, "sale.order");
 		mContext = context;
-		if (user().getVersion_number() == 7) {
+		if (user() !=null && user().getVersion_number() == 7) {
 			date_order.setParsePattern(ODate.DEFAULT_DATE_FORMAT);
 		}
+	}
+
+	@Override
+	public OContentProvider getContentProvider() {
+		return new SalesProvider();
 	}
 
 	public String stateChange(ODataRow row) {
@@ -109,6 +118,11 @@ public class SaleOrder extends OModel {
 		public SalesOrderLine(Context context) {
 			super(context, "sale.order.line");
 		}
+
+		@Override
+		public OContentProvider getContentProvider() {
+			return new SalesOrderLineProvider();
+		}
 	}
 
 	public static class ProductProduct extends OModel {
@@ -118,6 +132,11 @@ public class SaleOrder extends OModel {
 
 		public ProductProduct(Context context) {
 			super(context, "product.product");
+		}
+
+		@Override
+		public OContentProvider getContentProvider() {
+			return new ProductProvider();
 		}
 	}
 }

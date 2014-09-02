@@ -3,43 +3,37 @@ package com.odoo.addons.sale;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.controls.OList;
-import odoo.controls.OList.OnListBottomReachedListener;
-import odoo.controls.OList.OnListRowViewClickListener;
-import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
-import android.content.IntentFilter;
-import android.os.AsyncTask;
+import android.database.Cursor;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.res.ResPartners;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
-import com.odoo.orm.ODataRow;
-import com.odoo.orm.OModel;
-import com.odoo.orm.OValues;
-import com.odoo.receivers.SyncFinishReceiver;
+import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.SyncStatusObserverListener;
+import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
-public class Sales extends BaseFragment implements OnRowClickListener,
-		OnListBottomReachedListener, OnListRowViewClickListener,
-		OnRefreshListener {
+public class Sales extends BaseFragment implements OnRefreshListener,
+		LoaderCallbacks<Cursor>, SyncStatusObserverListener,
+		OnItemClickListener {
 
 	public static final String TAG = Sales.class.getSimpleName();
 
@@ -48,55 +42,47 @@ public class Sales extends BaseFragment implements OnRowClickListener,
 	}
 
 	View mView = null;
-	OList mListControl = null;
-	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	DataLoader mDataLoader = null;
+	ListView mListControl = null;
 	Keys mCurrentKey = Keys.Quotation;
-	Boolean mSyncDone = false;
-	Integer mLastPosition = -1;
-	Integer mLimit = 5;
-	private SwipeRefreshLayout mSwipeRefresh = null;
+	Context mContext = null;
+	private OCursorListAdapter mAdapter = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		scope = new AppScope(getActivity());
+		mContext = getActivity();
+		scope = new AppScope(mContext);
+
 		mView = inflater
 				.inflate(R.layout.common_list_control, container, false);
-		init();
 		return mView;
 	}
 
 	@Override
-	public Object databaseHelper(Context context) {
-		return new SaleOrder(context);
-	}
-
-	public void init() {
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		setHasSwipeRefreshView(view, R.id.swipe_container, this);
+		setHasSyncStatusObserver(ResPartners.KEY_DRAWER, this, db());
 		checkArguments();
-		mListControl = (OList) mView.findViewById(R.id.crm_listRecords);
-		mListControl.setOnRowClickListener(this);
-		mListControl.setOnListBottomReachedListener(this);
-		mListControl.setOnListRowViewClickListener(R.id.imgCancel, this);
-		mListControl.setOnListRowViewClickListener(R.id.imgConfirmCreate, this);
-		mListControl.setRecordLimit(mLimit);
-		mSwipeRefresh = (SwipeRefreshLayout) mView
-				.findViewById(R.id.swipe_container);
-		mSwipeRefresh.setOnRefreshListener(this);
-		mSwipeRefresh.setColorScheme(android.R.color.holo_blue_bright,
-				android.R.color.holo_green_light,
-				android.R.color.holo_orange_light,
-				android.R.color.holo_red_light);
-		if (mLastPosition == -1) {
-			mDataLoader = new DataLoader(0);
-			mDataLoader.execute();
-		}
+		mListControl = (ListView) view.findViewById(R.id.listRecords);
+		mAdapter = new OCursorListAdapter(mContext, null,
+				R.layout.sale_custom_layout);
+		// mAdapter.setOnViewCreateListener(this);
+		mListControl.setAdapter(mAdapter);
+		mListControl.setOnItemClickListener(this);
+		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
+		getLoaderManager().initLoader(0, null, this);
 	}
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
 		mCurrentKey = Keys.valueOf(arg.getString("sales"));
+	}
+
+	@Override
+	public Object databaseHelper(Context context) {
+		return new SaleOrder(context);
 	}
 
 	@Override
@@ -127,95 +113,6 @@ public class Sales extends BaseFragment implements OnRowClickListener,
 		return count;
 	}
 
-	class DataLoader extends AsyncTask<Void, Void, Void> {
-		Integer mOffset = 0;
-
-		public DataLoader(Integer offset) {
-			mOffset = offset;
-		}
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			scope.main().runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-					if (db().isEmptyTable() && !mSyncDone) {
-						scope.main().requestSync(SalesProvider.AUTHORITY);
-					}
-					// mListRecords.clear();
-					OModel model = db();
-					if (mOffset == 0)
-						mListRecords.clear();
-					String where = null, args[] = null;
-					switch (mCurrentKey) {
-					case Quotation:
-						where = "state = ? or state = ?";
-						args = new String[] { "draft", "cancel" };
-						break;
-					case Sale_order:
-						if (getArguments().containsKey("id")) {
-							where = "partner_id = ?";
-							args = new String[] { getArguments()
-									.getString("id") };
-						} else {
-							where = "state = ? or state = ? or state = ?";
-							args = new String[] { "manual", "progress", "done" };
-						}
-						break;
-					}
-					mListRecords.addAll(model.setLimit(mLimit)
-							.setOffset(mOffset).select(where, args));
-					mListControl.setRecordOffset(model.getNextOffset());
-				}
-			});
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			switch (mCurrentKey) {
-			case Quotation:
-				mListControl.setCustomView(R.layout.sale_custom_layout);
-				break;
-			case Sale_order:
-				mListControl.setCustomView(R.layout.sale_custom_layout);
-				break;
-			}
-			if (mListRecords.size() > 0)
-				mListControl.initListControl(mListRecords);
-			OControls.setGone(mView, R.id.loadingProgress);
-		}
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		scope.main().registerReceiver(mSyncFinishReceiver,
-				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		scope.main().unregisterReceiver(mSyncFinishReceiver);
-	}
-
-	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
-		@Override
-		public void onReceive(Context context, android.content.Intent intent) {
-			scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
-			if (mDataLoader != null) {
-				mDataLoader.cancel(true);
-			}
-			mDataLoader = new DataLoader(0);
-			mDataLoader.execute();
-			mSyncDone = true;
-			hideRefreshingProgress();
-		}
-	};
-
 	private Fragment object(Keys value) {
 		Sales sales = new Sales();
 		Bundle args = new Bundle();
@@ -225,111 +122,54 @@ public class Sales extends BaseFragment implements OnRowClickListener,
 	}
 
 	@Override
-	public void onRowItemClick(int position, View view, ODataRow row) {
-		QuotationsDetail quDetail = new QuotationsDetail();
-		Bundle bundle = new Bundle();
-		bundle.putString("key", mCurrentKey.toString());
-		bundle.putAll(row.getPrimaryBundleData());
-		quDetail.setArguments(bundle);
-		startFragment(quDetail, true);
-	}
-
-	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		super.onCreateOptionsMenu(menu, inflater);
-		inflater.inflate(R.menu.menu_sale, menu);
-		SearchView mSearchView = (SearchView) menu.findItem(
-				R.id.menu_sale_search).getActionView();
-		if (mListControl != null)
-			mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_sale_create:
-			QuotationsDetail quDetail = new QuotationsDetail();
-			Bundle bundle = new Bundle();
-			bundle.putString("key", mCurrentKey.toString());
-			quDetail.setArguments(bundle);
-			startFragment(quDetail, true);
-			break;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	public void onBottomReached(Integer limit, Integer offset) {
-		if (mDataLoader != null) {
-			mDataLoader.cancel(true);
-		}
-		if (mListRecords.size() == offset) {
-			mDataLoader = new DataLoader(offset);
-			mDataLoader.execute();
-		}
-	}
-
-	@Override
-	public Boolean showLoader() {
-		return true;
-	}
-
-	@Override
-	public void onRowViewClick(ViewGroup view_group, View view, int position,
-			ODataRow row) {
-		OValues values = null;
-		switch (view.getId()) {
-		case R.id.imgCancel:
-			if (row.getString("state").equals("cancel"))
-				Toast.makeText(getActivity(), "new Copy of Quotations",
-						Toast.LENGTH_SHORT).show();
-			else {
-				values = new OValues();
-				values.put("state", "cancel");
-				db().update(values, row.getInt("local_id"));
-				Toast.makeText(getActivity(), "Cancel", Toast.LENGTH_SHORT)
-						.show();
-			}
-			break;
-		case R.id.imgConfirmCreate:
-			if (mCurrentKey.equals(Keys.Quotation)
-					&& row.getString("state").equals("cancel"))
-				Toast.makeText(getActivity(), "new Copy of Quotations",
-						Toast.LENGTH_SHORT).show();
-			else {
-				if (Double.parseDouble(row.getString("amount_total")) > 0) {
-					values = new OValues();
-					values.put("state", "manual");
-					new SaleOrder(getActivity()).update(values,
-							row.getInt("local_id"));
-					Toast.makeText(getActivity(), "Confirm to Sale",
-							Toast.LENGTH_SHORT).show();
-				} else
-					Toast.makeText(getActivity(), "No Order Line",
-							Toast.LENGTH_SHORT).show();
-				break;
-			}
-		}
-		scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
-	}
-
-	@Override
 	public void onRefresh() {
 		if (app().inNetwork()) {
 			scope.main().requestSync(SalesProvider.AUTHORITY);
 		} else {
 			hideRefreshingProgress();
-			Toast.makeText(getActivity(), "No Connection", Toast.LENGTH_LONG)
-					.show();
+			Toast.makeText(mContext, _s(R.string.no_connection),
+					Toast.LENGTH_LONG).show();
 		}
 	}
 
-	private void hideRefreshingProgress() {
-		new Handler().postDelayed(new Runnable() {
-			@Override
-			public void run() {
-				mSwipeRefresh.setRefreshing(false);
-			}
-		}, 1000);
+	@Override
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		Cursor cr = (Cursor) mAdapter.getItem(position);
+		int _id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+		int record_id = cr.getInt(cr.getColumnIndex("id"));
+		QuotationsDetail quDetail = new QuotationsDetail();
+		Bundle bundle = new Bundle();
+		bundle.putInt(OColumn.ROW_ID, _id);
+		bundle.putInt("id", record_id);
+		bundle.putString("key", mCurrentKey.toString());
+		quDetail.setArguments(bundle);
+		startFragment(quDetail, true);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		return new CursorLoader(mContext, db().uri(), new String[] { "name",
+				"partner_id.image_small", "partner_id.name", "date_order" },
+				null, null, null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		mAdapter.changeCursor(cursor);
+		OControls.setGone(mView, R.id.loadingProgress);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		mAdapter.changeCursor(null);
+	}
+
+	@Override
+	public void onStatusChange(Boolean refreshing) {
+		if (!refreshing)
+			hideRefreshingProgress();
+		else
+			setSwipeRefreshing(true);
 	}
 }

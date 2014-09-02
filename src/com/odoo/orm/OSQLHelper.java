@@ -74,9 +74,6 @@ public class OSQLHelper {
 						column_statement.append(default_value);
 					}
 				}
-				if (column.isRequired()) {
-					column_statement.append(" NOT NULL ");
-				}
 				column_statement.append(", ");
 			}
 			if (column.getRelationType() != null) {
@@ -172,6 +169,7 @@ public class OSQLHelper {
 			if (type_class.isAssignableFrom(OText.class)) {
 				return new OText().getType();
 			}
+
 			// Text
 			if (type_class.isAssignableFrom(OHtml.class)) {
 				return new OHtml().getType();
