@@ -3,7 +3,6 @@ package com.odoo.addons.crm.receivers;
 import java.util.List;
 
 import odoo.ODomain;
-import odoo.Odoo;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.text.TextUtils;
@@ -74,7 +73,6 @@ public class CRMPartnerFinder {
 			} else {
 				// getting from server
 				App app = (App) mContext.getApplicationContext();
-				Odoo odoo = app.getOdoo();
 				ODomain domain = new ODomain();
 				domain.add("|");
 				domain.add("|");

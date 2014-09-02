@@ -5,7 +5,6 @@ import java.util.List;
 import odoo.controls.OForm;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,7 +55,6 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 	private void init() {
 		switch (mKey) {
 		case Leads:
-			Log.e("ARGS", getArguments() + "");
 			OControls.setVisible(mView, R.id.crmLeadDetail);
 			mForm = (OForm) mView.findViewById(R.id.crmLeadDetail);
 			if (mId != null) {

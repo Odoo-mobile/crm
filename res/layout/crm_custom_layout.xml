@@ -43,6 +43,7 @@
             odoo:field_name="create_date"
             odoo:with_label="false" >
         </odoo.controls.OField>
+
     </LinearLayout>
 
 </odoo.controls.OForm>

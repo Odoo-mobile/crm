@@ -45,6 +45,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 	OETouchListener mTouchListener = null;
 	DataLoader mDataLoader = null;
 	Keys mCurrentKey = Keys.Leads;
+	int index = -1;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,7 +70,11 @@ public class CRM extends BaseFragment implements OnPullListener,
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		mCurrentKey = Keys.valueOf(arg.getString("crm"));
+		if (arg.containsKey("crm"))
+			mCurrentKey = Keys.valueOf(arg.getString("crm"));
+		else if (arg.containsKey("remove_index")) {
+			index = arg.getInt("remove_index");
+		}
 	}
 
 	@Override
@@ -204,9 +209,10 @@ public class CRM extends BaseFragment implements OnPullListener,
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		menu.clear();
 		inflater.inflate(R.menu.menu_crm, menu);
-		SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-		if(mListControl!=null)
-				mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
+		SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search)
+				.getActionView();
+		if (mListControl != null)
+			mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
 	}
 
 	@Override
@@ -214,6 +220,7 @@ public class CRM extends BaseFragment implements OnPullListener,
 		CrmDetail crmDetail = new CrmDetail();
 		Bundle bundle = new Bundle();
 		bundle.putString("key", mCurrentKey.toString());
+		bundle.putInt("index", position);
 		bundle.putAll(row.getPrimaryBundleData());
 		crmDetail.setArguments(bundle);
 		startFragment(crmDetail, true);

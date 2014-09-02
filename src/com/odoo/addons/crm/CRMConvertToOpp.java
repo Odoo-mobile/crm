@@ -7,11 +7,14 @@ import odoo.OArguments;
 import odoo.Odoo;
 import odoo.controls.OForm;
 import odoo.controls.OList;
+import odoo.controls.OList.OnListRowViewClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -23,23 +26,27 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.model.CRMLead.CRMCaseStage;
+import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
+import com.odoo.support.AppScope;
 import com.odoo.support.ODialog;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class CRMConvertToOpp extends BaseFragment implements
-		OnCheckedChangeListener {
+		OnCheckedChangeListener, OnListRowViewClickListener {
 
 	View mView = null;
 	Bundle args = null;
 	OForm mForm = null;
+	List<ODataRow> list = null;
 	int index = 0;
 	ODataRow mLead = null;
 	ODataRow mCustomer = null;
@@ -51,7 +58,9 @@ public class CRMConvertToOpp extends BaseFragment implements
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		setHasOptionsMenu(true);
 		initArgs();
+		scope = new AppScope(getActivity());
 		mView = inflater.inflate(R.layout.crm_convert_to_opportunity,
 				container, false);
 		initFormControls();
@@ -63,13 +72,16 @@ public class CRMConvertToOpp extends BaseFragment implements
 		mLeadList = (OList) mForm.findViewById(R.id.crmLeadOppList);
 		rdoConvertOpp = (RadioButton) mForm
 				.findViewById(R.id.rdoConvertToOpportunity);
+
 		rdoMergeOpp = (RadioButton) mForm
 				.findViewById(R.id.rdoMergeExistingOpportunity);
 		mForm.setEditable(false);
+		mLeadList.setOnListRowViewClickListener(R.id.removeLead, this);
 		initFormData();
 		fillLeadList();
 		rdoConvertOpp.setOnCheckedChangeListener(this);
 		rdoMergeOpp.setOnCheckedChangeListener(this);
+
 	}
 
 	public void initFormData() {
@@ -85,11 +97,11 @@ public class CRMConvertToOpp extends BaseFragment implements
 				String stage_id = stages.get(0).getString("id");
 				ODataRow mParent = mCustomer.getM2ORecord("parent_id").browse();
 				String where = "partner_id = ? and stage_id != ?";
-				String whereArgs[] = new String[] { mCustomer.getString("id"),
-						stage_id };
+				String whereArgs[] = new String[] {
+						mCustomer.getString("local_id"), stage_id };
 				if (mParent != null) {
 					where = "partner_id = ? or partner_id = ? and stage_id != ?";
-					whereArgs = new String[] { mCustomer.getString("id"),
+					whereArgs = new String[] { mCustomer.getString("local_id"),
 							mParent.getString("id"), stage_id };
 				}
 				mOpportunities.addAll(db().select(where, whereArgs));
@@ -98,11 +110,10 @@ public class CRMConvertToOpp extends BaseFragment implements
 	}
 
 	public void fillLeadList() {
-		List<ODataRow> list = new ArrayList<ODataRow>();
+		list = new ArrayList<ODataRow>();
 		for (Object r : mOpportunities) {
 			list.add((ODataRow) r);
 		}
-		mLeadList.setCustomView(R.layout.crm_lead_list_item);
 		mLeadList.initListControl(list);
 	}
 
@@ -130,6 +141,8 @@ public class CRMConvertToOpp extends BaseFragment implements
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_crm_convert:
+			ConvertOpportunity convert = new ConvertOpportunity();
+			convert.execute();
 			break;
 		case R.id.menu_crm_convert_cancel:
 			break;
@@ -139,8 +152,6 @@ public class CRMConvertToOpp extends BaseFragment implements
 
 	@Override
 	public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-		ConvertOpportunity convert = new ConvertOpportunity();
-		convert.execute();
 		if (buttonView.getId() == R.id.rdoConvertToOpportunity) {
 			if (isChecked) {
 				mMergeOpportunity = false;
@@ -177,8 +188,6 @@ public class CRMConvertToOpp extends BaseFragment implements
 		@Override
 		protected Void doInBackground(Void... params) {
 			scope.main().runOnUiThread(new Runnable() {
-
-				@Override
 				public void run() {
 					try {
 						Odoo odoo = app().getOdoo();
@@ -193,7 +202,6 @@ public class CRMConvertToOpp extends BaseFragment implements
 									ids.add(r.getInt("id"));
 								}
 							}
-
 							values.put("name", name);
 							values.put("action", (mCustomer != null) ? "exist"
 									: "create");
@@ -224,7 +232,8 @@ public class CRMConvertToOpp extends BaseFragment implements
 									"action_apply", null);
 							OValues vals = new OValues();
 							vals.put("type", "opportunity");
-							db().update(vals, mLead.getInt("id"));
+							db().update(vals, mLead.getInt("local_id"));
+
 						} else {
 							mToast = _s(R.string.toast_no_netowrk);
 						}
@@ -236,5 +245,40 @@ public class CRMConvertToOpp extends BaseFragment implements
 			});
 			return null;
 		}
+
+		protected void onPostExecute(Void result) {
+			super.onPostExecute(result);
+			mProgress.dismiss();
+			if (mToast != null) {
+				Toast.makeText(getActivity(), mToast, Toast.LENGTH_LONG).show();
+			}
+			scope.main().requestSync(CRMProvider.AUTHORITY);
+			CRM crm = new CRM();
+			Bundle bundle = new Bundle();
+			bundle.putInt("remove_index", index);
+			crm.setArguments(bundle);
+			startFragment(crm, true);
+		}
 	}
+
+	@Override
+	public void onRowViewClick(ViewGroup view_group, View view, int position,
+			ODataRow row) {
+		final int pos = position;
+		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+		dialog.setCancelable(true);
+		dialog.setTitle("Remove");
+		dialog.setMessage("Do you want to Remove this lead from list");
+		dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				list.remove(pos);
+				mLeadList.initListControl(list);
+			}
+		});
+		dialog.setNegativeButton("No", null);
+		dialog.show();
+	}
+
 }
