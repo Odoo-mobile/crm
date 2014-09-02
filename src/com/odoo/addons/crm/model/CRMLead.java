@@ -3,6 +3,10 @@ package com.odoo.addons.crm.model;
 import odoo.ODomain;
 import android.content.Context;
 
+import com.odoo.addons.crm.providers.crm.CRMProvider;
+import com.odoo.addons.crm.providers.crm.CrmCaseCategProvider;
+import com.odoo.addons.crm.providers.crm.CrmCaseStageProvider;
+import com.odoo.addons.crm.providers.crm.CrmPaymentModeProvider;
 import com.odoo.base.res.ResCompany;
 import com.odoo.base.res.ResCountry;
 import com.odoo.base.res.ResPartner;
@@ -19,6 +23,7 @@ import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.support.OUser;
+import com.odoo.support.provider.OContentProvider;
 import com.odoo.util.ODate;
 
 public class CRMLead extends OModel {
@@ -77,6 +82,11 @@ public class CRMLead extends OModel {
 		mContext = context;
 	}
 
+	@Override
+	public OContentProvider getContentProvider() {
+		return new CRMProvider();
+	}
+
 	public String plannedProbability(ODataRow row) {
 		if (!row.getString("planned_revenue").equals("false")
 				&& Double.parseDouble(row.getString("planned_revenue")) > 0)
@@ -103,6 +113,10 @@ public class CRMLead extends OModel {
 			super(context, "crm.case.categ");
 		}
 
+		@Override
+		public OContentProvider getContentProvider() {
+			return new CrmCaseCategProvider();
+		}
 	}
 
 	public static class CRMCaseStage extends OModel {
@@ -118,6 +132,10 @@ public class CRMLead extends OModel {
 			super(context, "crm.case.stage");
 		}
 
+		@Override
+		public OContentProvider getContentProvider() {
+			return new CrmCaseStageProvider();
+		}
 	}
 
 	public static class CRMPaymentMode extends OModel {
@@ -128,5 +146,9 @@ public class CRMLead extends OModel {
 			super(context, "crm.payment.mode");
 		}
 
+		@Override
+		public OContentProvider getContentProvider() {
+			return new CrmPaymentModeProvider();
+		}
 	}
 }

@@ -141,6 +141,34 @@
             android:exported="true"
             android:label="Leads/Opportunities"
             android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.crm.providers.crm.CrmCaseStageProvider"
+            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Crm Case Stage"
+            android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.crm.providers.crm.CrmCaseCategProvider"
+            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Crm Case Categ"
+            android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.crm.providers.crm.CrmPaymentModeProvider"
+            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Crm Payment Mode"
+            android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.crm.providers.crm.PhoneCallProvider"
+            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:enabled="true"
+            android:exported="true"
+            android:label="Phone Call"
+            android:syncable="true" />
 
         <service
             android:name="com.odoo.addons.crm.services.CRMService"
