@@ -5,7 +5,6 @@ import android.content.Context;
 
 import com.odoo.addons.crm.model.CRMLead.CRMCaseCateg;
 import com.odoo.addons.crm.providers.crm.PhoneCallProvider;
-import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;

@@ -8,7 +8,7 @@ import com.odoo.orm.OModel;
 import com.odoo.support.provider.OContentProvider;
 
 public class ProductProvider extends OContentProvider {
-	public static String AUTHORITY = "com.odoo.addons.sale.providers.sale";
+	public static String AUTHORITY = "com.odoo.addons.sale.providers.sale.product";
 	public static final String PATH = "product_product";
 	public static final Uri CONTENT_URI = OContentProvider.buildURI(AUTHORITY,
 			PATH);

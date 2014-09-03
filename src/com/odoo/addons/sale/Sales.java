@@ -53,7 +53,6 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 		setHasOptionsMenu(true);
 		mContext = getActivity();
 		scope = new AppScope(mContext);
-
 		mView = inflater
 				.inflate(R.layout.common_list_control, container, false);
 		return mView;

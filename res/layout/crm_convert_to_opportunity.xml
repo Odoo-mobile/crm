@@ -57,18 +57,24 @@
                 app:field_name="partner_id"
                 app:ref_column="name"
                 app:with_label="true"
-                app:color="@color/odoo_purple" >
+               app:label_color="@color/odoo_purple">
             </odoo.controls.OField>
+
+            <odoo.controls.OLabel
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:bottom_border_height="2"
+                app:label="Leads / Opportunities"
+                app:color="@color/odoo_purple" >
+            </odoo.controls.OLabel>
 
             <odoo.controls.OList
                 android:id="@+id/crmLeadOppList"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:custom_layout="@layout/crm_lead_list_item"
-                 >
+                android:layout_height="match_parent"
+                app:custom_layout="@layout/crm_lead_list_item" >
             </odoo.controls.OList>
         </odoo.controls.OForm>
-
     </LinearLayout>
 
 </ScrollView>

@@ -3,30 +3,47 @@
     xmlns:app="http://schemas.android.com/apk/res/com.odoo.crm"
     android:id="@+id/crmLeadOppListItem"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:padding="15dp"
     odoo:model="crm.lead" >
 
-    <odoo.controls.OLabel
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:bottom_border_height="2"
-        app:label="Leads / Opportunities"
-        app:color="@color/odoo_purple" >
-    </odoo.controls.OLabel>
+        android:orientation="horizontal" >
 
-    <odoo.controls.OField
-        android:id="@+id/title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:field_name="contact_name" >
-    </odoo.controls.OField>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-    <odoo.controls.OField
-        android:id="@+id/type"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:field_name="email_from" >
-    </odoo.controls.OField>
+            <odoo.controls.OField
+                android:id="@+id/title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:field_name="name"
+                app:field_textAppearance="?android:attr/textAppearanceMedium"
+                app:with_label="false" >
+            </odoo.controls.OField>
+
+            <odoo.controls.OField
+                android:id="@+id/type"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:field_name="type"
+                app:with_label="false" >
+            </odoo.controls.OField>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/removeLead"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/oe_listview_background_selector"
+            android:clickable="true"
+            android:src="@drawable/ic_action_remove"
+            android:tint="@color/odoo_purple_tran" />
+    </LinearLayout>
 
 </odoo.controls.OForm>

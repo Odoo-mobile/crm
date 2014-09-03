@@ -3,34 +3,36 @@ package com.odoo.addons.crm;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.controls.OList;
-import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
-import android.content.IntentFilter;
-import android.os.AsyncTask;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.Toast;
+import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
-import com.odoo.OTouchListener.OnPullListener;
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.crm.R;
-import com.odoo.orm.ODataRow;
-import com.odoo.receivers.SyncFinishReceiver;
+import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.SyncStatusObserverListener;
+import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
-public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
-		OnRowClickListener {
-
+public class CRMPhoneCalls extends BaseFragment implements
+		LoaderCallbacks<Cursor>, OnItemClickListener, OnRefreshListener,
+		SyncStatusObserverListener {
 	public static final String TAG = CRMPhoneCalls.class.getSimpleName();
 
 	enum Keys {
@@ -38,28 +40,36 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	}
 
 	View mView = null;
-	OList mListControl = null;
-	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	DataLoader mDataLoader = null;
+	ListView mListControl = null;
+	Context mContext = null;
 	Keys mCurrentKey = Keys.SchduledLoggedcalls;
+	private OCursorListAdapter mAdapter = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		scope = new AppScope(this);
+		setHasOptionsMenu(true);
+		mContext = getActivity();
+		scope = new AppScope(mContext);
 		mView = inflater
 				.inflate(R.layout.common_list_control, container, false);
-		setHasOptionsMenu(true);
-		init();
 		return mView;
 	}
 
-	public void init() {
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		setHasSwipeRefreshView(view, R.id.swipe_container, this);
+		setHasSyncStatusObserver(TAG, this, db());
 		checkArguments();
-		mListControl = (OList) mView.findViewById(R.id.listRecords);
-		mListControl.setOnRowClickListener(this);
-		mDataLoader = new DataLoader();
-		mDataLoader.execute();
+		mListControl = (ListView) view.findViewById(R.id.listRecords);
+		mAdapter = new OCursorListAdapter(mContext, null,
+				R.layout.crm_phone_custom_layout);
+		// mAdapter.setOnViewCreateListener(this);
+		mListControl.setAdapter(mAdapter);
+		mListControl.setOnItemClickListener(this);
+		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
+		getLoaderManager().initLoader(0, null, this);
 	}
 
 	private void checkArguments() {
@@ -103,99 +113,52 @@ public class CRMPhoneCalls extends BaseFragment implements OnPullListener,
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.clear();
-		inflater.inflate(R.menu.menu_crm, menu);
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		return new CursorLoader(mContext, db().uri(), db().projection(), null,
+				null, null);
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_crm_detail_create) {
-			CRMPhoneDetail crmPhoneDeatil = new CRMPhoneDetail();
-			Bundle bundle = new Bundle();
-			bundle.putString("key", mCurrentKey.toString());
-			crmPhoneDeatil.setArguments(bundle);
-			startFragment(crmPhoneDeatil, true);
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	class DataLoader extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			scope.main().runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-					if (db().isEmptyTable()) {
-						scope.main().requestSync(CRMProvider.AUTHORITY);
-					}
-					mListRecords.clear();
-					switch (mCurrentKey) {
-					case SchduledLoggedcalls:
-						mListRecords.addAll(db().select());
-						break;
-					}
-				}
-			});
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			switch (mCurrentKey) {
-			case SchduledLoggedcalls:
-				mListControl.setCustomView(R.layout.crm_custom_lead_layout);
-				break;
-			}
-			mListControl.setCustomView(R.layout.crm_phone_custom_layout);
-			mListControl.initListControl(mListRecords);
-			OControls.setGone(mView, R.id.loadingProgress);
-		}
-
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		mAdapter.changeCursor(cursor);
+		OControls.setGone(mView, R.id.loadingProgress);
 	}
 
 	@Override
-	public void onPullStarted(View arg0) {
-		Bundle args = new Bundle();
-		args.putString("crmcall", "pull_callLog");
-		scope.main().requestSync(CRMProvider.AUTHORITY, args);
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		mAdapter.changeCursor(null);
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		scope.main().registerReceiver(mSyncFinishReceiver,
-				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		scope.main().unregisterReceiver(mSyncFinishReceiver);
-	}
-
-	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
-		@Override
-		public void onReceive(Context context, android.content.Intent intent) {
-			scope.main().refreshDrawer(TAG);
-			if (mDataLoader != null) {
-				mDataLoader.cancel(true);
-			}
-			mDataLoader = new DataLoader();
-			mDataLoader.execute();
-		}
-	};
-
-	@Override
-	public void onRowItemClick(int position, View view, ODataRow row) {
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		Cursor cr = (Cursor) mAdapter.getItem(position);
+		int _id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+		int record_id = cr.getInt(cr.getColumnIndex("id"));
 		CRMPhoneDetail crmPhoneDetail = new CRMPhoneDetail();
 		Bundle bundle = new Bundle();
-		bundle.putAll(row.getPrimaryBundleData());
+		bundle.putInt(OColumn.ROW_ID, _id);
+		bundle.putInt("id", record_id);
 		crmPhoneDetail.setArguments(bundle);
 		startFragment(crmPhoneDetail, true);
 	}
 
+	@Override
+	public void onStatusChange(Boolean refreshing) {
+		if (!refreshing)
+			hideRefreshingProgress();
+		else
+			setSwipeRefreshing(true);
+	}
+
+	@Override
+	public void onRefresh() {
+		if (app().inNetwork()) {
+			scope.main().requestSync(CRMProvider.AUTHORITY);
+		} else {
+			hideRefreshingProgress();
+			Toast.makeText(mContext, _s(R.string.no_connection),
+					Toast.LENGTH_LONG).show();
+		}
+	}
 }

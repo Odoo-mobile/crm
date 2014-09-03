@@ -3,35 +3,37 @@ package com.odoo.addons.crm;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.controls.OList;
-import odoo.controls.OList.OnRowClickListener;
 import android.content.Context;
-import android.content.IntentFilter;
-import android.os.AsyncTask;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ListView;
+import android.widget.Toast;
+import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
-import com.odoo.OTouchListener.OnPullListener;
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.addons.res.ResPartners;
 import com.odoo.crm.R;
-import com.odoo.orm.ODataRow;
-import com.odoo.receivers.SyncFinishReceiver;
+import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.SyncStatusObserverListener;
+import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
-public class CRM extends BaseFragment implements OnPullListener,
-		OnRowClickListener {
+public class CRM extends BaseFragment implements OnRefreshListener,
+		SyncStatusObserverListener, OnItemClickListener,
+		LoaderCallbacks<Cursor> {
 
 	public static final String TAG = CRM.class.getSimpleName();
 
@@ -40,33 +42,49 @@ public class CRM extends BaseFragment implements OnPullListener,
 	}
 
 	View mView = null;
-	OList mListControl = null;
-	List<ODataRow> mListRecords = new ArrayList<ODataRow>();
-	DataLoader mDataLoader = null;
+	ListView mListControl = null;
 	Keys mCurrentKey = Keys.Leads;
+	int index = -1;
+	Context mContext = null;
+	private OCursorListAdapter mAdapter = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
-		scope = new AppScope(this);
+		mContext = getActivity();
+		scope = new AppScope(mContext);
 		mView = inflater
 				.inflate(R.layout.common_list_control, container, false);
-		init();
 		return mView;
 	}
 
-	public void init() {
+	@Override
+	public void onViewCreated(View view, Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		setHasSwipeRefreshView(view, R.id.swipe_container, this);
+		setHasSyncStatusObserver(ResPartners.KEY_DRAWER, this, db());
 		checkArguments();
-		mListControl = (OList) mView.findViewById(R.id.listRecords);
-		mListControl.setOnRowClickListener(this);
-		mDataLoader = new DataLoader();
-		mDataLoader.execute();
+		mListControl = (ListView) view.findViewById(R.id.listRecords);
+		if (mCurrentKey == Keys.Leads)
+			mAdapter = new OCursorListAdapter(mContext, null,
+					R.layout.crm_custom_lead_layout);
+		else if (mCurrentKey == Keys.Opportunities)
+			mAdapter = new OCursorListAdapter(mContext, null,
+					R.layout.crm_custom_opportunties_layout);
+		mListControl.setAdapter(mAdapter);
+		mListControl.setOnItemClickListener(this);
+		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
+		getLoaderManager().initLoader(0, null, this);
 	}
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		mCurrentKey = Keys.valueOf(arg.getString("crm"));
+		if (arg.containsKey("crm"))
+			mCurrentKey = Keys.valueOf(arg.getString("crm"));
+		else if (arg.containsKey("remove_index")) {
+			index = arg.getInt("remove_index");
+		}
 	}
 
 	@Override
@@ -77,11 +95,10 @@ public class CRM extends BaseFragment implements OnPullListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		// menu.add(new DrawerItem(TAG, "CRM", true));
-		menu.add(new DrawerItem(TAG, "Leads", count(context, Keys.Leads), 0,
-				object(Keys.Leads)));
-		menu.add(new DrawerItem(TAG, "Opportunities", count(context,
-				Keys.Opportunities), 0, object(Keys.Opportunities)));
+		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Leads", count(context,
+				Keys.Leads), 0, object(Keys.Leads)));
+		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Opportunities", count(
+				context, Keys.Opportunities), 0, object(Keys.Opportunities)));
 		return menu;
 	}
 
@@ -101,93 +118,6 @@ public class CRM extends BaseFragment implements OnPullListener,
 		return count;
 	}
 
-	class DataLoader extends AsyncTask<Void, Void, Void> {
-
-		@Override
-		protected Void doInBackground(Void... params) {
-			scope.main().runOnUiThread(new Runnable() {
-
-				@Override
-				public void run() {
-					if (db().isEmptyTable()) {
-						scope.main().requestSync(CRMProvider.AUTHORITY);
-					}
-					mListRecords.clear();
-					switch (mCurrentKey) {
-					case Leads:
-						mListRecords.addAll(db().select("type = ?",
-								new String[] { "lead" }));
-						break;
-					case Opportunities:
-						// if true filter opportunity
-						if (getArguments().containsKey("id")) {
-							mListRecords
-									.addAll(db().select(
-											"partner_id = ? AND type = ?",
-											new String[] {
-													getArguments().getString(
-															"id"),
-													getArguments().getString(
-															"type") }));
-						} else {
-							mListRecords.addAll(db().select("type = ?",
-									new String[] { "opportunity" }));
-						}
-						break;
-					}
-				}
-			});
-			return null;
-		}
-
-		@Override
-		protected void onPostExecute(Void result) {
-			super.onPostExecute(result);
-			switch (mCurrentKey) {
-			case Leads:
-				mListControl.setCustomView(R.layout.crm_custom_lead_layout);
-				break;
-			case Opportunities:
-				mListControl
-						.setCustomView(R.layout.crm_custom_opportunties_layout);
-				break;
-			}
-			mListControl.initListControl(mListRecords);
-			OControls.setGone(mView, R.id.loadingProgress);
-		}
-
-	}
-
-	@Override
-	public void onPullStarted(View arg0) {
-		scope.main().requestSync(CRMProvider.AUTHORITY);
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-		scope.main().registerReceiver(mSyncFinishReceiver,
-				new IntentFilter(SyncFinishReceiver.SYNC_FINISH));
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		scope.main().unregisterReceiver(mSyncFinishReceiver);
-	}
-
-	SyncFinishReceiver mSyncFinishReceiver = new SyncFinishReceiver() {
-		@Override
-		public void onReceive(Context context, android.content.Intent intent) {
-			scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
-			if (mDataLoader != null) {
-				mDataLoader.cancel(true);
-			}
-			mDataLoader = new DataLoader();
-			mDataLoader.execute();
-		}
-	};
-
 	private Fragment object(Keys value) {
 		CRM crm = new CRM();
 		Bundle args = new Bundle();
@@ -196,34 +126,62 @@ public class CRM extends BaseFragment implements OnPullListener,
 		return crm;
 	}
 
-	public boolean onOptionsItemSelected(MenuItem item) {
-		if (item.getItemId() == R.id.menu_crm_detail_create) {
-			CrmDetail crmDetail = new CrmDetail();
-			Bundle bundle = new Bundle();
-			bundle.putString("key", mCurrentKey.toString());
-			crmDetail.setArguments(bundle);
-			startFragment(crmDetail, true);
+	@Override
+	public void onRefresh() {
+		if (app().inNetwork()) {
+			scope.main().requestSync(CRMProvider.AUTHORITY);
+		} else {
+			hideRefreshingProgress();
+			Toast.makeText(mContext, _s(R.string.no_connection),
+					Toast.LENGTH_LONG).show();
 		}
-		return super.onOptionsItemSelected(item);
 	}
 
 	@Override
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		menu.clear();
-		inflater.inflate(R.menu.menu_crm, menu);
-		SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search)
-				.getActionView();
-		if (mListControl != null)
-			mSearchView.setOnQueryTextListener(mListControl.getQueryListener());
+	public void onStatusChange(Boolean refreshing) {
+		if (!refreshing)
+			hideRefreshingProgress();
+		else
+			setSwipeRefreshing(true);
 	}
 
 	@Override
-	public void onRowItemClick(int position, View view, ODataRow row) {
+	public void onItemClick(AdapterView<?> parent, View view, int position,
+			long id) {
+		Cursor cr = (Cursor) mAdapter.getItem(position);
+		int _id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+		int record_id = cr.getInt(cr.getColumnIndex("id"));
 		CrmDetail crmDetail = new CrmDetail();
 		Bundle bundle = new Bundle();
+		bundle.putInt(OColumn.ROW_ID, _id);
+		bundle.putInt("id", record_id);
+		bundle.putInt("index", position);
 		bundle.putString("key", mCurrentKey.toString());
-		bundle.putAll(row.getPrimaryBundleData());
 		crmDetail.setArguments(bundle);
 		startFragment(crmDetail, true);
 	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		if (mCurrentKey == Keys.Leads)
+			return new CursorLoader(mContext, db().uri(), new String[] {
+					"name", "partner_id.image_small", "partner_id.name",
+					"stage_id.name" }, null, null, null);
+		else
+			return new CursorLoader(mContext, db().uri(), new String[] {
+					"name", "partner_id.image_small", "partner_id.name",
+					"stage_id.name" }, null, null, null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
+		mAdapter.changeCursor(cursor);
+		OControls.setGone(mView, R.id.loadingProgress);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> arg0) {
+		mAdapter.changeCursor(null);
+	}
+
 }

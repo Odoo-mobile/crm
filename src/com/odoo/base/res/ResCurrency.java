@@ -2,9 +2,11 @@ package com.odoo.base.res;
 
 import android.content.Context;
 
+import com.odoo.addons.sale.providers.sale.ResCurrencyProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OModel;
 import com.odoo.orm.types.OVarchar;
+import com.odoo.support.provider.OContentProvider;
 
 public class ResCurrency extends OModel {
 
@@ -15,4 +17,8 @@ public class ResCurrency extends OModel {
 		super(context, "res.currency");
 	}
 
+	@Override
+	public OContentProvider getContentProvider() {
+		return new ResCurrencyProvider();
+	}
 }

@@ -50,6 +50,7 @@ public class SaleOrder extends OModel {
 			RelationType.ManyToOne);
 	OColumn order_line = new OColumn("Order Lines", SalesOrderLine.class,
 			RelationType.OneToMany).setRelatedColumn("order_id");
+
 	@Functional(method = "stateChange")
 	OColumn stateChange = new OColumn("Total Amount", OText.class);
 	@Functional(method = "amountTotal")
@@ -58,7 +59,7 @@ public class SaleOrder extends OModel {
 	public SaleOrder(Context context) {
 		super(context, "sale.order");
 		mContext = context;
-		if (user() !=null && user().getVersion_number() == 7) {
+		if (user() != null && user().getVersion_number() == 7) {
 			date_order.setParsePattern(ODate.DEFAULT_DATE_FORMAT);
 		}
 	}
@@ -101,7 +102,6 @@ public class SaleOrder extends OModel {
 	}
 
 	public static class SalesOrderLine extends OModel {
-
 		OColumn product_id = new OColumn("Product Id", ProductProduct.class,
 				RelationType.ManyToOne);
 		OColumn name = new OColumn("Description ", OText.class);

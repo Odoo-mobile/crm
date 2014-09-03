@@ -138,33 +138,33 @@
             android:name="com.odoo.addons.crm.providers.crm.CRMProvider"
             android:authorities="com.odoo.addons.crm.providers.crm"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Leads/Opportunities"
             android:syncable="true" />
         <provider
             android:name="com.odoo.addons.crm.providers.crm.CrmCaseStageProvider"
-            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:authorities="com.odoo.addons.crm.providers.crm.casestage"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Crm Case Stage"
             android:syncable="true" />
         <provider
             android:name="com.odoo.addons.crm.providers.crm.CrmCaseCategProvider"
-            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:authorities="com.odoo.addons.crm.providers.crm.casecateg"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Crm Case Categ"
             android:syncable="true" />
         <provider
             android:name="com.odoo.addons.crm.providers.crm.CrmPaymentModeProvider"
-            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:authorities="com.odoo.addons.crm.providers.crm.paymentmode"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Crm Payment Mode"
             android:syncable="true" />
         <provider
             android:name="com.odoo.addons.crm.providers.crm.PhoneCallProvider"
-            android:authorities="com.odoo.addons.crm.providers.crm"
+            android:authorities="com.odoo.addons.crm.providers.crm.phonecall"
             android:enabled="true"
             android:exported="true"
             android:label="Phone Call"
@@ -181,28 +181,45 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_crm_data" />
         </service>
+        <service
+            android:name="com.odoo.addons.crm.services.CRMPhoneCallService"
+            android:exported="true" >
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter" />
+            </intent-filter>
 
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/sync_crm_phone" />
+        </service>
         <!-- Quotation/SalesOrder service -->
         <provider
             android:name="com.odoo.addons.sale.providers.sale.SalesProvider"
             android:authorities="com.odoo.addons.sale.providers.sale"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Quotation/SalesOrder"
             android:syncable="true" />
         <provider
             android:name="com.odoo.addons.sale.providers.sale.SalesOrderLineProvider"
-            android:authorities="com.odoo.addons.sale.providers.sale"
+            android:authorities="com.odoo.addons.sale.providers.sale.orderline"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Quotation/SalesOrderLine"
             android:syncable="true" />
         <provider
             android:name="com.odoo.addons.sale.providers.sale.ProductProvider"
-            android:authorities="com.odoo.addons.sale.providers.sale"
+            android:authorities="com.odoo.addons.sale.providers.sale.product"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Quotation/Product"
+            android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.sale.providers.sale.ResCurrencyProvider"
+            android:authorities="com.odoo.addons.sale.providers.sale.rescurrency"
+            android:enabled="true"
+            android:exported="false"
+            android:label="Res Currency"
             android:syncable="true" />
 
         <service
@@ -221,7 +238,7 @@
             android:name="com.odoo.addons.res.providers.res.ResProvider"
             android:authorities="com.odoo.addons.res.providers"
             android:enabled="true"
-            android:exported="true"
+            android:exported="false"
             android:label="Partner"
             android:syncable="true" />
 

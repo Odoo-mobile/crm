@@ -9,7 +9,7 @@ import com.odoo.support.provider.OContentProvider;
 
 public class SalesProvider extends OContentProvider {
 	public static String AUTHORITY = "com.odoo.addons.sale.providers.sale";
-	public static final String PATH = "sale_order_line";
+	public static final String PATH = "sale_order";
 	public static final Uri CONTENT_URI = OContentProvider.buildURI(AUTHORITY,
 			PATH);
 
@@ -20,16 +20,16 @@ public class SalesProvider extends OContentProvider {
 
 	@Override
 	public String authority() {
-		return SalesOrderLineProvider.AUTHORITY;
+		return SalesProvider.AUTHORITY;
 	}
 
 	@Override
 	public String path() {
-		return SalesOrderLineProvider.PATH;
+		return SalesProvider.PATH;
 	}
 
 	@Override
 	public Uri uri() {
-		return SalesOrderLineProvider.CONTENT_URI;
+		return SalesProvider.CONTENT_URI;
 	}
 }

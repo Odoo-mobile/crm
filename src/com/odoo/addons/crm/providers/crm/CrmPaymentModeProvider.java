@@ -8,7 +8,7 @@ import com.odoo.orm.OModel;
 import com.odoo.support.provider.OContentProvider;
 
 public class CrmPaymentModeProvider extends OContentProvider {
-	public static String AUTHORITY = "com.odoo.addons.crm.providers.crm";
+	public static String AUTHORITY = "com.odoo.addons.crm.providers.crm.paymentmode";
 	public static final String PATH = "crm_payment_mode";
 	public static final Uri CONTENT_URI = OContentProvider.buildURI(AUTHORITY,
 			PATH);
