@@ -19,6 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
+import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.addons.res.ResPartners;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
@@ -152,6 +153,10 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		if (db().isEmptyTable()) {
+			scope.main().requestSync(SalesProvider.AUTHORITY);
+			setSwipeRefreshing(true);
+		}
 		String where = "";
 		String args[] = {};
 		if (mCurrentKey == Keys.Quotation) {
