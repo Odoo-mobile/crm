@@ -21,6 +21,8 @@ import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
+import com.odoo.addons.crm.providers.crm.PhoneCallProvider;
+import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
@@ -114,6 +116,10 @@ public class CRMPhoneCalls extends BaseFragment implements
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		if (db().isEmptyTable()) {
+			scope.main().requestSync(PhoneCallProvider.AUTHORITY);
+			setSwipeRefreshing(true);
+		}
 		return new CursorLoader(mContext, db().uri(), db().projection(), null,
 				null, null);
 	}
