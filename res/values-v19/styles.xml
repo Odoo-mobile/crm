@@ -9,7 +9,6 @@
         <item name="android:actionBarStyle">@style/TranslucentActionBar</item>
         <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:fitsSystemWindows">true</item>
         <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
     </style>
 
@@ -21,7 +20,6 @@
         <item name="android:actionBarStyle">@style/CustomActionbar</item>
         <item name="android:windowTranslucentNavigation">false</item>
         <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:fitsSystemWindows">false</item>
         <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
     </style>
 
