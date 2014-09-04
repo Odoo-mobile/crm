@@ -38,6 +38,7 @@
             <enum name="horizontal" value="0" />
             <enum name="vertical" value="1" />
         </attr>
+        <attr name="readMoreButton" format="boolean" />
     </declare-styleable>
     <declare-styleable name="OLabel">
         <attr name="label" format="string" />
@@ -73,6 +74,18 @@
         <attr name="maskDrawable" format="reference" />
         <attr name="borderDrawable" format="reference" />
         <attr name="desaturateOnPress" format="boolean" />
+    </declare-styleable>
+    <declare-styleable name="FloatingActionButton">
+        <attr name="drawable" format="integer" />
+        <attr name="fabColor" format="color" />
+        <attr name="shadowRadius" format="float" />
+        <attr name="shadowDx" format="float" />
+        <attr name="shadowDy" format="float" />
+        <attr name="shadowColor" format="integer" />
+    </declare-styleable>
+    <declare-styleable name="OCollectionView">
+        <attr name="emptyIcon" format="reference" />
+        <attr name="emptyMessage" format="reference" />
     </declare-styleable>
 
 </resources>

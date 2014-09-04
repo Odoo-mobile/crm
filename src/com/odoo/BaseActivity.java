@@ -63,6 +63,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 	private Boolean mRequestForNewAccount = false;
 	private LinearLayout mAccountListContainer;
 	private ViewGroup mDrawerItemsListContainer;
+	private Boolean hideActionbar = true;
 
 	// variables that control the Action Bar auto hide behavior (aka
 	// "quick recall")
@@ -114,7 +115,11 @@ public abstract class BaseActivity extends FragmentActivity implements
 		}
 	}
 
-	@SuppressLint("InlinedApi")
+	public void hideActionBar(boolean hide) {
+		hideActionbar = hide;
+	}
+
+	@SuppressLint({ "InlinedApi", "NewApi" })
 	protected void onActionBarAutoShowOrHide(boolean shown) {
 		for (View view : mHideableHeaderViews) {
 			if (shown) {
@@ -127,10 +132,12 @@ public abstract class BaseActivity extends FragmentActivity implements
 						.setInterpolator(new DecelerateInterpolator());
 			}
 		}
-		if (shown) {
-			getActionBar().show();
-		} else {
-			getActionBar().hide();
+		if (hideActionbar) {
+			if (shown) {
+				getActionBar().show();
+			} else {
+				getActionBar().hide();
+			}
 		}
 	}
 
@@ -388,7 +395,7 @@ public abstract class BaseActivity extends FragmentActivity implements
 		}
 		titleView.setText(title);
 		if (counter > 0) {
-			String ctr = (counter > 99) ? "99+" : counter + "";
+			String ctr = /* (counter > 99) ? "99+" : */counter + "";
 			counterView.setText(ctr);
 		} else {
 			counterView.setText("");

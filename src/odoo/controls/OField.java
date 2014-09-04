@@ -38,10 +38,10 @@ import android.text.TextUtils;
 import android.text.TextUtils.TruncateAt;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.HorizontalScrollView;
@@ -139,6 +139,9 @@ public class OField extends LinearLayout implements
 
 	/** The Constant KEY_CUSTOM_LAYOUT_ORIANTATION. */
 	public static final String KEY_CUSTOM_LAYOUT_ORIANTATION = "customLayoutOriantation";
+
+	/** The Constant KEY_READ_MORE_BUTTON. */
+	public static final String KEY_READ_MORE_BUTTON = "readMoreButton";
 
 	/**
 	 * The Enum OFieldMode.
@@ -266,7 +269,7 @@ public class OField extends LinearLayout implements
 	private Switch mSwitch = null;
 
 	/** The web view. */
-	private WebView mWebView = null;
+	private OWebTextView mWebView = null;
 
 	/** The display metrics. */
 	private DisplayMetrics mMetrics = null;
@@ -336,13 +339,15 @@ public class OField extends LinearLayout implements
 			mTypedArray.recycle();
 		}
 		if (mAttributes.size() > 0)
-			initControls();
+			setTag("field_tag_" + mAttributes.getString(KEY_FIELD_NAME, ""));
 	}
 
 	/**
 	 * Re init the control.
 	 */
 	public void reInit() {
+		if (getTag() == null)
+			setTag("field_tag_" + mAttributes.getString(KEY_FIELD_NAME, ""));
 		initControls();
 	}
 
@@ -352,7 +357,6 @@ public class OField extends LinearLayout implements
 	private void initControls() {
 		removeAllViews();
 		setOrientation(LinearLayout.VERTICAL);
-		setTag("field_tag_" + mAttributes.getString(KEY_FIELD_NAME, ""));
 		createLabel();
 		if (mFieldWidget == null) {
 			createTextViewControl();
@@ -623,22 +627,81 @@ public class OField extends LinearLayout implements
 				if (!showAsText) {
 					String content = mControlRecord
 							.getString(mColumn.getName());
-					content = content.replaceAll("(\r\n|\n)", "<br />");
 					mLayoutParams = new LayoutParams(LayoutParams.MATCH_PARENT,
 							LayoutParams.WRAP_CONTENT);
-					mWebView = new WebView(mContext);
+					mWebView = new OWebTextView(mContext);
 					mWebView.setLayoutParams(mLayoutParams);
-					mWebView.loadData(content, "text/html; charset=UTF-8",
-							"UTF-8");
-					mWebView.getSettings().setTextZoom(90);
+					if (content.equals("false")) {
+						content = "";
+					} else if (withReadMoreButton()) {
+						mWebView.setLines(5);
+					}
+					mWebView.setHtmlContent(content);
 					mWebView.setBackgroundColor(Color.TRANSPARENT);
 					addView(mWebView);
+					addReadMoreButton(mWebView, content);
 				} else {
 					createTextViewControl();
 					setText(StringUtils.htmlToString(mControlRecord
 							.getString(mColumn.getName())));
 				}
 			}
+		}
+	}
+
+	private boolean withReadMoreButton() {
+		return mAttributes.getBoolean(KEY_READ_MORE_BUTTON, false);
+	}
+
+	private void addReadMoreButton(final OWebTextView container,
+			final String content) {
+		if (withReadMoreButton() && !TextUtils.isEmpty(container.getText())) {
+			final OWebTextView shortContainer = new OWebTextView(mContext);
+			shortContainer.setHtmlSpanContent(container.getHtmlSpan());
+			shortContainer.setBackgroundColor(Color.TRANSPARENT);
+			shortContainer.setLayoutParams(container.getLayoutParams());
+			shortContainer.setVisibility(View.GONE);
+			shortContainer.setTextAppearance(mContext,
+					android.R.attr.textAppearanceSmall);
+			container.setTextAppearance(mContext,
+					android.R.attr.textAppearanceSmall);
+			addView(shortContainer);
+			container.setPadding(container.getPaddingLeft(),
+					container.getPaddingTop(), container.getPaddingRight(),
+					(int) (3 * mScaleFactor));
+			TextView txvAddMore = new TextView(mContext);
+			txvAddMore.setGravity(Gravity.CENTER);
+			txvAddMore.setTextAppearance(mContext,
+					android.R.attr.textAppearanceMedium);
+			txvAddMore.setTypeface(OControlHelper.boldFont());
+			txvAddMore.setText(R.string.label_read_more);
+			txvAddMore.setAllCaps(true);
+			int padd = (int) (10 * mScaleFactor);
+			txvAddMore.setPadding(padd, padd, padd, padd);
+			txvAddMore.setClickable(true);
+			txvAddMore.setTextColor(mContext.getResources().getColor(
+					R.color.odoo_purple));
+			txvAddMore.setBackgroundResource(R.drawable.oe_background_selector);
+			txvAddMore.setTag("more");
+			txvAddMore.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					TextView txv = (TextView) v;
+					if (v.getTag().toString().equals("more")) {
+						container.setVisibility(View.GONE);
+						shortContainer.setVisibility(View.VISIBLE);
+						txv.setText(R.string.label_read_less);
+						v.setTag("less");
+					} else {
+						v.setTag("more");
+						txv.setText(R.string.label_read_more);
+						container.setVisibility(View.VISIBLE);
+						shortContainer.setVisibility(View.GONE);
+					}
+				}
+			});
+			addView(txvAddMore);
 		}
 	}
 
@@ -720,7 +783,14 @@ public class OField extends LinearLayout implements
 	 */
 	private void createBinaryControl(final OFieldType binary_type,
 			final boolean roundedImage) {
-		final ImageView imgBinary = new ImageView(mContext);
+		final ImageView imgBinary;
+		if (roundedImage) {
+			imgBinary = new BezelImageView(mContext);
+			imgBinary.setScaleType(ScaleType.CENTER_CROP);
+			((BezelImageView) imgBinary).autoSetMaskDrawable();
+		} else {
+			imgBinary = new ImageView(mContext);
+		}
 		int heightWidth = mAttributes.getResource(KEY_ROUND_IMAGE_WIDTH_HEIGHT,
 				-1);
 		if (heightWidth > -1) {
@@ -730,18 +800,14 @@ public class OField extends LinearLayout implements
 		}
 		final int default_image = mAttributes.getResource(KEY_DEFAULT_IMAGE,
 				R.drawable.attachment);
-		final Bitmap binary_image = BitmapFactory.decodeResource(mContext
-				.getResources(), (default_image < 0) ? R.drawable.attachment
-				: default_image);
-		if (roundedImage) {
-			imgBinary.setImageBitmap(Base64Helper.getRoundedCornerBitmap(
-					mContext, binary_image, true));
-		} else
-			imgBinary.setImageBitmap(binary_image);
 		new Handler().postDelayed(new Runnable() {
 
 			@Override
 			public void run() {
+				final Bitmap binary_image = BitmapFactory.decodeResource(
+						mContext.getResources(),
+						(default_image < 0) ? R.drawable.attachment
+								: default_image);
 				ODataRow record = null;
 				String column_name = getRefColumn();
 				if (mControlRecord != null) {
@@ -779,12 +845,7 @@ public class OField extends LinearLayout implements
 						if (!roundedImage)
 							imgBinary.setScaleType(ScaleType.CENTER_CROP);
 					}
-					if (roundedImage) {
-						imgBinary.setImageBitmap(Base64Helper
-								.getRoundedCornerBitmap(mContext, newBitmap,
-										true));
-					} else
-						imgBinary.setImageBitmap(newBitmap);
+					imgBinary.setImageBitmap(newBitmap);
 					break;
 				default:
 					break;
@@ -1068,6 +1129,8 @@ public class OField extends LinearLayout implements
 				mTypedArray.getInt(R.styleable.OField_imageWidthHeight, -1));
 		mAttributes.put(KEY_CUSTOM_LAYOUT_ORIANTATION, mTypedArray.getInt(
 				R.styleable.OField_customLayoutOriantation, -1));
+		mAttributes.put(KEY_READ_MORE_BUTTON, mTypedArray.getBoolean(
+				R.styleable.OField_readMoreButton, false));
 	}
 
 	/**

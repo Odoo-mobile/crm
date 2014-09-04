@@ -5,8 +5,13 @@
         AppBaseTheme from BOTH res/values/styles.xml and
         res/values-v11/styles.xml on API 14+ devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Holo.Light">
-        <item name="android:windowContentOverlay">@null</item>
+    <style name="AppBaseTheme" parent="android:Theme.Holo.Light.DarkActionBar">
+        <item name="android:actionBarStyle">@style/CustomActionbar</item>
+        <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="AppBaseTheme">
+        <item name="android:actionBarStyle">@style/CustomActionbar</item>
     </style>
 
 </resources>

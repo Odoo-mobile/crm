@@ -22,6 +22,6 @@
     <color name="navdrawer_icon_tint">#808080</color>
     <color name="navdrawer_icon_tint_selected">@color/theme_primary</color>
     <color name="actionbar_bg_color">#ebebeb</color>
-    <color name="translucent_status_bg_color">@color/actionbar_bg_color</color>
+    <color name="translucent_status_bg_color">@color/odoo_purple</color>
 
 </resources>
