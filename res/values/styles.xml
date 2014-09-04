@@ -17,7 +17,7 @@
 
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
         <item name="android:actionBarStyle">@style/CustomActionbar</item>
-        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
     </style>
 
     <style name="CustomActionbar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
@@ -28,6 +28,10 @@
     <style name="ActionBar.TitleTextStyle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">#ffffff</item>
+    </style>
+
+    <style name="PreferenceTheme" parent="AppBaseTheme">
+        <item name="android:actionBarStyle">@style/CustomActionbar</item>
     </style>
 
 </resources>
