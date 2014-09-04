@@ -4,7 +4,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="10dp"
-    odoo:background_selector="?android:attr/listSelector"
     odoo:model="res.partner" >
 
     <LinearLayout
@@ -71,7 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="0dp"
-                odoo:field_name="resEmail"
+                odoo:field_name="email"
                 odoo:textLines="1"
                 odoo:with_label="false" />
 
@@ -79,10 +78,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="0dp"
-                odoo:field_name="resPhone"
+                odoo:field_name="phone"
                 odoo:textLines="1"
                 odoo:with_label="false" />
 
+            <!--
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -109,6 +109,8 @@
                     odoo:field_name="salesOrdersCount"
                     odoo:with_label="false" />
             </LinearLayout>
+            -->
+
         </LinearLayout>
     </LinearLayout>
 

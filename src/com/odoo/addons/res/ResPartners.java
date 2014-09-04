@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
@@ -27,12 +30,14 @@ import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
+import com.odoo.support.listview.OCursorListAdapter.OnRowViewClickListener;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 
 public class ResPartners extends BaseFragment implements OnRefreshListener,
 		OnItemClickListener, LoaderCallbacks<Cursor>,
-		SyncStatusObserverListener {
+		SyncStatusObserverListener, OnRowViewClickListener {
 	public static final String TAG = ResPartners.class.getSimpleName();
 	public static final String KEY_DRAWER = "Sales";
 	View mView = null;
@@ -64,6 +69,9 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
+		mAdapter.setOnRowViewClickListener(R.id.imgLocation, this);
+		mAdapter.setOnRowViewClickListener(R.id.imgMail, this);
+		mAdapter.setOnRowViewClickListener(R.id.imgCall, this);
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -142,5 +150,80 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 			hideRefreshingProgress();
 		else
 			setSwipeRefreshing(true);
+	}
+
+	@Override
+	public void onRowViewClick(int position, Cursor cursor, View view,
+			View parent) {
+		switch (view.getId()) {
+		case R.id.imgLocation:
+			String address = null;
+			address = cursor.getString(cursor.getColumnIndex("street"));
+			address += "+" + cursor.getString(cursor.getColumnIndex("street2"));
+			address += "+" + cursor.getString(cursor.getColumnIndex("city"));
+			address += "+" + cursor.getString(cursor.getColumnIndex("zip"));
+
+			// address = row.getString("street");
+			// address += "+" + row.getString("street2");
+			// address += "+" + row.getString("city");
+			// address += "+" + row.getString("zip");
+			final Intent locationIntent = new Intent(Intent.ACTION_VIEW,
+					Uri.parse("google.navigation:q=" + address));
+			startActivity(locationIntent);
+			break;
+		case R.id.imgMail:
+			String phone = cursor.getString(cursor.getColumnIndex("phone"));
+			if (phone.equals("false"))
+				Toast.makeText(mContext, "No valid number", Toast.LENGTH_SHORT)
+						.show();
+			else {
+				String phoneNo = (phone.replace(" ", "").replace("+", ""));
+				Intent callIntent = new Intent(Intent.ACTION_CALL);
+				callIntent.setData(Uri.parse("tel:" + phoneNo));
+				startActivity(callIntent);
+			}
+			break;
+		case R.id.imgCall:
+			String email = cursor.getString(cursor.getColumnIndex("email"));
+			if (email.equals("false"))
+				OLog.log("Note Mail");
+			else {
+				boolean installed = appInstalledOrNot("com.openerp");
+				OLog.log("Mail Installed messaging :" + installed);
+				if (installed) {
+					Intent LaunchIntent = getActivity().getPackageManager()
+							.getLaunchIntentForPackage("com.openerp");
+					startActivity(LaunchIntent);
+				} else {
+					Intent emailIntent = new Intent(
+							android.content.Intent.ACTION_SEND);
+					String[] recipients = new String[] { email, "", };
+					emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
+							recipients);
+					emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
+							"Test Email");
+					emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
+							"This is email's Partner");
+					emailIntent.setType("text/html");
+					startActivity(Intent.createChooser(emailIntent,
+							"Send mail..."));
+				}
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	private boolean appInstalledOrNot(String uri) {
+		PackageManager pm = getActivity().getPackageManager();
+		boolean app_installed = false;
+		try {
+			pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
+			app_installed = true;
+		} catch (PackageManager.NameNotFoundException e) {
+			app_installed = false;
+		}
+		return app_installed;
 	}
 }

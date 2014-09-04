@@ -292,7 +292,7 @@ public abstract class OContentProvider extends ContentProvider implements
 		if (selection != null && selectionArgs != null) {
 			if (withAlias) {
 				// Check for and
-				Pattern pattern = Pattern.compile("and|AND");
+				Pattern pattern = Pattern.compile(" and | AND ");
 				String[] data = pattern.split(selection);
 				for (String token : data) {
 					whr.append(base_alias + "." + token.trim());
@@ -300,7 +300,7 @@ public abstract class OContentProvider extends ContentProvider implements
 				}
 				whr.delete(whr.length() - 5, whr.length());
 				// Check for or
-				pattern = Pattern.compile("or|OR");
+				pattern = Pattern.compile(" or | OR ");
 				data = pattern.split(whr.toString());
 				whr = new StringBuffer();
 				for (String token : data) {

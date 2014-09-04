@@ -1,6 +1,9 @@
 package com.odoo.addons.crm.services;
 
+import android.os.Bundle;
+
 import com.odoo.addons.crm.model.CRMLead;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OSyncAdapter;
 import com.odoo.support.service.OSyncService;
 
@@ -11,8 +14,13 @@ public class CRMService extends OSyncService {
 	@Override
 	public OSyncAdapter getSyncAdapter() {
 		return new OSyncAdapter(getApplicationContext(), new CRMLead(
-				getApplicationContext()), true);
+				getApplicationContext()), this, true);
 	}
+
+	@Override
+	public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
+	}
+	
 	// @Override
 	// public android.app.Service getService() {
 	// return this;
@@ -43,5 +51,4 @@ public class CRMService extends OSyncService {
 	// e.printStackTrace();
 	// }
 	// }
-
 }

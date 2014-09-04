@@ -24,16 +24,18 @@ import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.OValues;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
+import com.odoo.support.listview.OCursorListAdapter.OnRowViewClickListener;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class Sales extends BaseFragment implements OnRefreshListener,
 		LoaderCallbacks<Cursor>, SyncStatusObserverListener,
-		OnItemClickListener {
+		OnItemClickListener, OnRowViewClickListener {
 
 	public static final String TAG = Sales.class.getSimpleName();
 
@@ -71,6 +73,8 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
+		mAdapter.setOnRowViewClickListener(R.id.imgConfirmCreate, this);
+		mAdapter.setOnRowViewClickListener(R.id.imgCancel, this);
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -148,9 +152,23 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		String where = "";
+		String args[] = {};
+		if (mCurrentKey == Keys.Quotation) {
+			where = "state = ? or state = ?";
+			args = new String[] { "draft", "cancel" };
+		} else {
+			if (getArguments().containsKey("id")) { // Res partner in sales
+				where = "partner_id = ?";
+				args = new String[] { getArguments().getString("id") };
+			} else {
+				where = "state = ? or state = ? or state = ?";
+				args = new String[] { "manual", "progress", "done" };
+			}
+		}
 		return new CursorLoader(mContext, db().uri(), new String[] { "name",
-				"partner_id.image_small", "partner_id.name", "date_order" },
-				null, null, null);
+				"partner_id.image_small", "partner_id.id", "partner_id.name",
+				"date_order", "state", "amount_total" }, where, args, null);
 	}
 
 	@Override
@@ -170,5 +188,51 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 			hideRefreshingProgress();
 		else
 			setSwipeRefreshing(true);
+	}
+
+	@Override
+	public void onRowViewClick(int position, Cursor cursor, View view,
+			View parent) {
+		OValues values = null;
+		String state = cursor.getString(cursor.getColumnIndex("state"));
+		int _id = cursor.getInt(cursor.getColumnIndex("_id"));
+		switch (view.getId()) {
+		case R.id.imgConfirmCreate:
+			if (mCurrentKey.equals(Keys.Quotation) && state.equals("cancel"))
+				Toast.makeText(getActivity(), "new Copy of Quotations",
+						Toast.LENGTH_SHORT).show();
+			else if (mCurrentKey.equals(Keys.Quotation)) {
+				Double amount = Double.parseDouble(cursor.getString(cursor
+						.getColumnIndex("amount_total")));
+				if (amount > 0) {
+					values = new OValues();
+					values.put("state", "manual");
+					new SaleOrder(getActivity()).update(values, _id);
+					Toast.makeText(getActivity(), "Confirm to Sale",
+							Toast.LENGTH_SHORT).show();
+				} else
+					Toast.makeText(getActivity(), "No Order Line",
+							Toast.LENGTH_SHORT).show();
+			} else {
+				Toast.makeText(getActivity(), "Remainig...", Toast.LENGTH_SHORT)
+						.show();
+			}
+			break;
+		case R.id.imgCancel:
+			if (state.equals("cancel"))
+				Toast.makeText(getActivity(), "new Copy of Quotations",
+						Toast.LENGTH_SHORT).show();
+			else {
+				values = new OValues();
+				values.put("state", "cancel");
+				db().update(values, _id);
+				Toast.makeText(getActivity(), "Cancel", Toast.LENGTH_SHORT)
+						.show();
+			}
+			break;
+		default:
+			break;
+		}
+		scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
 	}
 }

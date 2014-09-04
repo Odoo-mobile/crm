@@ -1,6 +1,9 @@
 package com.odoo.addons.res.services;
 
+import android.os.Bundle;
+
 import com.odoo.base.res.ResPartner;
+import com.odoo.support.OUser;
 import com.odoo.support.service.OSyncAdapter;
 import com.odoo.support.service.OSyncService;
 
@@ -11,7 +14,12 @@ public class ResService extends OSyncService {
 	@Override
 	public OSyncAdapter getSyncAdapter() {
 		return new OSyncAdapter(getApplicationContext(), new ResPartner(
-				getApplicationContext()), true);
+				getApplicationContext()), this, true);
+	}
+
+	@Override
+	public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
+
 	}
 
 	// @Override
