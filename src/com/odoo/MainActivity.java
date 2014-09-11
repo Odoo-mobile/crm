@@ -31,6 +31,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -49,6 +50,7 @@ import com.odoo.base.login_signup.AccountCreate;
 import com.odoo.base.login_signup.LoginSignup;
 import com.odoo.crm.R;
 import com.odoo.support.OUser;
+import com.odoo.support.fragment.AsyncTaskListener;
 import com.odoo.support.fragment.FragmentListener;
 import com.odoo.util.PreferenceManager;
 import com.odoo.util.drawer.DrawerItem;
@@ -444,6 +446,12 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			}
 
 		}
+		if (mFragment.findFragmentByTag("main_fragment") != null) {
+			mFragment.popBackStack("main_fragment",
+					FragmentManager.POP_BACK_STACK_INCLUSIVE);
+			mFragment.popBackStack(null,
+					FragmentManager.POP_BACK_STACK_INCLUSIVE);
+		}
 		FragmentTransaction tran = mFragment.beginTransaction().replace(
 				container_id, fragment, "main_fragment");
 		tran.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -532,6 +540,39 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		Log.v(TAG, "setActionbarAutoHide");
 		enableActionBarAutoHide(listView);
 		hideActionBar(true);
+	}
+
+	/**
+	 * AsyncTask quick task helper
+	 */
+
+	public class BackgroundTask extends AsyncTask<Void, Void, Object> {
+		AsyncTaskListener mListener = null;
+
+		public BackgroundTask(AsyncTaskListener listener) {
+			mListener = listener;
+		}
+
+		@Override
+		protected Object doInBackground(Void... params) {
+			if (mListener != null) {
+				return mListener.onPerformTask();
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Object result) {
+			super.onPostExecute(result);
+			if (mListener != null) {
+				mListener.onFinish(result);
+				mListener = null;
+			}
+		}
+	}
+
+	public BackgroundTask newBackgroundTask(AsyncTaskListener taskListener) {
+		return new BackgroundTask(taskListener);
 	}
 
 }
