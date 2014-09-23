@@ -51,10 +51,13 @@ public class SaleOrder extends OModel {
 	OColumn order_line = new OColumn("Order Lines", SalesOrderLine.class,
 			RelationType.OneToMany).setRelatedColumn("order_id");
 
-	@Functional(method = "stateChange")
-	OColumn stateChange = new OColumn("Total Amount", OText.class);
-	@Functional(method = "amountTotal")
-	OColumn amountTotalSymbol = new OColumn("Total Amount", OText.class);
+	@Functional(method = "stateChange", store = true, depends = { "state" })
+	OColumn stateChange = new OColumn("Total Amount", OVarchar.class)
+			.setLocalColumn();
+	@Functional(method = "amountTotal", store = true, depends = {
+			"amount_total", "currency_id" })
+	OColumn amountTotalSymbol = new OColumn("Total Amount", OVarchar.class)
+			.setLocalColumn();
 
 	public SaleOrder(Context context) {
 		super(context, "sale.order");
