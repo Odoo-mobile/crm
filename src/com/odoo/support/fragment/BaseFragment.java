@@ -331,4 +331,5 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 		super.onViewCreated(view, savedInstanceState);
 		scope = new AppScope(getActivity());
 	}
+
 }

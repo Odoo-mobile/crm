@@ -35,6 +35,8 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.base.ir.Attachments;
+import com.odoo.base.ir.IrAttachment;
 import com.odoo.base.ir.IrModel;
 import com.odoo.orm.ORelationRecordList.ORelationRecords;
 import com.odoo.support.OUser;
@@ -346,6 +348,8 @@ public class OSyncHelper {
 				if (updateToServerRecordList.size() > 0) {
 					updateRecordOnServer(model, updateToServerRecordList);
 				}
+				Log.v(TAG, newORUpdateRecords.length()
+						+ " records new/update in local");
 				newResult.accumulate("records", newORUpdateRecords);
 				model.checkInActiveRecord(false);
 			}
@@ -371,7 +375,9 @@ public class OSyncHelper {
 					mOdoo.updateValues(model.getModelName(), values,
 							row.getInt("id"));
 					OValues vals = new OValues();
-					vals.put("is_dirty", "false");
+					if (row.getBoolean("is_active")) {
+						vals.put("is_dirty", "false");
+					}
 					model.update(vals, row.getInt(OColumn.ROW_ID));
 				}
 			}
@@ -436,9 +442,18 @@ public class OSyncHelper {
 	 * @param data_row
 	 *            the data_row
 	 */
-	public void create(OModel model, ODataRow data_row) {
+	public Integer create(OModel model, ODataRow data_row) {
 		try {
 			JSONObject values = createJSONValues(model, data_row);
+			if (model.getModelName().equals(
+					new IrAttachment(mContext).getModelName())) {
+				if (data_row.contains(Attachments.KEY_DB_DATAS))
+					values.put(Attachments.KEY_DB_DATAS,
+							data_row.get(Attachments.KEY_DB_DATAS));
+				if (data_row.contains(Attachments.KEY_TYPE))
+					values.put(Attachments.KEY_TYPE,
+							data_row.get(Attachments.KEY_TYPE));
+			}
 			if (values != null) {
 				Integer newId = 0;
 				values.remove("id");
@@ -449,10 +464,12 @@ public class OSyncHelper {
 				vals.put("id", newId);
 				vals.put("is_dirty", "false");
 				model.update(vals, data_row.getInt(OColumn.ROW_ID));
+				return newId;
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		return null;
 	}
 
 	/**
@@ -471,7 +488,7 @@ public class OSyncHelper {
 			for (OColumn col : model.getColumns(false)) {
 				if (col.getRelationType() == null) {
 					Object val = row.get(col.getName());
-					if (val.toString().equals("false") || val == null
+					if (val == null || val.toString().equals("false")
 							|| TextUtils.isEmpty(val.toString()))
 						val = false;
 					values.put(col.getName(), val);
@@ -801,8 +818,10 @@ public class OSyncHelper {
 	public JSONObject getFields(OModel model) {
 		JSONObject fields = new JSONObject();
 		try {
-			for (OColumn column : model.getColumns(false))
-				fields.accumulate("fields", column.getName());
+			for (OColumn column : model.getColumns(false)) {
+				if (!column.getName().equals("id"))
+					fields.accumulate("fields", column.getName());
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

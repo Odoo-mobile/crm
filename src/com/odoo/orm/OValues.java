@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.ContentValues;
+
 public class OValues {
 	private HashMap<String, Object> _values = new HashMap<String, Object>();
 
@@ -82,5 +84,25 @@ public class OValues {
 	@Override
 	public String toString() {
 		return _values.toString();
+	}
+
+	public ODataRow toDataRow() {
+		ODataRow row = new ODataRow();
+		row.addAll(_values);
+		return row;
+	}
+
+	public ContentValues toContentValues() {
+		ContentValues values = new ContentValues();
+		for (String key : _values.keySet()) {
+			Object val = _values.get(key);
+			val = (val == null) ? "false" : val;
+			values.put(key, val.toString());
+		}
+		return values;
+	}
+
+	public void addAll(HashMap<String, Object> data) {
+		_values.putAll(data);
 	}
 }

@@ -1841,6 +1841,10 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		}
 	}
 
+	public OContentResolver resolver() {
+		return new OContentResolver(this, mContext);
+	}
+
 }
 
 /**
