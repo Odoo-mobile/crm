@@ -19,7 +19,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
-import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.addons.res.ResPartners;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
@@ -173,7 +172,8 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 		}
 		return new CursorLoader(mContext, db().uri(), new String[] { "name",
 				"partner_id.image_small", "partner_id.id", "partner_id.name",
-				"date_order", "state", "amount_total" }, where, args, null);
+				"date_order", "state", "amount_total", "stateChange",
+				"amountTotalSymbol" }, where, args, null);
 	}
 
 	@Override
