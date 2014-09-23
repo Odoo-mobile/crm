@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
@@ -48,12 +50,16 @@ public class CRMConvertToOpp extends BaseFragment implements
 	OForm mForm = null;
 	List<ODataRow> list = null;
 	int index = 0;
+	Context mContext = null;
+	List<Integer> mIds = null;
 	ODataRow mLead = null;
 	ODataRow mCustomer = null;
 	List<Object> mOpportunities = new ArrayList<Object>();
 	boolean mMergeOpportunity = false;
 	RadioButton rdoConvertOpp, rdoMergeOpp;
+	Cursor c = null;
 	OList mLeadList = null;
+	ListView mListView = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -61,6 +67,7 @@ public class CRMConvertToOpp extends BaseFragment implements
 		setHasOptionsMenu(true);
 		initArgs();
 		scope = new AppScope(getActivity());
+		mContext = getActivity();
 		mView = inflater.inflate(R.layout.crm_convert_to_opportunity,
 				container, false);
 		initFormControls();
@@ -70,6 +77,7 @@ public class CRMConvertToOpp extends BaseFragment implements
 	public void initFormControls() {
 		mForm = (OForm) mView.findViewById(R.id.crmConvertToOpp);
 		mLeadList = (OList) mForm.findViewById(R.id.crmLeadOppList);
+		// mListView = (ListView) mForm.findViewById(R.id.crmLeadOppList);
 		rdoConvertOpp = (RadioButton) mForm
 				.findViewById(R.id.rdoConvertToOpportunity);
 
@@ -81,7 +89,6 @@ public class CRMConvertToOpp extends BaseFragment implements
 		fillLeadList();
 		rdoConvertOpp.setOnCheckedChangeListener(this);
 		rdoMergeOpp.setOnCheckedChangeListener(this);
-
 	}
 
 	public void initFormData() {
@@ -97,16 +104,18 @@ public class CRMConvertToOpp extends BaseFragment implements
 				String stage_id = stages.get(0).getString("id");
 				ODataRow mParent = mCustomer.getM2ORecord("parent_id").browse();
 				String where = "partner_id = ? and stage_id != ?";
-				String whereArgs[] = new String[] {
-						mCustomer.getString("local_id"), stage_id };
+				String whereArgs[] = new String[] { mCustomer.getString("_id"),
+						stage_id };
+
 				if (mParent != null) {
 					where = "partner_id = ? or partner_id = ? and stage_id != ?";
-					whereArgs = new String[] { mCustomer.getString("local_id"),
+					whereArgs = new String[] { mCustomer.getString("_id"),
 							mParent.getString("id"), stage_id };
 				}
 				mOpportunities.addAll(db().select(where, whereArgs));
 			}
 		}
+
 	}
 
 	public void fillLeadList() {
@@ -155,19 +164,12 @@ public class CRMConvertToOpp extends BaseFragment implements
 		if (buttonView.getId() == R.id.rdoConvertToOpportunity) {
 			if (isChecked) {
 				mMergeOpportunity = false;
-				OControls.setGone(mView, R.id.crmLeadOppList);
+				OControls.setInvisible(mView, R.id.crmLeadOppList);
+				OControls.setInvisible(mView, R.id.leadLabel);
 			} else {
 				mMergeOpportunity = true;
+				OControls.setVisible(mView, R.id.leadLabel);
 				OControls.setVisible(mView, R.id.crmLeadOppList);
-			}
-		}
-		if (buttonView.getId() == R.id.rdoMergeExistingOpportunity) {
-			if (isChecked) {
-				mMergeOpportunity = true;
-				OControls.setVisible(mView, R.id.crmLeadOppList);
-			} else {
-				mMergeOpportunity = false;
-				OControls.setGone(mView, R.id.crmLeadOppList);
 			}
 		}
 	}
@@ -193,47 +195,64 @@ public class CRMConvertToOpp extends BaseFragment implements
 						Odoo odoo = app().getOdoo();
 						if (odoo != null) {
 							OValues values = new OValues();
-							List<Integer> ids = new ArrayList<Integer>();
 							String name = "convert";
+							List<Integer> ids = new ArrayList<Integer>();
 							if (mMergeOpportunity && mOpportunities.size() > 1) {
 								name = "merge";
-								for (Object row : mOpportunities) {
+								for (Object row : list) {
 									ODataRow r = (ODataRow) row;
 									ids.add(r.getInt("id"));
 								}
 							}
 							values.put("name", name);
+							values.put("opportunity_ids", ids);
 							values.put("action", (mCustomer != null) ? "exist"
 									: "create");
 							values.put(
 									"partner_id",
 									(mCustomer != null) ? mCustomer
 											.getInt("id") : false);
+
 							JSONObject context = new JSONObject();
 							context.put("stage_type", "lead");
 							context.put("active_id", mLead.getInt("id"));
 							context.put("active_ids",
 									new JSONArray().put(mLead.getInt("id")));
 							context.put("active_model", "crm.lead");
-							odoo.updateContext(context);
+							JSONObject newContext = odoo.updateContext(context);
 							JSONObject args = new JSONObject();
 							for (String key : values.keys()) {
 								args.put(key, values.get(key));
 							}
+							odoo.debug(true);
 							JSONObject result = odoo.createNew(
 									"crm.lead2opportunity.partner", args);
 							int lead_to_opp_partner_id = result
 									.getInt("result");
 
 							// Action Apply
-							OArguments arg = new OArguments();
-							arg.add(new JSONArray().put(lead_to_opp_partner_id));
-							odoo.call_kw("crm.lead2opportunity.partner",
-									"action_apply", null);
+							OArguments cargs = new OArguments();
+							cargs.add(lead_to_opp_partner_id);
+							cargs.add(newContext);
+
+							/*
+							 * Problem with merge opportunity.. Server Response
+							 * Error. Sending update context while there is no
+							 * requirement of this
+							 */
+
+							// odoo.call_kw("crm.lead2opportunity.partner",
+							// "action_apply", cargs.get());
+							// odoo.callMethod("crm.lead2opportunity.partner",
+							// "action_apply", , null);
+
+							// db().getSyncHelper()
+							// .callMethod("crm.lead2opportunity.partner",
+							// "action_apply", cargs, null, null);
+							odoo.debug(false);
 							OValues vals = new OValues();
 							vals.put("type", "opportunity");
-							db().update(vals, mLead.getInt("local_id"));
-
+							db().update(vals, mLead.getInt("_id"));
 						} else {
 							mToast = _s(R.string.toast_no_netowrk);
 						}
@@ -262,23 +281,25 @@ public class CRMConvertToOpp extends BaseFragment implements
 	}
 
 	@Override
-	public void onRowViewClick(ViewGroup view_group, View view, int position,
+	public void onRowViewClick(ViewGroup view_group, View v, int position,
 			ODataRow row) {
 		final int pos = position;
-		AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
-		dialog.setCancelable(true);
-		dialog.setTitle("Remove");
-		dialog.setMessage("Do you want to Remove this lead from list");
-		dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+		if (v.getId() == R.id.removeLead) {
+			AlertDialog.Builder dialog = new AlertDialog.Builder(getActivity());
+			dialog.setCancelable(true);
+			dialog.setTitle("Remove");
+			dialog.setMessage("Do you want to Remove this lead from list");
+			dialog.setPositiveButton("Yes",
+					new DialogInterface.OnClickListener() {
 
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				list.remove(pos);
-				mLeadList.initListControl(list);
-			}
-		});
-		dialog.setNegativeButton("No", null);
-		dialog.show();
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							list.remove(pos);
+							mLeadList.initListControl(list);
+						}
+					});
+			dialog.setNegativeButton("No", null);
+			dialog.show();
+		}
 	}
-
 }

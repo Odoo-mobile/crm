@@ -1,80 +1,94 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+ <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:odoo="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res/com.odoo.crm"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:clipToPadding="false"
-    android:fillViewport="true"
-    android:paddingTop="?android:attr/actionBarSize" >
+    android:fillViewport="true" >
+-->
 
-    <LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/com.odoo.crm"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
+
+    <odoo.controls.OForm
+        android:id="@+id/crmConvertToOpp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:padding="15dp"
+        odoo:model="crm.lead" >
 
-        <odoo.controls.OForm
-            android:id="@+id/crmConvertToOpp"
+        <odoo.controls.OLabel
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="15dp"
-            odoo:model="crm.lead" >
+            app:bottom_border_height="2"
+            app:label="Conversion Action"
+            app:color="@color/odoo_purple" >
+        </odoo.controls.OLabel>
 
-            <odoo.controls.OLabel
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:bottom_border_height="2"
-                app:label="Conversion Action"
-                app:color="@color/odoo_purple" >
-            </odoo.controls.OLabel>
+        <RadioGroup
+            android:id="@+id/rdoConvertOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" >
 
-            <RadioGroup
-                android:id="@+id/rdoConvertOptions"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" >
-
-                <RadioButton
-                    android:id="@+id/rdoConvertToOpportunity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="@string/label_convert_to_opp"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <RadioButton
-                    android:id="@+id/rdoMergeExistingOpportunity"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/label_merge_with_opp"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-            </RadioGroup>
-
-            <odoo.controls.OField
-                android:id="@+id/text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:field_name="partner_id"
-                app:ref_column="name"
-                app:with_label="true"
-               app:label_color="@color/odoo_purple">
-            </odoo.controls.OField>
-
-            <odoo.controls.OLabel
+            <RadioButton
+                android:id="@+id/rdoConvertToOpportunity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:bottom_border_height="2"
-                app:label="Leads / Opportunities"
-                app:color="@color/odoo_purple" >
-            </odoo.controls.OLabel>
+                android:checked="true"
+                android:text="@string/label_convert_to_opp"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-            <odoo.controls.OList
-                android:id="@+id/crmLeadOppList"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:custom_layout="@layout/crm_lead_list_item" >
-            </odoo.controls.OList>
-        </odoo.controls.OForm>
-    </LinearLayout>
+            <RadioButton
+                android:id="@+id/rdoMergeExistingOpportunity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/label_merge_with_opp"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+        </RadioGroup>
 
-</ScrollView>
+        <odoo.controls.OField
+            android:id="@+id/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:field_name="partner_id"
+            app:label_color="@color/odoo_purple"
+            app:ref_column="name"
+            app:with_label="true" >
+        </odoo.controls.OField>
+
+        <odoo.controls.OLabel
+            android:id="@+id/leadLabel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:bottom_border_height="2"
+            app:label="Leads / Opportunities"
+            app:color="@color/odoo_purple" >
+        </odoo.controls.OLabel>
+
+        <odoo.controls.OList
+            android:id="@+id/crmLeadOppList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            app:custom_layout="@layout/crm_lead_list_item" >
+        </odoo.controls.OList>
+
+        <!--
+        <ListView
+            android:id="@+id/crmLeadOppList"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible" >
+        </ListView>
+        -->
+    </odoo.controls.OForm>
+
+</LinearLayout>

@@ -76,6 +76,7 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
 		getLoaderManager().initLoader(0, null, this);
+
 	}
 
 	private void checkArguments() {
@@ -167,14 +168,16 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 			scope.main().requestSync(CRMProvider.AUTHORITY);
 			setSwipeRefreshing(true);
 		}
-		if (mCurrentKey == Keys.Leads)
-			return new CursorLoader(mContext, db().uri(), new String[] {
-					"name", "partner_id.image_small", "partner_id.name",
-					"stage_id.name" }, null, null, null);
-		else
-			return new CursorLoader(mContext, db().uri(), new String[] {
-					"name", "partner_id.image_small", "partner_id.name",
-					"stage_id.name" }, null, null, null);
+		String where = "type = ?";
+		String[] whereArgs = null;
+		if (mCurrentKey == Keys.Leads) {
+			whereArgs = new String[] { "lead" };
+		} else {
+			whereArgs = new String[] { "opportunity" };
+		}
+		return new CursorLoader(mContext, db().uri(), new String[] { "name",
+				"partner_id.image_small", "partner_id.name", "stage_id.name",
+				"type" }, where, whereArgs, null);
 	}
 
 	@Override
