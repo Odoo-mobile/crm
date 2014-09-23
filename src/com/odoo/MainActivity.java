@@ -119,20 +119,31 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 					View.GONE);
 			mTwoPane = true;
 		}
+		if (savedInstanceState != null) {
+			// mDrawerItemSelectedPosition = savedInstanceState
+			// .getInt("current_drawer_item");
+			return;
+		}
 		init();
 	}
 
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		if (OUser.current(mContext) != null && savedInstanceState != null
-				&& !isNewAccountRequest()) {
-			setDrawerItemPosition(savedInstanceState
-					.getInt("current_drawer_item"));
-			if (OdooAccountManager.isAnyUser(mContext)) {
-				setDrawerItemPosition((getDrawerItemPosition() < 0) ? 0
-						: getDrawerItemPosition());
-				onNavDrawerItemClicked(getDrawerItem(getDrawerItemPosition()));
+		if (OUser.current(mContext) != null && !isNewAccountRequest()) {
+			populateNavDrawer(savedInstanceState);
+			setupAccountBox();
+			if (savedInstanceState != null) {
+				setDrawerItemPosition(savedInstanceState
+						.getInt("current_drawer_item"));
+			} else {
+				if (OdooAccountManager.isAnyUser(mContext)) {
+					setDrawerItemPosition((getDrawerItemPosition() < 0) ? 0
+							: getDrawerItemPosition());
+					onNavDrawerItemClicked(
+							getDrawerItem(getDrawerItemPosition()),
+							savedInstanceState);
+				}
 			}
 		}
 	}
@@ -392,15 +403,19 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 	@Override
 	public void loadFragment(DrawerItem item) {
-
-		Fragment fragment = (Fragment) item.getFragmentInstace();
-		if (item.getTagColor() != null
-				&& !fragment.getArguments().containsKey("tag_color")) {
-			Bundle tagcolor = fragment.getArguments();
-			tagcolor.putInt("tag_color", Color.parseColor(item.getTagColor()));
-			fragment.setArguments(tagcolor);
+		Object frag = item.getFragmentInstace();
+		if (frag instanceof Fragment) {
+			Fragment fragment = (Fragment) frag;
+			if (item.getTagColor() != null
+					&& !fragment.getArguments().containsKey("tag_color")) {
+				Bundle tagcolor = fragment.getArguments();
+				tagcolor.putInt("tag_color",
+						Color.parseColor(item.getTagColor()));
+				fragment.setArguments(tagcolor);
+			}
+			frag = fragment;
 		}
-		loadFragment(fragment);
+		loadFragment(frag);
 	}
 
 	private void loadFragment(Object instance) {
