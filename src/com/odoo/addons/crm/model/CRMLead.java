@@ -99,7 +99,6 @@ public class CRMLead extends OModel {
 	@Override
 	public ODomain defaultDomain() {
 		ODomain domain = new ODomain();
-		domain.add("|");
 		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
 		// domain.add("user_id", "=", false);
 		return domain;

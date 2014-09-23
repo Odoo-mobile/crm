@@ -2,8 +2,15 @@ package com.odoo.addons.crm;
 
 import java.util.List;
 
+import odoo.OArguments;
+import odoo.Odoo;
 import odoo.controls.OForm;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +27,7 @@ import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OValues;
+import com.odoo.support.ODialog;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
@@ -69,6 +77,8 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 		case Opportunities:
 			OControls.setVisible(mView, R.id.crmOppDetail);
 			mForm = (OForm) mView.findViewById(R.id.crmOppDetail);
+			mForm.findViewById(R.id.btnConvertToQuotation).setOnClickListener(
+					this);
 			break;
 		}
 		CRMLead crmLead = new CRMLead(getActivity());
@@ -168,17 +178,100 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 					convertToOpportunity.setArguments(bundle);
 					startFragment(convertToOpportunity, true);
 				} else {
-					Toast.makeText(mContext, _s(R.string.toast_no_netowrk), Toast.LENGTH_SHORT)
-							.show();
+					Toast.makeText(mContext, _s(R.string.toast_no_netowrk),
+							Toast.LENGTH_SHORT).show();
 				}
 			} else {
 				Toast.makeText(mContext, _s(R.string.toast_sync_before),
 						Toast.LENGTH_SHORT).show();
 			}
 			break;
-
+		case R.id.btnConvertToQuotation:
+			if (mRecord.getM2ORecord("partner_id").browse() != null) {
+				ConvertToQuotation converToQuotation = new ConvertToQuotation(
+						mRecord);
+				converToQuotation.execute();
+			}
 		default:
 			break;
 		}
 	}
+
+	class ConvertToQuotation extends AsyncTask<Void, Void, Void> {
+		ODataRow mLead = null;
+		ODialog mDialog = null;
+		String mToast = null;
+
+		public ConvertToQuotation(ODataRow lead) {
+			mLead = lead;
+		}
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			mDialog = new ODialog(getActivity(), false, "Converting....");
+			mDialog.show();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+			getActivity().runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					try {
+						Odoo odoo = app().getOdoo();
+						int version = odoo.getOdooVersion().getVersion_number();
+						OArguments args = new OArguments();
+						JSONArray fields = new JSONArray();
+						fields.put("close");
+						if (version == 7)
+							fields.put("shop_id");
+						fields.put("partner_id");
+						args.add(fields);
+						JSONObject kwargs = new JSONObject();
+						JSONObject context = new JSONObject();
+						if (version == 7)
+							context.put("stage_type", "opportunity");
+						context.put("active_model", "crm.lead");
+						context.put("active_id", mLead.getInt("id"));
+						context.put("active_ids",
+								new JSONArray().put(mLead.getInt("id")));
+						kwargs.put("context", context);
+						odoo.DEBUG = true;
+						JSONObject response = (JSONObject) odoo.call_kw(
+								"crm.make.sale", "default_get",
+								new JSONArray().put(fields), kwargs);
+						JSONObject result= response.getJSONObject("result");
+						odoo.DEBUG = false;
+						JSONObject arguments = new JSONObject();
+						arguments.put("partner_id", result.get("partner_id"));
+						if (version == 7)
+							arguments.put("shop_id", result.get("shop_id"));
+						arguments.put("close", false);
+						JSONObject newContext = odoo.updateContext(context);
+						JSONObject res = odoo.createNew("crm.make.sale",
+								arguments);
+						int id = res.getInt("result");
+
+						// makeOrder
+						OArguments make_order_args = new OArguments();
+						make_order_args.add(id);
+						make_order_args.add(newContext);
+						JSONObject order = odoo.call_kw("crm.make.sale",
+								"makeOrder", make_order_args.get());
+						if (order.getJSONObject("result").has("res_id")) {
+							mToast = "Quotation SO"
+									+ order.getJSONObject("result").getInt(
+											"res_id") + " created";
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+			return null;
+		}
+	}
+
 }

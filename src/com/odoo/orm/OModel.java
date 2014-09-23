@@ -1669,6 +1669,7 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 			if (model_class != null)
 				model = new OModel(context, model_name)
 						.createInstance(model_class);
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

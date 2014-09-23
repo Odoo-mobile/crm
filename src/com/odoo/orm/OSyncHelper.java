@@ -974,8 +974,8 @@ public class OSyncHelper {
 			if (context != null) {
 				args.add(mOdoo.updateContext(context));
 			}
-			JSONObject result = mOdoo.call_kw(mModel.getModelName(), method,
-					args.getArray(), kwargs);
+			JSONObject result = mOdoo.call_kw(model, method, args.getArray(),
+					kwargs);
 
 			if (result.has("result")) {
 				return result.get("result");

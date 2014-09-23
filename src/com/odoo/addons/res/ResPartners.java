@@ -171,7 +171,7 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 					Uri.parse("google.navigation:q=" + address));
 			startActivity(locationIntent);
 			break;
-		case R.id.imgMail:
+		case R.id.imgCall:
 			String phone = cursor.getString(cursor.getColumnIndex("phone"));
 			if (phone.equals("false"))
 				Toast.makeText(mContext, "No valid number", Toast.LENGTH_SHORT)
@@ -183,7 +183,7 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 				startActivity(callIntent);
 			}
 			break;
-		case R.id.imgCall:
+		case R.id.imgMail:
 			String email = cursor.getString(cursor.getColumnIndex("email"));
 			if (email.equals("false"))
 				OLog.log("Note Mail");
