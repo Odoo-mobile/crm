@@ -31,6 +31,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.content.SyncAdapterType;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -120,8 +121,6 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 			mTwoPane = true;
 		}
 		if (savedInstanceState != null) {
-			// mDrawerItemSelectedPosition = savedInstanceState
-			// .getInt("current_drawer_item");
 			return;
 		}
 		init();
@@ -130,7 +129,8 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	@Override
 	protected void onPostCreate(Bundle savedInstanceState) {
 		super.onPostCreate(savedInstanceState);
-		if (OUser.current(mContext) != null && !isNewAccountRequest()) {
+		if (OUser.current(mContext) != null && !isNewAccountRequest()
+				&& !intentRequests()) {
 			populateNavDrawer(savedInstanceState);
 			setupAccountBox();
 			if (savedInstanceState != null) {
@@ -153,23 +153,56 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		/**
 		 * checks for available account related to Odoo
 		 */
-		if (!OdooAccountManager.hasAccounts(this) || isNewAccountRequest()) {
-			getActionBar().setDisplayHomeAsUpEnabled(false);
-			getActionBar().setHomeButtonEnabled(false);
-			lockDrawer(true);
-			LoginSignup loginSignUp = new LoginSignup();
-			startMainFragment(loginSignUp, false);
+		App app = (App) getApplicationContext();
+		if (app.appInstalled("com.openerp")) {
+			showUpgradeDialog();
 		} else {
-			lockDrawer(false);
-			/**
-			 * User found but not logged in. Requesting for login with available
-			 * accounts.
-			 */
-			if (!OdooAccountManager.isAnyUser(mContext)) {
-				accountSelectionDialog(
-						OdooAccountManager.fetchAllAccounts(mContext)).show();
+			if (!OdooAccountManager.hasAccounts(this) || isNewAccountRequest()) {
+				getActionBar().setDisplayHomeAsUpEnabled(false);
+				getActionBar().setHomeButtonEnabled(false);
+				lockDrawer(true);
+				LoginSignup loginSignUp = new LoginSignup();
+				startMainFragment(loginSignUp, false);
+			} else {
+				lockDrawer(false);
+				/**
+				 * User found but not logged in. Requesting for login with
+				 * available accounts.
+				 */
+				if (!OdooAccountManager.isAnyUser(mContext)) {
+					accountSelectionDialog(
+							OdooAccountManager.fetchAllAccounts(mContext))
+							.show();
+				}
 			}
 		}
+	}
+
+	private void showUpgradeDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setTitle("Uninstall required");
+		builder.setMessage("Please uninstall older version of Odoo Messaging");
+		builder.setCancelable(false);
+		builder.setPositiveButton("Uninstall now", new OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				Uri packageUri = Uri.parse("package:com.openerp");
+				Intent uninstallIntent = new Intent(
+						Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
+				startActivity(uninstallIntent);
+				OdooAccountManager.removeAllAccounts(getApplicationContext());
+				finish();
+			}
+		});
+		builder.setNegativeButton("Cancel", new OnClickListener() {
+
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				finish();
+			}
+		});
+		builder.show();
 	}
 
 	private void initTouchListener() {
@@ -522,27 +555,20 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	}
 
 	@Override
-	protected void intentRequests() {
-		int position = getCurrentPosition();
+	protected boolean intentRequests() {
 		/**
 		 * TODO: handle intent request from outside
 		 */
 		if (getIntent().getAction() != null
 				&& !getIntent().getAction().toString()
 						.equalsIgnoreCase("android.intent.action.MAIN")) {
-
+			lockDrawer(false);
 			/**
 			 * TODO: handle widget fragment requests.
 			 */
 
-		} else {
-			if (position > 0) {
-				if (position != getDrawerItemPosition()) {
-					loadFragment(getDrawerItem(position));
-				}
-			}
 		}
-
+		return false;
 	}
 
 	public void setViewAutoHide(ListView listView, View view) {
