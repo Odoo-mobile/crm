@@ -49,6 +49,10 @@ public class OdooAccountManager {
 	 */
 	public static List<OUser> fetchAllAccounts(Context context) {
 		List<OUser> userObjs = new ArrayList<OUser>();
+		App app = (App) context.getApplicationContext();
+		if (app.appInstalled("com.openerp")) {
+			return userObjs;
+		}
 		AccountManager accMgr = AccountManager.get(context);
 		Account[] accounts = accMgr.getAccountsByType(PARAM_AUTHTOKEN_TYPE);
 		if (accounts.length > 0) {
@@ -108,7 +112,6 @@ public class OdooAccountManager {
 	 */
 	public static boolean isAnyUser(Context context) {
 		boolean flag = false;
-
 		List<OUser> accounts = OdooAccountManager.fetchAllAccounts(context);
 		if (accounts != null) {
 			for (OUser user : accounts) {
@@ -130,6 +133,9 @@ public class OdooAccountManager {
 	 */
 	public static OUser currentUser(Context context) {
 		App app = (App) context.getApplicationContext();
+		if (app.appInstalled("com.openerp")) {
+			return null;
+		}
 		if (app.getUser() != null) {
 			return app.getUser();
 		}
@@ -142,6 +148,14 @@ public class OdooAccountManager {
 			}
 		}
 		return null;
+	}
+
+	public static void removeAllAccounts(Context context) {
+		AccountManager accMgr = AccountManager.get(context);
+		Account[] accounts = accMgr.getAccountsByType(PARAM_AUTHTOKEN_TYPE);
+		for (Account ac : accounts) {
+			accMgr.removeAccount(ac, null, null);
+		}
 	}
 
 	/**
