@@ -1,5 +1,6 @@
 package com.odoo.addons.sale.services;
 
+import odoo.ODomain;
 import android.os.Bundle;
 
 import com.odoo.addons.sale.model.SaleOrder;
@@ -18,34 +19,9 @@ public class SalesService extends OSyncService {
 
 	@Override
 	public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-
+		ODomain domain = new ODomain();
+		domain.add("user_id", "=", user.getUser_id());
+		adapter.setDomain(domain);
 	}
-
-	// @Override
-	// public Service getService() {
-	// return this;
-	// }
-	//
-	// @Override
-	// public void performSync(Context context, OUser user, Account account,
-	// Bundle extras, String authority, ContentProviderClient provider,
-	// SyncResult syncResult) {
-	// Log.v(TAG, "SalesService:performSync()");
-	// try {
-	// OSyncHelper sync = null;
-	// Intent intent = new Intent();
-	// intent.setAction(SyncFinishReceiver.SYNC_FINISH);
-	// SaleOrder db = new SaleOrder(context);
-	// sync = db.getSyncHelper();
-	// if (sync.syncWithServer())
-	// context.sendBroadcast(intent);
-	// // ResCurrency dbRes = new ResCurrency(context);
-	// // sync = dbRes.getSyncHelper();
-	// // if (sync.syncWithServer())
-	// // context.sendBroadcast(intent);
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// }
 
 }

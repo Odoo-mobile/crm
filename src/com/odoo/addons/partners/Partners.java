@@ -1,11 +1,11 @@
-package com.odoo.addons.res;
+package com.odoo.addons.partners;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.controls.helper.OListViewUtil;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -22,8 +22,10 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
-import com.odoo.addons.res.providers.res.ResProvider;
+import com.odoo.OSwipeListener.SwipeCallbacks;
+import com.odoo.OTouchListener;
 import com.odoo.base.res.ResPartner;
+import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
@@ -35,15 +37,16 @@ import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.odoo.util.logger.OLog;
 
-public class ResPartners extends BaseFragment implements OnRefreshListener,
+public class Partners extends BaseFragment implements OnRefreshListener,
 		OnItemClickListener, LoaderCallbacks<Cursor>,
-		SyncStatusObserverListener, OnRowViewClickListener {
-	public static final String TAG = ResPartners.class.getSimpleName();
+		SyncStatusObserverListener, OnRowViewClickListener, SwipeCallbacks {
+	public static final String TAG = Partners.class.getSimpleName();
 	public static final String KEY_DRAWER = "Sales";
-	View mView = null;
-	ListView mListControl = null;
+	private View mView = null;
+	private ListView mListControl = null;
 	private OCursorListAdapter mAdapter = null;
-	Context mContext = null;
+	private Context mContext = null;
+	private OTouchListener mTouch;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,7 +54,7 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 		setHasOptionsMenu(true);
 		mContext = getActivity();
 		scope = new AppScope(mContext);
-
+		mTouch = scope.main().getTouchAttacher();
 		mView = inflater
 				.inflate(R.layout.common_list_control, container, false);
 		return mView;
@@ -66,12 +69,14 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 		mAdapter = new OCursorListAdapter(mContext, null,
 				R.layout.res_custom_layout);
 		// mAdapter.setOnViewCreateListener(this);
+		mAdapter.allowCacheView(true);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
-		mAdapter.setOnRowViewClickListener(R.id.imgLocation, this);
-		mAdapter.setOnRowViewClickListener(R.id.imgMail, this);
-		mAdapter.setOnRowViewClickListener(R.id.imgCall, this);
+		mTouch.setSwipeableView(mListControl, this);
+		mAdapter.setOnRowViewClickListener(R.id.user_location, this);
+		mAdapter.setOnRowViewClickListener(R.id.mail_to_user, this);
+		mAdapter.setOnRowViewClickListener(R.id.call_user, this);
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -83,8 +88,8 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(KEY_DRAWER, "Customer", count(context), 0,
-				object("customer")));
+		menu.add(new DrawerItem(KEY_DRAWER, "Customers", count(context),
+				R.drawable.ic_action_customers, object("customer")));
 		return menu;
 	}
 
@@ -95,7 +100,7 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 	}
 
 	private Fragment object(String value) {
-		ResPartners resPartners = new ResPartners();
+		Partners resPartners = new Partners();
 		Bundle args = new Bundle();
 		args.putString("resPartner", value);
 		resPartners.setArguments(args);
@@ -105,7 +110,7 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 	@Override
 	public void onRefresh() {
 		if (app().inNetwork()) {
-			scope.main().requestSync(ResProvider.AUTHORITY);
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
 		} else {
 			hideRefreshingProgress();
 			Toast.makeText(getActivity(), _s(R.string.no_connection),
@@ -137,6 +142,9 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
 		OControls.setGone(mView, R.id.loadingProgress);
+		if (cursor.getCount() == 0) {
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
+		}
 	}
 
 	@Override
@@ -156,22 +164,14 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 	public void onRowViewClick(int position, Cursor cursor, View view,
 			View parent) {
 		switch (view.getId()) {
-		case R.id.imgLocation:
-			String address = null;
-			address = cursor.getString(cursor.getColumnIndex("street"));
-			address += "+" + cursor.getString(cursor.getColumnIndex("street2"));
-			address += "+" + cursor.getString(cursor.getColumnIndex("city"));
-			address += "+" + cursor.getString(cursor.getColumnIndex("zip"));
-
-			// address = row.getString("street");
-			// address += "+" + row.getString("street2");
-			// address += "+" + row.getString("city");
-			// address += "+" + row.getString("zip");
-			final Intent locationIntent = new Intent(Intent.ACTION_VIEW,
-					Uri.parse("google.navigation:q=" + address));
-			startActivity(locationIntent);
+		case R.id.user_location:
+			String address = ((ResPartner) db()).getAddress(cursor);
+			OLog.log(address + " <<");
+			String map = "google.navigation:q=" + address;
+			Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
+			startActivity(intent);
 			break;
-		case R.id.imgCall:
+		case R.id.call_user:
 			String phone = cursor.getString(cursor.getColumnIndex("phone"));
 			if (phone.equals("false"))
 				Toast.makeText(mContext, "No valid number", Toast.LENGTH_SHORT)
@@ -183,31 +183,21 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 				startActivity(callIntent);
 			}
 			break;
-		case R.id.imgMail:
+		case R.id.mail_to_user:
 			String email = cursor.getString(cursor.getColumnIndex("email"));
-			if (email.equals("false"))
-				OLog.log("Note Mail");
-			else {
-				boolean installed = appInstalledOrNot("com.openerp");
-				OLog.log("Mail Installed messaging :" + installed);
-				if (installed) {
-					Intent LaunchIntent = getActivity().getPackageManager()
-							.getLaunchIntentForPackage("com.openerp");
-					startActivity(LaunchIntent);
-				} else {
-					Intent emailIntent = new Intent(
-							android.content.Intent.ACTION_SEND);
-					String[] recipients = new String[] { email, "", };
-					emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
-							recipients);
-					emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT,
-							"Test Email");
-					emailIntent.putExtra(android.content.Intent.EXTRA_TEXT,
-							"This is email's Partner");
-					emailIntent.setType("text/html");
-					startActivity(Intent.createChooser(emailIntent,
-							"Send mail..."));
-				}
+			if (!email.equals("false")) {
+				Intent emailIntent = new Intent(
+						android.content.Intent.ACTION_SEND);
+				String[] recipients = new String[] { email, "", };
+				emailIntent.putExtra(android.content.Intent.EXTRA_EMAIL,
+						recipients);
+				emailIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "");
+				emailIntent.putExtra(android.content.Intent.EXTRA_TEXT, "");
+				emailIntent.setType("text/html");
+				startActivity(Intent.createChooser(emailIntent, "Send mail..."));
+			} else {
+				Toast.makeText(getActivity(), "No email found !",
+						Toast.LENGTH_LONG).show();
 			}
 			break;
 		default:
@@ -215,15 +205,31 @@ public class ResPartners extends BaseFragment implements OnRefreshListener,
 		}
 	}
 
-	private boolean appInstalledOrNot(String uri) {
-		PackageManager pm = getActivity().getPackageManager();
-		boolean app_installed = false;
-		try {
-			pm.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);
-			app_installed = true;
-		} catch (PackageManager.NameNotFoundException e) {
-			app_installed = false;
+	int last_pos = -1;
+
+	@Override
+	public boolean canSwipe(int pos) {
+		if (last_pos == pos) {
+			return false;
 		}
-		return app_installed;
+		return true;
 	}
+
+	@Override
+	public void onSwipe(View arg0, int[] ids) {
+		if (last_pos != -1) {
+			View v = OListViewUtil.getViewFromListView(mListControl, last_pos);
+			OControls.setGone(v, R.id.partner_swipe_layout);
+			OControls.setVisible(v, R.id.partner_detail_layout);
+			last_pos = -1;
+		}
+		for (int position : ids) {
+			View view = OListViewUtil.getViewFromListView(mListControl,
+					position);
+			OControls.setGone(view, R.id.partner_detail_layout);
+			OControls.setVisible(view, R.id.partner_swipe_layout);
+			last_pos = position;
+		}
+	}
+
 }

@@ -118,12 +118,15 @@
         <provider
             android:name="com.odoo.base.res.providers.partners.PartnersProvider"
             android:authorities="com.odoo.crm.base.res.providers.partners"
+            android:enabled="true"
             android:exported="false"
-            android:multiprocess="true" />
+            android:label="Partner"
+            android:multiprocess="true"
+            android:syncable="true" />
 
         <!-- /Base Providers -->
-        <!-- Contact service -->
         <!--
+        Contact service 
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
@@ -240,17 +243,8 @@
                 android:name="android.content.SyncAdapter"
                 android:resource="@xml/sync_sale_data" />
         </service>
-        <!-- ResPartner service -->
-        <provider
-            android:name="com.odoo.addons.res.providers.res.ResProvider"
-            android:authorities="com.odoo.addons.res.providers"
-            android:enabled="true"
-            android:exported="false"
-            android:label="Partner"
-            android:syncable="true" />
-
         <service
-            android:name="com.odoo.addons.res.services.ResService"
+            android:name="com.odoo.addons.partners.services.PartnerService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
@@ -258,7 +252,7 @@
 
             <meta-data
                 android:name="android.content.SyncAdapter"
-                android:resource="@xml/sync_res_data" />
+                android:resource="@xml/sync_partner_data" />
         </service>
 
         <!-- Phone state receiver -->

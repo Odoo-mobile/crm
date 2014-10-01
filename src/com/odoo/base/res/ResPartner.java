@@ -20,18 +20,19 @@
 package com.odoo.base.res;
 
 import android.content.Context;
+import android.database.Cursor;
 
 import com.odoo.base.res.providers.partners.PartnersProvider;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
-import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
 import com.odoo.support.provider.OContentProvider;
+import com.odoo.util.CursorUtils;
 
 /**
  * The Class Res_PartnerDBHelper.
@@ -56,50 +57,22 @@ public class ResPartner extends OModel {
 	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
 			RelationType.ManyToOne);
 
-	// @Functional(method = "getSaleOrdersCount")
-	// OColumn salesOrdersCount = new OColumn("Total Sale Orders",
-	// OVarchar.class);
-	// @Functional(method = "getcrmLeadCount")
-	// OColumn crmLeadCount = new OColumn("Total Opportunities",
-	// OVarchar.class);
-	@Functional(method = "resAddressFull")
-	OColumn resAddress = new OColumn("Address", OText.class);
-
 	public ResPartner(Context context) {
 		super(context, "res.partner");
 		mContext = context;
 	}
 
-	// public String getSaleOrdersCount(ODataRow row) {
-	// SaleOrder sale = new SaleOrder(mContext);
-	// int count = sale.count("partner_id = ? ",
-	// new Object[] { row.getInt(OColumn.ROW_ID) });
-	// if (count > 0)
-	// return count + " Sales";
-	// else
-	// return "";
-	// }
-	//
-	// public String getcrmLeadCount(ODataRow row) {
-	// CRMLead sale = new CRMLead(mContext);
-	// int count = sale.count("partner_id = ? and type = ?", new Object[] {
-	// row.getInt(OColumn.ROW_ID), "opportunity" });
-	// if (count > 0)
-	// return count + " Opportunities";
-	// else
-	// return "";
-	// }
-
-	public String resAddressFull(ODataRow row) {
+	public String getAddress(Cursor cr) {
 		String add = "";
-		if (!row.getBoolean("street").equals(false))
-			add = row.getString("street");
-		if (!row.getBoolean("street2").equals(false))
-			add = add + "\n" + row.getString("street2");
-		if (!row.getBoolean("city").equals(false))
-			add = add + row.getString("city");
-		if (!row.getBoolean("zip").equals(false))
-			add = add + row.getString("zip");
+		ODataRow row = CursorUtils.toDataRow(cr);
+		if (!row.getString("street").equals("false"))
+			add += row.getString("street") + ", ";
+		if (!row.getString("street2").equals("false"))
+			add += add + "\n" + row.getString("street2") + ", ";
+		if (!row.getString("city").equals("false"))
+			add += add + row.getString("city") + " - ";
+		if (!row.getString("zip").equals("false"))
+			add += add + row.getString("zip") + " ";
 		return add;
 	}
 

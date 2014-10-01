@@ -187,11 +187,11 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+				OdooAccountManager.removeAllAccounts(getApplicationContext());
 				Uri packageUri = Uri.parse("package:com.openerp");
 				Intent uninstallIntent = new Intent(
 						Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
 				startActivity(uninstallIntent);
-				OdooAccountManager.removeAllAccounts(getApplicationContext());
 				finish();
 			}
 		});

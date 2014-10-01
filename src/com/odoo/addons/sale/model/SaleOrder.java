@@ -2,7 +2,6 @@ package com.odoo.addons.sale.model;
 
 import java.util.HashMap;
 
-import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.addons.sale.providers.sale.ProductProvider;
@@ -21,7 +20,6 @@ import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
-import com.odoo.support.OUser;
 import com.odoo.support.provider.OContentProvider;
 import com.odoo.util.ODate;
 
@@ -95,13 +93,6 @@ public class SaleOrder extends OModel {
 							.getString("symbol");
 		else
 			return "";
-	}
-
-	@Override
-	public ODomain defaultDomain() {
-		ODomain domain = new ODomain();
-		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
-		return domain;
 	}
 
 	public static class SalesOrderLine extends OModel {

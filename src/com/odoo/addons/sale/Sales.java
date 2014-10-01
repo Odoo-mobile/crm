@@ -19,7 +19,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
-import com.odoo.addons.res.ResPartners;
+import com.odoo.addons.partners.Partners;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
@@ -64,7 +64,7 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setHasSwipeRefreshView(view, R.id.swipe_container, this);
-		setHasSyncStatusObserver(ResPartners.KEY_DRAWER, this, db());
+		setHasSyncStatusObserver(Partners.KEY_DRAWER, this, db());
 		checkArguments();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
 		mAdapter = new OCursorListAdapter(mContext, null,
@@ -91,10 +91,12 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Quotations", count(
-				context, Keys.Quotation), 0, object(Keys.Quotation)));
-		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Sales Order", count(
-				context, Keys.Sale_order), 0, object(Keys.Sale_order)));
+		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Quotations", count(
+				context, Keys.Quotation), R.drawable.ic_action_quotation,
+				object(Keys.Quotation)));
+		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Sales Orders", count(
+				context, Keys.Sale_order), R.drawable.ic_action_sale_order,
+				object(Keys.Sale_order)));
 		return menu;
 	}
 
@@ -238,6 +240,6 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 		default:
 			break;
 		}
-		scope.main().refreshDrawer(ResPartners.KEY_DRAWER);
+		scope.main().refreshDrawer(Partners.KEY_DRAWER);
 	}
 }

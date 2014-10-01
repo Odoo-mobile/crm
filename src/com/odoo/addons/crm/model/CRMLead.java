@@ -96,14 +96,6 @@ public class CRMLead extends OModel {
 			return "";
 	}
 
-	@Override
-	public ODomain defaultDomain() {
-		ODomain domain = new ODomain();
-		domain.add("user_id", "=", OUser.current(mContext).getUser_id());
-		// domain.add("user_id", "=", false);
-		return domain;
-	}
-
 	public static class CRMCaseCateg extends OModel {
 
 		OColumn name = new OColumn("Name", OVarchar.class);

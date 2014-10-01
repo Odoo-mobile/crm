@@ -3,21 +3,29 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="10dp"
     odoo:model="res.partner" >
 
+    <include
+        android:id="@+id/partner_swipe_layout"
+        layout="@layout/partners_item_swipe_layout"
+        android:visibility="gone" />
+
     <LinearLayout
+        android:id="@+id/partner_detail_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:padding="10dp" >
 
         <odoo.controls.OField
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginRight="10dp"
             odoo:binaryType="round_image"
             odoo:defaultImage="@drawable/avatar"
             odoo:field_name="image_small"
+            odoo:imageWidthHeight="75"
             odoo:with_label="false" >
         </odoo.controls.OField>
 
@@ -43,27 +51,6 @@
                     odoo:field_textAppearance="?android:attr/textAppearanceMedium"
                     odoo:singleLine="true"
                     odoo:with_label="false" />
-
-                <ImageView
-                    android:id="@+id/imgLocation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:src="@drawable/ic_action_location_place" />
-
-                <ImageView
-                    android:id="@+id/imgMail"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:src="@drawable/ic_action_mark_unread" />
-
-                <ImageView
-                    android:id="@+id/imgCall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="right"
-                    android:src="@drawable/ic_action_device_access_call" />
             </LinearLayout>
 
             <odoo.controls.OField

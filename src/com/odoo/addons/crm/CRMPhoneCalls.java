@@ -22,7 +22,6 @@ import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.addons.crm.providers.crm.PhoneCallProvider;
-import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
@@ -90,7 +89,8 @@ public class CRMPhoneCalls extends BaseFragment implements
 
 		menu.add(new DrawerItem(TAG, "Phone Call", true));
 		menu.add(new DrawerItem(TAG, "Logged Calls", count(context,
-				Keys.SchduledLoggedcalls), 0, object(Keys.SchduledLoggedcalls)));
+				Keys.SchduledLoggedcalls), R.drawable.ic_action_call_logs,
+				object(Keys.SchduledLoggedcalls)));
 		return menu;
 	}
 

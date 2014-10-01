@@ -21,7 +21,7 @@ import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
-import com.odoo.addons.res.ResPartners;
+import com.odoo.addons.partners.Partners;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
@@ -63,7 +63,7 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setHasSwipeRefreshView(view, R.id.swipe_container, this);
-		setHasSyncStatusObserver(ResPartners.KEY_DRAWER, this, db());
+		setHasSyncStatusObserver(Partners.KEY_DRAWER, this, db());
 		checkArguments();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
 		if (mCurrentKey == Keys.Leads)
@@ -96,10 +96,11 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Leads", count(context,
-				Keys.Leads), 0, object(Keys.Leads)));
-		menu.add(new DrawerItem(ResPartners.KEY_DRAWER, "Opportunities", count(
-				context, Keys.Opportunities), 0, object(Keys.Opportunities)));
+		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Leads", count(context,
+				Keys.Leads), R.drawable.ic_action_leads, object(Keys.Leads)));
+		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Opportunities", count(
+				context, Keys.Opportunities),
+				R.drawable.ic_action_opportunities, object(Keys.Opportunities)));
 		return menu;
 	}
 

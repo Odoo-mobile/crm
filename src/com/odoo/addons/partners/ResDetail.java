@@ -1,4 +1,4 @@
-package com.odoo.addons.res;
+package com.odoo.addons.partners;
 
 import java.util.List;
 
@@ -16,7 +16,6 @@ import com.odoo.orm.ODataRow;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.logger.OLog;
 
 public class ResDetail extends BaseFragment {
 	private View mView = null;
