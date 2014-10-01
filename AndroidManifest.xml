@@ -117,6 +117,7 @@
 
         <!-- /Base Providers -->
         <!-- Contact service -->
+        <!--
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
@@ -132,6 +133,7 @@
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
         </service>
+        -->
     </application>
 
 </manifest>
