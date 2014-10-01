@@ -123,6 +123,7 @@
 
         <!-- /Base Providers -->
         <!-- Contact service -->
+        <!--
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
@@ -138,7 +139,7 @@
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
         </service>
-
+        -->
         <!-- Lead/Opportunity service -->
         <provider
             android:name="com.odoo.addons.crm.providers.crm.CRMProvider"
