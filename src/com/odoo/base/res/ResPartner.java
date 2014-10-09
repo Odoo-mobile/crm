@@ -32,7 +32,7 @@ import com.odoo.orm.types.OVarchar;
 import com.odoo.support.provider.OContentProvider;
 
 /**
- * The Class Res_PartnerDBHelper.
+ * The Class ResPartner.
  */
 public class ResPartner extends OModel {
 
@@ -59,4 +59,5 @@ public class ResPartner extends OModel {
 	public OContentProvider getContentProvider() {
 		return new PartnersProvider();
 	}
+
 }

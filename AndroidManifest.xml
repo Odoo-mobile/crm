@@ -114,6 +114,11 @@
             android:authorities="com.odoo.crm.base.res.providers.partners"
             android:exported="false"
             android:multiprocess="true" />
+        <provider
+            android:name="com.odoo.addons.partners.providers.country_state.CountryStateProvider"
+            android:authorities="com.odoo.addons.partners.providers.country_state"
+            android:exported="false"
+            android:multiprocess="true" />
 
         <!-- /Base Providers -->
         <!-- Contact service -->
@@ -132,6 +137,7 @@
             <meta-data
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
+
         </service>
         -->
     </application>
