@@ -177,8 +177,8 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 			whereArgs = new String[] { "opportunity" };
 		}
 		return new CursorLoader(mContext, db().uri(), new String[] { "name",
-				"partner_id.image_small", "partner_id.name", "stage_id.name",
-				"type" }, where, whereArgs, null);
+				"type", "contact_name", "partner_name", "stage_id.name" },
+				where, whereArgs, null);
 	}
 
 	@Override

@@ -73,7 +73,8 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
-		mTouch.setSwipeableView(mListControl, this);
+		if (!db().isEmptyTable())
+			mTouch.setSwipeableView(mListControl, this);
 		mAdapter.setOnRowViewClickListener(R.id.user_location, this);
 		mAdapter.setOnRowViewClickListener(R.id.mail_to_user, this);
 		mAdapter.setOnRowViewClickListener(R.id.call_user, this);
@@ -217,12 +218,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 
 	@Override
 	public void onSwipe(View arg0, int[] ids) {
-		if (last_pos != -1) {
-			View v = OListViewUtil.getViewFromListView(mListControl, last_pos);
-			OControls.setGone(v, R.id.partner_swipe_layout);
-			OControls.setVisible(v, R.id.partner_detail_layout);
-			last_pos = -1;
-		}
+		hideLastSwipe();
 		for (int position : ids) {
 			View view = OListViewUtil.getViewFromListView(mListControl,
 					position);
@@ -232,4 +228,21 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		}
 	}
 
+	private void hideLastSwipe() {
+		if (last_pos != -1) {
+			View v = OListViewUtil.getViewFromListView(mListControl, last_pos);
+			OControls.setGone(v, R.id.partner_swipe_layout);
+			OControls.setVisible(v, R.id.partner_detail_layout);
+			last_pos = -1;
+		}
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		if (last_pos != -1) {
+			hideLastSwipe();
+			return false;
+		}
+		return true;
+	}
 }

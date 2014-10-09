@@ -33,6 +33,7 @@ import android.widget.SearchView.OnQueryTextListener;
 import android.widgets.SwipeRefreshLayout;
 
 import com.odoo.App;
+import com.odoo.MainActivity.OnBackPressCallBack;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.orm.OModel;
 import com.odoo.support.AppScope;
@@ -41,7 +42,8 @@ import com.odoo.support.OUser;
 /**
  * The Class BaseFragment.
  */
-public abstract class BaseFragment extends Fragment implements OModuleHelper {
+public abstract class BaseFragment extends Fragment implements OModuleHelper,
+		OnBackPressCallBack {
 
 	/** The scope. */
 	public AppScope scope;
@@ -219,6 +221,7 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 			mSyncObserverHandle = ContentResolver.addStatusChangeListener(mask,
 					mSyncStatusObserver);
 		}
+		scope.main().setOnBackPressCallBack(this);
 	}
 
 	@Override
@@ -330,6 +333,11 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper {
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		scope = new AppScope(getActivity());
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		return true;
 	}
 
 }

@@ -269,10 +269,14 @@ public abstract class OContentProvider extends ContentProvider implements
 						mJoinTables.add(alias);
 						joins.append(" JOIN ");
 						joins.append(table);
-						joins.append(" ON ");
+						joins.append(" ON (");
 						joins.append(base_alias + "." + column.getName());
 						joins.append(" = ");
 						joins.append(alias + "." + OColumn.ROW_ID);
+						joins.append(" ");
+						joins.append(" OR ");
+						joins.append(base_alias + "." + column.getName());
+						joins.append(" IS NULL )");
 						joins.append(" ");
 					}
 					String rel_col = col;
@@ -287,11 +291,16 @@ public abstract class OContentProvider extends ContentProvider implements
 			}
 			projectionMap.put(col, display_col);
 		}
+		List<String> strs = new ArrayList<String>();
+		for (String k : projectionMap.keySet()) {
+			strs.add(projectionMap.get(k));
+		}
 		StringBuffer tables = new StringBuffer();
 		tables.append(base_table + ((withAlias) ? " AS " + base_alias : " "));
 		tables.append(joins.toString());
 		query.setTables(tables.toString());
 		query.setProjectionMap(projectionMap);
+
 		StringBuffer whr = new StringBuffer();
 		String where = null;
 		if (selection != null && selectionArgs != null) {
