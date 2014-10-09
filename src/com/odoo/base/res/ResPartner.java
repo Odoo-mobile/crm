@@ -35,7 +35,7 @@ import com.odoo.support.provider.OContentProvider;
 import com.odoo.util.CursorUtils;
 
 /**
- * The Class Res_PartnerDBHelper.
+ * The Class ResPartner.
  */
 public class ResPartner extends OModel {
 	Context mContext = null;
@@ -80,4 +80,5 @@ public class ResPartner extends OModel {
 	public OContentProvider getContentProvider() {
 		return new PartnersProvider();
 	}
+
 }

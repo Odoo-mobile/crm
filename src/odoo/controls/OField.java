@@ -57,6 +57,7 @@ import android.widget.Toast;
 
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.OColumn.ColumnDomain;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OM2ORecord;
@@ -279,6 +280,16 @@ public class OField extends LinearLayout implements
 	private Float mScaleFactor = 0F;
 
 	private OForm.OnViewClickListener mOForm_OnViewClickListener = null;
+	/**
+	 * Used for handling onChange of Control (if any)
+	 */
+	private OnChangeCallback mOnChangeCallBack = null;
+
+	/**
+	 * Used to filter data depends on another column at runtime
+	 */
+	private OnDomainFilterCallbacks mOnDomainFilterCallbacks = null;
+	private ColumnDomain mColumnDomain = null;
 
 	/**
 	 * Instantiates a new field.
@@ -905,6 +916,13 @@ public class OField extends LinearLayout implements
 		}
 	}
 
+	public void selectManyToOneRecord(int row_id) {
+		if (mManyToOne != null) {
+			mManyToOne.setRecordId(row_id);
+			mManyToOne.reInit();
+		}
+	}
+
 	/**
 	 * Creates the label.
 	 */
@@ -1398,6 +1416,15 @@ public class OField extends LinearLayout implements
 	@Override
 	public void onManyToOneItemChangeListener(OColumn column, ODataRow row) {
 		mFieldValue = row.get(OColumn.ROW_ID);
+		if (row.getInt(OColumn.ROW_ID) != 0) {
+			if (mOnChangeCallBack != null) {
+				mOnChangeCallBack.onValueChange(row);
+			}
+			if (mOnDomainFilterCallbacks != null) {
+				mColumnDomain.setValue(mFieldValue);
+				mOnDomainFilterCallbacks.onFieldValueChanged(mColumnDomain);
+			}
+		}
 	}
 
 	/**
@@ -1440,5 +1467,15 @@ public class OField extends LinearLayout implements
 	public void addTagObject(Object tag) {
 		if (mManyToManyTags != null)
 			mManyToManyTags.addObject(tag);
+	}
+
+	public void setOnChangeCallBack(OnChangeCallback callback) {
+		mOnChangeCallBack = callback;
+	}
+
+	public void setOnFilterDomainCallBack(ColumnDomain domain,
+			OnDomainFilterCallbacks callback) {
+		mColumnDomain = domain;
+		mOnDomainFilterCallbacks = callback;
 	}
 }

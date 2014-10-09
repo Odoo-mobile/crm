@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import odoo.controls.OField.TextStyle;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
@@ -215,6 +214,10 @@ public class OManyToOneWidget extends LinearLayout implements
 		return this;
 	}
 
+	public void setDomains(LinkedHashMap<String, ColumnDomain> domains) {
+		mColumn.cloneDomain(domains);
+	}
+
 	/**
 	 * Sets the record id.
 	 * 
@@ -253,7 +256,7 @@ public class OManyToOneWidget extends LinearLayout implements
 	private void fillRecords() {
 		mSpinnerObjects.clear();
 		ODataRow select_row = new ODataRow();
-		select_row.put("id", 0);
+		select_row.put(OColumn.ROW_ID, 0);
 		select_row.put(mColumn.getName(), "Select " + mColumn.getLabel());
 		mSpinnerObjects.add(select_row);
 		StringBuffer whr = new StringBuffer();
@@ -318,8 +321,7 @@ public class OManyToOneWidget extends LinearLayout implements
 			field.setLayoutParams(this.mParams);
 			field.setPadding(8, 8, 8, 8);
 			field.reInit();
-			field.setTextAppearance(android.R.style.TextAppearance_Medium);
-			field.setTextStyle(TextStyle.NORMAL);
+			field.setTextAppearance(android.R.attr.textAppearanceMedium);
 			form.addView(field);
 		}
 		form.initForm(row);

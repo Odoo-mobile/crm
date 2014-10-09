@@ -141,6 +141,7 @@
             <meta-data
                 android:name="android.provider.CONTACTS_STRUCTURE"
                 android:resource="@xml/contacts" />
+
         </service>
         -->
         <!-- Lead/Opportunity service -->

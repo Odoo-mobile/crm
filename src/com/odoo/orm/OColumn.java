@@ -107,6 +107,10 @@ public class OColumn {
 
 	private Boolean mSyncMasterRecord = true;
 
+	private Method mOnChangeMethod = null;
+	private Boolean mOnChangeBGProcess = false;
+	private Boolean mHasDomainFilterColumn = false;
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -522,6 +526,13 @@ public class OColumn {
 	 * @return the domains
 	 */
 	public LinkedHashMap<String, ColumnDomain> getDomains() {
+		if (hasDomainFilterColumn()) {
+			return new LinkedHashMap<String, OColumn.ColumnDomain>();
+		}
+		return columnDomains;
+	}
+
+	public LinkedHashMap<String, ColumnDomain> getFilterDomains() {
 		return columnDomains;
 	}
 
@@ -767,6 +778,38 @@ public class OColumn {
 	public OColumn syncMasterRecord(boolean syncMasterRecord) {
 		mSyncMasterRecord = syncMasterRecord;
 		return this;
+	}
+
+	public boolean hasOnChange() {
+		return (mOnChangeMethod != null);
+	}
+
+	public Method getOnChangeMethod() {
+		return mOnChangeMethod;
+	}
+
+	public void setOnChangeMethod(Method method) {
+		mOnChangeMethod = method;
+	}
+
+	public Boolean isOnChangeBGProcess() {
+		return mOnChangeBGProcess;
+	}
+
+	public void setOnChangeBGProcess(Boolean process) {
+		mOnChangeBGProcess = process;
+	}
+
+	public void setHasDomainFilterColumn(Boolean filter_column) {
+		mHasDomainFilterColumn = filter_column;
+	}
+
+	public boolean hasDomainFilterColumn() {
+		return mHasDomainFilterColumn;
+	}
+
+	public void cleanDomains() {
+		columnDomains.clear();
 	}
 
 }
