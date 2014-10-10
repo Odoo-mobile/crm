@@ -1,6 +1,5 @@
 package com.odoo.addons.crm.model;
 
-import odoo.ODomain;
 import android.content.Context;
 
 import com.odoo.addons.crm.providers.crm.CRMProvider;
@@ -22,7 +21,6 @@ import com.odoo.orm.types.OInteger;
 import com.odoo.orm.types.OReal;
 import com.odoo.orm.types.OText;
 import com.odoo.orm.types.OVarchar;
-import com.odoo.support.OUser;
 import com.odoo.support.provider.OContentProvider;
 import com.odoo.util.ODate;
 

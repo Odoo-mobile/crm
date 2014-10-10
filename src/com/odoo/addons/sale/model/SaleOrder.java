@@ -12,8 +12,8 @@ import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OValues;
 import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.ODateTime;
 import com.odoo.orm.types.OInteger;
@@ -34,12 +34,6 @@ public class SaleOrder extends OModel {
 	OColumn amount_total = new OColumn("Total", OReal.class);
 	OColumn amount_untaxed = new OColumn("Untaxed", OInteger.class);
 	OColumn amount_tax = new OColumn("Tax", OInteger.class);
-
-	// OColumn pricelist_id = new OColumn("Pricelist",,RelationType.ManyToOne);
-	// OColumn partner_shipping_id = new
-	// OColumn("Delivery Address",ResPartners.class,RelationType.ManyToOne);
-	// OColumn partner_invoice_id = new
-	// OColumn("Invoice Address",ResPartners.class,RelationType.ManyToOne);
 	OColumn client_order_ref = new OColumn("Client Order Reference",
 			OVarchar.class, 100);
 	OColumn state = new OColumn("status", OVarchar.class, 10)
@@ -70,7 +64,7 @@ public class SaleOrder extends OModel {
 		return new SalesProvider();
 	}
 
-	public String stateChange(ODataRow row) {
+	public String stateChange(OValues row) {
 		HashMap<String, String> mStates = new HashMap<String, String>();
 		mStates.put("draft", "Draft Quotation");
 		mStates.put("sent", "Quotation Sent");
@@ -84,13 +78,11 @@ public class SaleOrder extends OModel {
 		return mStates.get(row.getString("state"));
 	}
 
-	public String amountTotal(ODataRow row) {
+	public String amountTotal(OValues row) {
+
 		if (!row.getString("amount_total").equals("false")
 				&& Double.parseDouble(row.getString("amount_total")) > 0)
-			return row.getString("amount_total")
-					+ " "
-					+ row.getM2ORecord("currency_id").browse()
-							.getString("symbol");
+			return row.getString("amount_total");
 		else
 			return "";
 	}
@@ -105,10 +97,6 @@ public class SaleOrder extends OModel {
 		OColumn order_id = new OColumn("ID", SaleOrder.class,
 				RelationType.ManyToOne);
 
-		// OColumn tax_id = new OColumn("Tax Id",,RelationType.ManyToMany);
-		// OColumn sequence = new OColumn("Sequence", OInteger.class);
-		// OColumn product_uom = new OColumn("Unit of Measure",,
-		// RelationType.ManyToOne);
 		public SalesOrderLine(Context context) {
 			super(context, "sale.order.line");
 		}

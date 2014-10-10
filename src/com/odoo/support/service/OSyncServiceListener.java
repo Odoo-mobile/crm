@@ -18,9 +18,9 @@
  */
 package com.odoo.support.service;
 
-import com.odoo.support.OUser;
-
 import android.os.Bundle;
+
+import com.odoo.support.OUser;
 
 
 public interface OSyncServiceListener {

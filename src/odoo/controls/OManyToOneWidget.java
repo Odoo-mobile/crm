@@ -353,7 +353,7 @@ public class OManyToOneWidget extends LinearLayout implements
 	public void onNothingSelected(AdapterView<?> parent) {
 
 	}
-
+	
 	/**
 	 * The listener interface for receiving manyToOneItemChange events. The
 	 * class that is interested in processing a manyToOneItemChange event

@@ -125,8 +125,8 @@
             android:syncable="true" />
 
         <!-- /Base Providers -->
+        <!-- Contact service -->
         <!--
-        Contact service 
         <service
             android:name="com.odoo.base.res.services.ContactSyncService"
             android:exported="true"
