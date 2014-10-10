@@ -27,6 +27,7 @@ import java.util.TimeZone;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.provider.Settings;
+import android.text.TextUtils;
 import android.util.Log;
 
 /**
@@ -47,20 +48,25 @@ public class ODate {
 	}
 
 	public static String getDate(Context context, String date,
-			String toTimezone, String format) {
+			String toTimezone, String to_format) {
+		return getDate(context, date, toTimezone, DEFAULT_FORMAT, to_format);
+	}
 
-		if (date.equals("false")) {
+	public static String getDate(Context context, String date,
+			String toTimezone, String from_format, String to_format) {
+
+		if (date.equals("false") || TextUtils.isEmpty(date)) {
 			return date;
 		}
 
 		Calendar cal = Calendar.getInstance();
-		Date originalDate = convertToDate(date);
+		Date originalDate = convertToDate(date, from_format);
 		cal.setTime(originalDate);
 
 		Date oDate = removeTime(originalDate);
 		Date today = removeTime(currentDate());
 		String finalDateTime = "";
-		if (format == null) {
+		if (to_format == null) {
 			dateFormat = new SimpleDateFormat(dateFormat(context));
 			timeFormat = new SimpleDateFormat(timeFormat(context));
 			dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
@@ -74,7 +80,7 @@ public class ODate {
 						toTimezone).getTime());
 			}
 		} else {
-			dateFormat = new SimpleDateFormat(format);
+			dateFormat = new SimpleDateFormat(to_format);
 			dateFormat.setTimeZone(TimeZone.getTimeZone(toTimezone));
 			finalDateTime = dateFormat.format(convertFullToTimezone(cal,
 					toTimezone).getTime());
@@ -125,6 +131,10 @@ public class ODate {
 
 	private static Date currentDate() {
 		return new Date();
+	}
+
+	private static Date convertToDate(String date, String original_pattern) {
+		return convertToDate(date, original_pattern, true);
 	}
 
 	private static Date convertToDate(String date) {

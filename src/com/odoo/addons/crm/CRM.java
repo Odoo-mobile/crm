@@ -24,16 +24,18 @@ import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.addons.partners.Partners;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.ODataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
+import com.odoo.support.listview.OCursorListAdapter.BeforeBindUpdateData;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class CRM extends BaseFragment implements OnRefreshListener,
 		SyncStatusObserverListener, OnItemClickListener,
-		LoaderCallbacks<Cursor> {
+		LoaderCallbacks<Cursor>, BeforeBindUpdateData {
 
 	public static final String TAG = CRM.class.getSimpleName();
 
@@ -72,6 +74,7 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 		else if (mCurrentKey == Keys.Opportunities)
 			mAdapter = new OCursorListAdapter(mContext, null,
 					R.layout.crm_custom_opportunties_layout);
+		mAdapter.setBeforeBindUpdateData(this);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
@@ -171,14 +174,21 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 		}
 		String where = "type = ?";
 		String[] whereArgs = null;
+		String[] projections;
 		if (mCurrentKey == Keys.Leads) {
 			whereArgs = new String[] { "lead" };
+			projections = new String[] { "name", "type", "display_name",
+					"stage_id.name", "create_date", "assignee_name" };
 		} else {
 			whereArgs = new String[] { "opportunity" };
+			projections = new String[] { "name", "type", "display_name",
+					"stage_id.name", "create_date", "assignee_name",
+					"planned_revenue", "probability",
+					"company_currency.symbol", "title_action", "date_action" };
 		}
-		return new CursorLoader(mContext, db().uri(), new String[] { "name",
-				"type", "display_name", "stage_id.name" }, where, whereArgs,
-				null);
+
+		return new CursorLoader(mContext, db().uri(), projections, where,
+				whereArgs, "create_date DESC, assignee_name");
 	}
 
 	@Override
@@ -190,6 +200,19 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	@Override
 	public void onLoaderReset(Loader<Cursor> arg0) {
 		mAdapter.changeCursor(null);
+	}
+
+	@Override
+	public ODataRow updateDataRow(Cursor cr) {
+		ODataRow row = new ODataRow();
+		if (mCurrentKey == Keys.Opportunities) {
+			row.put("sep_at", " at ");
+			row.put("sep_percentage", "%");
+			String date_action = cr.getString(cr.getColumnIndex("date_action"));
+			if (!date_action.equals("") && !date_action.equals("false"))
+				row.put("sep_action", " : ");
+		}
+		return row;
 	}
 
 }

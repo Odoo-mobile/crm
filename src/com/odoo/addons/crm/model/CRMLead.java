@@ -11,6 +11,7 @@ import com.odoo.addons.crm.providers.crm.CrmCaseStageProvider;
 import com.odoo.addons.crm.providers.crm.CrmPaymentModeProvider;
 import com.odoo.base.res.ResCompany;
 import com.odoo.base.res.ResCountry;
+import com.odoo.base.res.ResCurrency;
 import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;
@@ -58,6 +59,8 @@ public class CRMLead extends OModel {
 			RelationType.ManyToOne);
 	OColumn country_id = new OColumn("Country", ResCountry.class,
 			RelationType.ManyToOne);
+	OColumn company_currency = new OColumn("Company Currency",
+			ResCurrency.class, RelationType.ManyToOne);
 
 	/**
 	 * Only used for type opportunity
@@ -70,14 +73,22 @@ public class CRMLead extends OModel {
 	OColumn date_deadline = new OColumn("Expected Closing", ODateTime.class)
 			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn date_action = new OColumn("Next Action Date", ODateTime.class)
-			.setParsePattern(ODate.DEFAULT_FORMAT);
+			.setParsePattern(ODate.DEFAULT_DATE_FORMAT);
 	OColumn title_action = new OColumn("Next Action", OVarchar.class, 64);
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);
 	OColumn planned_cost = new OColumn("Planned Cost", OReal.class, 20);
+
+	/**
+	 * Extra functional fields
+	 */
 	@Functional(method = "getDisplayName", store = true, depends = {
 			"partner_id", "contact_name", "partner_name" })
-	OColumn display_name = new OColumn("Display Name", OVarchar.class, 64);
+	OColumn display_name = new OColumn("Display Name", OVarchar.class, 64)
+			.setLocalColumn();
+	@Functional(method = "storeAssigneeName", store = true, depends = { "user_id" })
+	OColumn assignee_name = new OColumn("Assignee", OVarchar.class, 100)
+			.setLocalColumn();
 
 	public CRMLead(Context context) {
 		super(context, "crm.lead");
@@ -100,7 +111,9 @@ public class CRMLead extends OModel {
 				name = row.getString("partner_name");
 			}
 			if (!row.getString("contact_name").equals("false")) {
-				name += " (" + row.getString("contact_name") + ")";
+				name += (TextUtils.isEmpty(name)) ? row
+						.getString("contact_name") : " ("
+						+ row.getString("contact_name") + ")";
 			}
 			if (TextUtils.isEmpty(name)) {
 				name = "No Parnter";
@@ -109,6 +122,11 @@ public class CRMLead extends OModel {
 			e.printStackTrace();
 		}
 		return name;
+	}
+
+	public String storeAssigneeName(OValues vals) {
+		return (!vals.getString("user_id").equals("false")) ? "Me"
+				: "Unassigned";
 	}
 
 	public static class CRMCaseCateg extends OModel {

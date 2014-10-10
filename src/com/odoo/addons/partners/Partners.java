@@ -47,14 +47,13 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 	private OCursorListAdapter mAdapter = null;
 	private Context mContext = null;
 	private OTouchListener mTouch;
+	private int last_swiped_pos = -1;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		setHasOptionsMenu(true);
 		mContext = getActivity();
-		scope = new AppScope(mContext);
-		mTouch = scope.main().getTouchAttacher();
 		mView = inflater
 				.inflate(R.layout.common_list_control, container, false);
 		return mView;
@@ -65,7 +64,11 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		super.onViewCreated(view, savedInstanceState);
 		setHasSwipeRefreshView(view, R.id.swipe_container, this);
 		setHasSyncStatusObserver(KEY_DRAWER, this, db());
+		scope = new AppScope(mContext);
+		mTouch = scope.main().getTouchAttacher();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
+		if (mTouch != null)
+			mTouch.setSwipeableView(mListControl, this);
 		mAdapter = new OCursorListAdapter(mContext, null,
 				R.layout.res_custom_layout);
 		// mAdapter.setOnViewCreateListener(this);
@@ -73,8 +76,6 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
-		if (!db().isEmptyTable())
-			mTouch.setSwipeableView(mListControl, this);
 		mAdapter.setOnRowViewClickListener(R.id.user_location, this);
 		mAdapter.setOnRowViewClickListener(R.id.mail_to_user, this);
 		mAdapter.setOnRowViewClickListener(R.id.call_user, this);
@@ -206,11 +207,9 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		}
 	}
 
-	int last_pos = -1;
-
 	@Override
 	public boolean canSwipe(int pos) {
-		if (last_pos == pos) {
+		if (last_swiped_pos == pos) {
 			return false;
 		}
 		return true;
@@ -224,22 +223,23 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 					position);
 			OControls.setGone(view, R.id.partner_detail_layout);
 			OControls.setVisible(view, R.id.partner_swipe_layout);
-			last_pos = position;
+			last_swiped_pos = position;
 		}
 	}
 
 	private void hideLastSwipe() {
-		if (last_pos != -1) {
-			View v = OListViewUtil.getViewFromListView(mListControl, last_pos);
+		if (last_swiped_pos != -1) {
+			View v = OListViewUtil.getViewFromListView(mListControl,
+					last_swiped_pos);
 			OControls.setGone(v, R.id.partner_swipe_layout);
 			OControls.setVisible(v, R.id.partner_detail_layout);
-			last_pos = -1;
+			last_swiped_pos = -1;
 		}
 	}
 
 	@Override
 	public boolean onBackPressed() {
-		if (last_pos != -1) {
+		if (last_swiped_pos != -1) {
 			hideLastSwipe();
 			return false;
 		}

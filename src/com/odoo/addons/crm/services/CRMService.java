@@ -21,7 +21,9 @@ public class CRMService extends OSyncService {
 	@Override
 	public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
 		ODomain domain = new ODomain();
+		domain.add("|");
 		domain.add("user_id", "=", user.getUser_id());
+		domain.add("user_id", "=", false);
 		adapter.setDomain(domain);
 	}
 }

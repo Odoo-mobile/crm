@@ -1204,7 +1204,7 @@ public class OField extends LinearLayout implements
 			if (displayPattern != null
 					&& mColumn.getType().isAssignableFrom(ODateTime.class)) {
 				text = ODate.getDate(mContext, text, TimeZone.getDefault()
-						.getID(), displayPattern);
+						.getID(), mColumn.getParsePattern(), displayPattern);
 			}
 			mFieldTextView.setText(text);
 		}
