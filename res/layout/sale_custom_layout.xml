@@ -17,8 +17,18 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             odoo:fieldTextStyle="bold"
+            odoo:field_color="@color/odoo_green"
             odoo:field_name="name"
-            odoo:field_textAppearance="?android:attr/textAppearanceLarge"
+            odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+            odoo:with_label="false" />
+
+        <odoo.controls.OField
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            odoo:displayPattern="MMMM, dd"
+            odoo:fieldTextStyle="bold"
+            odoo:field_color="#626262"
+            odoo:field_name="date_order"
             odoo:with_label="false" />
     </LinearLayout>
 
@@ -28,16 +38,11 @@
         android:orientation="horizontal" >
 
         <odoo.controls.OField
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            odoo:binaryType="round_image"
-            odoo:defaultImage="@drawable/avatar"
-            odoo:field_name="partner_id_image_small"
-            odoo:with_label="false" />
-
-        <odoo.controls.OField
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            odoo:fieldTextStyle="bold"
+            odoo:field_color="#686868"
             odoo:field_name="partner_id_name"
             odoo:with_label="false" />
     </LinearLayout>
@@ -47,28 +52,33 @@
         android:layout_height="wrap_content"
         android:divider="#aaa"
         android:dividerPadding="8dp"
+        android:gravity="right"
         android:orientation="horizontal" >
-
-        <odoo.controls.OField
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            odoo:field_color="@color/odoo_purple"
-            odoo:field_name="stateChange"
-            odoo:with_label="false" />
 
         <odoo.controls.OField
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            odoo:displayPattern="MMM dd, yyyy"
-            odoo:field_name="date_order"
+            odoo:field_color="@color/odoo_purple"
+            odoo:field_name="state_title"
             odoo:with_label="false" />
 
         <odoo.controls.OField
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            odoo:field_name="amountTotalSymbol"
+            odoo:fieldTextStyle="bold"
+            odoo:field_color="@color/odoo_green"
+            odoo:field_name="amount_total"
+            odoo:with_label="false" />
+
+        <odoo.controls.OField
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            odoo:fieldTextStyle="bold"
+            odoo:field_color="@color/odoo_green"
+            odoo:field_name="currency_id_symbol"
             odoo:with_label="false" />
     </LinearLayout>
 

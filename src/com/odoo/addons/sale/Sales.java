@@ -24,16 +24,18 @@ import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
+import com.odoo.orm.ODataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
+import com.odoo.support.listview.OCursorListAdapter.BeforeBindUpdateData;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
 public class Sales extends BaseFragment implements OnRefreshListener,
 		LoaderCallbacks<Cursor>, SyncStatusObserverListener,
-		OnItemClickListener {
+		OnItemClickListener, BeforeBindUpdateData {
 
 	public static final String TAG = Sales.class.getSimpleName();
 
@@ -67,6 +69,7 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
 		mAdapter = new OCursorListAdapter(mContext, null,
 				R.layout.sale_custom_layout);
+		mAdapter.setBeforeBindUpdateData(this);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
 		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
@@ -168,9 +171,9 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 			}
 		}
 		return new CursorLoader(mContext, db().uri(), new String[] { "name",
-				"partner_id.image_small", "partner_id.id", "partner_id.name",
-				"date_order", "state", "amount_total", "stateChange",
-				"amountTotalSymbol" }, where, args, null);
+				"partner_id.id", "partner_id.name", "date_order", "state",
+				"amount_total", "state_title", "currency_id.symbol",
+				"order_line_count" }, where, args, "date_order DESC");
 	}
 
 	@Override
@@ -190,5 +193,17 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 			hideRefreshingProgress();
 		else
 			setSwipeRefreshing(true);
+	}
+
+	@Override
+	public ODataRow updateDataRow(Cursor cr) {
+		ODataRow row = new ODataRow();
+		String name = cr.getString(cr.getColumnIndex("name"));
+		String type = (mCurrentKey == Keys.Quotation) ? "Quotation"
+				: "Sales Order";
+		row.put("name", type + " " + name);
+		row.put("state_title", cr.getString(cr.getColumnIndex("state_title"))
+				+ cr.getString(cr.getColumnIndex("order_line_count")));
+		return row;
 	}
 }

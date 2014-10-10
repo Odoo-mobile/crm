@@ -123,4 +123,31 @@
             odoo:with_label="false" />
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <odoo.controls.OField
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            odoo:fieldTextStyle="bold"
+            odoo:field_color="@color/odoo_purple"
+            odoo:field_name="assignee_name"
+            odoo:field_textAppearance="?android:attr/textAppearanceSmall"
+            odoo:with_label="false" />
+
+        <odoo.controls.OField
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            odoo:displayPattern="MMMM, d"
+            odoo:fieldTextStyle="bold"
+            odoo:field_color="#616161"
+            odoo:field_name="create_date"
+            odoo:field_textAppearance="?android:attr/textAppearanceSmall"
+            odoo:with_label="false" />
+    </LinearLayout>
+
 </odoo.controls.OForm>

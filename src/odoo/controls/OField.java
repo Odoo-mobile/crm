@@ -1203,6 +1203,9 @@ public class OField extends LinearLayout implements
 					null);
 			if (displayPattern != null
 					&& mColumn.getType().isAssignableFrom(ODateTime.class)) {
+				if (mColumn.getParsePattern() == null) {
+					mColumn.setParsePattern(ODate.DEFAULT_FORMAT);
+				}
 				text = ODate.getDate(mContext, text, TimeZone.getDefault()
 						.getID(), mColumn.getParsePattern(), displayPattern);
 			}

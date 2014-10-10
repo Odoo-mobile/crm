@@ -2,6 +2,8 @@ package com.odoo.addons.sale.model;
 
 import java.util.HashMap;
 
+import org.json.JSONArray;
+
 import android.content.Context;
 
 import com.odoo.addons.sale.providers.sale.ProductProvider;
@@ -26,7 +28,8 @@ import com.odoo.util.ODate;
 public class SaleOrder extends OModel {
 	Context mContext = null;
 	OColumn name = new OColumn("name", OVarchar.class, 64);
-	OColumn date_order = new OColumn("Date", ODateTime.class);
+	OColumn date_order = new OColumn("Date", ODateTime.class)
+			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
 			RelationType.ManyToOne);
 	OColumn user_id = new OColumn("Salesperson", ResUsers.class,
@@ -38,17 +41,15 @@ public class SaleOrder extends OModel {
 			OVarchar.class, 100);
 	OColumn state = new OColumn("status", OVarchar.class, 10)
 			.setDefault("draft");
+	@Functional(method = "getStateTitle", store = true, depends = { "state" })
+	OColumn state_title = new OColumn("State Title", OVarchar.class)
+			.setLocalColumn();
 	OColumn currency_id = new OColumn("currency", ResCurrency.class,
 			RelationType.ManyToOne);
 	OColumn order_line = new OColumn("Order Lines", SalesOrderLine.class,
 			RelationType.OneToMany).setRelatedColumn("order_id");
-
-	@Functional(method = "stateChange", store = true, depends = { "state" })
-	OColumn stateChange = new OColumn("Total Amount", OVarchar.class)
-			.setLocalColumn();
-	@Functional(method = "amountTotal", store = true, depends = {
-			"amount_total", "currency_id" })
-	OColumn amountTotalSymbol = new OColumn("Total Amount", OVarchar.class)
+	@Functional(method = "countOrderLines", store = true, depends = { "order_line" })
+	OColumn order_line_count = new OColumn("Total Lines", OVarchar.class, 64)
 			.setLocalColumn();
 
 	public SaleOrder(Context context) {
@@ -64,7 +65,7 @@ public class SaleOrder extends OModel {
 		return new SalesProvider();
 	}
 
-	public String stateChange(OValues row) {
+	public String getStateTitle(OValues row) {
 		HashMap<String, String> mStates = new HashMap<String, String>();
 		mStates.put("draft", "Draft Quotation");
 		mStates.put("sent", "Quotation Sent");
@@ -78,13 +79,16 @@ public class SaleOrder extends OModel {
 		return mStates.get(row.getString("state"));
 	}
 
-	public String amountTotal(OValues row) {
-
-		if (!row.getString("amount_total").equals("false")
-				&& Double.parseDouble(row.getString("amount_total")) > 0)
-			return row.getString("amount_total");
-		else
-			return "";
+	public String countOrderLines(OValues vals) {
+		try {
+			JSONArray order_line = new JSONArray(vals.getString("order_line"));
+			if (order_line.length() > 0) {
+				return " (" + order_line.length() + " lines)";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return " (No lines)";
 	}
 
 	public static class SalesOrderLine extends OModel {
