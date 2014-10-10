@@ -37,31 +37,11 @@
         android:orientation="horizontal" >
 
         <odoo.controls.OField
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            odoo:binaryType="round_image"
-            odoo:defaultImage="@drawable/avatar"
-            odoo:field_name="partner_id_image_small"
-            odoo:ref_column="image_small"
-            odoo:with_label="false" />
-
-        <odoo.controls.OField
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            odoo:field_name="partner_id_name"
-            odoo:singleLine="true"
-            odoo:with_label="false" />
-
-        <!--
-             <odoo.controls.OField
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            odoo:field_name="plannedProbabilityTotal"
+            odoo:field_name="display_name"
+            odoo:singleLine="true"
             odoo:with_label="false" />
-        -->
-
     </LinearLayout>
 
 </odoo.controls.OForm>

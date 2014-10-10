@@ -1,6 +1,9 @@
 package com.odoo.addons.crm.model;
 
+import org.json.JSONArray;
+
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.odoo.addons.crm.providers.crm.CRMProvider;
 import com.odoo.addons.crm.providers.crm.CrmCaseCategProvider;
@@ -12,8 +15,8 @@ import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
-import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OValues;
 import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
@@ -72,8 +75,9 @@ public class CRMLead extends OModel {
 	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
 			RelationType.ManyToOne);
 	OColumn planned_cost = new OColumn("Planned Cost", OReal.class, 20);
-	@Functional(method = "plannedProbability")
-	OColumn plannedProbabilityTotal = new OColumn("Total Amount", OText.class);
+	@Functional(method = "getDisplayName", store = true, depends = {
+			"partner_id", "contact_name", "partner_name" })
+	OColumn display_name = new OColumn("Display Name", OVarchar.class, 64);
 
 	public CRMLead(Context context) {
 		super(context, "crm.lead");
@@ -85,13 +89,26 @@ public class CRMLead extends OModel {
 		return new CRMProvider();
 	}
 
-	public String plannedProbability(ODataRow row) {
-		if (!row.getString("planned_revenue").equals("false")
-				&& Double.parseDouble(row.getString("planned_revenue")) > 0)
-			return row.getString("planned_revenue") + " at "
-					+ row.getString("probability") + "%";
-		else
-			return "";
+	public String getDisplayName(OValues row) {
+		String name = "";
+		try {
+			if (!row.getString("partner_id").equals("false")) {
+				JSONArray partner_id = new JSONArray(
+						row.getString("partner_id"));
+				name = partner_id.getString(1);
+			} else if (!row.getString("partner_name").equals("false")) {
+				name = row.getString("partner_name");
+			}
+			if (!row.getString("contact_name").equals("false")) {
+				name += " (" + row.getString("contact_name") + ")";
+			}
+			if (TextUtils.isEmpty(name)) {
+				name = "No Parnter";
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return name;
 	}
 
 	public static class CRMCaseCateg extends OModel {

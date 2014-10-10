@@ -238,12 +238,10 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 						context.put("active_ids",
 								new JSONArray().put(mLead.getInt("id")));
 						kwargs.put("context", context);
-						odoo.DEBUG = true;
 						JSONObject response = (JSONObject) odoo.call_kw(
 								"crm.make.sale", "default_get",
 								new JSONArray().put(fields), kwargs);
 						JSONObject result= response.getJSONObject("result");
-						odoo.DEBUG = false;
 						JSONObject arguments = new JSONObject();
 						arguments.put("partner_id", result.get("partner_id"));
 						if (version == 7)
