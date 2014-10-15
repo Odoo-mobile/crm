@@ -3,8 +3,11 @@ package com.odoo.addons.crm;
 import java.util.List;
 
 import odoo.OArguments;
+import odoo.ODomain;
 import odoo.Odoo;
+import odoo.controls.OField;
 import odoo.controls.OForm;
+import odoo.controls.OSearchableMany2One.DialogListRowViewListener;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -19,10 +22,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.addons.crm.CRM.Keys;
 import com.odoo.addons.crm.model.CRMLead;
+import com.odoo.base.res.ResUsers;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
@@ -30,9 +35,11 @@ import com.odoo.orm.OValues;
 import com.odoo.support.ODialog;
 import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
+import com.odoo.util.ODate;
 import com.odoo.util.drawer.DrawerItem;
 
-public class CrmDetail extends BaseFragment implements OnClickListener {
+public class CRMDetail extends BaseFragment implements OnClickListener,
+		DialogListRowViewListener {
 
 	private View mView = null;
 	private Keys mKey = null;
@@ -73,6 +80,8 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 			} else {
 				mForm.findViewById(R.id.btnLayout).setVisibility(View.GONE);
 			}
+			OField partner_id = (OField) mForm.findViewById(R.id.partner_id);
+			partner_id.setManyToOneSearchableCallbacks(this);
 			break;
 		case Opportunities:
 			OControls.setVisible(mView, R.id.crmOppDetail);
@@ -98,7 +107,7 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 
 	public void initArgs() {
 		arg = getArguments();
-		mKey = Keys.valueOf(arg.getString("key"));
+		mKey = Keys.valueOf(arg.getString(CRM.KEY_CRM_LEAD_TYPE));
 		if (arg.containsKey(OColumn.ROW_ID)) {
 			mId = arg.getInt(OColumn.ROW_ID);
 		}
@@ -145,6 +154,21 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 						break;
 					}
 				} else {
+					ResUsers users = new ResUsers(getActivity());
+					values.put("user_id",
+							users.selectRowId(scope.User().getUser_id()));
+					values.put("assignee_name", "Me");
+					CRMLead.CRMCaseStage stages = new CRMLead.CRMCaseStage(
+							getActivity());
+					List<ODataRow> stage = stages.select(
+							"type = ? and name = ?", new String[] { "both",
+									"New" });
+					if (stage.size() > 0) {
+						values.put("stage_id",
+								stage.get(0).getInt(OColumn.ROW_ID));
+					}
+					values.put("create_date",
+							ODate.getUTCDate(ODate.DEFAULT_FORMAT));
 					switch (mKey) {
 					case Leads:
 						new CRMLead(getActivity()).create(values);
@@ -241,7 +265,7 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 						JSONObject response = (JSONObject) odoo.call_kw(
 								"crm.make.sale", "default_get",
 								new JSONArray().put(fields), kwargs);
-						JSONObject result= response.getJSONObject("result");
+						JSONObject result = response.getJSONObject("result");
 						JSONObject arguments = new JSONObject();
 						arguments.put("partner_id", result.get("partner_id"));
 						if (version == 7)
@@ -269,6 +293,27 @@ public class CrmDetail extends BaseFragment implements OnClickListener {
 				}
 			});
 			return null;
+		}
+	}
+
+	@Override
+	public View onDialogListRowGetView(ODataRow data, int position, View view,
+			ViewGroup parent) {
+		return null;
+	}
+
+	@Override
+	public ODomain onDialogSearchChange(String filter) {
+		ODomain domain = new ODomain();
+		domain.add("name", "=ilike", filter + "%");
+		return domain;
+	}
+
+	@Override
+	public void bindDisplayLayoutLoad(ODataRow data, View layout) {
+		if (data != null) {
+			TextView txvName = (TextView) layout;
+			txvName.setText(data.getString("name"));
 		}
 	}
 

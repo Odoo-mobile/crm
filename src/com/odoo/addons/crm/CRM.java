@@ -11,6 +11,9 @@ import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -27,6 +30,7 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.support.listview.OCursorListAdapter.BeforeBindUpdateData;
@@ -35,20 +39,22 @@ import com.odoo.util.drawer.DrawerItem;
 
 public class CRM extends BaseFragment implements OnRefreshListener,
 		SyncStatusObserverListener, OnItemClickListener,
-		LoaderCallbacks<Cursor>, BeforeBindUpdateData {
+		LoaderCallbacks<Cursor>, BeforeBindUpdateData,
+		OnSearchViewChangeListener {
 
 	public static final String TAG = CRM.class.getSimpleName();
+	public static final String KEY_CRM_LEAD_TYPE = "crm_lead_type";
 
 	enum Keys {
 		Leads, Opportunities
 	}
 
-	View mView = null;
-	ListView mListControl = null;
-	Keys mCurrentKey = Keys.Leads;
-	int index = -1;
-	Context mContext = null;
+	private View mView = null;
+	private ListView mListControl = null;
+	private Keys mCurrentKey = Keys.Leads;
+	private Context mContext = null;
 	private OCursorListAdapter mAdapter = null;
+	private String mFilterText = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -84,11 +90,8 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 
 	private void checkArguments() {
 		Bundle arg = getArguments();
-		if (arg.containsKey("crm"))
-			mCurrentKey = Keys.valueOf(arg.getString("crm"));
-		else if (arg.containsKey("remove_index")) {
-			index = arg.getInt("remove_index");
-		}
+		if (arg.containsKey(KEY_CRM_LEAD_TYPE))
+			mCurrentKey = Keys.valueOf(arg.getString(KEY_CRM_LEAD_TYPE));
 	}
 
 	@Override
@@ -126,7 +129,7 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	private Fragment object(Keys value) {
 		CRM crm = new CRM();
 		Bundle args = new Bundle();
-		args.putString("crm", value.toString());
+		args.putString(KEY_CRM_LEAD_TYPE, value.toString());
 		crm.setArguments(args);
 		return crm;
 	}
@@ -155,13 +158,10 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 			long id) {
 		Cursor cr = (Cursor) mAdapter.getItem(position);
 		int _id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
-		int record_id = cr.getInt(cr.getColumnIndex("id"));
-		CrmDetail crmDetail = new CrmDetail();
+		CRMDetail crmDetail = new CRMDetail();
 		Bundle bundle = new Bundle();
 		bundle.putInt(OColumn.ROW_ID, _id);
-		bundle.putInt("id", record_id);
-		bundle.putInt("index", position);
-		bundle.putString("key", mCurrentKey.toString());
+		bundle.putString(KEY_CRM_LEAD_TYPE, mCurrentKey.toString());
 		crmDetail.setArguments(bundle);
 		startFragment(crmDetail, true);
 	}
@@ -173,22 +173,26 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 			setSwipeRefreshing(true);
 		}
 		String where = "type = ?";
-		String[] whereArgs = null;
+		List<String> whereArgs = new ArrayList<String>();
 		String[] projections;
 		if (mCurrentKey == Keys.Leads) {
-			whereArgs = new String[] { "lead" };
+			whereArgs.add("lead");
 			projections = new String[] { "name", "type", "display_name",
 					"stage_id.name", "create_date", "assignee_name" };
 		} else {
-			whereArgs = new String[] { "opportunity" };
+			whereArgs.add("opportunity");
 			projections = new String[] { "name", "type", "display_name",
 					"stage_id.name", "create_date", "assignee_name",
 					"planned_revenue", "probability",
 					"company_currency.symbol", "title_action", "date_action" };
 		}
-
+		if (mFilterText != null) {
+			where += " and name like ?";
+			whereArgs.add("%" + mFilterText + "%");
+		}
 		return new CursorLoader(mContext, db().uri(), projections, where,
-				whereArgs, "create_date DESC, assignee_name");
+				whereArgs.toArray(new String[whereArgs.size()]),
+				"create_date DESC, assignee_name");
 	}
 
 	@Override
@@ -215,4 +219,38 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 		return row;
 	}
 
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.menu_crm, menu);
+		if (mAdapter != null) {
+			setHasSearchView(this, menu, R.id.menu_search);
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.menu_crm_detail_create:
+			CRMDetail detail = new CRMDetail();
+			Bundle bundle = new Bundle();
+			bundle.putString(KEY_CRM_LEAD_TYPE, mCurrentKey.toString());
+			detail.setArguments(bundle);
+			startFragment(detail, true);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	public boolean onSearchViewTextChange(String newFilter) {
+		mFilterText = newFilter;
+		getLoaderManager().restartLoader(0, null, this);
+		return true;
+	}
+
+	@Override
+	public void onSearchViewClose() {
+		// Nothing to do..
+	}
 }

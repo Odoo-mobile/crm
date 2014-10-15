@@ -19,6 +19,8 @@
 
 package com.odoo.base.res;
 
+import org.json.JSONArray;
+
 import android.content.Context;
 import android.database.Cursor;
 
@@ -27,6 +29,8 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
 import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
+import com.odoo.orm.OValues;
+import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.types.OBlob;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.OText;
@@ -56,10 +60,27 @@ public class ResPartner extends OModel {
 			RelationType.ManyToOne).addDomain("is_company", "=", true);
 	OColumn parent_id = new OColumn("Related Company", ResPartner.class,
 			RelationType.ManyToOne);
+	OColumn country_id = new OColumn("Country", ResCountry.class,
+			RelationType.ManyToOne);
+	@Odoo.Functional(store = true, depends = { "parent_id" }, method = "storeCompanyName")
+	OColumn company_name = new OColumn("Compnay Name", OVarchar.class, 100)
+			.setLocalColumn();
 
 	public ResPartner(Context context) {
 		super(context, "res.partner");
 		mContext = context;
+	}
+
+	public String storeCompanyName(OValues vals) {
+		try {
+			if (!vals.getString("parent_id").equals("false")) {
+				JSONArray parent_id = new JSONArray(vals.getString("parent_id"));
+				return parent_id.getString(1);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 
 	public String getAddress(Cursor cr) {

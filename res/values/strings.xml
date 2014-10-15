@@ -16,6 +16,7 @@
     <string name="label_create_opportunity">Create Opportunity</string>
     <string name="label_convert_to_opp">Convert To Opportunity</string>
     <string name="label_merge_with_opp">Merge with existing opportunities</string>
+    <string name="label_search_customer">Search Customer</string>
 
     <!-- Toast Messages -->
     <string name="toast_sync_before">Sync Before Converting</string>

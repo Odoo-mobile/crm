@@ -70,7 +70,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		if (mTouch != null)
 			mTouch.setSwipeableView(mListControl, this);
 		mAdapter = new OCursorListAdapter(mContext, null,
-				R.layout.res_custom_layout);
+				R.layout.partners_item_layout);
 		// mAdapter.setOnViewCreateListener(this);
 		mAdapter.allowCacheView(true);
 		mListControl.setAdapter(mAdapter);

@@ -73,6 +73,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 
 	/** The current record. */
 	ODataRow mRecord = null;
+	ODataRow onChangeRecord = null;
 
 	/** The control attributes. */
 	OControlAttributes mAttrs = new OControlAttributes();
@@ -230,6 +231,9 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 					if (column.getRelationType() != null
 							&& column.getRelationType() == RelationType.ManyToOne) {
 						widget = OFieldType.MANY_TO_ONE;
+						if (field.isSearchableWidget()) {
+							widget = OFieldType.MANY_TO_ONE_SEARCHABLE;
+						}
 					}
 					if (column.getRelationType() != null
 							&& (column.getRelationType() == RelationType.ManyToMany || column
@@ -328,14 +332,18 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			public void onValueChange(ODataRow row) {
 				if (!col.isOnChangeBGProcess()) {
 					ODataRow vals = mModel.getOnChangeValue(col, row);
-					for (String key : vals.keys()) {
-						if (mFormFieldControls.containsKey(key)) {
-							OField field = mFormFieldControls.get(key);
-							if (field.getWidget() != null) {
-								// Relation field
-								field.selectManyToOneRecord(vals.getInt(key));
-							} else {
-								field.setText(vals.getString(key));
+					onChangeRecord = vals;
+					if (vals != null) {
+						for (String key : vals.keys()) {
+							if (mFormFieldControls.containsKey(key)) {
+								OField field = mFormFieldControls.get(key);
+								if (field.getWidget() != null) {
+									// Relation field
+									field.selectManyToOneRecord(vals
+											.getInt(key));
+								} else {
+									field.setText(vals.getString(key));
+								}
 							}
 						}
 					}
@@ -462,6 +470,9 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 				values.put("local_id", mRecord.getInt(OColumn.ROW_ID));
 				values.put("is_dirty", true);
 			}
+		}
+		if (onChangeRecord != null) {
+			values.addAll(onChangeRecord.getAll());
 		}
 		return values;
 	}

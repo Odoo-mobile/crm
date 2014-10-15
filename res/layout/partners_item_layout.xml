@@ -18,14 +18,14 @@
         android:padding="10dp" >
 
         <odoo.controls.OField
-            android:layout_width="75dp"
-            android:layout_height="75dp"
+            android:layout_width="55dp"
+            android:layout_height="55dp"
             android:layout_gravity="center_vertical"
             android:layout_marginRight="10dp"
             odoo:binaryType="round_image"
             odoo:defaultImage="@drawable/avatar"
             odoo:field_name="image_small"
-            odoo:imageWidthHeight="75"
+            odoo:imageWidthHeight="55"
             odoo:with_label="false" >
         </odoo.controls.OField>
 
@@ -41,14 +41,25 @@
                 android:orientation="horizontal" >
 
                 <odoo.controls.OField
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
                     android:padding="0dp"
                     odoo:fieldTextStyle="bold"
                     odoo:field_color="@color/odoo_purple"
                     odoo:field_name="name"
-                    odoo:field_textAppearance="?android:attr/textAppearanceMedium"
+                    odoo:field_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:singleLine="true"
+                    odoo:with_label="false" />
+
+                <odoo.controls.OField
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:padding="0dp"
+                    odoo:fieldTextStyle="bold"
+                    odoo:field_color="@color/odoo_green"
+                    odoo:field_name="company_name"
+                    odoo:field_textAppearance="?android:attr/textAppearanceSmall"
                     odoo:singleLine="true"
                     odoo:with_label="false" />
             </LinearLayout>

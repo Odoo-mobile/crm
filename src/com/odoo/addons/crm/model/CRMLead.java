@@ -16,8 +16,10 @@ import com.odoo.base.res.ResPartner;
 import com.odoo.base.res.ResUsers;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.ODataRow;
 import com.odoo.orm.OModel;
 import com.odoo.orm.OValues;
+import com.odoo.orm.annotations.Odoo;
 import com.odoo.orm.annotations.Odoo.Functional;
 import com.odoo.orm.types.OBoolean;
 import com.odoo.orm.types.ODateTime;
@@ -32,13 +34,20 @@ public class CRMLead extends OModel {
 
 	Context mContext = null;
 
+	@Odoo.onChange(method = "partner_id_on_change")
 	OColumn partner_id = new OColumn("Customer", ResPartner.class,
 			RelationType.ManyToOne);
-	OColumn name = new OColumn("Subject", OVarchar.class, 64).setRequired(true);
+	OColumn name = new OColumn("Name", OVarchar.class, 64).setRequired(true);
 	OColumn email_from = new OColumn("Email", OVarchar.class, 128);
+	OColumn street = new OColumn("Street", OText.class);
+	OColumn street2 = new OColumn("Street2", OText.class);
+	OColumn city = new OColumn("City", OVarchar.class, 100);
+	OColumn zip = new OColumn("Zip", OVarchar.class, 20);
+	OColumn phone = new OColumn("Phone", OVarchar.class, 20);
+
 	OColumn create_date = new OColumn("Creation Date", ODateTime.class)
 			.setParsePattern(ODate.DEFAULT_FORMAT);
-	OColumn description = new OColumn("Note", OText.class);
+	OColumn description = new OColumn("Internal Notes", OText.class);
 	OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
 			RelationType.ManyToMany);
 	OColumn contact_name = new OColumn("Contact Name", OVarchar.class, 64);
@@ -127,6 +136,69 @@ public class CRMLead extends OModel {
 	public String storeAssigneeName(OValues vals) {
 		return (!vals.getString("user_id").equals("false")) ? "Me"
 				: "Unassigned";
+	}
+
+	/**
+	 * OnChange methods
+	 */
+
+	public ODataRow partner_id_on_change(ODataRow row) {
+		ODataRow rec = new ODataRow();
+		String display_name = "";
+		ResCountry country = new ResCountry(mContext);
+		try {
+			rec.put("partner_name", row.getString("name"));
+			rec.put("partner_name", rec.getString("partner_name"));
+			if (!row.getString("parent_id").equals("false")) {
+				if (row.get("parent_id") instanceof JSONArray) {
+					JSONArray parent_id = new JSONArray(
+							row.getString("parent_id"));
+					rec.put("partner_name", parent_id.get(1));
+					display_name = parent_id.getString(1);
+				} else {
+					ODataRow parent_id = row.getM2ORecord("parent_id").browse();
+					if (parent_id != null) {
+						rec.put("partner_name", parent_id.getString("name"));
+						display_name = parent_id.getString("name");
+					}
+				}
+				if (!TextUtils.isEmpty(display_name))
+					display_name += " (" + row.getString("name") + ")";
+				else
+					display_name += row.getString("name");
+			} else {
+				display_name = row.getString("name");
+			}
+			Integer country_id = 0;
+			if (!row.getString("country_id").equals("false")) {
+				if (row.get("country_id") instanceof JSONArray) {
+					JSONArray country_data = new JSONArray(
+							row.getString("country_id"));
+					country_id = country.selectRowId(country_data.getInt(0));
+					if (country_id == null) {
+						country_id = 0;
+					}
+				} else {
+					ODataRow country_data = row.getM2ORecord("country_id")
+							.browse();
+					if (country_data != null) {
+						country_id = country_data.getInt(OColumn.ROW_ID);
+					}
+				}
+				if (country_id != 0)
+					rec.put("country_id", country_id);
+			}
+			rec.put("display_name", display_name);
+			rec.put("street", row.getString("street"));
+			rec.put("street2", row.getString("street2"));
+			rec.put("city", row.getString("city"));
+			rec.put("zip", row.getString("zip"));
+			rec.put("email_from", row.getString("email"));
+			rec.put("phone", row.getString("phone"));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return rec;
 	}
 
 	public static class CRMCaseCateg extends OModel {
