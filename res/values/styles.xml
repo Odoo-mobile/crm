@@ -4,34 +4,11 @@
         Base application theme, dependent on API level. This theme is replaced
         by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
     -->
-    <style name="AppBaseTheme" parent="android:Theme.Light">
-        <!--
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        -->
-    </style>
+    <style name="AppBaseTheme" parent="Theme.AppCompat.Light.DarkActionBar"></style>
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
-
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
-        <item name="android:actionBarStyle">@style/CustomActionbar</item>
-        <item name="android:windowContentOverlay">@drawable/actionbar_bottom_border</item>
-    </style>
-
-    <style name="CustomActionbar" parent="android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/odoo_purple</item>
-        <item name="android:titleTextStyle">@style/ActionBar.TitleTextStyle</item>
-    </style>
-
-    <style name="ActionBar.TitleTextStyle" parent="android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-        <item name="android:textStyle">bold</item>
-        <item name="android:textColor">#ffffff</item>
-    </style>
-
-    <style name="PreferenceTheme" parent="AppBaseTheme">
-        <item name="android:actionBarStyle">@style/CustomActionbar</item>
     </style>
 
 </resources>
