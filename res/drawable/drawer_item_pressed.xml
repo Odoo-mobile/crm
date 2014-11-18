@@ -4,7 +4,7 @@
 
     <gradient
         android:angle="270"
-        android:endColor="#d0a2c4"
-        android:startColor="#d0a2c4" />
+        android:endColor="@color/nav_drawer_pressed"
+        android:startColor="@color/nav_drawer_pressed" />
 
 </shape>

@@ -13,6 +13,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.OSwipeListener.SwipeCallbacks;
 import com.odoo.OTouchListener;
@@ -71,7 +71,6 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 			mTouch.setSwipeableView(mListControl, this);
 		mAdapter = new OCursorListAdapter(mContext, null,
 				R.layout.partners_item_layout);
-		// mAdapter.setOnViewCreateListener(this);
 		mAdapter.allowCacheView(true);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
@@ -80,6 +79,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		mAdapter.setOnRowViewClickListener(R.id.mail_to_user, this);
 		mAdapter.setOnRowViewClickListener(R.id.call_user, this);
 		getLoaderManager().initLoader(0, null, this);
+
 	}
 
 	@Override
@@ -118,6 +118,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 			Toast.makeText(getActivity(), _s(R.string.no_connection),
 					Toast.LENGTH_LONG).show();
 		}
+
 	}
 
 	@Override
@@ -136,6 +137,10 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		if (db().isEmptyTable()) {
+			scope.main().requestSync(PartnersProvider.AUTHORITY);
+			setSwipeRefreshing(true);
+		}
 		return new CursorLoader(mContext, db().uri(), db().projection(), null,
 				null, null);
 	}
@@ -147,6 +152,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		if (cursor.getCount() == 0) {
 			scope.main().requestSync(PartnersProvider.AUTHORITY);
 		}
+
 	}
 
 	@Override
@@ -244,5 +250,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 			return false;
 		}
 		return true;
+
 	}
+
 }

@@ -57,7 +57,6 @@
                     android:layout_marginLeft="5dp"
                     android:padding="0dp"
                     odoo:fieldTextStyle="bold"
-                    odoo:field_color="@color/odoo_green"
                     odoo:field_name="company_name"
                     odoo:field_textAppearance="?android:attr/textAppearanceSmall"
                     odoo:singleLine="true"

@@ -302,4 +302,11 @@ public class CRMConvertToOpp extends BaseFragment implements
 			dialog.show();
 		}
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

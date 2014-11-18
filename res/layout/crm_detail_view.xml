@@ -16,7 +16,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="15dp"
+            android:background="#cccccc"
             android:visibility="gone"
+            odoo:autoUIGenerate="true"
             odoo:model="crm.lead" >
 
             <LinearLayout
@@ -113,6 +115,8 @@
             android:orientation="vertical"
             android:padding="15dp"
             android:visibility="gone"
+            android:background="#cccccc"
+            odoo:autoUIGenerate="true"
             odoo:model="crm.lead" >
 
             <LinearLayout

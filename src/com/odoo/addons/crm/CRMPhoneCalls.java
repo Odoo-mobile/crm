@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.crm.model.CRMPhoneCall;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
@@ -60,7 +60,7 @@ public class CRMPhoneCalls extends BaseFragment implements
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		setHasSwipeRefreshView(view, R.id.swipe_container, this);
+//		setHasSwipeRefreshView(view, R.id.swipe_container, this);
 		setHasSyncStatusObserver(TAG, this, db());
 		checkArguments();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
@@ -166,5 +166,11 @@ public class CRMPhoneCalls extends BaseFragment implements
 			Toast.makeText(mContext, _s(R.string.no_connection),
 					Toast.LENGTH_LONG).show();
 		}
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 }

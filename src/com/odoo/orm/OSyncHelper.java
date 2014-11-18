@@ -260,7 +260,6 @@ public class OSyncHelper {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-
 		}
 	}
 

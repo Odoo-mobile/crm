@@ -118,4 +118,10 @@ public class CRMPhoneDetail extends BaseFragment {
 		return null;
 	}
 
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

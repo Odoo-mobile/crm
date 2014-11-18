@@ -72,4 +72,11 @@ public class ResDetail extends BaseFragment {
 		return null;
 	}
 
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+
 }

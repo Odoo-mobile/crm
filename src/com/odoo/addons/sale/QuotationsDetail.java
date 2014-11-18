@@ -69,7 +69,7 @@ public class QuotationsDetail extends BaseFragment {
 			mRecord = db().select(mId);
 			mForm.initForm(mRecord);
 			mRecordLine = saleOrderLine.select(mId);
-			// mFormLine.initForm(mRecordLine);
+			 mFormLine.initForm(mRecordLine);
 			// Log.e("Quotations", ":>>>> " + mRecord);
 			if (mRecord.getString("state").equals("draft")) {
 				mForm.setEditable(true);
@@ -139,5 +139,12 @@ public class QuotationsDetail extends BaseFragment {
 	public List<DrawerItem> drawerMenus(Context context) {
 		return null;
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 
 }

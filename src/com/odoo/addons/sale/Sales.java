@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.partners.Partners;
 import com.odoo.addons.sale.model.SaleOrder;
@@ -206,4 +206,11 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 				+ cr.getString(cr.getColumnIndex("order_line_count")));
 		return row;
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

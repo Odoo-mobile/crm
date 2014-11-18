@@ -61,6 +61,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 
 	/** The Constant KEY_FALSE_BACKGROUND_SELECTOR. */
 	public static final String KEY_FALSE_BACKGROUND_SELECTOR = "false_background_selector";
+	public static final String KEY_AUTO_UI_GENERATE = "autoUIGenerate";
 
 	/** The Constant KEY_MODEL. */
 	public static final String KEY_MODEL = "model";
@@ -160,6 +161,8 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			mAttrs.put(KEY_FALSE_BACKGROUND_SELECTOR, mTypedArray
 					.getResourceId(R.styleable.OForm_false_background_selector,
 							-1));
+			mAttrs.put(KEY_AUTO_UI_GENERATE, mTypedArray.getBoolean(
+					R.styleable.OForm_autoUIGenerate, false));
 			mModel = OModel.get(mContext, mAttrs.getString(KEY_MODEL, null));
 			mTypedArray.recycle();
 		}
@@ -198,6 +201,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			View v = mFormFieldControls.get(key);
 			if (v instanceof OField) {
 				OField field = (OField) v;
+				field.setAutoUpdateUI(autoGenerateUI());
 				field.reInit();
 				OColumn column = mModel.getColumn(field.getFieldName());
 				OModel ref_model = null;
@@ -293,6 +297,10 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 				}
 			}
 		}
+	}
+
+	public boolean autoGenerateUI() {
+		return mAttrs.getBoolean(KEY_AUTO_UI_GENERATE, false);
 	}
 
 	private void setOnDomainFilterCallBack(final OField field, final OColumn col) {

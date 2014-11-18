@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +21,6 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
-import android.widgets.SwipeRefreshLayout.OnRefreshListener;
 
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
@@ -36,13 +36,14 @@ import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.support.listview.OCursorListAdapter.BeforeBindUpdateData;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
+import com.odoo.util.logger.OLog;
 
 public class CRM extends BaseFragment implements OnRefreshListener,
 		SyncStatusObserverListener, OnItemClickListener,
 		LoaderCallbacks<Cursor>, BeforeBindUpdateData,
 		OnSearchViewChangeListener {
 
-	public static final String TAG = CRM.class.getSimpleName();
+//	public static final String TAG = CRM.class.getSimpleName();
 	public static final String KEY_CRM_LEAD_TYPE = "crm_lead_type";
 
 	enum Keys {
@@ -177,8 +178,8 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 		String[] projections;
 		if (mCurrentKey == Keys.Leads) {
 			whereArgs.add("lead");
-			projections = new String[] { "name", "type", "display_name",
-					"stage_id.name", "create_date", "assignee_name" };
+			 projections = new String[] { "name", "type", "display_name",
+			 "stage_id.name", "create_date", "assignee_name" };
 		} else {
 			whereArgs.add("opportunity");
 			projections = new String[] { "name", "type", "display_name",
@@ -252,5 +253,10 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	@Override
 	public void onSearchViewClose() {
 		// Nothing to do..
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		return false;
 	}
 }

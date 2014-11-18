@@ -317,4 +317,10 @@ public class CRMDetail extends BaseFragment implements OnClickListener,
 		}
 	}
 
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

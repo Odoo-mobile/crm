@@ -28,7 +28,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="right"
             odoo:fieldTextStyle="bold"
-            odoo:field_color="@color/odoo_purple_tran"
             odoo:field_name="stage_id_name"
             odoo:with_label="false" />
     </LinearLayout>

@@ -207,6 +207,7 @@ public class CRMLead extends OModel {
 
 		public CRMCaseCateg(Context context) {
 			super(context, "crm.case.categ");
+				
 		}
 
 		@Override
