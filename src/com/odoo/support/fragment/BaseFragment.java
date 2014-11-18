@@ -355,4 +355,9 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper,
 		scope = new AppScope(getActivity());
 		return scope.main().getActionbar();
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		return true;
+	}
 }

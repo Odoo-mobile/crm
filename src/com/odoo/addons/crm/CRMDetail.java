@@ -88,6 +88,8 @@ public class CRMDetail extends BaseFragment implements OnClickListener,
 			mForm = (OForm) mView.findViewById(R.id.crmOppDetail);
 			mForm.findViewById(R.id.btnConvertToQuotation).setOnClickListener(
 					this);
+			partner_id = (OField) mForm.findViewById(R.id.partner_id_opp);
+			partner_id.setManyToOneSearchableCallbacks(this);
 			break;
 		}
 		CRMLead crmLead = new CRMLead(getActivity());

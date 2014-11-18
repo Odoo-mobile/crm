@@ -65,6 +65,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		setHasSwipeRefreshView(view, R.id.swipe_container, this);
 		setHasSyncStatusObserver(KEY_DRAWER, this, db());
 		scope = new AppScope(mContext);
+		scope.main().setOnBackPressCallBack(this);
 		mTouch = scope.main().getTouchAttacher();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
 		if (mTouch != null)
@@ -250,7 +251,6 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 			return false;
 		}
 		return true;
-
 	}
 
 }
