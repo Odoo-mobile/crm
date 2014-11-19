@@ -207,7 +207,12 @@ public class CRMLead extends OModel {
 
 		public CRMCaseCateg(Context context) {
 			super(context, "crm.case.categ");
-				
+			if (getOdooVersion() != null) {
+				int version = getOdooVersion().getVersion_number();
+				if (version >= 9) {
+					setModelName("crm.categ");
+				}
+			}
 		}
 
 		@Override
@@ -227,6 +232,12 @@ public class CRMLead extends OModel {
 
 		public CRMCaseStage(Context context) {
 			super(context, "crm.case.stage");
+			if (getOdooVersion() != null) {
+				int version = getOdooVersion().getVersion_number();
+				if (version >= 9) {
+					setModelName("crm.stage");
+				}
+			}
 		}
 
 		@Override
