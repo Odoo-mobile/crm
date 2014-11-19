@@ -207,6 +207,16 @@ public class OModel extends OSQLiteHelper implements OModelHelper {
 		createFieldList();
 	}
 
+	/**
+	 * Sets model name runtime. Used when you need different model name with
+	 * different Odoo Versions
+	 * 
+	 * @param name
+	 */
+	public void setModelName(String name) {
+		_name = name;
+	}
+
 	public OModel newInstance(OModel model) {
 		try {
 			return model.getClass().newInstance();
