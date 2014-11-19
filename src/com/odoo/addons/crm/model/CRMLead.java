@@ -48,7 +48,12 @@ public class CRMLead extends OModel {
 	OColumn create_date = new OColumn("Creation Date", ODateTime.class)
 			.setParsePattern(ODate.DEFAULT_FORMAT);
 	OColumn description = new OColumn("Internal Notes", OText.class);
+	@Odoo.api.v7
+	@Odoo.api.v8
 	OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
+			RelationType.ManyToMany);
+	@Odoo.api.v9alpha
+	OColumn tag_ids = new OColumn("Tags", CRMCaseCateg.class,
 			RelationType.ManyToMany);
 	OColumn contact_name = new OColumn("Contact Name", OVarchar.class, 64);
 	OColumn partner_name = new OColumn("Partner Name", OVarchar.class, 64);
@@ -84,8 +89,9 @@ public class CRMLead extends OModel {
 	OColumn date_action = new OColumn("Next Action Date", ODateTime.class)
 			.setParsePattern(ODate.DEFAULT_DATE_FORMAT);
 	OColumn title_action = new OColumn("Next Action", OVarchar.class, 64);
-	OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
-			RelationType.ManyToOne);
+	// FIXME: Why used payment_mode ?
+	// OColumn payment_mode = new OColumn("Payment Mode", CRMPaymentMode.class,
+	// RelationType.ManyToOne);
 	OColumn planned_cost = new OColumn("Planned Cost", OReal.class, 20);
 
 	/**
@@ -102,6 +108,7 @@ public class CRMLead extends OModel {
 	public CRMLead(Context context) {
 		super(context, "crm.lead");
 		mContext = context;
+
 	}
 
 	@Override
@@ -210,7 +217,7 @@ public class CRMLead extends OModel {
 			if (getOdooVersion() != null) {
 				int version = getOdooVersion().getVersion_number();
 				if (version >= 9) {
-					setModelName("crm.categ");
+					setModelName("crm.lead.tag");
 				}
 			}
 		}
