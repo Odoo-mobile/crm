@@ -5,30 +5,23 @@
     android:clipToPadding="false"
     android:orientation="vertical" >
 
-    <include
-        android:id="@+id/loadingProgress"
-        layout="@layout/listview_data_loading_progress"
-        android:paddingBottom="5dp"
-        android:paddingTop="5dp" />
-
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:minHeight="100dp" >
-
-        <!--
-        <odoo.controls.OList
-            android:id="@+id/crm_listRecords"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-        </odoo.controls.OList>
-        -->
+        android:minHeight="100dp"
+        android:visibility="gone" >
 
         <ListView
             android:id="@+id/listRecords"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
     </android.support.v4.widget.SwipeRefreshLayout>
+
+    <include
+        android:id="@+id/loadingProgress"
+        layout="@layout/listview_data_loading_progress"
+        android:paddingBottom="5dp"
+        android:paddingTop="5dp" />
 
 </LinearLayout>

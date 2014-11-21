@@ -1,4 +1,4 @@
-package com.odoo.addons.partners;
+package com.odoo.addons.customers;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ import com.odoo.support.fragment.BaseFragment;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 
-public class ResDetail extends BaseFragment {
+public class CustomerDetail extends BaseFragment {
 	private View mView = null;
 	Context mContext = null;
 	private Integer mId = null;
@@ -31,7 +31,7 @@ public class ResDetail extends BaseFragment {
 		initArgs();
 		mContext = getActivity();
 		setHasOptionsMenu(true);
-		mView = inflater.inflate(R.layout.res_detail, container, false);
+		mView = inflater.inflate(R.layout.partner_detail, container, false);
 		return mView;
 	}
 

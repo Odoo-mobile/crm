@@ -1,4 +1,4 @@
-package com.odoo.addons.partners.services;
+package com.odoo.addons.customers.services;
 
 import odoo.ODomain;
 import android.os.Bundle;

@@ -1,4 +1,4 @@
-package com.odoo.addons.partners;
+package com.odoo.addons.customers;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,12 +9,15 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -30,6 +33,7 @@ import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.support.listview.OCursorListAdapter.OnRowViewClickListener;
@@ -37,10 +41,11 @@ import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
 import com.odoo.util.logger.OLog;
 
-public class Partners extends BaseFragment implements OnRefreshListener,
+public class Customers extends BaseFragment implements OnRefreshListener,
 		OnItemClickListener, LoaderCallbacks<Cursor>,
-		SyncStatusObserverListener, OnRowViewClickListener, SwipeCallbacks {
-	public static final String TAG = Partners.class.getSimpleName();
+		SyncStatusObserverListener, OnRowViewClickListener, SwipeCallbacks,
+		OnSearchViewChangeListener {
+	public static final String TAG = Customers.class.getSimpleName();
 	public static final String KEY_DRAWER = "Sales";
 	private View mView = null;
 	private ListView mListControl = null;
@@ -48,6 +53,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 	private Context mContext = null;
 	private OTouchListener mTouch;
 	private int last_swiped_pos = -1;
+	private String mFilterText = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -72,10 +78,8 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 			mTouch.setSwipeableView(mListControl, this);
 		mAdapter = new OCursorListAdapter(mContext, null,
 				R.layout.partners_item_layout);
-		mAdapter.allowCacheView(true);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
-		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
 		mAdapter.setOnRowViewClickListener(R.id.user_location, this);
 		mAdapter.setOnRowViewClickListener(R.id.mail_to_user, this);
 		mAdapter.setOnRowViewClickListener(R.id.call_user, this);
@@ -103,7 +107,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 	}
 
 	private Fragment object(String value) {
-		Partners resPartners = new Partners();
+		Customers resPartners = new Customers();
 		Bundle args = new Bundle();
 		args.putString("resPartner", value);
 		resPartners.setArguments(args);
@@ -128,7 +132,7 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		Cursor cr = (Cursor) mAdapter.getItem(position);
 		int _id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
 		int record_id = cr.getInt(cr.getColumnIndex("id"));
-		ResDetail resDetail = new ResDetail();
+		CustomerDetail resDetail = new CustomerDetail();
 		Bundle bundle = new Bundle();
 		bundle.putInt(OColumn.ROW_ID, _id);
 		bundle.putInt("id", record_id);
@@ -138,19 +142,36 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 
 	@Override
 	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+
+		String[] projection = { "name", "email", "image_small", "phone",
+				"mobile" };
+
 		if (db().isEmptyTable()) {
 			scope.main().requestSync(PartnersProvider.AUTHORITY);
 			setSwipeRefreshing(true);
 		}
-		return new CursorLoader(mContext, db().uri(), db().projection(), null,
-				null, null);
+		String where = null;
+		String[] args = null;
+		if (mFilterText != null) {
+			where = "name like ?";
+			args = new String[] { "%" + mFilterText + "%" };
+		}
+		return new CursorLoader(mContext, db().uri(), projection, where, args,
+				null);
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
-		OControls.setGone(mView, R.id.loadingProgress);
-		if (cursor.getCount() == 0) {
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				OControls.setGone(mView, R.id.loadingProgress);
+				OControls.setVisible(mView, R.id.swipe_container);
+			}
+		}, 700);
+		if (db().isEmptyTable()) {
 			scope.main().requestSync(PartnersProvider.AUTHORITY);
 		}
 
@@ -253,4 +274,24 @@ public class Partners extends BaseFragment implements OnRefreshListener,
 		return true;
 	}
 
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.menu_customers, menu);
+		if (mAdapter != null) {
+			setHasSearchView(this, menu, R.id.menu_customer_search);
+		}
+	}
+
+	@Override
+	public boolean onSearchViewTextChange(String newFilter) {
+		mFilterText = newFilter;
+		getLoaderManager().restartLoader(0, null, this);
+		return true;
+	}
+
+	@Override
+	public void onSearchViewClose() {
+		// Nothing to do
+	}
 }

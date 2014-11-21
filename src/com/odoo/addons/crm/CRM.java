@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -24,7 +25,7 @@ import android.widget.Toast;
 
 import com.odoo.addons.crm.model.CRMLead;
 import com.odoo.addons.crm.providers.crm.CRMProvider;
-import com.odoo.addons.partners.Partners;
+import com.odoo.addons.customers.Customers;
 import com.odoo.crm.R;
 import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
@@ -36,14 +37,13 @@ import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.support.listview.OCursorListAdapter.BeforeBindUpdateData;
 import com.odoo.util.OControls;
 import com.odoo.util.drawer.DrawerItem;
-import com.odoo.util.logger.OLog;
 
 public class CRM extends BaseFragment implements OnRefreshListener,
 		SyncStatusObserverListener, OnItemClickListener,
 		LoaderCallbacks<Cursor>, BeforeBindUpdateData,
 		OnSearchViewChangeListener {
 
-//	public static final String TAG = CRM.class.getSimpleName();
+	// public static final String TAG = CRM.class.getSimpleName();
 	public static final String KEY_CRM_LEAD_TYPE = "crm_lead_type";
 
 	enum Keys {
@@ -72,7 +72,7 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setHasSwipeRefreshView(view, R.id.swipe_container, this);
-		setHasSyncStatusObserver(Partners.KEY_DRAWER, this, db());
+		setHasSyncStatusObserver(Customers.KEY_DRAWER, this, db());
 		checkArguments();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
 		if (mCurrentKey == Keys.Leads)
@@ -84,7 +84,6 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 		mAdapter.setBeforeBindUpdateData(this);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
-		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
 		getLoaderManager().initLoader(0, null, this);
 
 	}
@@ -103,9 +102,9 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Leads", count(context,
+		menu.add(new DrawerItem(Customers.KEY_DRAWER, "Leads", count(context,
 				Keys.Leads), R.drawable.ic_action_leads, object(Keys.Leads)));
-		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Opportunities", count(
+		menu.add(new DrawerItem(Customers.KEY_DRAWER, "Opportunities", count(
 				context, Keys.Opportunities),
 				R.drawable.ic_action_opportunities, object(Keys.Opportunities)));
 		return menu;
@@ -178,8 +177,8 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 		String[] projections;
 		if (mCurrentKey == Keys.Leads) {
 			whereArgs.add("lead");
-			 projections = new String[] { "name", "type", "display_name",
-			 "stage_id.name", "create_date", "assignee_name" };
+			projections = new String[] { "name", "type", "display_name",
+					"stage_id.name", "create_date", "assignee_name" };
 		} else {
 			whereArgs.add("opportunity");
 			projections = new String[] { "name", "type", "display_name",
@@ -199,7 +198,14 @@ public class CRM extends BaseFragment implements OnRefreshListener,
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
-		OControls.setGone(mView, R.id.loadingProgress);
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				OControls.setGone(mView, R.id.loadingProgress);
+				OControls.setVisible(mView, R.id.swipe_container);
+			}
+		}, 700);
 	}
 
 	@Override

@@ -1,17 +1,21 @@
 package com.odoo.addons.sale;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -19,7 +23,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.odoo.addons.partners.Partners;
+import com.odoo.addons.customers.Customers;
 import com.odoo.addons.sale.model.SaleOrder;
 import com.odoo.addons.sale.providers.sale.SalesProvider;
 import com.odoo.crm.R;
@@ -27,6 +31,7 @@ import com.odoo.orm.OColumn;
 import com.odoo.orm.ODataRow;
 import com.odoo.support.AppScope;
 import com.odoo.support.fragment.BaseFragment;
+import com.odoo.support.fragment.OnSearchViewChangeListener;
 import com.odoo.support.fragment.SyncStatusObserverListener;
 import com.odoo.support.listview.OCursorListAdapter;
 import com.odoo.support.listview.OCursorListAdapter.BeforeBindUpdateData;
@@ -35,7 +40,7 @@ import com.odoo.util.drawer.DrawerItem;
 
 public class Sales extends BaseFragment implements OnRefreshListener,
 		LoaderCallbacks<Cursor>, SyncStatusObserverListener,
-		OnItemClickListener, BeforeBindUpdateData {
+		OnItemClickListener, BeforeBindUpdateData, OnSearchViewChangeListener {
 
 	public static final String TAG = Sales.class.getSimpleName();
 
@@ -43,11 +48,12 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 		Quotation, Sale_order
 	}
 
-	View mView = null;
-	ListView mListControl = null;
-	Keys mCurrentKey = Keys.Quotation;
-	Context mContext = null;
+	private Context mContext = null;
+	private View mView = null;
+	private ListView mListControl = null;
+	private Keys mCurrentKey = Keys.Quotation;
 	private OCursorListAdapter mAdapter = null;
+	private String mSearchFilter = null;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -64,7 +70,7 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
 		setHasSwipeRefreshView(view, R.id.swipe_container, this);
-		setHasSyncStatusObserver(Partners.KEY_DRAWER, this, db());
+		setHasSyncStatusObserver(Customers.KEY_DRAWER, this, db());
 		checkArguments();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
 		mAdapter = new OCursorListAdapter(mContext, null,
@@ -72,7 +78,6 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 		mAdapter.setBeforeBindUpdateData(this);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
-		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -89,10 +94,10 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 	@Override
 	public List<DrawerItem> drawerMenus(Context context) {
 		List<DrawerItem> menu = new ArrayList<DrawerItem>();
-		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Quotations", count(
+		menu.add(new DrawerItem(Customers.KEY_DRAWER, "Quotations", count(
 				context, Keys.Quotation), R.drawable.ic_action_quotation,
 				object(Keys.Quotation)));
-		menu.add(new DrawerItem(Partners.KEY_DRAWER, "Sales Orders", count(
+		menu.add(new DrawerItem(Customers.KEY_DRAWER, "Sales Orders", count(
 				context, Keys.Sale_order), R.drawable.ic_action_sale_order,
 				object(Keys.Sale_order)));
 		return menu;
@@ -157,29 +162,42 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 			setSwipeRefreshing(true);
 		}
 		String where = "";
-		String args[] = {};
+		List<String> args = new ArrayList<String>();
+		if (mSearchFilter != null) {
+			where = "name like ? and ";
+			args.add("%" + mSearchFilter + "%");
+		}
 		if (mCurrentKey == Keys.Quotation) {
-			where = "state = ? or state = ?";
-			args = new String[] { "draft", "cancel" };
+			where += "(state = ? or state = ?)";
+			args.addAll(Arrays.asList(new String[] { "draft", "cancel" }));
 		} else {
 			if (getArguments().containsKey("id")) { // Res partner in sales
-				where = "partner_id = ?";
-				args = new String[] { getArguments().getString("id") };
+				where += "partner_id = ?";
+				args.add(getArguments().getString("id"));
 			} else {
-				where = "state = ? or state = ? or state = ?";
-				args = new String[] { "manual", "progress", "done" };
+				where += "(state = ? or state = ? or state = ?)";
+				args.addAll(Arrays.asList(new String[] { "manual", "progress",
+						"done" }));
 			}
 		}
 		return new CursorLoader(mContext, db().uri(), new String[] { "name",
 				"partner_id.id", "partner_id.name", "date_order", "state",
 				"amount_total", "state_title", "currency_id.symbol",
-				"order_line_count" }, where, args, "date_order DESC");
+				"order_line_count" }, where, args.toArray(new String[args
+				.size()]), "date_order DESC");
 	}
 
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
-		OControls.setGone(mView, R.id.loadingProgress);
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				OControls.setGone(mView, R.id.loadingProgress);
+				OControls.setVisible(mView, R.id.swipe_container);
+			}
+		}, 700);
 	}
 
 	@Override
@@ -211,6 +229,27 @@ public class Sales extends BaseFragment implements OnRefreshListener,
 	public boolean onBackPressed() {
 		// TODO Auto-generated method stub
 		return false;
+	}
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		menu.clear();
+		inflater.inflate(R.menu.menu_sale, menu);
+		if (mAdapter != null) {
+			setHasSearchView(this, menu, R.id.menu_sale_search);
+		}
+	}
+
+	@Override
+	public boolean onSearchViewTextChange(String newFilter) {
+		mSearchFilter = newFilter;
+		getLoaderManager().restartLoader(0, null, this);
+		return true;
+	}
+
+	@Override
+	public void onSearchViewClose() {
+		// Nothing to do
 	}
 
 }

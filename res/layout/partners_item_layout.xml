@@ -15,25 +15,35 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:padding="10dp" >
+        android:paddingLeft="16dp" >
 
-        <odoo.controls.OField
-            android:layout_width="55dp"
-            android:layout_height="55dp"
+        <LinearLayout
+            android:layout_width="41dp"
+            android:layout_height="41dp"
             android:layout_gravity="center_vertical"
-            android:layout_marginRight="10dp"
-            odoo:binaryType="round_image"
-            odoo:defaultImage="@drawable/avatar"
-            odoo:field_name="image_small"
-            odoo:imageWidthHeight="55"
-            odoo:with_label="false" >
-        </odoo.controls.OField>
+            android:background="@drawable/circle_mask" >
+
+            <odoo.controls.OField
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                odoo:binaryType="round_image"
+                odoo:defaultImage="@drawable/avatar"
+                odoo:field_name="image_small"
+                odoo:imageWidthHeight="40"
+                odoo:with_label="false" >
+            </odoo.controls.OField>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
             android:layout_weight="1"
-            android:orientation="vertical" >
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingRight="16dp"
+            android:paddingTop="10dp" >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -78,36 +88,6 @@
                 odoo:field_name="phone"
                 odoo:textLines="1"
                 odoo:with_label="false" />
-
-            <!--
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
-
-                <odoo.controls.OField
-                    android:id="@+id/oCrmLeadCount"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@drawable/oe_listview_background_selector"
-                    odoo:customLayoutOriantation="horizontal"
-                    odoo:field_color="@color/odoo_purple"
-                    odoo:field_name="crmLeadCount"
-                    odoo:with_label="false" />
-
-                <odoo.controls.OField
-                    android:id="@+id/oSaleOrderCount"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@drawable/oe_listview_background_selector"
-                    odoo:customLayoutOriantation="horizontal"
-                    odoo:field_color="@color/odoo_purple"
-                    odoo:field_name="salesOrdersCount"
-                    odoo:with_label="false" />
-            </LinearLayout>
-            -->
-
         </LinearLayout>
     </LinearLayout>
 

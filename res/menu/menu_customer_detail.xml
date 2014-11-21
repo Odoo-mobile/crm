@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
+
+    <item
+        android:id="@+id/menu_sales_detail_edit"
+        android:icon="@drawable/ic_menu_edit"
+        android:title="@string/label_edit"
+        app:showAsAction="always">
+    </item>
+    <item
+        android:id="@+id/menu_sales_detail_save"
+        android:icon="@drawable/ic_action_done"
+        android:title="@string/label_save"
+        app:showAsAction="always">
+    </item>
+
+</menu>

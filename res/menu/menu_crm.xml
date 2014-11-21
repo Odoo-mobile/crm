@@ -1,18 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
         android:id="@+id/menu_search"
-        android:actionViewClass="android.widget.SearchView"
         android:icon="@drawable/ic_action_search"
-        android:showAsAction="always|collapseActionView"
-        android:title="@string/label_search">
+        android:title="@string/label_search"
+        app:actionViewClass="android.support.v7.widget.SearchView"
+        app:showAsAction="always|collapseActionView">
     </item>
     <item
         android:id="@+id/menu_crm_detail_create"
         android:icon="@drawable/ic_action_content_new"
-        android:showAsAction="ifRoom|withText"
-        android:title="@string/label_create">
+        android:title="@string/label_create"
+        app:showAsAction="ifRoom|withText">
     </item>
 
 </menu>

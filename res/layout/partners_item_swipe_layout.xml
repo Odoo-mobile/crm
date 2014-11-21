@@ -9,7 +9,9 @@
         android:background="@color/odoo_purple"
         android:baselineAligned="true"
         android:gravity="center"
-        android:orientation="horizontal" >
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" >
 
         <!-- Opportunity -->
 

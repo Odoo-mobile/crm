@@ -183,7 +183,7 @@
                 android:resource="@xml/sync_sale_data" />
         </service>
         <service
-            android:name="com.odoo.addons.partners.services.PartnerService"
+            android:name="com.odoo.addons.customers.services.PartnerService"
             android:exported="true" >
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />

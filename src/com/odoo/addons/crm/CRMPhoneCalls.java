@@ -6,6 +6,7 @@ import java.util.List;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager.LoaderCallbacks;
 import android.support.v4.content.CursorLoader;
@@ -60,7 +61,7 @@ public class CRMPhoneCalls extends BaseFragment implements
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-//		setHasSwipeRefreshView(view, R.id.swipe_container, this);
+		// setHasSwipeRefreshView(view, R.id.swipe_container, this);
 		setHasSyncStatusObserver(TAG, this, db());
 		checkArguments();
 		mListControl = (ListView) view.findViewById(R.id.listRecords);
@@ -69,7 +70,6 @@ public class CRMPhoneCalls extends BaseFragment implements
 		// mAdapter.setOnViewCreateListener(this);
 		mListControl.setAdapter(mAdapter);
 		mListControl.setOnItemClickListener(this);
-		mListControl.setEmptyView(mView.findViewById(R.id.loadingProgress));
 		getLoaderManager().initLoader(0, null, this);
 	}
 
@@ -127,7 +127,14 @@ public class CRMPhoneCalls extends BaseFragment implements
 	@Override
 	public void onLoadFinished(Loader<Cursor> arg0, Cursor cursor) {
 		mAdapter.changeCursor(cursor);
-		OControls.setGone(mView, R.id.loadingProgress);
+		new Handler().postDelayed(new Runnable() {
+
+			@Override
+			public void run() {
+				OControls.setGone(mView, R.id.loadingProgress);
+				OControls.setVisible(mView, R.id.swipe_container);
+			}
+		}, 700);
 	}
 
 	@Override

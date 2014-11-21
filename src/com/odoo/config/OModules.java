@@ -20,7 +20,7 @@ package com.odoo.config;
 
 import com.odoo.addons.crm.CRM;
 import com.odoo.addons.crm.CRMPhoneCalls;
-import com.odoo.addons.partners.Partners;
+import com.odoo.addons.customers.Customers;
 import com.odoo.addons.sale.Sales;
 import com.odoo.support.OModule;
 import com.odoo.support.OModulesHelper;
@@ -30,7 +30,7 @@ import com.odoo.support.OModulesHelper;
  */
 public class OModules extends OModulesHelper {
 
-	OModule a_res_partner = new OModule(Partners.class).setDefault();
+	OModule a_res_partner = new OModule(Customers.class).setDefault();
 	OModule b_crm = new OModule(CRM.class);
 	OModule c_sale = new OModule(Sales.class);
 	OModule d_crm_phone_call = new OModule(CRMPhoneCalls.class);

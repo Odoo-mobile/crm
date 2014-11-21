@@ -18,8 +18,13 @@
  */
 package com.odoo.util;
 
+import java.text.Normalizer;
+
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.style.BackgroundColorSpan;
 
 public class StringUtils {
 	public static String repeat(String string, int repeat) {
@@ -67,5 +72,37 @@ public class StringUtils {
 	 */
 	public static Spanned stringToHtml(String string) {
 		return Html.fromHtml(string);
+	}
+
+	public static CharSequence highlight(int color, String search,
+			String originalText) {
+		// ignore case and accents
+		// the same thing should have been done for the search text
+		String normalizedText = Normalizer
+				.normalize(originalText, Normalizer.Form.NFD)
+				.replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+				.toLowerCase();
+
+		int start = normalizedText.indexOf(search);
+		if (start < 0) {
+			// not found, nothing to to
+			return originalText;
+		} else {
+			// highlight each appearance in the original text
+			// while searching in normalized text
+			Spannable highlighted = new SpannableString(originalText);
+			while (start >= 0) {
+				int spanStart = Math.min(start, originalText.length());
+				int spanEnd = Math.min(start + search.length(),
+						originalText.length());
+
+				highlighted.setSpan(new BackgroundColorSpan(color), spanStart,
+						spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+				start = normalizedText.indexOf(search, spanEnd);
+			}
+
+			return highlighted;
+		}
 	}
 }
