@@ -32,12 +32,15 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.SearchView.OnQueryTextListener;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 
 import com.odoo.App;
+import com.odoo.BaseActivity.ToolBarMenuItemListener;
 import com.odoo.MainActivity.OnBackPressCallBack;
 import com.odoo.auth.OdooAccountManager;
+import com.odoo.crm.R;
 import com.odoo.orm.OModel;
 import com.odoo.support.AppScope;
 import com.odoo.support.OUser;
@@ -46,7 +49,7 @@ import com.odoo.support.OUser;
  * The Class BaseFragment.
  */
 public abstract class BaseFragment extends Fragment implements OModuleHelper,
-		OnBackPressCallBack {
+		OnBackPressCallBack, ToolBarMenuItemListener {
 
 	/** The scope. */
 	public AppScope scope;
@@ -122,8 +125,16 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper,
 	};
 
 	public void startFragment(Fragment fragment, Boolean addToBackState) {
+		startFragment(fragment, false, addToBackState);
+	}
+
+	public void startFragment(Fragment fragment, Boolean isDetailFragment,
+			Boolean addToBackState) {
 		FragmentListener fragmentListener = (FragmentListener) mContext;
-		fragmentListener.startMainFragment(fragment, addToBackState);
+		if (!isDetailFragment)
+			fragmentListener.startMainFragment(fragment, addToBackState);
+		else
+			fragmentListener.startDetailFragment(fragment);
 	}
 
 	public OModel db() {
@@ -359,5 +370,33 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper,
 	@Override
 	public boolean onBackPressed() {
 		return true;
+	}
+
+	/**
+	 * Tablet support methods
+	 */
+	@Override
+	public void setHasOptionsMenu(boolean hasMenu) {
+		scope = new AppScope(this);
+		if (scope.main().isTwoPane()) {
+			hasMenu = false;
+			scope.main().setSubToolBarMenuHandler(this);
+		}
+		super.setHasOptionsMenu(hasMenu);
+	}
+
+	@Override
+	public boolean onMenuItemClick(MenuItem item) {
+		return onOptionsItemSelected(item);
+	}
+
+	@Override
+	public int getMenuForTablet() {
+		return R.menu.main_menu_drawer_open;
+	}
+
+	@Override
+	public void onMenuCreated(Menu menu) {
+
 	}
 }
