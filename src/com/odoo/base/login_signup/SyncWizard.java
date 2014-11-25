@@ -206,4 +206,11 @@ public class SyncWizard extends BaseFragment {
 		actionbar().show();
 		actionbar().setTitle(_s(R.string.title_configuration));
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

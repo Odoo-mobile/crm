@@ -220,4 +220,11 @@ public class AccountsDetail extends BaseFragment implements
 		actionbar().show();
 		scope.main().lockDrawer(false);
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

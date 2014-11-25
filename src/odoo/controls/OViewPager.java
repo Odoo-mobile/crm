@@ -342,6 +342,12 @@ public class OViewPager extends ViewPager implements OViewPagerObjectListener {
 			return null;
 		}
 
+		@Override
+		public boolean onBackPressed() {
+			// TODO Auto-generated method stub
+			return false;
+		}
+
 	}
 
 	/**

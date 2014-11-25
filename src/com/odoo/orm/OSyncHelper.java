@@ -260,7 +260,6 @@ public class OSyncHelper {
 
 		} catch (Exception e) {
 			e.printStackTrace();
-
 		}
 	}
 
@@ -1009,6 +1008,7 @@ public class OSyncHelper {
 			}
 			JSONObject result = mOdoo.call_kw(model, method, args.getArray(),
 					kwargs);
+
 			if (result.has("result")) {
 				return result.get("result");
 			}
@@ -1016,6 +1016,18 @@ public class OSyncHelper {
 			e.printStackTrace();
 		}
 		return false;
+	}
+
+	public ODataRow getServerData(OModel model, ODomain domain) {
+		try {
+			JSONObject result = mOdoo.search_read(model.getModelName(),
+					getFields(model), domain.get());
+			handleResult(model, result);
+			handleRelationRecords(model);
+		} catch (Exception e) {
+
+		}
+		return null;
 	}
 
 	public ServerDataHelper dataHelper() {

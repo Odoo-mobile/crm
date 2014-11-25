@@ -69,6 +69,7 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 	private OTouchListener mTouchAttacher;
 	private boolean mTwoPane;
 	private OUser mAccount = null;
+	private OnBackPressCallBack mOnBackPressCallBack = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -197,11 +198,11 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+				OdooAccountManager.removeAllAccounts(getApplicationContext());
 				Uri packageUri = Uri.parse("package:com.openerp");
 				Intent uninstallIntent = new Intent(
 						Intent.ACTION_UNINSTALL_PACKAGE, packageUri);
 				startActivity(uninstallIntent);
-				OdooAccountManager.removeAllAccounts(getApplicationContext());
 				finish();
 			}
 		});
@@ -617,4 +618,21 @@ public class MainActivity extends BaseActivity implements FragmentListener {
 		return new BackgroundTask(taskListener);
 	}
 
+	@Override
+	public void onBackPressed() {
+		if (mOnBackPressCallBack != null) {
+			if (mOnBackPressCallBack.onBackPressed()) {
+				super.onBackPressed();
+			}
+		} else
+			super.onBackPressed();
+	}
+
+	public void setOnBackPressCallBack(OnBackPressCallBack backpress) {
+		mOnBackPressCallBack = backpress;
+	}
+
+	public interface OnBackPressCallBack {
+		public boolean onBackPressed();
+	}
 }

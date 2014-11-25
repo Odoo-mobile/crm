@@ -149,11 +149,6 @@ public class OField extends LinearLayout implements
 	public static final String KEY_WIDGET_TITLE = "widgetTitle";
 
 	/**
-	 * Parent view. Updated for new UI look for API 21+
-	 */
-	private LinearLayout mParent = null;
-
-	/**
 	 * The Enum OFieldMode.
 	 */
 	enum OFieldMode {
@@ -1293,7 +1288,7 @@ public class OField extends LinearLayout implements
 		return mFieldType;
 	}
 
-	public void setText(String text) {
+	public void setText(CharSequence text) {
 		text = (text.equals("false")) ? "" : text;
 		if (mAttributes.getBoolean(KEY_EDITABLE, false)) {
 			mFieldEditText.setText(text);
@@ -1302,8 +1297,12 @@ public class OField extends LinearLayout implements
 					null);
 			if (displayPattern != null
 					&& mColumn.getType().isAssignableFrom(ODateTime.class)) {
-				text = ODate.getDate(mContext, text, TimeZone.getDefault()
-						.getID(), displayPattern);
+				if (mColumn.getParsePattern() == null) {
+					mColumn.setParsePattern(ODate.DEFAULT_FORMAT);
+				}
+				text = ODate.getDate(mContext, text.toString(), TimeZone
+						.getDefault().getID(), mColumn.getParsePattern(),
+						displayPattern);
 			}
 			if (mColumn != null) {
 				if (mColumn.getType().isAssignableFrom(OBoolean.class)) {

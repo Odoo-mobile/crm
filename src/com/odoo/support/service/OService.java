@@ -18,9 +18,6 @@
  */
 package com.odoo.support.service;
 
-import com.odoo.auth.OdooAccountManager;
-import com.odoo.support.OUser;
-
 import android.accounts.Account;
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
@@ -30,6 +27,9 @@ import android.content.Intent;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.os.IBinder;
+
+import com.odoo.auth.OdooAccountManager;
+import com.odoo.support.OUser;
 
 public abstract class OService extends Service implements OServiceListener {
 	private SyncAdapterImpl sSyncAdapter = null;

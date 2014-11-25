@@ -558,11 +558,12 @@ public class OSearchableMany2One extends LinearLayout implements
 		@Override
 		protected Void doInBackground(Void... params) {
 			try {
-				Thread.sleep(300);
+				mModel.getSyncHelper().dataHelper()
+						.quickCreateLocalRecord(record);
+				Thread.sleep(700);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			mModel.getSyncHelper().dataHelper().quickCreateLocalRecord(record);
 			return null;
 		}
 

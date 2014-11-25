@@ -38,6 +38,7 @@ import android.widget.ArrayAdapter;
 
 import com.odoo.App;
 import com.odoo.BaseActivity.ToolBarMenuItemListener;
+import com.odoo.MainActivity.OnBackPressCallBack;
 import com.odoo.auth.OdooAccountManager;
 import com.odoo.crm.R;
 import com.odoo.orm.OModel;
@@ -48,7 +49,7 @@ import com.odoo.support.OUser;
  * The Class BaseFragment.
  */
 public abstract class BaseFragment extends Fragment implements OModuleHelper,
-		ToolBarMenuItemListener {
+		OnBackPressCallBack, ToolBarMenuItemListener {
 
 	/** The scope. */
 	public AppScope scope;
@@ -364,6 +365,11 @@ public abstract class BaseFragment extends Fragment implements OModuleHelper,
 	public ActionBar actionbar() {
 		scope = new AppScope(getActivity());
 		return scope.main().getActionbar();
+	}
+
+	@Override
+	public boolean onBackPressed() {
+		return true;
 	}
 
 	/**

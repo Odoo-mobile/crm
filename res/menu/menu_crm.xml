@@ -3,17 +3,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto" >
 
     <item
-        android:id="@+id/menu_partner_search"
-        android:icon="@drawable/ic_action_search_dark"
+        android:id="@+id/menu_search"
+        android:icon="@drawable/ic_action_search"
         android:title="@string/label_search"
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always|collapseActionView">
     </item>
     <item
-        android:id="@+id/menu_partner_create"
-        android:icon="@drawable/ic_action_content_new_dark"
-        android:title="@string/create_new"
-        app:showAsAction="always">
+        android:id="@+id/menu_crm_detail_create"
+        android:icon="@drawable/ic_action_content_new"
+        android:title="@string/label_create"
+        app:showAsAction="ifRoom|withText">
     </item>
 
 </menu>

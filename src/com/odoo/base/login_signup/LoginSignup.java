@@ -481,4 +481,10 @@ public class LoginSignup extends BaseFragment implements OnClickListener,
 		outState.putBoolean(KEY_SELF_HOSTED_URL, mSelfHosted);
 	}
 
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

@@ -1,7 +1,7 @@
 package com.odoo.orm.sql;
 
-import com.odoo.orm.OModel;
 import com.odoo.orm.OColumn.RelationType;
+import com.odoo.orm.OModel;
 
 class RelationColumnAlias {
 	private String table = null;

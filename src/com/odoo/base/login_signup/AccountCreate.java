@@ -376,4 +376,11 @@ public class AccountCreate extends BaseFragment implements OnItemClickListener {
 		super.onResume();
 //		getActivity().getActionBar().hide();
 	}
+
+	@Override
+	public boolean onBackPressed() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

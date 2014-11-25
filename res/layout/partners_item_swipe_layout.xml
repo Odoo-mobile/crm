@@ -1,0 +1,226 @@
+<HorizontalScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:background="@color/odoo_purple"
+        android:baselineAligned="true"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp" >
+
+        <!-- Opportunity -->
+
+        <LinearLayout
+            android:id="@+id/partner_opportunities"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_opportunities"
+                android:tint="#ffffff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="center"
+                android:text="Opportunities"
+                android:textAllCaps="true"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+        <!-- Leads -->
+
+        <LinearLayout
+            android:id="@+id/partner_leads"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_leads"
+                android:tint="#ffffff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="center"
+                android:text="Leads"
+                android:textAllCaps="true"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+        <!-- Location Marker -->
+
+        <LinearLayout
+            android:id="@+id/user_location"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_marker" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="center"
+                android:text="Location"
+                android:textAllCaps="true"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <!-- Call User -->
+
+        <LinearLayout
+            android:id="@+id/call_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_calls" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="center"
+                android:text="Call"
+                android:textAllCaps="true"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <!-- Mail to user -->
+
+        <LinearLayout
+            android:id="@+id/mail_to_user"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_message" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="center"
+                android:text="Send Mail"
+                android:textAllCaps="true"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <!-- Call Log -->
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_call_logs"
+                android:tint="#fff" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="center"
+                android:text="Call Log"
+                android:textAllCaps="true"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+
+        <!-- Meetings -->
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="?android:selectableItemBackground"
+            android:clickable="true"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_horizontal"
+                android:padding="5dp"
+                android:src="@drawable/ic_action_calendar" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:fontFamily="@string/font_fontFamily_light"
+                android:gravity="center"
+                android:text="Meetings"
+                android:textAllCaps="true"
+                android:textColor="#ffffff" />
+        </LinearLayout>
+    </LinearLayout>
+
+</HorizontalScrollView>

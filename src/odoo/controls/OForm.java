@@ -74,6 +74,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 
 	/** The current record. */
 	ODataRow mRecord = null;
+	ODataRow onChangeRecord = null;
 
 	/** The control attributes. */
 	OControlAttributes mAttrs = new OControlAttributes();
@@ -339,6 +340,7 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 			public void onValueChange(ODataRow row) {
 				if (!col.isOnChangeBGProcess()) {
 					ODataRow vals = mModel.getOnChangeValue(col, row);
+					onChangeRecord = vals;
 					if (vals != null) {
 						for (String key : vals.keys()) {
 							if (mFormFieldControls.containsKey(key)) {
@@ -476,6 +478,9 @@ public class OForm extends LinearLayout implements View.OnClickListener {
 				values.put("local_id", mRecord.getInt(OColumn.ROW_ID));
 				values.put("is_dirty", true);
 			}
+		}
+		if (onChangeRecord != null) {
+			values.addAll(onChangeRecord.getAll());
 		}
 		return values;
 	}

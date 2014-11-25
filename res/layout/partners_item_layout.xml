@@ -1,0 +1,94 @@
+<odoo.controls.OForm xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    odoo:model="res.partner" >
+
+    <include
+        android:id="@+id/partner_swipe_layout"
+        layout="@layout/partners_item_swipe_layout"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/partner_detail_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:paddingLeft="16dp" >
+
+        <LinearLayout
+            android:layout_width="41dp"
+            android:layout_height="41dp"
+            android:layout_gravity="center_vertical"
+            android:background="@drawable/circle_mask" >
+
+            <odoo.controls.OField
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center_vertical"
+                odoo:binaryType="round_image"
+                odoo:defaultImage="@drawable/avatar"
+                odoo:field_name="image_small"
+                odoo:imageWidthHeight="40"
+                odoo:with_label="false" >
+            </odoo.controls.OField>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingBottom="10dp"
+            android:paddingRight="16dp"
+            android:paddingTop="10dp" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
+
+                <odoo.controls.OField
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="0dp"
+                    odoo:fieldTextStyle="bold"
+                    odoo:field_color="@color/odoo_purple"
+                    odoo:field_name="name"
+                    odoo:field_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:singleLine="true"
+                    odoo:with_label="false" />
+
+                <odoo.controls.OField
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:padding="0dp"
+                    odoo:fieldTextStyle="bold"
+                    odoo:field_name="company_name"
+                    odoo:field_textAppearance="?android:attr/textAppearanceSmall"
+                    odoo:singleLine="true"
+                    odoo:with_label="false" />
+            </LinearLayout>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                odoo:field_name="email"
+                odoo:textLines="1"
+                odoo:with_label="false" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="0dp"
+                odoo:field_name="phone"
+                odoo:textLines="1"
+                odoo:with_label="false" />
+        </LinearLayout>
+    </LinearLayout>
+
+</odoo.controls.OForm>
