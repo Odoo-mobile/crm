@@ -222,6 +222,12 @@
             android:exported="false"
             android:label="Res Currency"
             android:syncable="true" />
+        <provider
+            android:name="com.odoo.addons.calendar.providers.events.CalendarEventProvider"
+            android:authorities="com.odoo.addons.calendar.providers.events"
+            android:enabled="true"
+            android:exported="false"
+            android:syncable="true" />
     </application>
 
 </manifest>
