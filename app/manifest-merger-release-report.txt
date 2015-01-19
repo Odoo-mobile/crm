@@ -1,0 +1,371 @@
+-- Merging decision tree log ---
+manifest
+ADDED from AndroidManifest.xml:2:1
+	xmlns:android
+		ADDED from AndroidManifest.xml:2:11
+	package
+		ADDED from AndroidManifest.xml:3:5
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:versionName
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:versionCode
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+uses-permission#android.permission.INTERNET
+ADDED from AndroidManifest.xml:5:5
+	android:name
+		ADDED from AndroidManifest.xml:5:22
+uses-permission#android.permission.VIBRATE
+ADDED from AndroidManifest.xml:6:5
+	android:name
+		ADDED from AndroidManifest.xml:6:22
+uses-permission#android.permission.ACCESS_WIFI_STATE
+ADDED from AndroidManifest.xml:7:5
+	android:name
+		ADDED from AndroidManifest.xml:7:22
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from AndroidManifest.xml:8:5
+	android:name
+		ADDED from AndroidManifest.xml:8:22
+uses-permission#android.permission.GET_TASKS
+ADDED from AndroidManifest.xml:9:5
+	android:name
+		ADDED from AndroidManifest.xml:9:22
+uses-permission#android.permission.AUTHENTICATE_ACCOUNTS
+ADDED from AndroidManifest.xml:10:5
+	android:name
+		ADDED from AndroidManifest.xml:10:22
+uses-permission#android.permission.GET_ACCOUNTS
+ADDED from AndroidManifest.xml:11:5
+	android:name
+		ADDED from AndroidManifest.xml:11:22
+uses-permission#android.permission.USE_CREDENTIALS
+ADDED from AndroidManifest.xml:12:5
+	android:name
+		ADDED from AndroidManifest.xml:12:22
+uses-permission#android.permission.MANAGE_ACCOUNTS
+ADDED from AndroidManifest.xml:13:5
+	android:name
+		ADDED from AndroidManifest.xml:13:22
+uses-permission#android.permission.READ_SYNC_SETTINGS
+ADDED from AndroidManifest.xml:14:5
+	android:name
+		ADDED from AndroidManifest.xml:14:22
+uses-permission#android.permission.READ_SYNC_STATS
+ADDED from AndroidManifest.xml:15:5
+	android:name
+		ADDED from AndroidManifest.xml:15:22
+uses-permission#android.permission.WRITE_SYNC_SETTINGS
+ADDED from AndroidManifest.xml:16:5
+	android:name
+		ADDED from AndroidManifest.xml:16:22
+uses-permission#android.permission.WAKE_LOCK
+ADDED from AndroidManifest.xml:17:5
+	android:name
+		ADDED from AndroidManifest.xml:17:22
+uses-permission#com.google.android.c2dm.permission.RECEIVE
+ADDED from AndroidManifest.xml:18:5
+	android:name
+		ADDED from AndroidManifest.xml:18:22
+uses-permission#android.permission.READ_PHONE_STATE
+ADDED from AndroidManifest.xml:19:5
+	android:name
+		ADDED from AndroidManifest.xml:19:22
+uses-permission#android.permission.RECORD_AUDIO
+ADDED from AndroidManifest.xml:20:5
+	android:name
+		ADDED from AndroidManifest.xml:20:22
+uses-permission#android.permission.SYSTEM_ALERT_WINDOW
+ADDED from AndroidManifest.xml:21:5
+	android:name
+		ADDED from AndroidManifest.xml:21:22
+uses-permission#android.permission.CALL_PHONE
+ADDED from AndroidManifest.xml:22:5
+	android:name
+		ADDED from AndroidManifest.xml:22:22
+uses-permission#android.permission.READ_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:23:5
+	android:name
+		ADDED from AndroidManifest.xml:23:22
+uses-permission#android.permission.WRITE_EXTERNAL_STORAGE
+ADDED from AndroidManifest.xml:24:5
+	android:name
+		ADDED from AndroidManifest.xml:24:22
+permission#com.odoo.permission.C2D_MESSAGE
+ADDED from AndroidManifest.xml:26:5
+	android:protectionLevel
+		ADDED from AndroidManifest.xml:28:9
+	android:name
+		ADDED from AndroidManifest.xml:27:9
+application
+ADDED from AndroidManifest.xml:30:5
+MERGED from com.android.support:appcompat-v7:21.0.3:16:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from com.google.android.gms:play-services:6.5.87:20:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from master-crm-studio-dpr:calendar-lib:unspecified:11:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from master-crm-studio-dpr:bottom-sheet-lib:unspecified:11:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from com.android.support:appcompat-v7:21.0.3:16:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from master-crm-studio-dpr:snackbar-lib:unspecified:11:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from master-crm-studio-dpr:parallax-effect-lib:unspecified:11:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+MERGED from com.android.support:appcompat-v7:21.0.3:16:5
+MERGED from com.android.support:support-v4:21.0.3:16:5
+	android:label
+		ADDED from AndroidManifest.xml:36:9
+	android:allowBackup
+		ADDED from AndroidManifest.xml:32:9
+	android:icon
+		ADDED from AndroidManifest.xml:33:9
+	android:theme
+		ADDED from AndroidManifest.xml:37:9
+	android:hardwareAccelerated
+		ADDED from AndroidManifest.xml:35:9
+	android:largeHeap
+		ADDED from AndroidManifest.xml:34:9
+	android:name
+		ADDED from AndroidManifest.xml:31:9
+activity#com.odoo.core.account.OdooLogin
+ADDED from AndroidManifest.xml:38:9
+	android:screenOrientation
+		ADDED from AndroidManifest.xml:40:13
+	android:name
+		ADDED from AndroidManifest.xml:39:13
+intent-filter#android.intent.action.MAIN+android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:41:13
+action#android.intent.action.MAIN
+ADDED from AndroidManifest.xml:42:17
+	android:name
+		ADDED from AndroidManifest.xml:42:25
+category#android.intent.category.LAUNCHER
+ADDED from AndroidManifest.xml:44:17
+	android:name
+		ADDED from AndroidManifest.xml:44:27
+activity#com.odoo.core.account.ManageAccounts
+ADDED from AndroidManifest.xml:48:9
+	android:name
+		ADDED from AndroidManifest.xml:48:19
+activity#com.odoo.OdooActivity
+ADDED from AndroidManifest.xml:49:9
+	android:name
+		ADDED from AndroidManifest.xml:49:19
+activity#odoo.controls.SearchableItemActivity
+ADDED from AndroidManifest.xml:50:9
+	android:name
+		ADDED from AndroidManifest.xml:50:19
+activity#com.odoo.SettingsActivity
+ADDED from AndroidManifest.xml:51:9
+	android:name
+		ADDED from AndroidManifest.xml:51:19
+activity#com.odoo.core.account.About
+ADDED from AndroidManifest.xml:52:9
+	android:name
+		ADDED from AndroidManifest.xml:52:19
+activity#com.odoo.core.account.Profile
+ADDED from AndroidManifest.xml:53:9
+	android:name
+		ADDED from AndroidManifest.xml:53:19
+service#com.odoo.core.auth.OdooAuthService
+ADDED from AndroidManifest.xml:55:9
+	android:name
+		ADDED from AndroidManifest.xml:55:18
+intent-filter#android.accounts.AccountAuthenticator
+ADDED from AndroidManifest.xml:56:13
+action#android.accounts.AccountAuthenticator
+ADDED from AndroidManifest.xml:57:17
+	android:name
+		ADDED from AndroidManifest.xml:57:25
+meta-data#android.accounts.AccountAuthenticator
+ADDED from AndroidManifest.xml:60:13
+	android:resource
+		ADDED from AndroidManifest.xml:62:17
+	android:name
+		ADDED from AndroidManifest.xml:61:17
+provider#com.odoo.core.orm.provider.BaseModelProvider
+ADDED from AndroidManifest.xml:65:9
+	android:authorities
+		ADDED from AndroidManifest.xml:66:13
+	android:name
+		ADDED from AndroidManifest.xml:67:13
+provider#com.odoo.addons.customers.providers.CustomersSyncProvider
+ADDED from AndroidManifest.xml:71:9
+	android:label
+		ADDED from AndroidManifest.xml:72:13
+	android:authorities
+		ADDED from AndroidManifest.xml:73:13
+	android:name
+		ADDED from AndroidManifest.xml:74:13
+service#com.odoo.addons.customers.services.CustomerSyncService
+ADDED from AndroidManifest.xml:75:9
+	android:process
+		ADDED from AndroidManifest.xml:78:13
+	android:exported
+		ADDED from AndroidManifest.xml:77:13
+	android:name
+		ADDED from AndroidManifest.xml:76:13
+intent-filter#android.content.SyncAdapter
+ADDED from AndroidManifest.xml:79:13
+action#android.content.SyncAdapter
+ADDED from AndroidManifest.xml:80:17
+	android:name
+		ADDED from AndroidManifest.xml:80:25
+meta-data#android.content.SyncAdapter
+ADDED from AndroidManifest.xml:82:13
+	android:resource
+		ADDED from AndroidManifest.xml:84:17
+	android:name
+		ADDED from AndroidManifest.xml:83:17
+provider#com.odoo.addons.calendar.providers.CalendarSyncProvider
+ADDED from AndroidManifest.xml:86:9
+	android:label
+		ADDED from AndroidManifest.xml:87:13
+	android:authorities
+		ADDED from AndroidManifest.xml:88:13
+	android:name
+		ADDED from AndroidManifest.xml:89:13
+service#com.odoo.addons.calendar.services.CalendarSyncService
+ADDED from AndroidManifest.xml:90:9
+	android:process
+		ADDED from AndroidManifest.xml:93:13
+	android:exported
+		ADDED from AndroidManifest.xml:92:13
+	android:name
+		ADDED from AndroidManifest.xml:91:13
+provider#com.odoo.addons.crm.providers.CRMLeadProvider
+ADDED from AndroidManifest.xml:101:9
+	android:label
+		ADDED from AndroidManifest.xml:102:13
+	android:authorities
+		ADDED from AndroidManifest.xml:103:13
+	android:name
+		ADDED from AndroidManifest.xml:104:13
+service#com.odoo.addons.crm.services.CRMLeadSyncService
+ADDED from AndroidManifest.xml:105:9
+	android:process
+		ADDED from AndroidManifest.xml:108:13
+	android:exported
+		ADDED from AndroidManifest.xml:107:13
+	android:name
+		ADDED from AndroidManifest.xml:106:13
+provider#com.odoo.addons.sale.providers.SaleOrderProvider
+ADDED from AndroidManifest.xml:116:9
+	android:label
+		ADDED from AndroidManifest.xml:117:13
+	android:authorities
+		ADDED from AndroidManifest.xml:118:13
+	android:name
+		ADDED from AndroidManifest.xml:119:13
+service#com.odoo.addons.sale.services.SaleOrderSyncService
+ADDED from AndroidManifest.xml:120:9
+	android:process
+		ADDED from AndroidManifest.xml:123:13
+	android:exported
+		ADDED from AndroidManifest.xml:122:13
+	android:name
+		ADDED from AndroidManifest.xml:121:13
+provider#com.odoo.addons.phonecall.providers.PhoneCallProvider
+ADDED from AndroidManifest.xml:131:9
+	android:label
+		ADDED from AndroidManifest.xml:132:13
+	android:authorities
+		ADDED from AndroidManifest.xml:133:13
+	android:name
+		ADDED from AndroidManifest.xml:134:13
+service#com.odoo.addons.phonecall.services.PhoneCallSyncService
+ADDED from AndroidManifest.xml:135:9
+	android:process
+		ADDED from AndroidManifest.xml:138:13
+	android:exported
+		ADDED from AndroidManifest.xml:137:13
+	android:name
+		ADDED from AndroidManifest.xml:136:13
+activity#com.odoo.addons.calendar.EventDetail
+ADDED from AndroidManifest.xml:147:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:149:13
+	android:name
+		ADDED from AndroidManifest.xml:148:13
+activity#com.odoo.addons.customers.CustomerDetails
+ADDED from AndroidManifest.xml:150:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:152:13
+	android:name
+		ADDED from AndroidManifest.xml:151:13
+activity#com.odoo.addons.crm.CRMDetail
+ADDED from AndroidManifest.xml:153:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:155:13
+	android:name
+		ADDED from AndroidManifest.xml:154:13
+activity#com.odoo.addons.phonecall.PhoneCallDetail
+ADDED from AndroidManifest.xml:156:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:158:13
+	android:name
+		ADDED from AndroidManifest.xml:157:13
+activity#com.odoo.addons.sale.SalesDetail
+ADDED from AndroidManifest.xml:159:9
+	android:windowSoftInputMode
+		ADDED from AndroidManifest.xml:161:13
+	android:name
+		ADDED from AndroidManifest.xml:160:13
+receiver#com.odoo.core.utils.reminder.ReminderReceiver
+ADDED from AndroidManifest.xml:164:9
+	android:name
+		ADDED from AndroidManifest.xml:164:19
+receiver#com.odoo.core.utils.reminder.ReminderActionReceiver
+ADDED from AndroidManifest.xml:165:9
+	android:name
+		ADDED from AndroidManifest.xml:165:19
+receiver#com.odoo.addons.phonecall.features.receivers.PhoneStateReceiver
+ADDED from AndroidManifest.xml:167:9
+	android:name
+		ADDED from AndroidManifest.xml:167:19
+intent-filter#android.intent.action.PHONE_STATE
+ADDED from AndroidManifest.xml:168:13
+action#android.intent.action.PHONE_STATE
+ADDED from AndroidManifest.xml:169:17
+	android:name
+		ADDED from AndroidManifest.xml:169:25
+intent-filter#android.intent.action.NEW_OUTGOING_CALL
+ADDED from AndroidManifest.xml:171:13
+action#android.intent.action.NEW_OUTGOING_CALL
+ADDED from AndroidManifest.xml:172:17
+	android:name
+		ADDED from AndroidManifest.xml:172:25
+uses-sdk
+INJECTED from AndroidManifest.xml:0:0 reason: use-sdk injection requested
+MERGED from com.android.support:appcompat-v7:21.0.3:15:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from com.google.android.gms:play-services:6.5.87:18:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from master-crm-studio-dpr:calendar-lib:unspecified:7:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from master-crm-studio-dpr:bottom-sheet-lib:unspecified:7:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from com.android.support:appcompat-v7:21.0.3:15:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from master-crm-studio-dpr:snackbar-lib:unspecified:7:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from master-crm-studio-dpr:parallax-effect-lib:unspecified:7:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+MERGED from com.android.support:appcompat-v7:21.0.3:15:5
+MERGED from com.android.support:support-v4:21.0.3:15:5
+	android:targetSdkVersion
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+	android:minSdkVersion
+		INJECTED from AndroidManifest.xml:0:0
+		INJECTED from AndroidManifest.xml:0:0
+meta-data#com.google.android.gms.version
+ADDED from com.google.android.gms:play-services:6.5.87:21:9
+	android:name
+		ADDED from com.google.android.gms:play-services:6.5.87:22:13
+	android:value
+		ADDED from com.google.android.gms:play-services:6.5.87:23:13

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- From: file:/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/parallax-effect-lib/src/main/res/values-land/dimens.xml -->
+    <eat-comment/>
+    <dimen name="actionFontSize">14sp</dimen>
+</resources>

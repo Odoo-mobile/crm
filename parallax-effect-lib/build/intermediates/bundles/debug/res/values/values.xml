@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ParallaxScroll"><attr format="float" name="parallax_factor"/><attr format="float" name="alpha_factor"/><attr format="float" name="inner_parallax_factor"/><attr format="integer" name="parallax_views_num"/><attr format="boolean" name="circular_parallax"/><attr format="color|reference" name="parallax_overlay_color"/><attr format="dimension" name="parallax_actionbar_height"/><attr format="dimension" name="parallax_actionbar_title_font_size"/></declare-styleable>
+    <!-- From: file:/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/parallax-effect-lib/src/main/res/values/dimens.xml -->
+    <eat-comment/>
+    <dimen name="actionBarSize">56dp</dimen>
+    <dimen name="actionFontSize">20sp</dimen>
+</resources>

@@ -1,0 +1,7 @@
+<resources>
+
+    <string name="app_name">OdooSnackBarLib</string>
+    <string name="undo">Undo</string>
+    <string name="action">Action</string>
+
+</resources>

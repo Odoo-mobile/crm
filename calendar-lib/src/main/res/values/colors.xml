@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="day_name">#aaaaaa</color>
+    <color name="day_date">#414141</color>
+    <color name="day_name_selected">#88009688</color>
+    <color name="day_date_selected">#88009688</color>
+    <color name="day_indicator_selected">#88009688</color>
+    <color name="date_focused">#009688</color>
+
+</resources>

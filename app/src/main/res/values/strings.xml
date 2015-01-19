@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CRM</string>
+    <string name="label_today">Today</string>
+    <!-- Sync Labels//-->
+    <string name="sync_label_customers">Customers</string>
+    <string name="sync_label_calendar">Calendar</string>
+    <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
+    <string name="sync_label_quotation_sales_orders">Quotations/Sales Orders</string>
+    <string name="sync_label_phonecalls">Logged Calls</string>
+
+    <string name="no_notification">No Notification</string>
+    <string name="at_the_time_of_event">At the time of event</string>
+    <string name="on_the_day_at">On the day at %s</string>
+    <string name="day_before_at">The day before at %s</string>
+    <string name="minutes_before">%s minutes before</string>
+    <string name="custom">Custom...</string>
+
+    <string name="error_end_date_small_than_start_date">End date cannot be set before start date.</string>
+
+    <string name="label_leads">Leads</string>
+    <string name="label_lead">Lead</string>
+    <string name="label_opportunities">Opportunities</string>
+    <string name="label_quotation">Quotations</string>
+    <string name="label_opportunity">Opportunity</string>
+    <string name="label_sale_orders">Sales Orders</string>
+    <string name="label_phone_calls">Phone calls</string>
+    <string name="label_logged_calls">Logged calls</string>
+    <string name="label_convert_to_opportunity">Convert to Opportunity</string>
+    <string name="label_convert_to_quotation">Convert to Quotation</string>
+    <string name="label_location">Location</string>
+    <string name="label_call">Call</string>
+    <string name="label_message">Message</string>
+    <string name="label_schedule_call">Schedule Call</string>
+    <string name="label_meetings">Meeting</string>
+</resources>
