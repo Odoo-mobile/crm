@@ -46,6 +46,7 @@ import java.util.List;
 
 import odoo.ODomain;
 import odoo.Odoo;
+import odoo.OdooInstance;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
@@ -244,9 +245,18 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
     public static Odoo createOdooInstance(Context context, OUser user) {
         try {
-            Odoo odoo = new Odoo(context, user.isOAauthLogin() ? user.getInstanceUrl() : user.getHost()
-                    , user.isAllowSelfSignedSSL());
-            odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+            Odoo odoo;
+            if (user.isOAauthLogin()) {
+                odoo = new Odoo(context, user.getInstanceUrl(), user.isAllowSelfSignedSSL());
+                OdooInstance instance = new OdooInstance();
+                instance.setInstanceUrl(user.getInstanceUrl());
+                instance.setDatabaseName(user.getInstanceDatabase());
+                instance.setClientId(user.getClientId());
+                odoo.oauth_authenticate(instance, user.getUsername(), user.getPassword());
+            } else {
+                odoo = new Odoo(context, user.getHost(), user.isAllowSelfSignedSSL());
+                odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+            }
             return odoo;
         } catch (Exception e) {
             e.printStackTrace();

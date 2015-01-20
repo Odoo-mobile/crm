@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -42,7 +43,6 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
-import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
@@ -54,8 +54,11 @@ import com.odoo.crm.R;
 import java.util.ArrayList;
 import java.util.List;
 
-public class PhoneCalls extends BaseFragment implements IOnItemClickListener,
-        OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener, View.OnClickListener, ISyncStatusObserverListener {
+
+public class PhoneCalls extends BaseFragment implements
+        OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>,
+        SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener,
+        View.OnClickListener, ISyncStatusObserverListener, AdapterView.OnItemClickListener {
     public static final String TAG = PhoneCalls.class.getSimpleName();
 
     private View mView;
@@ -82,8 +85,8 @@ public class PhoneCalls extends BaseFragment implements IOnItemClickListener,
         mList = (ListView) mView.findViewById(R.id.listview);
         mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.phonecall_item);
         mAdapter.setOnViewBindListener(this);
-        mAdapter.handleItemClickListener(mList, this);
         mList.setAdapter(mAdapter);
+        mList.setOnItemClickListener(this);
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
         setHasSyncStatusObserver(TAG, this, db());
         getLoaderManager().initLoader(0, null, this);
@@ -189,17 +192,6 @@ public class PhoneCalls extends BaseFragment implements IOnItemClickListener,
         return CRMPhoneCalls.class;
     }
 
-    @Override
-    public void onItemDoubleClick(View view, int position) {
-        ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
-        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, row.getPrimaryBundleData());
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        // TODO
-    }
-
 
     @Override
     public void onRefresh() {
@@ -246,5 +238,11 @@ public class PhoneCalls extends BaseFragment implements IOnItemClickListener,
     @Override
     public void onStatusChange(Boolean refreshing) {
         getLoaderManager().restartLoader(0, null, this);
+    }
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
+        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, row.getPrimaryBundleData());
     }
 }

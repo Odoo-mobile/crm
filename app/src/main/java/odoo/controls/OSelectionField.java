@@ -362,7 +362,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                         row = new ODataRow();
                     }
                 } else {
-                    if (!(value instanceof Boolean) && value != null) {
+                    if (!(value instanceof Boolean) && value != null && !value.toString().equals("false")) {
                         int row_id = (Integer) value;
                         row = getRecordData(row_id);
                     } else {

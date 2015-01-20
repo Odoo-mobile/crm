@@ -25,7 +25,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
@@ -266,15 +265,7 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
                     } else {
                         final int row_id = resPartner.insert(values);
                         if (row_id != OModel.INVALID_ROW_ID) {
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    extras = new Bundle();
-                                    extras.putInt(OColumn.ROW_ID, row_id);
-                                    mEditMode = false;
-                                    setupActionBar();
-                                }
-                            }, 300);
+                            finish();
                         }
                     }
                     Toast.makeText(this, "Information Saved", Toast.LENGTH_LONG).show();

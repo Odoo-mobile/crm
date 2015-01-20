@@ -111,7 +111,7 @@ public class BaseModelProvider extends ContentProvider {
 
     private String[] removeRelationColumns(String[] projection) {
         HashSet<String> columns = new HashSet<>();
-        if (projection != null && projection.length > 0) {
+        if (projection != null && projection.length > 0 && mModel != null) {
             for (String key : projection) {
                 OColumn column = mModel.getColumn(key);
                 if (column != null && column.getRelationType() == null) {

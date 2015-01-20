@@ -29,6 +29,7 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
@@ -45,12 +46,12 @@ public class CRMPhoneCalls extends OModel {
     public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.crm_phonecall";
 
     OColumn user_id = new OColumn("Responsible", ResUsers.class,
-            OColumn.RelationType.ManyToOne);
+            OColumn.RelationType.ManyToOne).setRequired();
     OColumn partner_id = new OColumn("Contact", ResPartner.class,
-            OColumn.RelationType.ManyToOne);
+            OColumn.RelationType.ManyToOne).setRequired();
     OColumn description = new OColumn("Description", OText.class);
     OColumn state = new OColumn("status", OVarchar.class);
-    OColumn name = new OColumn("Call summary", OVarchar.class);
+    OColumn name = new OColumn("Call summary", OVarchar.class).setRequired();
     OColumn duration = new OColumn("Duration", OFloat.class);
     OColumn categ_id = new OColumn("Category", CRMPhoneCallsCategory.class,
             OColumn.RelationType.ManyToOne);
@@ -76,6 +77,10 @@ public class CRMPhoneCalls extends OModel {
     @Odoo.Functional(depends = {"categ_id"}, store = true, method = "storeCallType")
     OColumn call_type = new OColumn("Call Type", OVarchar.class).setSize(100)
             .setLocalColumn();
+    OColumn has_reminder = new OColumn("Has reminder", OBoolean.class).setLocalColumn()
+            .setDefaultValue("false");
+    OColumn reminder_datetime = new OColumn("Reminder type", ODateTime.class)
+            .setDefaultValue("false").setLocalColumn();
 
 
     public CRMPhoneCalls(Context context, OUser user) {

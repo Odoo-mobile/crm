@@ -33,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,7 +44,6 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
-import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
@@ -58,7 +58,7 @@ import java.util.List;
 public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindListener,
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
-        IOnSearchViewChangeListener, IOnItemClickListener, View.OnClickListener {
+        IOnSearchViewChangeListener, View.OnClickListener, AdapterView.OnItemClickListener {
     public static final String TAG = CRM.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
     private Type mType = Type.Leads;
@@ -67,6 +67,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     private OCursorListAdapter mAdapter;
 
     private String mFilter = null;
+
 
     public enum Type {
         Leads, Opportunities
@@ -95,7 +96,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
-        mAdapter.handleItemClickListener(mList, this);
+        mList.setOnItemClickListener(this);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -206,17 +207,6 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     }
 
     @Override
-    public void onItemDoubleClick(View view, int position) {
-        ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
-        IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        // TODO
-    }
-
-    @Override
     public List<ODrawerItem> drawerMenus(Context context) {
         List<ODrawerItem> menu = new ArrayList<>();
         menu.add(new ODrawerItem(TAG)
@@ -280,4 +270,9 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         // Nothing to do
     }
 
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
+        IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
+    }
 }

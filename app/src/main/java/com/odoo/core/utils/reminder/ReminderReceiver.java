@@ -26,6 +26,7 @@ import android.os.Bundle;
 
 import com.odoo.addons.calendar.EventDetail;
 import com.odoo.addons.calendar.models.CalendarEvent;
+import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.notification.ONotificationBuilder;
@@ -41,26 +42,39 @@ public class ReminderReceiver extends BroadcastReceiver {
     }
 
     private void showNotification(Context context, String type, Bundle data) {
+        ODataRow record = null;
         if (type.equals("event")) {
             CalendarEvent event = new CalendarEvent(context, null);
             int row_id = data.getInt(OColumn.ROW_ID);
-            ODataRow record = event.browse(new String[]{"name", "description", "location"}, row_id);
+            record = event.browse(new String[]{"name", "description", "location"}, row_id);
             if (record != null) {
                 if (record.getString("description").equals("false")) {
                     record.put("description", record.getString("name"));
                 }
-                ONotificationBuilder builder = new ONotificationBuilder(context, 0);
-                builder.setAutoCancel(true);
-                builder.setIcon(R.drawable.ic_action_event);
-                builder.setTitle(record.getString("name"));
-                builder.setText(record.getString("description"));
-                builder.setBigText(record.getString("description"));
-
-                Intent resultIntent = new Intent(context, EventDetail.class);
-                resultIntent.putExtras(data);
-                builder.setResultIntent(resultIntent);
-                builder.build().show();
             }
+        }
+        if (type.equals("phonecall")) {
+            CRMPhoneCalls phoneCalls = new CRMPhoneCalls(context, null);
+            int row_id = data.getInt(OColumn.ROW_ID);
+            record = phoneCalls.browse(new String[]{"name", "description"}, row_id);
+            if (record != null) {
+                if (record.getString("description").equals("false")) {
+                    record.put("description", record.getString("name"));
+                }
+            }
+        }
+        if (record != null) {
+            ONotificationBuilder builder = new ONotificationBuilder(context, 0);
+            builder.setAutoCancel(true);
+            builder.setIcon(R.drawable.ic_action_event);
+            builder.setTitle(record.getString("name"));
+            builder.setText(record.getString("description"));
+            builder.setBigText(record.getString("description"));
+
+            Intent resultIntent = new Intent(context, EventDetail.class);
+            resultIntent.putExtras(data);
+            builder.setResultIntent(resultIntent);
+            builder.build().show();
         }
     }
 

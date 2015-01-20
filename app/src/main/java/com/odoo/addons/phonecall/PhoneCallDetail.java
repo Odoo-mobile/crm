@@ -22,17 +22,26 @@ package com.odoo.addons.phonecall;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Menu;
 import android.view.MenuItem;
 
+import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.features.receivers.PhoneStateReceiver;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.addons.phonecall.models.CRMPhoneCallsCategory;
+import com.odoo.base.addons.res.ResPartner;
+import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
+import com.odoo.core.utils.reminder.ReminderUtils;
 import com.odoo.crm.R;
+
+import java.util.Date;
 
 import odoo.controls.OForm;
 
@@ -46,6 +55,7 @@ public class PhoneCallDetail extends ActionBarActivity {
     private OForm mForm;
     private ODataRow record;
     private CRMPhoneCalls crmPhoneCalls;
+    private Menu mMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +87,6 @@ public class PhoneCallDetail extends ActionBarActivity {
                         finish();
                     }
                 }
-
                 ODataRow record = new ODataRow();
                 record.put("partner_id", extra.getInt(OColumn.ROW_ID));
                 record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
@@ -97,10 +106,78 @@ public class PhoneCallDetail extends ActionBarActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_phonecall_detail, menu);
+        mMenu = menu;
+        if (extra == null) {
+            mMenu.findItem(R.id.menu_phonecall_edit).setVisible(false);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
+        } else {
+            if (extra.containsKey(KEY_LOG_CALL_REQUEST)) {
+                mMenu.findItem(R.id.menu_phonecall_edit).setVisible(false);
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
+            } else {
+                mMenu.findItem(R.id.menu_phonecall_save).setVisible(false);
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
+            }
+        }
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                if (extra != null && mForm.getEditable()) {
+                    mForm.setEditable(false);
+                    mMenu.findItem(R.id.menu_phonecall_edit).setVisible(true);
+                    mMenu.findItem(R.id.menu_phonecall_save).setVisible(false);
+                    actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
+                } else
+                    finish();
+                break;
+            case R.id.menu_phonecall_edit:
+                mMenu.findItem(R.id.menu_phonecall_edit).setVisible(false);
+                mMenu.findItem(R.id.menu_phonecall_save).setVisible(true);
+                mForm.setEditable(true);
+                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
+                break;
+            case R.id.menu_phonecall_save:
+                OValues values = mForm.getValues();
+                if (values != null) {
+                    values.put("user_id", ResUsers.myId(this));
+                    ResPartner partner = new ResPartner(this, null);
+                    ODataRow row = partner.browse(values.getInt("partner_id"));
+                    values.put("customer_name", row.getString("name"));
+                    CRMLead crmLead = new CRMLead(this, null);
+                    ODataRow lead = crmLead.browse(values.getInt("opportunity_id"));
+                    values.put("lead_name", "false");
+                    if (lead != null) {
+                        values.put("lead_name", lead.getString("name"));
+                    }
+                    values.put("call_type", "false");
+                    CRMPhoneCallsCategory category = new CRMPhoneCallsCategory(this, null);
+                    ODataRow categ_id = category.browse(values.getInt("categ_id"));
+                    if (categ_id != null) {
+                        values.put("call_type", categ_id.getString("name"));
+                    }
+                    values.put("state", "pending");
+
+                    Date date = ODateUtils.createDateObject(values.getString("date"),
+                            ODateUtils.DEFAULT_FORMAT, false);
+                    Date now = new Date();
+                    if (now.compareTo(date) < 0) {
+                        values.put("has_reminder", "true");
+                        Bundle extra = row.getPrimaryBundleData();
+                        extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
+                        ReminderUtils.get(getApplicationContext()).setReminder(date, extra);
+                    }
+                    if (extra == null)
+                        crmPhoneCalls.insert(values);
+                    else
+                        crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
+                    finish();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
