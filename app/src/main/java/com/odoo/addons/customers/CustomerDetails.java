@@ -320,7 +320,7 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
             String image = null;
             try {
                 Thread.sleep(300);
-                Odoo odoo = app.getOdoo();
+                Odoo odoo = app.getOdoo(resPartner.getUser());
                 ODomain domain = new ODomain();
                 domain.add("id", "=", params[0]);
                 JSONObject result = odoo.search_read(resPartner.getModelName(),

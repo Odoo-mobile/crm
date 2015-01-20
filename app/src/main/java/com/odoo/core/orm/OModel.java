@@ -73,6 +73,7 @@ public class OModel extends OSQLite {
     private List<OColumn> mFunctionalColumns = new ArrayList<>();
     private HashMap<String, Field> mDeclaredFields = new HashMap<>();
     private OdooVersion mOdooVersion = null;
+    private static OModelRegistry modelRegistry = new OModelRegistry();
 
     // Relation record command
     public enum Command {
@@ -400,16 +401,22 @@ public class OModel extends OSQLite {
     }
 
     public static OModel get(Context context, String model_name, String username) {
-        OModel model = null;
-        try {
-            OPreferenceManager pfManager = new OPreferenceManager(context);
-            Class<?> model_class = Class.forName(pfManager.getString(
-                    model_name, null));
-            if (model_class != null)
-                model = new OModel(context, model_name, OdooAccountManager.getDetails(context, username))
-                        .createInstance(model_class);
-        } catch (Exception e) {
-            e.printStackTrace();
+        OModel model = modelRegistry.getModel(model_name, username);
+        if (model == null) {
+            try {
+                OPreferenceManager pfManager = new OPreferenceManager(context);
+                Class<?> model_class = Class.forName(pfManager.getString(
+                        model_name, null));
+                if (model_class != null) {
+                    model = new OModel(context, model_name, OdooAccountManager.getDetails(context, username))
+                            .createInstance(model_class);
+                    if (model != null) {
+                        modelRegistry.register(model);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return model;
     }
@@ -873,14 +880,14 @@ public class OModel extends OSQLite {
                         break;
                     case Replace:
                         // Removing old entries
-                        String where = base_column + " = ? ";
-                        String[] args = new String[]{row_id + ""};
                         db.delete(table, base_column + " = ?", new String[]{row_id + ""});
                         // Creating new entries
                         storeManyToManyRecord(column_name, row_id, relationIds, Command.Add);
                         break;
                 }
             } finally {
+                db.close();
+                rel_model.close();
             }
         } else {
             throw new InvalidObjectException("Column [" + column_name + "] not found in " + getModelName() + " model.");
@@ -912,12 +919,14 @@ public class OModel extends OSQLite {
                 cr.close();
             }
         }
-        return rel_model.select(projection, OColumn.ROW_ID + " IN (" + StringUtils.repeat(" ?, ", ids.size() - 1) + " ?)",
+        List<ODataRow> data = rel_model.select(projection, OColumn.ROW_ID + " IN (" + StringUtils.repeat(" ?, ", ids.size() - 1) + " ?)",
                 ids.toArray(new String[ids.size()]));
+        rel_model.close();
+        return data;
     }
 
     public ServerDataHelper getServerDataHelper() {
-        return new ServerDataHelper(mContext, this);
+        return new ServerDataHelper(mContext, this, getUser());
     }
 
     public ODataRow quickCreateRecord(ODataRow record) {

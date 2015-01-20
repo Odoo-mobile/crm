@@ -210,6 +210,7 @@ public class OSyncDataUtils {
                                     } else {
                                         m2oRowId = m2o_model.selectRowId(m2oData.getInt(0));
                                     }
+
                                     values.put(name, m2oRowId);
                                     if (mCreateRelationRecords) {
                                         // Add id to sync if model contains more than (id,name) columns
@@ -223,6 +224,7 @@ public class OSyncDataUtils {
                                                     column.getRelationType(), m2oIds);
                                         }
                                     }
+                                    m2o_model.close();
                                     break;
                                 case ManyToMany:
                                     OModel m2mModel = mModel.createInstance(column.getType());
@@ -252,6 +254,7 @@ public class OSyncDataUtils {
                                         // (generated _id for each of server ids)
                                         values.put(name, m2mRowIds);
                                     }
+                                    m2mModel.close();
                                     break;
                                 case OneToMany:
                                     if (mCreateRelationRecords) {
@@ -262,6 +265,7 @@ public class OSyncDataUtils {
                                                 column.getRelationType(),
                                                 (column.getRecordSyncLimit() > 0) ?
                                                         o2mIds.subList(0, column.getRecordSyncLimit()) : o2mIds);
+                                        o2mModel.close();
                                     }
                                     break;
                             }
@@ -301,6 +305,7 @@ public class OSyncDataUtils {
                     value.put("_is_dirty", "false");
                     value.put("_write_date", ODateUtils.getUTCDate());
                     model.update(record.getInt(OColumn.ROW_ID), value);
+                    model.close();
                 }
             }
             Log.i(TAG, counter + " records updated on server");
@@ -328,6 +333,13 @@ public class OSyncDataUtils {
         if (mCreateRelationRecords)
             return relationRecordsHashMap;
         return new HashMap<>();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        if (mModel != null)
+            mModel.close();
     }
 
     public static class SyncRelationRecords {

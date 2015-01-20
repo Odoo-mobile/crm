@@ -27,9 +27,9 @@ import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
-import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 
+import java.util.HashMap;
 import java.util.List;
 
 import odoo.Odoo;
@@ -37,21 +37,23 @@ import odoo.Odoo;
 public class App extends Application {
 
     public static final String TAG = App.class.getSimpleName();
-    private static Odoo mOdoo = null;
+    private static HashMap<String, Odoo> mOdooInstances = new HashMap<>();
 
     @Override
     public void onCreate() {
         super.onCreate();
     }
 
-    public Odoo getOdoo() {
-        if (mOdoo == null) {
-            OUser user = OUser.current(this);
-            if (user != null) {
-                mOdoo = OSyncAdapter.createOdooInstance(this, user);
-            }
+    public Odoo getOdoo(OUser user) {
+        if (mOdooInstances.containsKey(user.getAndroidName())) {
+            return mOdooInstances.get(user.getAndroidName());
         }
-        return mOdoo;
+        return null;
+    }
+
+    public void setOdoo(Odoo odoo, OUser user) {
+        if (user != null)
+            mOdooInstances.put(user.getAndroidName(), odoo);
     }
 
     /**
@@ -101,9 +103,5 @@ public class App extends Application {
             meOnTop = true;
         }
         return meOnTop;
-    }
-
-    public void setOdoo(Odoo odoo) {
-        mOdoo = odoo;
     }
 }

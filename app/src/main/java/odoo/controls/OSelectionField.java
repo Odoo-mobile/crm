@@ -123,7 +123,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             rdoBtn.setLayoutParams(params);
             rdoBtn.setText(label.getString("name"));
             if (textSize > -1) {
-                rdoBtn.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                rdoBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
             if (appearance > -1) {
                 rdoBtn.setTextAppearance(mContext, appearance);
@@ -164,7 +164,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                             }
                         });
                         if (textSize > -1) {
-                            txvView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                            txvView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
                         }
                         if (appearance > -1) {
                             txvView.setTextAppearance(mContext, appearance);
@@ -207,7 +207,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                             }
                         });
                         if (textSize > -1) {
-                            txvView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                            txvView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
                         }
                         if (appearance > -1) {
                             txvView.setTextAppearance(mContext, appearance);
@@ -232,7 +232,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             setOnClickListener(null);
             txvView = new TextView(mContext);
             if (textSize > -1) {
-                txvView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                txvView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
             if (appearance > -1) {
                 txvView.setTextAppearance(mContext, appearance);
@@ -279,7 +279,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     @Override
     public void setValue(Object value) {
         mValue = value;
-        if (mValue == null) {
+        if (mValue == null || mValue.toString().equals("false")) {
             mValue = -1;
         }
         ODataRow row = new ODataRow();
@@ -293,11 +293,11 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                             row = items.get(getPos());
                         } else {
                             Integer row_id = null;
-                            if (value instanceof OM2ORecord) {
-                                row = ((OM2ORecord) value).browse();
+                            if (mValue instanceof OM2ORecord) {
+                                row = ((OM2ORecord) mValue).browse();
                                 row_id = row.getInt(OColumn.ROW_ID);
                             } else
-                                row_id = (Integer) value;
+                                row_id = (Integer) mValue;
                             int index = 0;
                             for (int i = 0; i < items.size(); i++) {
                                 if (items.get(i).getInt(OColumn.ROW_ID) == row_id) {
@@ -316,10 +316,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                         if (mResourceArray != -1) {
                             row = items.get(getPos());
                         } else {
-                            if (value instanceof OM2ORecord)
-                                row = ((OM2ORecord) value).browse();
-                            else if (value instanceof Integer)
-                                row = getRecordData((Integer) value);
+                            if (mValue instanceof OM2ORecord)
+                                row = ((OM2ORecord) mValue).browse();
+                            else if (mValue instanceof Integer)
+                                row = getRecordData((Integer) mValue);
                         }
                         txvView.setText(row.getString("name"));
                         if (txvView.getTag() != null) {
@@ -336,11 +336,11 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                     row = items.get(getPos());
                 } else {
                     Integer row_id = null;
-                    if (value instanceof OM2ORecord) {
-                        row = ((OM2ORecord) value).browse();
+                    if (mValue instanceof OM2ORecord) {
+                        row = ((OM2ORecord) mValue).browse();
                         row_id = row.getInt(OColumn.ROW_ID);
-                    } else if (value instanceof Integer)
-                        row_id = (Integer) value;
+                    } else if (mValue instanceof Integer)
+                        row_id = (Integer) mValue;
                     int index = 0;
                     for (int i = 0; i < items.size(); i++) {
                         if (items.get(i).getInt(OColumn.ROW_ID) == row_id) {
@@ -356,14 +356,14 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (mResourceArray != -1) {
                 row = items.get(getPos());
             } else {
-                if (value instanceof OM2ORecord) {
-                    row = ((OM2ORecord) value).browse();
+                if (mValue instanceof OM2ORecord) {
+                    row = ((OM2ORecord) mValue).browse();
                     if (row == null) {
                         row = new ODataRow();
                     }
                 } else {
-                    if (!(value instanceof Boolean) && value != null && !value.toString().equals("false")) {
-                        int row_id = (Integer) value;
+                    if (!(mValue instanceof Boolean) && mValue != null && !mValue.toString().equals("false")) {
+                        int row_id = (Integer) mValue;
                         row = getRecordData(row_id);
                     } else {
                         row = new ODataRow();
@@ -374,7 +374,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (!row.getString("name").equals("false"))
                 txvView.setText(row.getString("name"));
         }
-        if (mValueUpdateListener != null) {
+        if (mValueUpdateListener != null && mValue != -1) {
             mValueUpdateListener.onValueUpdate(row);
         }
     }

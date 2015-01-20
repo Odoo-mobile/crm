@@ -23,6 +23,7 @@ import android.content.Context;
 
 import com.odoo.App;
 import com.odoo.core.service.OSyncAdapter;
+import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.JSONUtils;
 
@@ -42,11 +43,13 @@ public class ServerDataHelper {
     private Odoo mOdoo;
     private App mApp;
 
-    public ServerDataHelper(Context context, OModel model) {
+    public ServerDataHelper(Context context, OModel model, OUser user) {
         mContext = context;
         mModel = model;
-        mOdoo = OSyncAdapter.createOdooInstance(mContext, model.getUser());
         mApp = (App) mContext.getApplicationContext();
+        mOdoo = mApp.getOdoo(user);
+        if (mOdoo == null)
+            mOdoo = OSyncAdapter.createOdooInstance(mContext, model.getUser());
     }
 
     public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int limit) {

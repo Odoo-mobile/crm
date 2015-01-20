@@ -75,12 +75,12 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     private Boolean useTemplate = true;
     private Integer defaultImage = -1;
     // Appearance
-    int textColor = Color.BLACK;
-    int labelColor = Color.DKGRAY;
-    int textAppearance = -1;
-    int labelAppearance = -1;
-    float textSize = -1;
-    float labelSize = -1;
+    private int textColor = Color.BLACK;
+    private int labelColor = Color.DKGRAY;
+    private int textAppearance = -1;
+    private int labelAppearance = -1;
+    private float textSize = -1;
+    private float labelSize = -1;
     private IOnFieldValueChangeListener mValueUpdateListener = null;
 
     public enum WidgetType {
@@ -332,9 +332,9 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             if (type_class.isAssignableFrom(OText.class)) {
                 return FieldType.Text;
             }
-            // TODO: WebView
+            // FIXME: WebView type
             if (type_class.isAssignableFrom(OHtml.class)) {
-                return null;
+                return FieldType.Text;
             }
             // ManyToOne
             if (mColumn.getRelationType() != null
@@ -454,7 +454,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
                 LayoutParams.WRAP_CONTENT);
         TextView label = new TextView(mContext);
         if (labelSize > -1) {
-            label.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize);
+            label.setTextSize(TypedValue.COMPLEX_UNIT_PX, labelSize);
         }
         if (labelAppearance > -1) {
             label.setTextAppearance(mContext, labelAppearance);

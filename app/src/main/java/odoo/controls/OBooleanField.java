@@ -104,7 +104,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
                         if (mLabel != null)
                             mSwitch.setText(mLabel);
                         if (textSize > -1) {
-                            mSwitch.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                            mSwitch.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
                         }
                         if (appearance > -1) {
                             mSwitch.setTextAppearance(mContext, appearance);
@@ -122,7 +122,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
                 if (mLabel != null)
                     mCheckbox.setText(mLabel);
                 if (textSize > -1) {
-                    mCheckbox.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                    mCheckbox.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
                 }
                 if (appearance > -1) {
                     mCheckbox.setTextAppearance(mContext, appearance);
@@ -137,7 +137,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
             if (mLabel != null)
                 txvView.setText(mLabel);
             if (textSize > -1) {
-                txvView.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+                txvView.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
             if (appearance > -1) {
                 txvView.setTextAppearance(mContext, appearance);
@@ -195,7 +195,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
 
     @Override
     public void setError(String error) {
-        if(error!=null)
+        if (error != null)
             Toast.makeText(mContext, error, Toast.LENGTH_LONG).show();
     }
 

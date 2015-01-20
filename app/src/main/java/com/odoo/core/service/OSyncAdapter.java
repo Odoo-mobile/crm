@@ -27,6 +27,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -207,6 +208,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         contentProviderClient, syncResult);
             }
         }
+        model.close();
     }
 
 
@@ -217,6 +219,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             OSyncDataUtils.SyncRelationRecords record = relationRecords.get(key);
             OModel model = record.getBaseModel();
             OModel rel_model = model.createInstance(record.getRelationModel());
+            model.close();
             ODomain domain = new ODomain();
             domain.add("id", "in", record.getUniqueIds());
             syncData(rel_model, user, domain, result, false, false);
@@ -240,22 +243,27 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     // Nothing to do. Already added relation records links
                     break;
             }
+            rel_model.close();
         }
     }
 
     public static Odoo createOdooInstance(Context context, OUser user) {
         try {
-            Odoo odoo;
-            if (user.isOAauthLogin()) {
-                odoo = new Odoo(context, user.getInstanceUrl(), user.isAllowSelfSignedSSL());
-                OdooInstance instance = new OdooInstance();
-                instance.setInstanceUrl(user.getInstanceUrl());
-                instance.setDatabaseName(user.getInstanceDatabase());
-                instance.setClientId(user.getClientId());
-                odoo.oauth_authenticate(instance, user.getUsername(), user.getPassword());
-            } else {
-                odoo = new Odoo(context, user.getHost(), user.isAllowSelfSignedSSL());
-                odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+            App app = (App) context.getApplicationContext();
+            Odoo odoo = app.getOdoo(user);
+            if (odoo == null) {
+                if (user.isOAauthLogin()) {
+                    odoo = new Odoo(context, user.getInstanceUrl(), user.isAllowSelfSignedSSL());
+                    OdooInstance instance = new OdooInstance();
+                    instance.setInstanceUrl(user.getInstanceUrl());
+                    instance.setDatabaseName(user.getInstanceDatabase());
+                    instance.setClientId(user.getClientId());
+                    odoo.oauth_authenticate(instance, user.getUsername(), user.getPassword());
+                } else {
+                    odoo = new Odoo(context, user.getHost(), user.isAllowSelfSignedSSL());
+                    odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
+                }
+                app.setOdoo(odoo, user);
             }
             return odoo;
         } catch (Exception e) {

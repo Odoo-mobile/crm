@@ -114,7 +114,7 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
             txvText.setText(getDate(mValue.toString(), mParsePattern));
         }
         if (textSize > -1) {
-            txvText.setTextSize(TypedValue.COMPLEX_UNIT_SP, textSize);
+            txvText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
         }
         if (appearance > -1) {
             txvText.setTextAppearance(mContext, appearance);

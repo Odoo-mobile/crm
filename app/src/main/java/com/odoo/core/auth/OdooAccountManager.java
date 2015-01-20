@@ -24,6 +24,8 @@ import android.accounts.AccountManager;
 import android.content.Context;
 import android.util.Log;
 
+import com.odoo.App;
+import com.odoo.core.orm.OModelRegistry;
 import com.odoo.core.support.OUser;
 
 import java.util.ArrayList;
@@ -166,8 +168,15 @@ public class OdooAccountManager {
      * @return new user object
      */
     public static OUser login(Context context, String username) {
-        // Logging out user if any
+
+        // Setting odoo instance to null
+        App app = (App) context.getApplicationContext();
+        app.setOdoo(null, null);
+        // Clearing models registry
+        OModelRegistry registry = new OModelRegistry();
+        registry.clearAll();
         OUser activeUser = getActiveUser(context);
+        // Logging out user if any
         if (activeUser != null) {
             logout(context, activeUser.getAndroidName());
         }

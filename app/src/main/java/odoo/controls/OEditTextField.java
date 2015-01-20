@@ -24,6 +24,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -94,7 +95,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
             edtText.setHint(getLabel());
             edtText.setOnFocusChangeListener(this);
             if (textSize > -1) {
-                edtText.setTextSize(textSize);
+                edtText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
             if (appearance > -1) {
                 edtText.setTextAppearance(mContext, appearance);
@@ -108,7 +109,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
             txvText.setBackgroundColor(Color.TRANSPARENT);
             txvText.setPadding(0, 10, 10, 10);
             if (textSize > -1) {
-                txvText.setTextSize(textSize);
+                txvText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
             if (appearance > -1) {
                 txvText.setTextAppearance(mContext, appearance);

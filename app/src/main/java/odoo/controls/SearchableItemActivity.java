@@ -19,6 +19,8 @@
  */
 package odoo.controls;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -40,6 +42,7 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OdooFields;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.OResource;
 import com.odoo.crm.R;
 
 import java.util.ArrayList;
@@ -48,7 +51,8 @@ import java.util.List;
 import odoo.ODomain;
 
 public class SearchableItemActivity extends ActionBarActivity implements
-        AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener, OListAdapter.OnSearchChange {
+        AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
+        OListAdapter.OnSearchChange, IOnQuickRecordCreateListener {
     public static final String TAG = SearchableItemActivity.class.getSimpleName();
 
     private EditText edt_searchable_input;
@@ -59,9 +63,11 @@ public class SearchableItemActivity extends ActionBarActivity implements
     private Boolean mLiveSearch = false;
     private int resource_array_id = -1;
     private OModel mModel = null;
+    private OModel mRelModel = null;
     private Integer mRowId = null;
     private LiveSearch mLiveDataLoader = null;
     private OColumn mCol = null;
+    private AlertDialog.Builder builder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,11 +107,10 @@ public class SearchableItemActivity extends ActionBarActivity implements
                     objects.add(row);
                 }
             } else {
-                OModel rel_model = null;
                 if (extra.containsKey("column_name")) {
                     mCol = mModel.getColumn(extra.getString("column_name"));
-                    rel_model = mModel.createInstance(mCol.getType());
-                    objects.addAll(OSelectionField.getRecordItems(rel_model,
+                    mRelModel = mModel.createInstance(mCol.getType());
+                    objects.addAll(OSelectionField.getRecordItems(mRelModel,
                             mCol));
                 }
             }
@@ -146,13 +151,19 @@ public class SearchableItemActivity extends ActionBarActivity implements
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
-        Intent intent = new Intent("searchable_value_select");
         ODataRow data = (ODataRow) objects.get(position);
         if (!data.contains(OColumn.ROW_ID)) {
-            mModel.quickCreateRecord(data);
-            data.put(OColumn.ROW_ID, mModel.selectRowId(data.getInt("id")));
+            QuickCreateRecordProcess quickCreateRecordProcess = new QuickCreateRecordProcess(this);
+            quickCreateRecordProcess.execute(data);
+        } else {
+            onRecordCreated(data);
         }
-        intent.putExtra("selected_position", data.getInt(OColumn.ROW_ID));
+    }
+
+    @Override
+    public void onRecordCreated(ODataRow row) {
+        Intent intent = new Intent("searchable_value_select");
+        intent.putExtra("selected_position", row.getInt(OColumn.ROW_ID));
         if (mRowId != null) {
             intent.putExtra("record_id", true);
         }
@@ -205,6 +216,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
         }
     }
 
+
     private class LiveSearch extends AsyncTask<String, Void, List<ODataRow>> {
 
         @Override
@@ -217,8 +229,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
         @Override
         protected List<ODataRow> doInBackground(String... params) {
             try {
-                Thread.sleep(300);
-                ServerDataHelper helper = mModel.getServerDataHelper();
+                ServerDataHelper helper = mRelModel.getServerDataHelper();
                 ODomain domain = new ODomain();
                 domain.add("name", "ilike", params[0]);
                 if (mCol != null) {
@@ -228,7 +239,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
                                 dom.getValue());
                     }
                 }
-                OdooFields fields = new OdooFields(mModel.getColumns());
+                OdooFields fields = new OdooFields(mRelModel.getColumns());
                 return helper.searchRecords(fields, domain, 10);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -252,6 +263,46 @@ public class SearchableItemActivity extends ActionBarActivity implements
             super.onCancelled();
             findViewById(R.id.loading_progress).setVisibility(View.GONE);
             mList.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class QuickCreateRecordProcess extends AsyncTask<ODataRow, Void, ODataRow> {
+
+        private ProgressDialog progressDialog;
+        IOnQuickRecordCreateListener mOnQuickRecordCreateListener = null;
+
+        public QuickCreateRecordProcess(IOnQuickRecordCreateListener listener) {
+            mOnQuickRecordCreateListener = listener;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(SearchableItemActivity.this);
+            progressDialog.setTitle(R.string.title_please_wait);
+            progressDialog.setMessage(OResource.string(SearchableItemActivity.this, R.string.title_working));
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ODataRow doInBackground(ODataRow... params) {
+            try {
+                Thread.sleep(700);
+                return mRelModel.quickCreateRecord(params[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ODataRow data) {
+            super.onPostExecute(data);
+            if (data != null && mOnQuickRecordCreateListener != null) {
+                mOnQuickRecordCreateListener.onRecordCreated(data);
+            }
+            progressDialog.dismiss();
         }
     }
 

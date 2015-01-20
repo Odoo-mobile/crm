@@ -112,7 +112,7 @@ public class CRMLead extends OModel {
     OColumn assignee_name = new OColumn("Assignee", OVarchar.class).setSize(100)
             .setLocalColumn();
     @Odoo.Functional(method = "storeStageName", store = true, depends = {"stage_id"})
-    OColumn stage_name = new OColumn("Stage name", OVarchar.class);
+    OColumn stage_name = new OColumn("Stage name", OVarchar.class).setLocalColumn();
     OColumn data_type = new OColumn("Data type", OVarchar.class).setSize(34)
             .setLocalColumn().setDefaultValue("opportunity");
     OColumn is_done = new OColumn("Mark as Done", OInteger.class)
