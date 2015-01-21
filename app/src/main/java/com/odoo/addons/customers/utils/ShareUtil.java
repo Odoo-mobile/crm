@@ -51,8 +51,19 @@ public class ShareUtil {
             if (row.get("country_id") instanceof Integer) {
                 country = row.getM2ORecord("country_id").browse().getString("name");
             }
-            fw.write("ADR;TYPE=WORK:;;" + row.getString("street") + " " + row.getString("street2") + ";" +
-                    row.getString("city") + ";" + row.getString("zip") + ";" + country + "\r\n");
+//            if (!row.getString("street").equals("false") && !row.getString("street").equals("")) {
+            fw.write("ADR;TYPE=WORK:;;" + row.getString("street"));
+//                fw.write("ADR;TYPE=WORK:;;" + row.getString("street") + " " + row.getString("street2") + ";" +
+//                        row.getString("city") + ";" + row.getString("zip") + ";" + country + "\r\n");
+//            }
+//            if (!row.getString("street2").equals("false") && !row.getString("street2").equals(""))
+//                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("street2"));
+//            if (!row.getString("city").equals("false") && !row.getString("city").equals(""))
+//                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("city"));
+//            if (!row.getString("zip").equals("false") && !row.getString("zip").equals(""))
+//                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("zip") + ";" + country);
+
+//            if (!row.getString("email").equals("false") && !row.getString("email").equals(""))
             fw.write("EMAIL;TYPE=PREF,INTERNET:" + row.getString("email") + "\r\n");
             fw.write("END:VCARD\r\n");
             fw.close();

@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<translate xmlns:android="http://schemas.android.com/apk/res/android"
-    android:duration="150"
-    android:fromYDelta="0%"
-    android:interpolator="@android:interpolator/decelerate_quad"
-    android:toYDelta="100%" />
-<!-- From: file:/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/bottom-sheet-lib/src/main/res/anim/sheet_out.xml --><!-- From: file:/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/bottom-sheet-lib/build/intermediates/bundles/debug/res/anim/sheet_out.xml -->

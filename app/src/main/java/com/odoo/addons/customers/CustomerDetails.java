@@ -188,31 +188,31 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
         findViewById(R.id.email).setOnClickListener(this);
         findViewById(R.id.phone).setOnClickListener(this);
         findViewById(R.id.mobile).setOnClickListener(this);
-        if (record.getString("full_address").equals("false") || record.getString("full_address").equals("")) {
-            findViewById(R.id.full_address).setVisibility(View.GONE);
-        } else {
-            findViewById(R.id.full_address).setVisibility(View.VISIBLE);
-        }
-        if (record.getString("website").equals("false")) {
-            findViewById(R.id.website).setVisibility(View.GONE);
-        } else {
-            findViewById(R.id.website).setVisibility(View.VISIBLE);
-        }
-        if (record.getString("email").equals("false")) {
-            findViewById(R.id.email).setVisibility(View.GONE);
-        } else {
-            findViewById(R.id.email).setVisibility(View.VISIBLE);
-        }
-        if (record.getString("phone").equals("false")) {
-            findViewById(R.id.phone).setVisibility(View.GONE);
-        } else {
-            findViewById(R.id.phone).setVisibility(View.VISIBLE);
-        }
-        if (record.getString("mobile").equals("false")) {
-            findViewById(R.id.mobile).setVisibility(View.GONE);
-        } else {
-            findViewById(R.id.mobile).setVisibility(View.VISIBLE);
-        }
+//        if (record.getString("full_address").equals("false") || record.getString("full_address").equals("")) {
+//        findViewById(R.id.full_address).setVisibility(View.VISIBLE);
+//        } else {
+//            findViewById(R.id.full_address).setVisibility(View.VISIBLE);
+//        }
+        //if (record.getString("website").equals("false")) {
+//        findViewById(R.id.website).setVisibility(View.VISIBLE);
+        //} else {
+        //   findViewById(R.id.website).setVisibility(View.VISIBLE);
+        // }
+        //if (record.getString("email").equals("false")) {
+//        findViewById(R.id.email).setVisibility(View.VISIBLE);
+        //} else {
+        //   findViewById(R.id.email).setVisibility(View.VISIBLE);
+        //}
+//        if (record.getString("phone").equals("false")) {
+//        findViewById(R.id.phone).setVisibility(View.VISIBLE);
+//        } else {
+//            findViewById(R.id.phone).setVisibility(View.VISIBLE);
+//        }
+//        if (record.getString("mobile").equals("false")) {
+//        findViewById(R.id.mobile).setVisibility(View.VISIBLE);
+//        } else {
+//            findViewById(R.id.mobile).setVisibility(View.VISIBLE);
+//        }
     }
 
     private void setCustomerImage() {

@@ -39,6 +39,7 @@
                 android:layout_below="@+id/parallax_view"
                 android:gravity="center_vertical"
                 android:fontFamily="@string/font_normal"
+                android:singleLine="true"
                 android:paddingLeft="@dimen/default_16dp"
                 android:textColor="#ffffff"
                 android:textSize="30sp" />
@@ -121,6 +122,22 @@
                         android:layout_width="match_parent"
                         app:fieldName="mobile"
                         android:layout_height="wrap_content"></odoo.controls.OField>
+
+                    <odoo.controls.OField
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:fieldTextAppearance="?android:textAppearanceMedium"
+                        app:fieldLabelColor="@color/theme_secondary"
+                        android:id="@+id/fax"
+                        app:fieldName="fax"></odoo.controls.OField>
+
+                    <odoo.controls.OField
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:fieldTextAppearance="?android:textAppearanceMedium"
+                        app:fieldLabelColor="@color/theme_secondary"
+                        android:id="@+id/jobposition"
+                        app:fieldName="function"></odoo.controls.OField>
                 </odoo.controls.OForm>
             </LinearLayout>
         </RelativeLayout>

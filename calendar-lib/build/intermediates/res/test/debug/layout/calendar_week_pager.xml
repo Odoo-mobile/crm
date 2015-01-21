@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.view.ViewPager xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/pager"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
-
-</android.support.v4.view.ViewPager><!-- From: file:/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/calendar-lib/src/main/res/layout/calendar_week_pager.xml --><!-- From: file:/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/calendar-lib/build/intermediates/bundles/debug/res/layout/calendar_week_pager.xml -->

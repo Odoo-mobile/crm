@@ -58,6 +58,7 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
         int count = 0;
         for (ODataRow row : rows) {
             if (row.getBoolean("allday")) {
+                //FIXME add setting option for start day of user
                 row.put("date_start", row.getString("date_start") + " 03:30:00");
             }
             Date start_date = ODateUtils.createDateObject(row.getString("date_start"),
