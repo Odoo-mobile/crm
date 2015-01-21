@@ -37,6 +37,7 @@
             <enum name="SearchableLive" value="4" />
             <enum name="Image" value="5" />
             <enum name="ImageCircle" value="6" />
+            <enum name="Duration" value="7" />
         </attr>
         <attr name="widgetImageSize" format="dimension" />
         <attr name="withBottomPadding" format="boolean" />

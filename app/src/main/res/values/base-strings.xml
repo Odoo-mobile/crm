@@ -6,6 +6,7 @@
     <string name="label_password">Password</string>
     <string name="label_forgot_password">Forgot password?</string>
     <string name="label_add_self_hosted_url">Add self-hosted URL</string>
+    <string name="label_login_with_odoo">Login with Odoo.com</string>
     <string name="label_create_account">Create account</string>
     <string name="label_select_database">Select Database</string>
     <string name="title_ssl_warning">SSL Warning</string>

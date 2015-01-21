@@ -91,6 +91,12 @@ public class PhoneCallDetail extends ActionBarActivity {
                 record.put("partner_id", extra.getInt(OColumn.ROW_ID));
                 record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
                 record.put("opportunity_id", extra.getInt(KEY_OPPORTUNITY_ID));
+
+                long start_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_START));
+                long end_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_END));
+                long duration = (end_time - start_time);
+                record.put("duration", ODateUtils.durationToFloat(duration));
+
                 CRMPhoneCallsCategory.Type bound = CRMPhoneCallsCategory.Type.Inbound;
                 if (!extra.getBoolean("in_bound", false)) {
                     bound = CRMPhoneCallsCategory.Type.OutBound;

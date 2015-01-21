@@ -31,6 +31,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.utils.ODateUtils;
 
 public class OEditTextField extends LinearLayout implements IOControlData,
         View.OnFocusChangeListener {
@@ -40,6 +41,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
     private EditText edtText;
     private TextView txvText;
     private Boolean mEditable = false, mReady = false;
+    private OField.WidgetType mWidget = null;
     private OColumn mColumn;
     private String mLabel, mHint;
     private ValueUpdateListener mValueUpdateListener = null;
@@ -119,12 +121,19 @@ public class OEditTextField extends LinearLayout implements IOControlData,
         }
     }
 
+    public void setWidgetType(OField.WidgetType type) {
+        mWidget = type;
+        initControl();
+    }
+
     @Override
     public void setValue(Object value) {
         if (value == null)
             return;
         if (value.toString().equals("false")) {
             value = "";
+        } else if (mWidget == OField.WidgetType.Duration) {
+            value = ODateUtils.floatToDuration(value.toString());
         }
         if (mEditable) {
             edtText.setText(value.toString());
@@ -153,11 +162,15 @@ public class OEditTextField extends LinearLayout implements IOControlData,
 
     @Override
     public Object getValue() {
+        Object value = null;
         if (mEditable)
-            return edtText.getText();
+            value = edtText.getText();
         if (txvText != null)
-            return txvText.getText();
-        return null;
+            value = txvText.getText();
+        if ((value != null || !value.toString().equals("false")) && mWidget == OField.WidgetType.Duration) {
+            value = ODateUtils.durationToFloat(value.toString());
+        }
+        return value;
     }
 
     @Override

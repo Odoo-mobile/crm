@@ -26,6 +26,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 public class ODateUtils {
     public final static String TAG = ODateUtils.class.getSimpleName();
@@ -218,4 +219,40 @@ public class ODateUtils {
         return gmtFormat.format(date);
     }
 
+    public static String floatToDuration(String duration_in_float) {
+        duration_in_float = String.format("%2.2f", Float.parseFloat(duration_in_float));
+        String[] parts = duration_in_float.split("\\.");
+        long minute = Long.parseLong(parts[0]);
+        long seconds = (60 * Long.parseLong(parts[1])) / 100;
+        return String.format("%02d:%02d", minute, seconds);
+    }
+
+    public static String durationToFloat(String duration) {
+        String[] parts = duration.split("\\:");
+        if (parts.length == 2) {
+            long minute = Long.parseLong(parts[0]);
+            long seconds = Long.parseLong(parts[1]);
+            if (seconds == 60) {
+                minute = minute + 1;
+                seconds = 0;
+            } else {
+                seconds = (100 * seconds) / 60;
+            }
+            return String.format("%d.%d", minute, seconds);
+        }
+        return "false";
+    }
+
+    public static String durationToFloat(long milliseconds) {
+        long minute = TimeUnit.MILLISECONDS.toMinutes(milliseconds);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) -
+                TimeUnit.MINUTES.toSeconds(minute);
+        if (seconds == 60) {
+            minute = minute + 1;
+            seconds = 0;
+        } else {
+            seconds = (100 * seconds) / 60;
+        }
+        return String.format("%d.%d", minute, seconds);
+    }
 }

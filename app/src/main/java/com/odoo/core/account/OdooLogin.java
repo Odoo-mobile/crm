@@ -19,10 +19,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.OdooActivity;
-import com.odoo.crm.R;
+import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
-import com.odoo.datas.OConstants;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooInstancesSelectorDialog;
 import com.odoo.core.support.OdooLoginHelper;
@@ -31,6 +30,8 @@ import com.odoo.core.support.OdooUserLoginSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OAlertDialog;
 import com.odoo.core.utils.OResource;
+import com.odoo.crm.R;
+import com.odoo.datas.OConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -131,16 +132,19 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
     }
 
     private void toggleSelfHostedURL() {
+        TextView txvAddSelfHosted = (TextView) findViewById(R.id.txvAddSelfHosted);
         if (!mSelfHostedURL) {
             mSelfHostedURL = true;
             findViewById(R.id.layoutSelfHosted).setVisibility(View.VISIBLE);
             edtSelfHosted.setOnFocusChangeListener(this);
             edtSelfHosted.requestFocus();
+            txvAddSelfHosted.setText(R.string.label_login_with_odoo);
         } else {
             findViewById(R.id.layoutBorderDB).setVisibility(View.GONE);
             findViewById(R.id.layoutDatabase).setVisibility(View.GONE);
             findViewById(R.id.layoutSelfHosted).setVisibility(View.GONE);
             mSelfHostedURL = false;
+            txvAddSelfHosted.setText(R.string.label_add_self_hosted_url);
         }
     }
 
@@ -419,7 +423,14 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
         @Override
         protected Boolean doInBackground(OUser... params) {
             mUser = params[0];
-            return OdooAccountManager.createAccount(OdooLogin.this, params[0]);
+            if (OdooAccountManager.createAccount(OdooLogin.this, params[0])) {
+                // Dummy Count call for creating database for user.
+                // This will solve the issue to cursor loader in lower version < api 21
+                IrModel model = new IrModel(OdooLogin.this, mUser);
+                model.count(null, null);
+                return true;
+            }
+            return false;
         }
 
         @Override
@@ -438,7 +449,7 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
                         finish();
                     }
                 }
-            }, 300);
+            }, 1000);
         }
     }
 

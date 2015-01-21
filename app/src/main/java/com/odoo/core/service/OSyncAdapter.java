@@ -142,7 +142,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                                 && !model.isEmptyTable()) {
                             domain.add("|");
                         }
-                        if (createRelationRecords)
+                        if (createRelationRecords && model.checkForWriteDate())
                             domain.add("&");
                     }
                     int data_limit = preferenceManager.getInt("sync_data_limit", 60);

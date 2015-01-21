@@ -41,6 +41,7 @@
                     app:fieldName="name"
                     app:showIcon="false"
                     app:showLabel="false"
+                    app:fieldTextAppearance="?android:textAppearanceLarge"
                     android:layout_height="wrap_content"></odoo.controls.OField>
 
                 <View style="@style/ViewSeparator" />
@@ -51,7 +52,7 @@
                     app:fieldName="allday"
                     app:widgetType="Switch"
                     app:showLabel="false"
-                    app:fieldTextSize="5.5sp"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
                     app:fieldTextColor="@color/body_text_2"
                     app:iconTint="@color/icon_tint"
                     app:iconResource="@drawable/ic_action_time_clock"
@@ -77,9 +78,9 @@
                             android:layout_weight="1"
                             app:fieldName="event_date_start"
                             app:defaultValue="now()"
-                            app:fieldTextSize="5.5sp"
                             app:parsePattern="EEEE, MMM dd, yyyy"
                             app:fieldType="Date"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
                             app:withOutSidePadding="false"
                             app:showLabel="false"
                             app:fieldTextColor="@color/body_text_2"
@@ -92,7 +93,7 @@
                             app:fieldName="event_time_start"
                             app:defaultValue="now()"
                             app:parsePattern="hh:mm a"
-                            app:fieldTextSize="5.5sp"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
                             app:fieldTextColor="@color/body_text_2"
                             app:fieldType="Time"
                             app:withOutSidePadding="false"
@@ -112,7 +113,7 @@
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             app:fieldName="event_date_end"
-                            app:fieldTextSize="5.5sp"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
                             app:defaultValue="now()"
                             app:fieldTextColor="@color/body_text_2"
                             app:parsePattern="EEEE, MMM dd, yyyy"
@@ -128,7 +129,7 @@
                             app:fieldName="event_time_end"
                             app:defaultValue="now()"
                             app:parsePattern="hh:mm a"
-                            app:fieldTextSize="5.5sp"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
                             app:fieldTextColor="@color/body_text_2"
                             app:fieldType="Time"
                             app:withOutSidePadding="false"
@@ -149,6 +150,7 @@
                     app:iconTint="@color/icon_tint"
                     app:fieldName="location"
                     app:showLabel="false"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
                     app:iconResource="@drawable/ic_action_location"
                     android:layout_height="wrap_content"></odoo.controls.OField>
 
@@ -187,7 +189,7 @@
                         android:gravity="center_vertical"
                         android:paddingLeft="16dp"
                         android:text="@string/at_the_time_of_event"
-                        android:textSize="15.5sp" />
+                        android:textSize="@dimen/text_size_xmedium" />
                 </LinearLayout>
 
                 <View
@@ -226,7 +228,7 @@
                         android:gravity="center_vertical"
                         android:paddingLeft="16dp"
                         android:text="Default Color"
-                        android:textSize="15.5sp" />
+                        android:textSize="@dimen/text_size_xmedium" />
                 </LinearLayout>
 
                 <View
@@ -238,6 +240,7 @@
                     app:fieldName="description"
                     app:iconTint="@color/icon_tint"
                     app:showLabel="false"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
                     app:iconResource="@drawable/ic_action_notes_content"
                     android:layout_height="wrap_content"></odoo.controls.OField>
             </odoo.controls.OForm>
