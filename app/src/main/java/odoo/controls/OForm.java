@@ -198,6 +198,7 @@ public class OForm extends LinearLayout {
                     || val.toString().equals("-1")) {
                 val = false;
             }
+
             if (column != null && column.isRequired()) {
                 if (val.toString().equals("false")) {
                     control.setError(column.getLabel() +

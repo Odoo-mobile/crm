@@ -165,7 +165,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
         Object value = null;
         if (mEditable)
             value = edtText.getText();
-        if (txvText != null)
+        else if (txvText != null)
             value = txvText.getText();
         if ((value != null || !value.toString().equals("false")) && mWidget == OField.WidgetType.Duration) {
             value = ODateUtils.durationToFloat(value.toString());
