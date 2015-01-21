@@ -50,6 +50,8 @@ public class SaleOrder extends OModel {
     OColumn user_id = new OColumn("Salesperson", ResUsers.class,
             OColumn.RelationType.ManyToOne);
     OColumn amount_total = new OColumn("Total", OFloat.class);
+    OColumn validity_date = new OColumn("Expiration Date", ODate.class);
+    OColumn payment_term = new OColumn("Payment Term", AccountPaymentTerm.class, OColumn.RelationType.ManyToOne);
     OColumn amount_untaxed = new OColumn("Untaxed", OInteger.class);
     OColumn amount_tax = new OColumn("Tax", OInteger.class);
     OColumn client_order_ref = new OColumn("Client Order Reference",
