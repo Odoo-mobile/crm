@@ -84,7 +84,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     private IOnFieldValueChangeListener mValueUpdateListener = null;
 
     public enum WidgetType {
-        Switch, RadioGroup, SelectionDialog, Searchable, SearchableLive, Image, ImageCircle;
+        Switch, RadioGroup, SelectionDialog, Searchable, SearchableLive, Image, ImageCircle, Duration;
 
         public static WidgetType getWidgetType(int widget) {
             switch (widget) {
@@ -102,6 +102,8 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
                     return WidgetType.Image;
                 case 6:
                     return WidgetType.ImageCircle;
+                case 7:
+                    return WidgetType.Duration;
             }
             return null;
         }
@@ -393,6 +395,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
     private View initTextControl() {
         setOrientation(VERTICAL);
         OEditTextField edt = new OEditTextField(mContext);
+        edt.setWidgetType(mWidgetType);
         mControlData = edt;
         edt.setResource(textSize, textAppearance, textColor);
         edt.setColumn(mColumn);

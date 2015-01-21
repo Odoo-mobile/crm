@@ -36,6 +36,8 @@ import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.crm.R;
 
+import java.util.Date;
+
 public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomerFindListener {
     public static final String TAG = PhoneStateReceiver.class.getSimpleName();
     public static final String ACTION_CALL_BACK = "action_call_back";
@@ -45,6 +47,8 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
     public static final String KEY_RECEIVED = "phone_state_received";
     public static final String KEY_RINGING = "phone_state_ringing";
     public static final String KEY_OFFHOOK = "phone_state_offhook";
+    public static final String KEY_DURATION_START = "key_duration_start";
+    public static final String KEY_DURATION_END = "key_duration_end";
     private String callerNumber = null;
     private TelephonyManager telephonyManager;
     private OPreferenceManager mPref;
@@ -85,8 +89,10 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
 
                     mPref.setBoolean(KEY_RECEIVED, false);
                     mPref.setBoolean(KEY_RINGING, false);
-                    if (extra != null)
+                    if (extra != null) {
                         extra.putBoolean("in_bound", mPref.getBoolean("in_bound", false));
+                        extra.putString(KEY_DURATION_END, new Date().getTime() + "");
+                    }
                     if (!mPref.getBoolean(KEY_OFFHOOK, false)) {
                         showMissCallNotification(extra);
                     } else {
@@ -99,6 +105,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
                     mPref.setBoolean(KEY_OFFHOOK, true);
                     // Call Started (received or dialed)
                     // TODO: Start recording of call
+                    callStarted();
                     if (!mPref.getBoolean(KEY_RINGING, false)) {
                         mPref.setBoolean("in_bound", false);
                         customerFinder.findCustomer(true, callerNumber);
@@ -154,10 +161,17 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
         }
     }
 
+    private void callStarted() {
+        if (extra != null && !extra.containsKey(KEY_DURATION_START)) {
+            extra.putString(KEY_DURATION_START, new Date().getTime() + "");
+        }
+    }
+
     @Override
     public void onCustomerFind(Boolean dialed, ODataRow row) {
         if (row != null) {
             extra = row.getPrimaryBundleData();
+            callStarted();
             extra.putString("name", row.getString("name"));
             int row_id = (row.getString("opportunity_id").equals("false")) ? -1
                     : row.getInt("opportunity_id");

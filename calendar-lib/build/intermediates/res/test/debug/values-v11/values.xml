@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <!-- From: file:/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/calendar-lib/build/intermediates/bundles/debug/res/values-v11/values.xml -->
-    <eat-comment/>
-    <style name="AppBaseTheme" parent="android:Theme.Holo.Light">
-        <!-- API 11 theme customizations can go here. -->
-    </style>
-</resources>

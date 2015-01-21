@@ -20,7 +20,7 @@
     <dimen name="drawerAvatarWidthHeight">60dp</dimen>
 
     <!-- Dimensions -->
-    <dimen name="statusBarHeight">24dp</dimen>
+    <dimen name="statusBarHeight">0dp</dimen>
 
     <!-- Booleans -->
     <bool name="fitToScreenWindow">true</bool>

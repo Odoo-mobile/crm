@@ -89,8 +89,8 @@
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="play-services-6.5.87" level="project" />
-    <orderEntry type="module" module-name="calendar-lib" exported="" />
     <orderEntry type="module" module-name="snackbar-lib" exported="" />
+    <orderEntry type="module" module-name="calendar-lib" exported="" />
     <orderEntry type="module" module-name="bottom-sheet-lib" exported="" />
     <orderEntry type="module" module-name="parallax-effect-lib" exported="" />
   </component>
