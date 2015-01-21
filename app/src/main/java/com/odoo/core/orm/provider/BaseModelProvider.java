@@ -194,12 +194,12 @@ public class BaseModelProvider extends ContentProvider {
         setModel(uri);
         ContentValues[] values = generateValues(all_values);
         ContentValues value_to_update = values[0];
-        if (!value_to_update.containsKey("_write_date"))
+        if (!value_to_update.containsKey("_write_date")) {
             value_to_update.put("_write_date", ODateUtils.getUTCDate());
+        }
         if (!value_to_update.containsKey("_is_dirty")) {
             value_to_update.put("_is_dirty", "true");
         }
-
         int count = 0;
         int match = matcher.match(uri);
         switch (match) {

@@ -552,6 +552,7 @@ public class OModel extends OSQLite {
     }
 
     public void setLastSyncDateTimeToNow() {
+        Log.i(TAG, "Model Sync Update : " + getModelName());
         IrModel model = new IrModel(mContext, mUser);
         OValues values = new OValues();
         values.put("model", getModelName());
