@@ -162,6 +162,8 @@ public class OdooActivity extends ActionBarActivity {
                     setTitle(item.getTitle());
                 }
                 loadDrawerItemInstance(item.getInstance(), item.getExtra());
+            }else{
+                closeDrawer();
             }
         }
     };

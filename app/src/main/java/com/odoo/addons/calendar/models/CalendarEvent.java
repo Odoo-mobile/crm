@@ -22,6 +22,7 @@ package com.odoo.addons.calendar.models;
 import android.content.Context;
 import android.net.Uri;
 
+import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -92,6 +93,7 @@ public class CalendarEvent extends OModel {
             .setDefaultValue("false").setLocalColumn();
 
     OColumn user_id = new OColumn("Owner", ResUsers.class, OColumn.RelationType.ManyToOne);
+    OColumn partner_ids = new OColumn("Attendees", ResPartner.class, OColumn.RelationType.ManyToMany);
 
     public CalendarEvent(Context context, OUser user) {
         super(context, "calendar.event", user);
@@ -107,7 +109,9 @@ public class CalendarEvent extends OModel {
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
+        domain.add("|");
         domain.add("user_id", "=", getUser().getUser_id());
+        domain.add("partner_ids", "in", getUser().getPartner_id());
         return domain;
     }
 

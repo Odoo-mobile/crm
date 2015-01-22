@@ -40,8 +40,10 @@ public class CustomerSyncService extends OSyncService {
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         ODomain domain = new ODomain();
         domain.add("|");
+        domain.add("|");
         domain.add("opportunity_ids.user_id", "=", user.getUser_id());
         domain.add("sale_order_ids.user_id", "=", user.getUser_id());
+        domain.add("id", "in", adapter.getModel().getServerIds());
         adapter.setDomain(domain);
     }
 }

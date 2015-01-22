@@ -145,6 +145,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
                             "Schedule", REQUEST_CALL_SCHEDULE,
                             ACTION_CALL_SCHEDULE, PhoneCallDetail.class, data);
             builder.addAction(scheduleCall);
+            builder.allowVibrate(false);
             builder.build().show();
         }
     }
@@ -176,6 +177,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
             int row_id = (row.getString("opportunity_id").equals("false")) ? -1
                     : row.getInt("opportunity_id");
             extra.putInt("opportunity_id", row_id);
+            row.put("caller_contact", callerNumber);
             callerWindow.show(dialed, row);
         }
     }
