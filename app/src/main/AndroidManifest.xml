@@ -160,9 +160,6 @@
             android:name="com.odoo.addons.sale.SalesDetail"
             android:windowSoftInputMode="adjustPan"></activity>
         <activity
-            android:name="com.odoo.addons.sale.SalesDetail"
-            android:windowSoftInputMode="adjustPan"></activity>
-        <activity
             android:name="com.odoo.addons.sale.SaleOrderLine"
             android:windowSoftInputMode="adjustPan"></activity>
         <!-- Reminder Receivers//-->
