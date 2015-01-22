@@ -51,8 +51,9 @@ public class CalendarSyncProvider extends BaseModelProvider {
     public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs,
                         String sortOrder) {
         int match = matcher.match(uri);
+        CalendarEvent events = new CalendarEvent(getContext(), null);
         if (match != FULL_AGENDA) {
-            return super.query(uri, base_projection, selection, selectionArgs, sortOrder);
+            return super.query(events.uri(), base_projection, selection, selectionArgs, sortOrder);
         }
 
         String date_start = selectionArgs[0];
@@ -63,7 +64,6 @@ public class CalendarSyncProvider extends BaseModelProvider {
         String where = "";
         List<String> args = new ArrayList<>();
         // Getting events
-        CalendarEvent events = new CalendarEvent(getContext(), null);
         MatrixCursor event_separator = new MatrixCursor(
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
 
