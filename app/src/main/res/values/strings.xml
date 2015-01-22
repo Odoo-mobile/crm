@@ -34,4 +34,8 @@
     <string name="label_message">Message</string>
     <string name="label_schedule_call">Schedule Call</string>
     <string name="label_meetings">Meeting</string>
+    <string name="label_sale_confirm_sale">Confirm Sale</string>
+    <string name="label_sale_create_invoice">Create Invoice</string>
+    <string name="label_sale_cancel_order">Cancel Order</string>
+    <string name="label_sale_new_copy_of_quotation">New Copy of Quotation</string>
 </resources>

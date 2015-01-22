@@ -32,10 +32,10 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 
-import com.odoo.crm.R;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
+import com.odoo.crm.R;
 
 import java.net.URL;
 import java.util.ArrayList;

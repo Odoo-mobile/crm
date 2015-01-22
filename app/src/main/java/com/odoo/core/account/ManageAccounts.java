@@ -34,13 +34,13 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.OdooActivity;
-import com.odoo.crm.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
+import com.odoo.crm.R;
 
 import java.util.ArrayList;
 import java.util.List;
