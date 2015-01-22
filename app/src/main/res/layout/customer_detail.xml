@@ -123,21 +123,16 @@
                         app:fieldName="mobile"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
-                    <odoo.controls.OField
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        app:fieldTextAppearance="?android:textAppearanceMedium"
-                        app:fieldLabelColor="@color/theme_secondary"
-                        android:id="@+id/fax"
-                        app:fieldName="fax"></odoo.controls.OField>
+                    <View
+                        style="@style/ViewSeparator"
+                        android:layout_marginLeft="72dp" />
 
                     <odoo.controls.OField
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        app:iconResource="@drawable/ic_action_notes_content"
+                        app:fieldName="comment"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
-                        app:fieldLabelColor="@color/theme_secondary"
-                        android:id="@+id/jobposition"
-                        app:fieldName="function"></odoo.controls.OField>
+                        android:layout_height="wrap_content"></odoo.controls.OField>
                 </odoo.controls.OForm>
             </LinearLayout>
         </RelativeLayout>

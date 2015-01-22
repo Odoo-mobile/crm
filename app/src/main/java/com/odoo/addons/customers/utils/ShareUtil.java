@@ -52,9 +52,9 @@ public class ShareUtil {
                 country = row.getM2ORecord("country_id").browse().getString("name");
             }
 //            if (!row.getString("street").equals("false") && !row.getString("street").equals("")) {
-            fw.write("ADR;TYPE=WORK:;;" + row.getString("street"));
-//                fw.write("ADR;TYPE=WORK:;;" + row.getString("street") + " " + row.getString("street2") + ";" +
-//                        row.getString("city") + ";" + row.getString("zip") + ";" + country + "\r\n");
+//            fw.write("ADR;TYPE=WORK:;;" + row.getString("street"));
+            fw.write("ADR;TYPE=WORK:;;" + row.getString("street") + " " + row.getString("street2") + ";" +
+                    row.getString("city") + ";" + row.getString("zip") + ";" + country + "\r\n");
 //            }
 //            if (!row.getString("street2").equals("false") && !row.getString("street2").equals(""))
 //                fw.write("ADR;TYPE=WORK:;;" + " " + row.getString("street2"));
