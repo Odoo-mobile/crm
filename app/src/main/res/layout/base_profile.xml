@@ -63,7 +63,7 @@
                         app:fieldName="user_login"
                         app:controlLabel="USER LOGIN"
                         app:fieldLabelColor="@color/theme_primary"
-                        app:fieldTextSize="6sp"
+                        app:fieldTextSize="@dimen/text_size_xmedium"
                         app:showIcon="false"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
@@ -72,7 +72,7 @@
                         app:fieldName="server_url"
                         app:controlLabel="SERVER URL"
                         app:fieldLabelColor="@color/theme_primary"
-                        app:fieldTextSize="6sp"
+                        app:fieldTextSize="@dimen/text_size_xmedium"
                         app:showIcon="false"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
@@ -81,7 +81,7 @@
                         app:fieldName="database"
                         app:controlLabel="DATABASE"
                         app:fieldLabelColor="@color/theme_primary"
-                        app:fieldTextSize="6sp"
+                        app:fieldTextSize="@dimen/text_size_xmedium"
                         app:showIcon="false"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
@@ -90,7 +90,7 @@
                         app:fieldName="version"
                         app:controlLabel="ODOO VERSION"
                         app:fieldLabelColor="@color/theme_primary"
-                        app:fieldTextSize="6sp"
+                        app:fieldTextSize="@dimen/text_size_xmedium"
                         app:showIcon="false"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
@@ -99,7 +99,7 @@
                         app:fieldName="timezone"
                         app:controlLabel="TIMEZONE"
                         app:fieldLabelColor="@color/theme_primary"
-                        app:fieldTextSize="6sp"
+                        app:fieldTextSize="@dimen/text_size_xmedium"
                         app:showIcon="false"
                         android:layout_height="wrap_content"></odoo.controls.OField>
                 </odoo.controls.OForm>

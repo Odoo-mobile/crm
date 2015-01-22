@@ -197,6 +197,14 @@ public class ODateUtils {
         return cal.getTime();
     }
 
+    public static String getDateDayBeforeAfterUTC(String utcDate, int days) {
+        Date dt = createDateObject(utcDate, DEFAULT_FORMAT, false);
+        Calendar cal = new GregorianCalendar();
+        cal.setTime(dt);
+        cal.add(Calendar.DAY_OF_MONTH, days);
+        return createDate(cal.getTime(), DEFAULT_FORMAT, true);
+    }
+
     public static Date getDateDayBefore(Date originalDate, int days) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(originalDate);

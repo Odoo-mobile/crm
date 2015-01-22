@@ -40,12 +40,12 @@ import java.util.HashSet;
 
 public class BaseModelProvider extends ContentProvider {
     public static final String TAG = BaseModelProvider.class.getSimpleName();
-    private final static String KEY_MODEL = "key_model";
-    private final static String KEY_USERNAME = "key_username";
+    public final static String KEY_MODEL = "key_model";
+    public final static String KEY_USERNAME = "key_username";
     private final int COLLECTION = 1;
     private final int SINGLE_ROW = 2;
     private OModel mModel = null;
-    private UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
+    public UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     public static Uri buildURI(String authority, String model, String username) {
         Uri.Builder uriBuilder = new Uri.Builder();
@@ -66,7 +66,7 @@ public class BaseModelProvider extends ContentProvider {
         return null;
     }
 
-    private void setModel(Uri uri) {
+    public void setModel(Uri uri) {
         String authority = (authority() != null) ? authority() : uri.getAuthority();
         String path = uri.getQueryParameter(KEY_MODEL);
         String username = uri.getQueryParameter(KEY_USERNAME);
