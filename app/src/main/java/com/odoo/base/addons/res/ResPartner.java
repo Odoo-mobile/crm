@@ -80,6 +80,17 @@ public class ResPartner extends OModel {
         return "";
     }
 
+    public static String getContact(Context context, int row_id) {
+        ODataRow row = new ResPartner(context, null).browse(row_id);
+        String contact;
+        if (row.getString("mobile").equals("false")) {
+            contact = row.getString("phone");
+        } else {
+            contact = row.getString("mobile");
+        }
+        return contact;
+    }
+
     public String getAddress(ODataRow row) {
         String add = "";
         if (!row.getString("street").equals("false"))

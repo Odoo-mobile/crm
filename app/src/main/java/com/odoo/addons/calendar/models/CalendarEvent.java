@@ -116,6 +116,10 @@ public class CalendarEvent extends OModel {
         return buildURI(AUTHORITY);
     }
 
+    public Uri agendaUri() {
+        return uri().buildUpon().appendPath("full_agenda").build();
+    }
+
     public String storeStartDate(OValues value) {
         if (value.contains("date")) {
             return value.getString("date");

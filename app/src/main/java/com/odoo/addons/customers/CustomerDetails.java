@@ -43,6 +43,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
@@ -321,6 +322,9 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
             try {
                 Thread.sleep(300);
                 Odoo odoo = app.getOdoo(resPartner.getUser());
+                if (odoo == null) {
+                    odoo = OSyncAdapter.createOdooInstance(CustomerDetails.this, resPartner.getUser());
+                }
                 ODomain domain = new ODomain();
                 domain.add("id", "=", params[0]);
                 JSONObject result = odoo.search_read(resPartner.getModelName(),
