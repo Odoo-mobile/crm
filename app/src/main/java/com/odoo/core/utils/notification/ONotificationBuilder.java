@@ -48,6 +48,7 @@ public class ONotificationBuilder {
     private int icon = R.drawable.ic_odoo_o;
     private List<NotificationAction> mActions = new ArrayList<ONotificationBuilder.NotificationAction>();
     private int notification_id = 0;
+    private Boolean withVibrate = true;
 
     public ONotificationBuilder(Context context, int notification_id) {
         mContext = context;
@@ -89,6 +90,11 @@ public class ONotificationBuilder {
         return this;
     }
 
+    public ONotificationBuilder allowVibrate(Boolean vibrate) {
+        withVibrate = vibrate;
+        return this;
+    }
+
     private void init() {
         mNotificationManager = (NotificationManager) mContext
                 .getSystemService(Context.NOTIFICATION_SERVICE);
@@ -105,19 +111,17 @@ public class ONotificationBuilder {
             notiStyle.bigText(bigText);
             mNotificationBuilder.setStyle(notiStyle);
         }
-        setSoundForNotification();
-        setVibrateForNotification();
     }
 
     private void setSoundForNotification() {
-        mNotificationBuilder.setVibrate(new long[]{1000, 1000, 1000, 1000,
-                1000});
-    }
-
-    private void setVibrateForNotification() {
         Uri uri = RingtoneManager
                 .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mNotificationBuilder.setSound(uri);
+    }
+
+    private void setVibrateForNotification() {
+        mNotificationBuilder.setVibrate(new long[]{1000, 1000, 1000, 1000,
+                1000});
     }
 
     public ONotificationBuilder setResultIntent(Intent intent) {
@@ -127,6 +131,10 @@ public class ONotificationBuilder {
 
     public ONotificationBuilder build() {
         init();
+        if (withVibrate) {
+            setVibrateForNotification();
+            setSoundForNotification();
+        }
         if (resultIntent != null) {
             _setResultIntent();
         }

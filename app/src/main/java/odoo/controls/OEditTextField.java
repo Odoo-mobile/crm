@@ -218,7 +218,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (!hasFocus && edtText.getText().length() > 0) {
-            setValue(edtText.getText());
+            setValue(getValue());
         }
     }
 

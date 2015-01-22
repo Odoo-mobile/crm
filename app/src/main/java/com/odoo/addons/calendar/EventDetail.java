@@ -22,6 +22,7 @@ package com.odoo.addons.calendar;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
@@ -54,6 +55,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         EventColorDialog.OnColorSelectListener, OField.IOnFieldValueChangeListener, ReminderDialog.OnReminderValueSelectListener {
     public static final String TAG = EventDetail.class.getSimpleName();
     private ActionBar actionBar;
+    public static final String KEY_RESCHEDULE = "key_reschedule";
     private static final String KEY_EXTRA_EVENT_COLOR = "event_color";
     private static final String KEY_COLOR_DATA = "color_data";
     private String mEventColor = CalendarUtils.getBackgroundColors()[0];
@@ -122,6 +124,14 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
             eventForm.initForm(null);
         }
 
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(KEY_RESCHEDULE)) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onClick(findViewById(R.id.reminderForEvent));
+                }
+            }, 500);
+        }
     }
 
     @Override
@@ -245,6 +255,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
             }
             if (row_id != -1) {
                 Log.i(TAG, "Event updated");
+                //FIXME:  meeting.put("is_done", "false");
                 calendarEvent.update(row_id, meeting);
             } else {
                 Log.i(TAG, "Event created");

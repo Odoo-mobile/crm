@@ -111,11 +111,13 @@ public class OModel {
         mContext = context;
         mUser = (user == null) ? OUser.current(context) : user;
         this.model_name = model_name;
-        mOdooVersion = new OdooVersion();
-        mOdooVersion.setVersion_number(mUser.getVersion_number());
-        mOdooVersion.setServer_serie(mUser.getVersion_serie());
-        if (sqLite == null) {
-            sqLite = new OSQLite(mContext, mUser);
+        if (mUser != null) {
+            mOdooVersion = new OdooVersion();
+            mOdooVersion.setVersion_number(mUser.getVersion_number());
+            mOdooVersion.setServer_serie(mUser.getVersion_serie());
+            if (sqLite == null) {
+                sqLite = new OSQLite(mContext, mUser);
+            }
         }
     }
 
