@@ -19,11 +19,116 @@
  */
 package com.odoo.addons.calendar.providers;
 
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
+import android.net.Uri;
+
 import com.odoo.addons.calendar.models.CalendarEvent;
+import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.phonecall.models.CRMPhoneCalls;
+import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.provider.BaseModelProvider;
+import com.odoo.core.utils.ODateUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 public class CalendarSyncProvider extends BaseModelProvider {
     public static final String TAG = CalendarSyncProvider.class.getSimpleName();
+    public static final int FULL_AGENDA = 114;
+
+
+    @Override
+    public boolean onCreate() {
+        String path = new CalendarEvent(getContext(), null).getModelName().toLowerCase(Locale.getDefault());
+        matcher.addURI(authority(), path + "/full_agenda", FULL_AGENDA);
+        return super.onCreate();
+    }
+
+    @Override
+    public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs,
+                        String sortOrder) {
+        int match = matcher.match(uri);
+        if (match != FULL_AGENDA) {
+            return super.query(uri, base_projection, selection, selectionArgs, sortOrder);
+        }
+
+        String date_start = selectionArgs[0];
+        String date_end = ODateUtils.getDateDayBeforeAfterUTC(date_start, 1);
+        String filter = null;
+        if (selectionArgs.length > 1)
+            filter = selectionArgs[1];
+        String where = "";
+        List<String> args = new ArrayList<>();
+        // Getting events
+        CalendarEvent events = new CalendarEvent(getContext(), null);
+        MatrixCursor event_separator = new MatrixCursor(
+                new String[]{OColumn.ROW_ID, "data_type", "name"});
+
+        // Comparing date_start and date_end
+        where = "(date_start >= ? and date_start <= ?) and (date_end >= ? and date_end <= ?)";
+        args.add(date_start);
+        args.add(date_end);
+        args.add(date_start);
+        args.add(date_end);
+        if (filter != null) {
+            where += " and name like ?";
+            args.add(filter);
+        }
+        Cursor eventCR = getContext().getContentResolver().query(events.uri(),
+                base_projection, where, args.toArray(new String[args.size()]), sortOrder);
+        if (eventCR.getCount() > 0)
+            event_separator.addRow(new String[]{"0", "separator", "Events"});
+
+
+        // Getting phone calls
+        CRMPhoneCalls phoneCalls = new CRMPhoneCalls(getContext(), null);
+        MatrixCursor phone_calls_separator = new MatrixCursor(
+                new String[]{OColumn.ROW_ID, "data_type", "name"});
+
+        // Comparing date
+        where = "date >=  ? and date <= ?";
+        args.clear();
+        args.add(date_start);
+        args.add(date_end);
+        if (filter != null) {
+            where += " and (name like ? or description like ?)";
+            args.add(filter);
+            args.add(filter);
+        }
+        Cursor phoneCallsCR = getContext().getContentResolver().query(phoneCalls.uri(),
+                base_projection, where, args.toArray(new String[args.size()]), sortOrder);
+        if (phoneCallsCR.getCount() > 0)
+            phone_calls_separator.addRow(new String[]{"0", "separator", "Phone Calls"});
+
+        // Getting opportunity
+        CRMLead opportunity = new CRMLead(getContext(), null);
+        MatrixCursor opportunity_separator = new MatrixCursor(
+                new String[]{OColumn.ROW_ID, "data_type", "name"});
+        // Comparing with create_date and date_action and type
+        where = "(date_deadline >= ? and date_deadline <= ? or date_action >= ? and date_action <= ?) and type = ?";
+        args.clear();
+        args.add(date_start);
+        args.add(date_end);
+        args.add(date_start);
+        args.add(date_end);
+        args.add("opportunity");
+        if (filter != null) {
+            where += " and (name like ? or description like ?)";
+            args.add(filter);
+            args.add(filter);
+        }
+        Cursor opportunityCR = getContext().getContentResolver().query(opportunity.uri(),
+                base_projection, where, args.toArray(new String[args.size()]), sortOrder);
+        if (opportunityCR.getCount() > 0)
+            opportunity_separator.addRow(new String[]{"0", "separator", "Opportunities"});
+        MergeCursor mergedData = new MergeCursor(new Cursor[]{
+                event_separator, eventCR, phone_calls_separator, phoneCallsCR, opportunity_separator,
+                opportunityCR});
+        return mergedData;
+    }
 
     @Override
     public String authority() {
