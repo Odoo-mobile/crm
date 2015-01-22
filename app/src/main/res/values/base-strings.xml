@@ -6,6 +6,7 @@
     <string name="label_password">Password</string>
     <string name="label_forgot_password">Forgot password?</string>
     <string name="label_add_self_hosted_url">Add self-hosted URL</string>
+    <string name="label_login_with_odoo">Login with Odoo.com</string>
     <string name="label_create_account">Create account</string>
     <string name="label_select_database">Select Database</string>
     <string name="title_ssl_warning">SSL Warning</string>
@@ -71,7 +72,8 @@
     <string name="label_read_more">Read More</string>
     <string name="label_read_less">Read Less</string>
     <string name="label_no_records_found">No Records Found</string>
-
+    <string name="label_odoo_mobile_on_github">Odoo Mobile on GitHub</string>
+    <string name="label_our_apps">Our apps</string>
     <!-- Toasts -->
     <string name="toast_setting_saved">Setting saved.</string>
     <string name="toast_are_you_sure_logout">Are you sure want to logout ?</string>
@@ -117,4 +119,11 @@
     <string name="odoo_mobile_framework">Odoo Mobile framework</string>
     <string name="supported_versions">Supported versions</string>
     <string name="supported_versions_names">Odoo 7.0+</string>
+
+    <!-- Aboout Company Fragment Strings -->
+    <string name="about_Company_line1">Copyright © 2004-TODAY Odoo SA. All Rights Reserved.</string>
+    <string name="about_Company_line2">Odoo is a trademark of the <a href="https://www.odoo.com/">Odoo.com.</a></string>
+    <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
+    <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
+    <string name="app_version_name">Version</string>
 </resources>

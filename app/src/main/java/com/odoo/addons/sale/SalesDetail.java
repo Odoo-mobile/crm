@@ -22,18 +22,28 @@ package com.odoo.addons.sale;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.controls.ExpandableHeightGridView;
 import com.odoo.core.utils.logger.OLog;
 import com.odoo.crm.R;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import odoo.controls.OField;
 import odoo.controls.OForm;
@@ -48,6 +58,9 @@ public class SalesDetail extends ActionBarActivity {
     private SaleOrder sale;
     private ActionBar actionBar;
     private Menu menu;
+    private ExpandableHeightGridView mList;
+    private OListAdapter mAdapter;
+    List<Object> objects = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,10 +71,14 @@ public class SalesDetail extends ActionBarActivity {
         sale = new SaleOrder(this, null);
         extra = getIntent().getExtras();
         init();
+        initAdapter();
     }
 
     private void init() {
         mForm = (OForm) findViewById(R.id.saleForm);
+//        OField countOrderLine = (OField) mForm.findViewById(R.id.countLine);
+//        countOrderLine.setOnClickListener(this);
+
         if (extra == null) {
             mForm.setEditable(true);
             mForm.initForm(null);
@@ -80,6 +97,32 @@ public class SalesDetail extends ActionBarActivity {
             mForm.setEditable(false);
             mForm.initForm(record);
         }
+    }
+
+    private void initAdapter() {
+        mList = (ExpandableHeightGridView) findViewById(R.id.expListOrderLine);
+        mList.setVisibility(View.VISIBLE);
+        record = sale.browse(extra.getInt(OColumn.ROW_ID));
+        List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
+        objects.addAll(lines);
+        mAdapter = new OListAdapter(this, R.layout.sale_order_line_item, objects) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View mView = convertView;
+                if (mView == null) {
+                    mView = LayoutInflater.from(SalesDetail.this).inflate(getResource(), parent, false);
+                }
+                ODataRow row = (ODataRow) mAdapter.getItem(position);
+                OControls.setText(mView, R.id.edtName, row.getString("name"));
+                OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
+                OControls.setText(mView, R.id.edtProductPrice, row.getString("price_unit"));
+                OControls.setText(mView, R.id.edtSubTotal, row.getString("price_subtotal"));
+
+                return mView;
+            }
+        };
+        mList.setExpanded(true);
+        mList.setAdapter(mAdapter);
     }
 
     @Override
@@ -113,6 +156,9 @@ public class SalesDetail extends ActionBarActivity {
     }
 
     private void toggleMenu(boolean editModel) {
+        OField paymentTerm = (OField) mForm.findViewById(R.id.fPaymentTerm);
+        OField validityDate = (OField) mForm.findViewById(R.id.fValidityDate);
+        LinearLayout layoutTotal = (LinearLayout) mForm.findViewById(R.id.layoutTotal);
         if (editModel) {
             // Create mode (visible: save only)
             menu.findItem(R.id.menu_sale_edit).setVisible(false);
@@ -120,11 +166,19 @@ public class SalesDetail extends ActionBarActivity {
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
             OField name = (OField) mForm.findViewById(R.id.fname);
             name.setEditable(false);
+            paymentTerm.visibleControl(true);
+            validityDate.visibleControl(true);
+            mList.setVisibility(View.VISIBLE);
+            layoutTotal.setVisibility(View.GONE);
         } else {
             // display mode (visible: edit, more)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_edit).setVisible(true);
+            paymentTerm.visibleControl(false);
+            validityDate.visibleControl(false);
+            mList.setVisibility(View.GONE);
+            layoutTotal.setVisibility(View.VISIBLE);
         }
     }
 
@@ -174,7 +228,6 @@ public class SalesDetail extends ActionBarActivity {
                 break;
             case R.id.menu_sale_confirm_sale:
                 OLog.log("Confirm");
-//                TODO check the order line or not
                 if (values != null) {
                     if (record != null) {
                         if (extra != null && record.getFloat("amount_total") > 0) {
@@ -214,4 +267,10 @@ public class SalesDetail extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+//    @Override
+//    public void onClick(View v) {
+//        if (extra != null)
+//            IntentUtils.startActivity(this, SaleOrderLine.class, extra);
+//    }
 }

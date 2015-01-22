@@ -35,7 +35,7 @@
                 app:showIcon="false"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 app:controlLabel="Define the lead"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -46,7 +46,7 @@
                 android:layout_width="match_parent"
                 app:fieldName="partner_phone"
                 app:iconResource="@drawable/ic_action_phone"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -60,7 +60,7 @@
                 app:fieldName="partner_id"
                 app:widgetType="SearchableLive"
                 app:iconResource="@drawable/ic_action_user"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -74,7 +74,7 @@
                 app:fieldName="opportunity_id"
                 app:widgetType="Searchable"
                 app:iconResource="@drawable/ic_action_opportunities"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -89,7 +89,7 @@
                 app:parsePattern="MMM, dd hh:mm a"
                 app:defaultValue="now()"
                 app:iconResource="@drawable/ic_action_time_clock"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -97,7 +97,8 @@
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 app:fieldName="duration"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
+                app:widgetType="Duration"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -110,7 +111,7 @@
                 android:layout_width="match_parent"
                 app:fieldName="categ_id"
                 app:iconResource="@drawable/ic_action_in_out"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -123,7 +124,7 @@
                 android:layout_width="match_parent"
                 app:fieldName="description"
                 app:iconResource="@drawable/ic_action_notes_content"
-                app:fieldTextSize="5sp"
+                app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>

@@ -55,6 +55,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
     public static final String TAG = EventDetail.class.getSimpleName();
     private ActionBar actionBar;
     private static final String KEY_EXTRA_EVENT_COLOR = "event_color";
+    private static final String KEY_COLOR_DATA = "color_data";
     private String mEventColor = CalendarUtils.getBackgroundColors()[0];
     private OForm eventForm;
     private Integer mEventColorCode = 0;
@@ -83,7 +84,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         allDay = (OField) findViewById(R.id.fieldAllDay);
         if (savedInstanceState != null) {
             mEventColor = savedInstanceState.getString(KEY_EXTRA_EVENT_COLOR);
-            color_data = savedInstanceState.getParcelable("color_data");
+            color_data = savedInstanceState.getParcelable(KEY_COLOR_DATA);
             colorSelected(color_data);
         } else {
             setThemeColor(mEventColor);
@@ -143,19 +144,21 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString(KEY_EXTRA_EVENT_COLOR, mEventColor);
-        outState.putParcelable("color_data", color_data);
+        outState.putParcelable(KEY_COLOR_DATA, color_data);
     }
 
     @Override
     public void colorSelected(ODataRow color_data) {
-        mEventColor = color_data.getString("code");
-        this.color_data = color_data;
-        ImageView event_color_view = (ImageView) findViewById(R.id.event_color_view);
-        event_color_view.setColorFilter(Color.parseColor(mEventColor));
-        OControls.setText(mView, R.id.event_color_label,
-                color_data.getString("label"));
-        mEventColorCode = color_data.getInt("index");
-        setThemeColor(mEventColor);
+        if (color_data != null) {
+            mEventColor = color_data.getString("code");
+            this.color_data = color_data;
+            ImageView event_color_view = (ImageView) findViewById(R.id.event_color_view);
+            event_color_view.setColorFilter(Color.parseColor(mEventColor));
+            OControls.setText(mView, R.id.event_color_label,
+                    color_data.getString("label"));
+            mEventColorCode = color_data.getInt("index");
+            setThemeColor(mEventColor);
+        }
     }
 
     private void setThemeColor(String color_code) {
@@ -173,6 +176,9 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                break;
             case R.id.menu_calendar_detail_save:
                 OValues values = eventForm.getValues();
                 if (values != null) {

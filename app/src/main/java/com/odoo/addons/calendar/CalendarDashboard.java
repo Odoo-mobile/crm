@@ -29,6 +29,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -43,6 +44,8 @@ import com.odoo.addons.calendar.utils.TodayIcon;
 import com.odoo.addons.crm.CRMDetail;
 import com.odoo.addons.customers.CustomerDetails;
 import com.odoo.addons.phonecall.PhoneCallDetail;
+import com.odoo.addons.phonecall.models.CRMPhoneCalls;
+import com.odoo.base.addons.res.ResPartner;
 import com.odoo.calendar.SysCal;
 import com.odoo.calendar.view.OdooCalendar;
 import com.odoo.core.orm.ODataRow;
@@ -76,7 +79,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         OCursorListAdapter.OnViewBindListener, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, BottomSheetListeners.OnSheetActionClickListener,
         BottomSheetListeners.OnSheetMenuCreateListener, EventListener,
-        IOnSearchViewChangeListener, IOnItemClickListener {
+        IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener {
     public static final String TAG = CalendarDashboard.class.getSimpleName();
     public static final String KEY = "key_calendar_dashboard";
     public static final String KEY_DATE = "key_date";
@@ -90,7 +93,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private OCursorListAdapter mAdapter;
     private boolean syncRequested = false;
     private String mFilter = null;
-
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -124,9 +126,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
         mDateInfo = date;
         initAdapter();
-        mFilterDate = ODateUtils.convertToDefault(date.getYear() + "-" +
-                date.getMonth() + "-" + date.getDate()
-                , "yyyy-m-d", ODateUtils.DEFAULT_DATE_FORMAT);
+        mFilterDate = ODateUtils.convertToUTC(date.getYear() + "-" +
+                date.getMonth() + "-" + date.getDate() + " 00:00:00", ODateUtils.DEFAULT_FORMAT);
         getLoaderManager().restartLoader(0, null, this);
         return calendarView;
     }
@@ -135,6 +136,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         mAdapter = new OCursorListAdapter(getActivity(), null,
                 R.layout.calendar_dashboard_item_view);
         mAdapter.setOnViewBindListener(this);
+        mAdapter.setOnViewCreateListener(this);
         dashboardListView.setAdapter(mAdapter);
         mAdapter.changeCursor(null);
         mAdapter.handleItemClickListener(dashboardListView, this);
@@ -155,6 +157,12 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         if (data_type.equals("event")) {
             showSheet(SheetType.Event, cr);
         }
+        if (data_type.equals("phone_call")) {
+            showSheet(SheetType.PhoneCall, cr);
+        }
+        if (data_type.equals("opportunity")) {
+            showSheet(SheetType.Opportunity, cr);
+        }
     }
 
     private void showSheet(SheetType type, Cursor data) {
@@ -174,6 +182,12 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             case Event:
                 builder.menu(R.menu.menu_dashboard_events);
                 break;
+            case PhoneCall:
+                builder.menu(R.menu.menu_dashboard_phonecalls);
+                break;
+            case Opportunity:
+                builder.menu(R.menu.menu_dashboard_opportunity);
+                break;
         }
         mSheet = builder.create();
         mSheet.show();
@@ -190,21 +204,21 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 String data_type = cr.getString(cr.getColumnIndex("data_type"));
                 int record_id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
                 if (data_type.equals("phone_call")) {
+                    Bundle extra = new Bundle();
+                    extra.putInt(OColumn.ROW_ID, record_id);
+                    IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
                 }
                 if (data_type.equals("event")) {
                     Bundle extra = new Bundle();
                     extra.putInt(OColumn.ROW_ID, record_id);
                     IntentUtils.startActivity(getActivity(), EventDetail.class, extra);
                 }
-//                if (data_type.equals("opportunity")) {
-//                    CRMDetailFrag crmDetail = new CRMDetailFrag();
-//                    Bundle bundle = new Bundle();
-//                    bundle.putInt(OColumn.ROW_ID, record_id);
-//                    bundle.putString(CRM.KEY_CRM_LEAD_TYPE,
-//                            CRM.Keys.Opportunities.toString());
-//                    crmDetail.setArguments(bundle);
-//                    startFragment(crmDetail, true);
-//                }
+
+                if (data_type.equals("opportunity")) {
+                    Bundle bundle = new Bundle();
+                    bundle.putInt(OColumn.ROW_ID, record_id);
+                    IntentUtils.startActivity(getActivity(), CRMDetail.class, bundle);
+                }
             }
         }, 250);
 
@@ -221,9 +235,11 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         if (type.equals("event")) {
             mark_done = menu.findItem(R.id.menu_events_all_done);
         }
-//        if (type.equals("phone_call")) {
-//            mark_done = menu.findItem(R.id.menu_phonecall_all_done);
-//        }
+        if (type.equals("phone_call")) {
+            mark_done = menu.findItem(R.id.menu_phonecall_all_done);
+        }
+        if (type.equals("opportunity")) {
+        }
         if (mark_done != null) {
             mark_done.setTitle("Mark Undone");
             mark_done.setIcon(R.drawable.ic_action_mark_undone);
@@ -231,62 +247,83 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     }
 
     @Override
+    public View onViewCreated(Context context, ViewGroup view, Cursor cr, int position) {
+        String data_type = cr.getString(cr.getColumnIndex("data_type"));
+        if (data_type.equals("separator")) {
+            return LayoutInflater.from(getActivity()).inflate(
+                    R.layout.calendar_dashboard_item_separator, view, false);
+        }
+        return LayoutInflater.from(getActivity()).inflate(
+                R.layout.calendar_dashboard_item_view, view, false);
+    }
+
+    @Override
     public void onViewBind(View view, Cursor cursor, ODataRow row) {
         String type = row.getString("data_type");
         int icon = -1;
-        String date = "false";
-        if (row.getString("description").equals("false")) {
-            row.put("description", "");
-        }
-
-        if (type.equals("event")) {
-            icon = R.drawable.ic_action_event;
-            if (row.getString("allday").equals("false")) {
-                date = row.getString("date_start");
-                view.findViewById(R.id.allDay).setVisibility(View.GONE);
-            } else {
-                view.findViewById(R.id.allDay).setVisibility(View.VISIBLE);
+        if (type.equals("separator")) {
+            OControls.setText(view, R.id.list_separator, row.getString("name"));
+        } else {
+            String date = "false";
+            if (row.getString("description").equals("false")) {
+                row.put("description", "");
             }
 
-        }
-        OControls.setImage(view, R.id.event_icon, icon);
-        OControls.setText(view, R.id.event_name, row.getString("name"));
-        if (!date.equals("false")) {
-            date = ODateUtils.convertToDefault(date, ODateUtils.DEFAULT_FORMAT, "hh:mm a");
-            OControls.setText(view, R.id.event_time, date);
-        }
-        OControls.setText(view, R.id.event_description, row.getString("description"));
-        Boolean is_done = row.getString("is_done").equals("1");
-        if (is_done) {
-            int title_color = (is_done) ? Color.GRAY : Color.parseColor("#414141");
-            int time_color = (is_done) ? Color.GRAY : _c(R.color.theme_secondary_light);
-            int desc_color = (is_done) ? Color.GRAY : Color.parseColor("#aaaaaa");
-            int allDay_color = (is_done) ? Color.GRAY : _c(R.color.android_violet);
-            view.findViewById(R.id.event_icon).setBackgroundResource(
-                    R.drawable.circle_mask);
-            OControls.setTextColor(view, R.id.event_name, title_color);
-            OControls.setTextColor(view, R.id.event_time, time_color);
-            OControls.setTextColor(view, R.id.event_description, desc_color);
-            OControls.setTextColor(view, R.id.allDay, allDay_color);
-            OControls.setTextViewStrikeThrough(view, R.id.event_name);
-            OControls.setTextViewStrikeThrough(view, R.id.event_time);
-            OControls.setTextViewStrikeThrough(view, R.id.event_description);
-            OControls.setTextViewStrikeThrough(view, R.id.allDay);
+            if (type.equals("event")) {
+                icon = R.drawable.ic_action_event;
+                if (row.getString("allday").equals("false")) {
+                    date = row.getString("date_start");
+                    view.findViewById(R.id.allDay).setVisibility(View.GONE);
+                } else {
+                    view.findViewById(R.id.allDay).setVisibility(View.VISIBLE);
+                }
+            }
+
+            if (type.equals("phone_call")) {
+                icon = R.drawable.ic_action_phone;
+                date = row.getString("date");
+            }
+            if (type.equals("opportunity")) {
+                icon = R.drawable.ic_action_opportunities;
+            }
+
+            if (!date.equals("false")) {
+                date = ODateUtils.convertToDefault(date, ODateUtils.DEFAULT_FORMAT, "hh:mm a");
+                OControls.setText(view, R.id.event_time, date);
+            }
+            OControls.setText(view, R.id.event_description, row.getString("description"));
+            Boolean is_done = row.getString("is_done").equals("1");
+            OControls.setImage(view, R.id.event_icon, icon);
+            if (is_done) {
+                int title_color = (is_done) ? Color.GRAY : Color.parseColor("#414141");
+                int time_color = (is_done) ? Color.GRAY : _c(R.color.theme_secondary_light);
+                int desc_color = (is_done) ? Color.GRAY : Color.parseColor("#aaaaaa");
+                int allDay_color = (is_done) ? Color.GRAY : _c(R.color.android_violet);
+                view.findViewById(R.id.event_icon).setBackgroundResource(
+                        R.drawable.circle_mask);
+                OControls.setTextColor(view, R.id.event_name, title_color);
+                OControls.setTextColor(view, R.id.event_time, time_color);
+                OControls.setTextColor(view, R.id.event_description, desc_color);
+                OControls.setTextColor(view, R.id.allDay, allDay_color);
+                OControls.setTextViewStrikeThrough(view, R.id.event_name);
+                OControls.setTextViewStrikeThrough(view, R.id.event_time);
+                OControls.setTextViewStrikeThrough(view, R.id.event_description);
+                OControls.setTextViewStrikeThrough(view, R.id.allDay);
+            }
+            OControls.setText(view, R.id.event_name, row.getString("name"));
         }
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
-        String where = "(date(date_start) = ? or date(date_end) = ?) ";
         List<String> args = new ArrayList<>();
         args.add(mFilterDate);
-        args.add(mFilterDate);
         if (mFilter != null) {
-            where += " and name like ?";
             args.add("%" + mFilter + "%");
         }
-        return new CursorLoader(getActivity(), db().uri(),
-                db().projection(), where, args.toArray(new String[args.size()]), "date_start");
+        CalendarEvent event = (CalendarEvent) db();
+        return new CursorLoader(getActivity(), event.agendaUri(),
+                null, "", args.toArray(new String[args.size()]), null);
     }
 
     @Override
@@ -393,67 +430,73 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
                 break;
             case R.id.menu_events_reschedule:
+                ODataRow row = OCursorUtils.toDatarow(cr);
+                IntentUtils.startActivity(getActivity(), EventDetail.class, row.getPrimaryBundleData());
                 break;
-//            // Opportunity menus
-//            case R.id.menu_opp_customer_location:
-//                String address = cr.getString(cr.getColumnIndex("street")) + ", ";
-//                address += cr.getString(cr.getColumnIndex("street2")) + ", ";
-//                address += cr.getString(cr.getColumnIndex("city")) + ", ";
-//                address += cr.getString(cr.getColumnIndex("zip"));
-//                address = address.replaceAll("false", "");
-//                if (TextUtils.isEmpty(address)) {
-//                    Toast.makeText(getActivity(), "No location found !",
-//                            Toast.LENGTH_LONG).show();
-//                } else {
-//                    IntentUtil.redirectToMap(getActivity(), address);
-//                }
-//                break;
-//            case R.id.menu_opp_call_customer:
-//            case R.id.menu_phonecall_call:
-//                int partner_id = cr.getInt(cr.getColumnIndex("partner_id"));
-//                if (partner_id != 0) {
-//                    ResPartner pDb = new ResPartner(getActivity());
-//                    String contact = pDb.getContact(partner_id);
-//                    if (contact != null) {
-//                        IntentUtil.callIntent(getActivity(), contact);
-//                    } else {
-//                        Toast.makeText(getActivity(), "No contact found.",
-//                                Toast.LENGTH_LONG).show();
-//                    }
-//                } else {
-//                    Toast.makeText(getActivity(), "No contact found.",
-//                            Toast.LENGTH_LONG).show();
-//                }
-//                break;
-//            case R.id.menu_opp_lost:
-//                break;
-//            case R.id.menu_opp_won:
-//                break;
-//            case R.id.menu_opp_reschedule:
-//                break;
+            // Opportunity menus
+            case R.id.menu_opp_customer_location:
+                String address = cr.getString(cr.getColumnIndex("street")) + " ";
+                address += cr.getString(cr.getColumnIndex("street2")) + " ";
+                address += cr.getString(cr.getColumnIndex("city")) + " ";
+                address += cr.getString(cr.getColumnIndex("zip"));
+                address = address.replaceAll("false", "");
+                if (TextUtils.isEmpty(address.trim())) {
+                    Toast.makeText(getActivity(), "No location found !",
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    IntentUtils.redirectToMap(getActivity(), address);
+                }
+                break;
+            case R.id.menu_opp_call_customer:
+            case R.id.menu_phonecall_call:
+                int partner_id = cr.getInt(cr.getColumnIndex("partner_id"));
+                if (partner_id != 0) {
+                    String contact = ResPartner.getContact(getActivity(), partner_id);
+                    if (contact != null) {
+                        IntentUtils.requestCall(getActivity(), contact);
+                    } else {
+                        Toast.makeText(getActivity(), "No contact found.",
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "No contact found.",
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.menu_opp_lost:
+                //TODO: opportunity lost in Agenda
+                break;
+            case R.id.menu_opp_won:
+                //TODO: opportunity won in Agenda
+                break;
+            case R.id.menu_opp_reschedule:
+                //TODO: opportunity schedule in Agenda
+                break;
 
+            case R.id.menu_phonecall_reschedule:
+                row = OCursorUtils.toDatarow(cr);
+                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, row.getPrimaryBundleData());
+                break;
             // All done menu
-//            case R.id.menu_phonecall_all_done:
-//                final CRMPhoneCall phone_call = new CRMPhoneCall(getActivity());
-//                phone_call.resolver().update(row_id, vals);
-//                getLoaderManager().restartLoader(0, null, this);
-//                SnackBar.get(getActivity()).text("Phone call marked " + done_lable)
-//                        .actionColor(_c(R.color.theme_primary_light))
-//                        .duration(SnackbarDuration.LENGTH_TOO_LONG)
-//                        .withAction("undo", new ActionClickListener() {
-//
-//                            @Override
-//                            public void onActionClicked(SnackbarBuilder snackbar) {
-//                                vals.put("is_done", (vals.getString("is_done")
-//                                        .equals("0")) ? 1 : 0);
-//                                mFab.setVisibility(View.VISIBLE);
-//                                phone_call.resolver().update(row_id, vals);
-//                                getLoaderManager().restartLoader(0, null,
-//                                        CalendarDashboard.this);
-//                            }
-//                        }).show();
-//                hideFAB(6000);
-//                break;
+            case R.id.menu_phonecall_all_done:
+                final CRMPhoneCalls phone_call = new CRMPhoneCalls(getActivity(), null);
+                phone_call.update(row_id, values);
+                getLoaderManager().restartLoader(0, null, this);
+                SnackBar.get(getActivity()).text("Event marked " + done_label)
+                        .actionColor(_c(R.color.theme_primary_light))
+                        .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
+                        .withAction("undo", new ActionClickListener() {
+
+                            @Override
+                            public void onActionClicked(SnackbarBuilder snackbar) {
+                                values.put("is_done", (values.getString("is_done")
+                                        .equals("0")) ? 1 : 0);
+                                phone_call.update(row_id, values);
+                                getLoaderManager().restartLoader(0, null,
+                                        CalendarDashboard.this);
+                            }
+                        }).withEventListener(this).show();
+                break;
             case R.id.menu_events_all_done:
                 db().update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);

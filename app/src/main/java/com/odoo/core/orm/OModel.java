@@ -58,13 +58,14 @@ import java.util.Locale;
 import odoo.ODomain;
 import odoo.OdooVersion;
 
-public class OModel extends OSQLite {
+public class OModel {
 
     public static final String TAG = OModel.class.getSimpleName();
     public String BASE_AUTHORITY = "com.odoo.core.crm.provider.content";
     public static final String KEY_UPDATE_IDS = "key_update_ids";
     public static final String KEY_INSERT_IDS = "key_insert_ids";
     public static final int INVALID_ROW_ID = -1;
+    private static OSQLite sqLite = null;
     private Context mContext;
     private OUser mUser;
     private String model_name = null;
@@ -107,13 +108,31 @@ public class OModel extends OSQLite {
     OColumn _is_active = new OColumn("Active Record", OBoolean.class).setDefaultValue(true).setLocalColumn();
 
     public OModel(Context context, String model_name, OUser user) {
-        super(context, user);
         mContext = context;
         mUser = (user == null) ? OUser.current(context) : user;
         this.model_name = model_name;
         mOdooVersion = new OdooVersion();
         mOdooVersion.setVersion_number(mUser.getVersion_number());
         mOdooVersion.setServer_serie(mUser.getVersion_serie());
+        if (sqLite == null) {
+            sqLite = new OSQLite(mContext, mUser);
+        }
+    }
+
+    public SQLiteDatabase getReadableDatabase() {
+        return sqLite.getReadableDatabase();
+    }
+
+    public SQLiteDatabase getWritableDatabase() {
+        return sqLite.getWritableDatabase();
+    }
+
+    public String getDatabaseName() {
+        return sqLite.getDatabaseName();
+    }
+
+    public void close() {
+        // FIXME: Is close method required ???
     }
 
     public OModel setModelName(String model_name) {
@@ -552,6 +571,7 @@ public class OModel extends OSQLite {
     }
 
     public void setLastSyncDateTimeToNow() {
+        Log.i(TAG, "Model Sync Update : " + getModelName());
         IrModel model = new IrModel(mContext, mUser);
         OValues values = new OValues();
         values.put("model", getModelName());
