@@ -50,7 +50,7 @@ public class CRMDetail extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.crm_lead_detail);
+        setContentView(R.layout.crm_detail);
         OActionBarUtils.setActionBar(this, true);
         actionBar = getSupportActionBar();
         crmLead = new CRMLead(this, null);
@@ -60,25 +60,31 @@ public class CRMDetail extends ActionBarActivity {
 
     private void init() {
         mForm = (OForm) findViewById(R.id.crmLeadForm);
-        if (extra == null) {
+        if (!extra.containsKey(OColumn.ROW_ID)) {
+            if (extra.getString("type").equals(CRM.Type.Opportunities))
+                findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
             mForm.setEditable(true);
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
         } else {
-            record = crmLead.browse(extra.getInt(OColumn.ROW_ID));
-            if (record == null) {
-                finish();
-            }
-            if (!record.getString("type").equals("lead")) {
-                actionBar.setTitle(R.string.label_opportunity);
-                findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
-            } else {
-                actionBar.setTitle(R.string.label_lead);
-            }
+            initFormValues();
             mForm.setEditable(false);
-            mForm.initForm(record);
         }
+    }
+
+    private void initFormValues() {
+        record = crmLead.browse(extra.getInt(OColumn.ROW_ID));
+        if (record == null) {
+            finish();
+        }
+        if (!record.getString("type").equals("lead")) {
+            actionBar.setTitle(R.string.label_opportunity);
+            findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
+        } else {
+            actionBar.setTitle(R.string.label_lead);
+        }
+        mForm.initForm(record);
     }
 
     @Override
@@ -90,6 +96,8 @@ public class CRMDetail extends ActionBarActivity {
     }
 
     private void toggleMenu(boolean editModel) {
+        if (extra.containsKey(OColumn.ROW_ID))
+            initFormValues();
         if (editModel) {
             // Create mode (visible: save only)
             menu.findItem(R.id.menu_lead_detail_more).setVisible(false);

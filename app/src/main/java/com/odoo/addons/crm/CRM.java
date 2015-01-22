@@ -92,7 +92,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
 
     private void initAdapter() {
         mList = (ListView) mView.findViewById(R.id.listview);
-        mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.crm_lead_item);
+        mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.crm_item);
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
@@ -102,9 +102,12 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
 
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
             case R.id.fabButton:
-                IntentUtils.startActivity(getActivity(), CRMDetail.class, null);
+                Bundle type = new Bundle();
+                type.putString("type", mType.toString());
+                IntentUtils.startActivity(getActivity(), CRMDetail.class, type);
                 break;
         }
     }

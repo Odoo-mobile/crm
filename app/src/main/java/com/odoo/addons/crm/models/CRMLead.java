@@ -59,6 +59,7 @@ public class CRMLead extends OModel {
     OColumn street2 = new OColumn("Street2", OText.class);
     OColumn city = new OColumn("City", OVarchar.class).setSize(100);
     OColumn zip = new OColumn("Zip", OVarchar.class).setSize(20);
+    OColumn mobile = new OColumn("Mobile", OVarchar.class).setSize(20);
     OColumn phone = new OColumn("Phone", OVarchar.class).setSize(20);
     OColumn create_date = new OColumn("Creation Date", ODateTime.class);
     OColumn description = new OColumn("Internal Notes", OText.class);
@@ -132,6 +133,7 @@ public class CRMLead extends OModel {
     public ODataRow partnerIdOnChange(ODataRow row) {
         ODataRow rec = new ODataRow();
         String display_name = "";
+        String contact_name = "";
         ResCountry country = new ResCountry(mContext, null);
         try {
             rec.put("partner_name", row.getString("name"));
@@ -142,19 +144,25 @@ public class CRMLead extends OModel {
                             row.getString("parent_id"));
                     rec.put("partner_name", parent_id.get(1));
                     display_name = parent_id.getString(1);
+                    contact_name = parent_id.getString(1);
                 } else {
                     ODataRow parent_id = row.getM2ORecord("parent_id").browse();
                     if (parent_id != null) {
                         rec.put("partner_name", parent_id.getString("name"));
                         display_name = parent_id.getString("name");
+                        contact_name = parent_id.getString("name");
                     }
+
                 }
-                if (!TextUtils.isEmpty(display_name))
+                if (!TextUtils.isEmpty(display_name)) {
                     display_name += " (" + row.getString("name") + ")";
-                else
+                    contact_name = row.getString("name");
+                } else {
                     display_name += row.getString("name");
+                }
             } else {
                 display_name = row.getString("name");
+
             }
             Integer country_id = 0;
             if (!row.getString("country_id").equals("false")) {
@@ -176,6 +184,7 @@ public class CRMLead extends OModel {
                     rec.put("country_id", country_id);
             }
             rec.put("display_name", display_name);
+            rec.put("contact_name", contact_name);
             rec.put("street", row.getString("street"));
             rec.put("street2", row.getString("street2"));
             rec.put("city", row.getString("city"));
