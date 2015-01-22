@@ -104,6 +104,7 @@ public class CallerWindow {
         OControls.setImage(callerView, R.id.customerImage, bmp);
         OControls.setText(callerView, R.id.leadName, row.getString("lead_name"));
         OControls.setText(callerView, R.id.oppProbability, row.getString("probability"));
+        OControls.setText(callerView, R.id.partner_contact, row.getString("caller_contact"));
     }
 
     public void show(final Boolean dialed, final ODataRow row) {

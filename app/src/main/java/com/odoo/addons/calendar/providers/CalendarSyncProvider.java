@@ -78,7 +78,7 @@ public class CalendarSyncProvider extends BaseModelProvider {
             args.add(filter);
         }
         Cursor eventCR = getContext().getContentResolver().query(events.uri(),
-                base_projection, where, args.toArray(new String[args.size()]), sortOrder);
+                base_projection, where, args.toArray(new String[args.size()]), "is_done, date_start");
         if (eventCR.getCount() > 0)
             event_separator.addRow(new String[]{"0", "separator", "Events"});
 
@@ -99,7 +99,7 @@ public class CalendarSyncProvider extends BaseModelProvider {
             args.add(filter);
         }
         Cursor phoneCallsCR = getContext().getContentResolver().query(phoneCalls.uri(),
-                base_projection, where, args.toArray(new String[args.size()]), sortOrder);
+                base_projection, where, args.toArray(new String[args.size()]), "is_done , date");
         if (phoneCallsCR.getCount() > 0)
             phone_calls_separator.addRow(new String[]{"0", "separator", "Phone Calls"});
 
