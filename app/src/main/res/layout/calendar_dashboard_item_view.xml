@@ -53,9 +53,9 @@
                     android:visibility="gone"
                     android:text="All Day"
                     android:singleLine="true"
-                    android:fontFamily="@string/font_light"
+                    android:fontFamily="@string/font_normal"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/android_violet"
+                    android:textColor="@color/theme_secondary"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
@@ -64,8 +64,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
+                    android:fontFamily="@string/font_normal"
                     android:textAppearance="?android:attr/textAppearanceSmall"
-                    android:textColor="@color/theme_secondary_light" />
+                    android:textColor="@color/theme_secondary" />
             </LinearLayout>
 
             <TextView

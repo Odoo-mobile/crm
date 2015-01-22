@@ -295,12 +295,12 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             Boolean is_done = row.getString("is_done").equals("1");
             OControls.setImage(view, R.id.event_icon, icon);
             if (is_done) {
-                int title_color = (is_done) ? Color.GRAY : Color.parseColor("#414141");
-                int time_color = (is_done) ? Color.GRAY : _c(R.color.theme_secondary_light);
-                int desc_color = (is_done) ? Color.GRAY : Color.parseColor("#aaaaaa");
-                int allDay_color = (is_done) ? Color.GRAY : _c(R.color.android_violet);
+                int title_color = (is_done) ? Color.LTGRAY : Color.parseColor("#414141");
+                int time_color = (is_done) ? Color.LTGRAY : _c(R.color.theme_secondary_light);
+                int desc_color = (is_done) ? Color.LTGRAY : Color.parseColor("#aaaaaa");
+                int allDay_color = (is_done) ? Color.LTGRAY : _c(R.color.theme_secondary);
                 view.findViewById(R.id.event_icon).setBackgroundResource(
-                        R.drawable.circle_mask);
+                        R.drawable.circle_mask_gray);
                 OControls.setTextColor(view, R.id.event_name, title_color);
                 OControls.setTextColor(view, R.id.event_time, time_color);
                 OControls.setTextColor(view, R.id.event_description, desc_color);
@@ -431,7 +431,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 break;
             case R.id.menu_events_reschedule:
                 ODataRow row = OCursorUtils.toDatarow(cr);
-                IntentUtils.startActivity(getActivity(), EventDetail.class, row.getPrimaryBundleData());
+                Bundle data = row.getPrimaryBundleData();
+                data.putBoolean(EventDetail.KEY_RESCHEDULE, true);
+                IntentUtils.startActivity(getActivity(), EventDetail.class, data);
                 break;
             // Opportunity menus
             case R.id.menu_opp_customer_location:
