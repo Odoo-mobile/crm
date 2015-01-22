@@ -23,15 +23,18 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 public class IntentUtils {
 
     public static void openURLInBrowser(Context context, String url) {
-        if (!url.contains("http")) {
-            url = "http://" + url;
+        if (!url.equals("false") && !url.equals("")) {
+            if (!url.contains("http")) {
+                url = "http://" + url;
+            }
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            context.startActivity(intent);
         }
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-        context.startActivity(intent);
     }
 
     public static void startActivity(Context context, Class<?> activity_class, Bundle data) {
@@ -42,23 +45,30 @@ public class IntentUtils {
     }
 
     public static void redirectToMap(Context context, String location) {
-        String map = "geo:0,0?q=" + location;
-        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
-        context.startActivity(intent);
+        if (!location.equals("false") && !location.equals("")) {
+            Log.e(">>>>>>>>>","map");
+            String map = "geo:0,0?q=" + location;
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
+            context.startActivity(intent);
+        }
     }
 
     public static void requestMessage(Context context, String email) {
-        Intent intent = new Intent(Intent.ACTION_SENDTO);
-        intent.setType("text/plain");
-        intent.setData(Uri.parse("mailto:" + email));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
+        if (!email.equals("false") && !email.equals("")) {
+            Intent intent = new Intent(Intent.ACTION_SENDTO);
+            intent.setType("text/plain");
+            intent.setData(Uri.parse("mailto:" + email));
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }
     }
 
     public static void requestCall(Context context, String number) {
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        intent.setData(Uri.parse("tel:" + number));
-        context.startActivity(intent);
+        if (!number.equals("false") && number.equals("")) {
+            Intent intent = new Intent(Intent.ACTION_CALL);
+            intent.setData(Uri.parse("tel:" + number));
+            context.startActivity(intent);
+        }
     }
 
     public static void startContactIntent(Context context, String number) {

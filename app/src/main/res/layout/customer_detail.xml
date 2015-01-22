@@ -39,6 +39,7 @@
                 android:layout_below="@+id/parallax_view"
                 android:gravity="center_vertical"
                 android:fontFamily="@string/font_normal"
+                android:singleLine="true"
                 android:paddingLeft="@dimen/default_16dp"
                 android:textColor="#ffffff"
                 android:textSize="30sp" />
@@ -120,6 +121,17 @@
                         app:iconResource="@drawable/ic_action_mobile"
                         android:layout_width="match_parent"
                         app:fieldName="mobile"
+                        android:layout_height="wrap_content"></odoo.controls.OField>
+
+                    <View
+                        style="@style/ViewSeparator"
+                        android:layout_marginLeft="72dp" />
+
+                    <odoo.controls.OField
+                        android:layout_width="match_parent"
+                        app:iconResource="@drawable/ic_action_notes_content"
+                        app:fieldName="comment"
+                        app:fieldTextAppearance="?android:textAppearanceMedium"
                         android:layout_height="wrap_content"></odoo.controls.OField>
                 </odoo.controls.OForm>
             </LinearLayout>
