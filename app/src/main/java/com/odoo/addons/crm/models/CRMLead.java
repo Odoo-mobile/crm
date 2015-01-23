@@ -47,6 +47,8 @@ import org.json.JSONArray;
 public class CRMLead extends OModel {
     public static final String TAG = CRMLead.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.crm_lead";
+    public static final String KEY_LEAD = "lead";
+    public static final String KEY_OPPORTUNITY = "opportunity";
     private Context mContext;
 
     @Odoo.onChange(method = "partnerIdOnChange")
