@@ -48,7 +48,9 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         adapter.onSyncFinish(this);
+        
     }
+
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
