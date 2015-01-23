@@ -36,13 +36,9 @@ import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.crm.R;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OArguments;
 import odoo.controls.OForm;
 
 public class CRMDetail extends ActionBarActivity {
@@ -149,46 +145,9 @@ public class CRMDetail extends ActionBarActivity {
 
                 }
                 break;
-            case R.id.menu_lead_convert_to_opportunity:
-                try {
-                    odoo.Odoo odoo = crmLead.getServerDataHelper().getOdoo();
-                    OValues coValue = new OValues();
-                    List<Integer> ids = new ArrayList<Integer>();
-                    coValue.put("name", "convert");
-                    coValue.put("action", (record.getInt("partner_id") != null) ? "exist"
-                            : "create");
-                    coValue.put(
-                            "partner_id",
-                            (record.getInt("partner_id") != null) ? record.getInt("partner_id") : false);
-                    JSONObject context = new JSONObject();
-                    context.put("stage_type", "lead");
-                    context.put("active_id", record.getInt("id"));
-                    context.put("active_ids",
-                            new JSONArray().put(record.getInt("id")));
-                    context.put("active_model", "crm.lead");
-                    odoo.updateContext(context);
-                    JSONObject args = new JSONObject();
-                    for (String key : coValue.keys()) {
-                        args.put(key, coValue.get(key));
-                    }
-                    JSONObject result = odoo.createNew(
-                            "crm.lead2opportunity.partner", args);
-                    int lead_to_opp_partner_id = result
-                            .getInt("result");
-
-                    OArguments arg = new OArguments();
-                    arg.add(lead_to_opp_partner_id);
-                    arg.add(context);
-                    odoo.debug(true);
-                    odoo.call_kw("crm.lead2opportunity.partner",
-                            "action_apply", arg.get());
-                    OValues vals = new OValues();
-                    vals.put("type", "opportunity");
-                    crmLead.update(record.getInt(OColumn.ROW_ID), vals);
-                } catch (Exception e) {
-
-                }
-                finish();
+            case R.id.menu_lead_convert_to_opportunity :
+                List<Integer> ids = new ArrayList<Integer>();
+                values.put("name", "convert");
                 break;
         }
         return super.onOptionsItemSelected(item);

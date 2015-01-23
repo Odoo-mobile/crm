@@ -29,6 +29,8 @@
     <string name="label_logged_calls">Logged calls</string>
     <string name="label_convert_to_opportunity">Convert to Opportunity</string>
     <string name="label_convert_to_quotation">Convert to Quotation</string>
+    <string name="label_mark_as_lost">Mark Lost</string>
+    <string name="label_mark_as_won">Mark Won</string>
     <string name="label_location">Location</string>
     <string name="label_call">Call</string>
     <string name="label_message">Message</string>

@@ -72,6 +72,10 @@ public class ServerDataHelper {
         return items;
     }
 
+    public Odoo getOdoo() {
+        return mOdoo;
+    }
+
     public Object executeWorkFlow(int server_id, String signal) {
         try {
             return mOdoo.exec_workflow(mModel.getModelName(), server_id, signal);
