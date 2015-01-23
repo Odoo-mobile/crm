@@ -78,10 +78,13 @@ public class SalesDetail extends ActionBarActivity {
         mForm = (OForm) findViewById(R.id.saleForm);
         mForm.setEditable(true);
         TextView txvType = (TextView) findViewById(R.id.txvType);
+        TextView currency = (TextView) findViewById(R.id.currency);
+        TextView total_amt = (TextView) findViewById(R.id.fTotal);
         if (extra == null) {
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
+            txvType.setText(R.string.label_quotation);
         } else {
             record = sale.browse(extra.getInt(OColumn.ROW_ID));
             if (record == null) {
@@ -95,10 +98,10 @@ public class SalesDetail extends ActionBarActivity {
                 txvType.setText(R.string.label_sale_orders);
                 mForm.setEditable(false);
             }
+            currency.setText(record.getM2ORecord("currency_id").browse().getString("name"));
+            total_amt.setText(record.getString("amount_total"));
             mForm.initForm(record);
         }
-
-        ((OField) mForm.findViewById(R.id.fTotal)).setEditable(false);
     }
 
     private void initAdapter() {
@@ -180,6 +183,13 @@ public class SalesDetail extends ActionBarActivity {
                         values.put("name", "/");
                         values.put("create_date", ODateUtils.getUTCDate());
                         values.put("user_id", ResUsers.myId(this));
+                        values.put("state", "draft");
+                        values.put("state_title", sale.getStateTitle(values));
+                        ODataRow currency = sale.currency();
+                        values.put("currency_symbol", currency.getString("name"));
+                        values.put("currency_id", currency.getInt(OColumn.ROW_ID));
+                        values.put("order_line_count", "(No Lines)");
+                        values.put("amount_total", "0.0");
                         sale.insert(values);
                         finish();
                     }

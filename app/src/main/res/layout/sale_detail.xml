@@ -37,7 +37,6 @@
                 <TextView
                     android:id="@+id/txvType"
                     android:layout_width="wrap_content"
-                    android:text="Quotation"
                     android:gravity="right"
                     android:padding="@dimen/default_16dp"
                     android:textAppearance="?android:textAppearanceLarge"
@@ -46,12 +45,12 @@
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:id="@+id/fname"
+                    app:defaultValue="/"
                     app:fieldName="name"
                     app:showLabel="false"
                     app:showIcon="false"
                     app:fieldTextAppearance="?android:textAppearanceLarge"
-                    app:controlLabel="Define the sale"
-                    app:fieldTextSize="5sp"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
                     android:layout_height="wrap_content" />
             </LinearLayout>
 
@@ -66,20 +65,25 @@
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 android:layout_height="wrap_content" />
 
+            <View style="@style/ViewSeparator" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
+                android:showDividers="middle"
+                android:divider="?android:attr/dividerHorizontal"
                 android:layout_height="wrap_content">
 
                 <odoo.controls.OField
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     app:fieldName="date_order"
+                    app:defaultValue="now()"
                     app:showLabel="true"
                     app:showIcon="false"
-                    app:parsePattern="mmm/dd/yyyy hh:MM a"
-                    app:fieldTextSize="@dimen/text_size_xmedium"
-                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    app:parsePattern="MMM dd yyyy, hh:MM a"
+                    app:fieldTextSize="@dimen/text_size_medium"
+                    app:fieldTextAppearance="?android:textAppearanceSmall"
                     android:layout_height="wrap_content" />
 
                 <odoo.controls.OField
@@ -88,15 +92,21 @@
                     app:fieldName="validity_date"
                     app:showLabel="true"
                     app:showIcon="false"
-                    app:parsePattern="mmm/dd/yyyy"
-                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    app:parsePattern="MMM dd, yyyy"
+                    app:fieldTextSize="@dimen/text_size_medium"
+                    app:fieldTextAppearance="?android:textAppearanceSmall"
                     android:layout_height="wrap_content" />
             </LinearLayout>
+
+            <View style="@style/ViewSeparator" />
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 app:fieldName="payment_term"
                 app:showLabel="true"
+                app:fieldTextSize="@dimen/text_size_xmedium"
+                app:fieldTextAppearance="?android:textAppearanceMedium"
+                app:showIcon="false"
                 android:layout_height="wrap_content" />
 
 
@@ -105,41 +115,48 @@
             <com.odoo.core.utils.controls.ExpandableHeightGridView
                 android:id="@+id/expListOrderLine"
                 android:visibility="gone"
+                android:layout_marginTop="@dimen/default_8dp"
+                android:layout_marginBottom="@dimen/default_8dp"
+                android:numColumns="1"
+                android:verticalSpacing="@dimen/default_8dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <View style="@style/ViewSeparator" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:layout_height="match_parent">
 
                 <TextView
                     android:layout_width="0dp"
-                    android:text="Total :"
-                    android:gravity="right"
                     android:layout_weight="1"
                     android:padding="@dimen/default_16dp"
+                    android:text="Total:"
+                    android:gravity="center_vertical|right"
                     android:textAppearance="?android:textAppearanceMedium"
                     android:layout_height="match_parent" />
 
-                <odoo.controls.OField
+                <TextView
                     android:id="@+id/fTotal"
+                    android:paddingBottom="@dimen/default_16dp"
+                    android:paddingTop="@dimen/default_16dp"
                     android:layout_width="wrap_content"
-                    app:fieldName="amount_total"
-                    app:showLabel="false"
-                    app:showIcon="false"
-                    app:fieldTextAppearance="?android:textAppearanceMedium"
-                    android:layout_height="wrap_content" />
+                    android:gravity="center_vertical"
+                    android:fontFamily="@string/font_normal"
+                    android:textColor="@color/body_text_1"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:layout_height="match_parent" />
 
-                <odoo.controls.OField
+                <TextView
+                    android:id="@+id/currency"
+                    android:padding="@dimen/default_16dp"
                     android:layout_width="wrap_content"
-                    app:fieldName="currency_id"
-                    app:showLabel="false"
-                    app:showIcon="false"
-                    app:fieldTextAppearance="?android:textAppearanceMedium"
-                    android:layout_height="wrap_content" />
+                    android:gravity="center_vertical"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:layout_height="match_parent" />
+
             </LinearLayout>
         </odoo.controls.OForm>
     </ScrollView>

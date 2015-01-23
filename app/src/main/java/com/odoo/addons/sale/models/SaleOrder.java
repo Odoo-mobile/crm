@@ -22,9 +22,11 @@ package com.odoo.addons.sale.models;
 import android.content.Context;
 import android.net.Uri;
 
+import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
@@ -43,10 +45,11 @@ import java.util.HashMap;
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.sale_order";
+    private Context mContext;
     OColumn name = new OColumn("name", OVarchar.class);
     OColumn date_order = new OColumn("Date", ODateTime.class);
     OColumn partner_id = new OColumn("Customer", ResPartner.class,
-            OColumn.RelationType.ManyToOne);
+            OColumn.RelationType.ManyToOne).setRequired();
     OColumn user_id = new OColumn("Salesperson", ResUsers.class,
             OColumn.RelationType.ManyToOne);
     OColumn amount_total = new OColumn("Total", OFloat.class);
@@ -77,14 +80,25 @@ public class SaleOrder extends OModel {
 
     public SaleOrder(Context context, OUser user) {
         super(context, "sale.order", user);
+        mContext = context;
         if (getOdooVersion().getVersion_number() == 7) {
             date_order.setType(ODate.class);
         }
+
     }
 
     @Override
     public Uri uri() {
         return buildURI(AUTHORITY);
+    }
+
+    public ODataRow currency() {
+        ResCompany company = new ResCompany(mContext, getUser());
+        ODataRow row = company.browse(null, "id = ? ", new String[]{getUser().getCompany_id()});
+        if (row != null) {
+            return row.getM2ORecord("currency_id").browse();
+        }
+        return null;
     }
 
     public String getStateTitle(OValues row) {
