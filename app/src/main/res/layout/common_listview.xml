@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:odoo="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <include
+        layout="@layout/customer_filter_container"
+        android:id="@+id/customer_data_filter_container" />
+
     <LinearLayout
+        android:id="@+id/data_list_container"
+        android:layout_below="@+id/customer_data_filter_container"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -39,9 +45,10 @@
         android:id="@+id/fabButton"
         android:layout_width="72dp"
         android:layout_height="72dp"
-        android:layout_gravity="bottom|right"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:layout_marginBottom="16dp"
         android:layout_marginRight="16dp"
         odoo:drawable="@drawable/ic_action_content_add"
         odoo:fabColor="@color/theme_primary" />
-</FrameLayout>
+</RelativeLayout>

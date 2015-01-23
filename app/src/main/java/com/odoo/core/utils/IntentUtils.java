@@ -23,7 +23,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
 public class IntentUtils {
 
@@ -46,7 +45,6 @@ public class IntentUtils {
 
     public static void redirectToMap(Context context, String location) {
         if (!location.equals("false") && !location.equals("")) {
-            Log.e(">>>>>>>>>","map");
             String map = "geo:0,0?q=" + location;
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
             context.startActivity(intent);
@@ -64,7 +62,7 @@ public class IntentUtils {
     }
 
     public static void requestCall(Context context, String number) {
-        if (!number.equals("false") && number.equals("")) {
+        if (!number.equals("false") && !number.equals("")) {
             Intent intent = new Intent(Intent.ACTION_CALL);
             intent.setData(Uri.parse("tel:" + number));
             context.startActivity(intent);

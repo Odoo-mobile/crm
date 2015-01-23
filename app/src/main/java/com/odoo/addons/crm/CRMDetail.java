@@ -62,8 +62,8 @@ public class CRMDetail extends ActionBarActivity {
         mForm = (OForm) findViewById(R.id.crmLeadForm);
         if (!extra.containsKey(OColumn.ROW_ID)) {
             if (extra.getString("type").equals(CRM.Type.Opportunities)) {
-                findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
                 mForm.setEditable(true);
+                findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
             }
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);

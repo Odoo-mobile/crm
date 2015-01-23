@@ -30,7 +30,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -95,6 +94,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private OCursorListAdapter mAdapter;
     private boolean syncRequested = false;
     private String mFilter = null;
+
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -540,7 +540,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 IntentUtils.startActivity(getActivity(), CustomerDetails.class, null);
                 break;
             case R.id.menu_fab_new_lead:
-                Log.e(">>>", "hiiiiii");
                 Bundle type = new Bundle();
                 type.putString("type", CRM.Type.Leads.toString());
                 IntentUtils.startActivity(getActivity(), CRMDetail.class, type);
@@ -585,9 +584,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onStatusChange(Boolean refreshing) {
-//        if (!refreshing) {
-//            parent().sync().requestSync(CRMPhoneCalls.AUTHORITY);
-//        }
     }
 
     @Override

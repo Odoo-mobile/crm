@@ -39,8 +39,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.addons.crm.CRM;
+import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
@@ -66,6 +69,9 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         IOnBackPressListener, IOnItemClickListener {
 
     public static final String KEY = Customers.class.getSimpleName();
+    public static final String KEY_FILTER_REQUEST = "key_filter_request";
+    public static final String KEY_CUSTOMER_ID = "key_customer_id";
+    public static final String KEY_FILTER_TYPE = CRM.KEY_MENU;
     private View mView;
     private String mCurFilter = null;
     private ListView mPartnersList = null;
@@ -139,16 +145,20 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 }
             }, 500);
         } else {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    OControls.setGone(mView, R.id.loadingProgress);
+                    OControls.setGone(mView, R.id.swipe_container);
+                    OControls.setVisible(mView, R.id.customer_no_items);
+                    setHasSwipeRefreshView(mView, R.id.customer_no_items, Customers.this);
+                    OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
+                    OControls.setText(mView, R.id.title, "No Customers Found");
+                    OControls.setText(mView, R.id.subTitle, "");
+                }
+            }, 500);
             if (db().isEmptyTable()) {
                 onRefresh();
-            } else {
-                OControls.setGone(mView, R.id.loadingProgress);
-                OControls.setGone(mView, R.id.swipe_container);
-                OControls.setVisible(mView, R.id.customer_no_items);
-                setHasSwipeRefreshView(mView, R.id.customer_no_items, this);
-                OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
-                OControls.setText(mView, R.id.title, "No Customers Found");
-                OControls.setText(mView, R.id.subTitle, "");
             }
         }
     }
@@ -249,12 +259,13 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
         sheet.dismiss();
-        // FIXME: handle events
         ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
         switch (menu.getItemId()) {
             case R.id.menu_customer_opportunity:
+                requestLeads(CRM.Type.Opportunities, row.getInt(OColumn.ROW_ID), row.getString("name"));
                 break;
             case R.id.menu_customer_leads:
+                requestLeads(CRM.Type.Leads, row.getInt(OColumn.ROW_ID), row.getString("name"));
                 break;
             case R.id.menu_customer_location:
                 String address = ((ResPartner) db()).getAddress(OCursorUtils.toDatarow((Cursor) extras));
@@ -264,14 +275,28 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                     Toast.makeText(getActivity(), "No location found !", Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_customer_call:
+                IntentUtils.requestCall(getActivity(), (row.getString("phone").equals("false"))
+                        ? row.getString("mobile") : row.getString("phone"));
                 break;
             case R.id.menu_customer_send_message:
+                IntentUtils.requestMessage(getActivity(), row.getString("email"));
                 break;
             case R.id.menu_customer_schedule_call:
+                Bundle extra = row.getPrimaryBundleData();
+                extra.putInt(PhoneCallDetail.KEY_OPPORTUNITY_ID, -1);
+                extra.putBoolean(PhoneCallDetail.KEY_LOG_CALL_REQUEST, true);
+                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
                 break;
-//            case R.id.menu_customer_meetings:
-//                break;
         }
+    }
+
+    private void requestLeads(CRM.Type type, int row_id, String name) {
+        Bundle extra = new Bundle();
+        extra.putBoolean(KEY_FILTER_REQUEST, true);
+        extra.putInt(KEY_CUSTOMER_ID, row_id);
+        extra.putString(KEY_FILTER_TYPE, type.toString());
+        extra.putString("name", name);
+        startFragment(new CRM(), true, extra);
     }
 
     @Override

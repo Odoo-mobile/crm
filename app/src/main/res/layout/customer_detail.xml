@@ -114,6 +114,7 @@
                         android:layout_marginLeft="72dp" />
 
                     <odoo.controls.OField
+                        android:id="@+id/phone_number"
                         app:fieldLabelColor="@color/theme_secondary"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
                         app:iconResource="@drawable/ic_action_phone"
@@ -127,6 +128,7 @@
                         app:iconResource="@drawable/ic_action_mobile"
                         android:layout_width="match_parent"
                         app:fieldName="mobile"
+                        android:id="@+id/mobile_number"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
                     <View
@@ -299,7 +301,6 @@
                     <odoo.controls.OField
                         android:layout_width="match_parent"
                         app:iconResource="@drawable/ic_action_phone"
-                        android:id="@+id/phone"
                         app:fieldName="phone"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
                         android:layout_height="wrap_content"></odoo.controls.OField>
@@ -307,7 +308,6 @@
                     <odoo.controls.OField
                         android:layout_width="match_parent"
                         app:fieldName="mobile"
-                        android:id="@+id/mobile"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
                         app:iconResource="@drawable/ic_action_mobile"
                         android:layout_height="wrap_content"></odoo.controls.OField>

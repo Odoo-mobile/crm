@@ -27,7 +27,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -172,12 +171,10 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
             case R.id.email:
                 IntentUtils.requestMessage(this, record.getString("email"));
                 break;
-            case R.id.phone:
-                Log.e(">>>>>>>>>>>>>>>>.","hhhhhhh");
+            case R.id.phone_number:
                 IntentUtils.requestCall(this, record.getString("phone"));
                 break;
-            case R.id.mobile:
-                Log.e(">>>>>>>>>>>>>>>>.","hhhhhhh");
+            case R.id.mobile_number:
                 IntentUtils.requestCall(this, record.getString("mobile"));
                 break;
             case R.id.captureImage:
@@ -190,33 +187,8 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
         findViewById(R.id.full_address).setOnClickListener(this);
         findViewById(R.id.website).setOnClickListener(this);
         findViewById(R.id.email).setOnClickListener(this);
-        findViewById(R.id.phone).setOnClickListener(this);
-        findViewById(R.id.mobile).setOnClickListener(this);
-//        if (record.getString("full_address").equals("false") || record.getString("full_address").equals("")) {
-//        findViewById(R.id.full_address).setVisibility(View.VISIBLE);
-//        } else {
-//            findViewById(R.id.full_address).setVisibility(View.VISIBLE);
-//        }
-        //if (record.getString("website").equals("false")) {
-//        findViewById(R.id.website).setVisibility(View.VISIBLE);
-        //} else {
-        //   findViewById(R.id.website).setVisibility(View.VISIBLE);
-        // }
-        //if (record.getString("email").equals("false")) {
-//        findViewById(R.id.email).setVisibility(View.VISIBLE);
-        //} else {
-        //   findViewById(R.id.email).setVisibility(View.VISIBLE);
-        //}
-//        if (record.getString("phone").equals("false")) {
-//        findViewById(R.id.phone).setVisibility(View.VISIBLE);
-//        } else {
-//            findViewById(R.id.phone).setVisibility(View.VISIBLE);
-//        }
-//        if (record.getString("mobile").equals("false")) {
-//        findViewById(R.id.mobile).setVisibility(View.VISIBLE);
-//        } else {
-//            findViewById(R.id.mobile).setVisibility(View.VISIBLE);
-//        }
+        findViewById(R.id.phone_number).setOnClickListener(this);
+        findViewById(R.id.mobile_number).setOnClickListener(this);
     }
 
     private void setCustomerImage() {
