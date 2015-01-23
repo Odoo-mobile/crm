@@ -166,7 +166,7 @@ public class PhoneCalls extends BaseFragment implements
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, PhoneCalls.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
-                    OControls.setText(mView, R.id.title, "No Customers Found");
+                    OControls.setText(mView, R.id.title, "No Logged calls Found");
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);

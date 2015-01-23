@@ -584,6 +584,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onStatusChange(Boolean refreshing) {
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override

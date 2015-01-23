@@ -188,7 +188,8 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                     OControls.setGone(mView, R.id.swipe_container);
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, CRM.this);
-                    OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
+                    OControls.setImage(mView, R.id.icon, (mType == Type.Leads) ? R.drawable.ic_action_leads
+                            : R.drawable.ic_action_opportunities);
                     OControls.setText(mView, R.id.title, "No " + mType.toString() + " Found");
                     OControls.setText(mView, R.id.subTitle, "");
                 }
