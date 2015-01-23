@@ -27,6 +27,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -172,9 +173,11 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
                 IntentUtils.requestMessage(this, record.getString("email"));
                 break;
             case R.id.phone:
+                Log.e(">>>>>>>>>>>>>>>>.","hhhhhhh");
                 IntentUtils.requestCall(this, record.getString("phone"));
                 break;
             case R.id.mobile:
+                Log.e(">>>>>>>>>>>>>>>>.","hhhhhhh");
                 IntentUtils.requestCall(this, record.getString("mobile"));
                 break;
             case R.id.captureImage:
@@ -263,15 +266,15 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
                     }
                     if (record != null) {
                         resPartner.update(record.getInt(OColumn.ROW_ID), values);
+                        Toast.makeText(this, "Information Saved", Toast.LENGTH_LONG).show();
+                        mEditMode = !mEditMode;
+                        setupActionBar();
                     } else {
                         final int row_id = resPartner.insert(values);
                         if (row_id != OModel.INVALID_ROW_ID) {
                             finish();
                         }
                     }
-                    Toast.makeText(this, "Information Saved", Toast.LENGTH_LONG).show();
-                    mEditMode = !mEditMode;
-                    setupActionBar();
                 }
                 break;
             case R.id.menu_customer_cancel:
@@ -367,11 +370,13 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         OValues values = fileManager.handleResult(requestCode, resultCode, data);
-        if (values != null) {
+        if (values != null && !values.contains("size_limit_exceed")) {
             newImage = values.getString("datas");
             userImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
             userImage.setColorFilter(null);
             userImage.setImageBitmap(BitmapUtils.getBitmapImage(this, newImage));
+        } else {
+            Toast.makeText(this, "Image size is too large.", Toast.LENGTH_LONG).show();
         }
     }
 }

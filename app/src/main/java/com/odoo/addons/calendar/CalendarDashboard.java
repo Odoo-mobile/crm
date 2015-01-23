@@ -30,6 +30,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -41,6 +42,7 @@ import android.widget.Toast;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.TodayIcon;
+import com.odoo.addons.crm.CRM;
 import com.odoo.addons.crm.CRMDetail;
 import com.odoo.addons.customers.CustomerDetails;
 import com.odoo.addons.phonecall.PhoneCallDetail;
@@ -147,7 +149,15 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public void onItemDoubleClick(View view, int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
-        IntentUtils.startActivity(getActivity(), EventDetail.class, row.getPrimaryBundleData());
+        String type = row.getString("data_type");
+        Class<?> cls = EventDetail.class;
+        if (type.equals("phone_call")) {
+            cls = PhoneCallDetail.class;
+        }
+        if (type.equals("opportunity")) {
+            cls = CRMDetail.class;
+        }
+        IntentUtils.startActivity(getActivity(), cls, row.getPrimaryBundleData());
     }
 
     @Override
@@ -530,7 +540,10 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 IntentUtils.startActivity(getActivity(), CustomerDetails.class, null);
                 break;
             case R.id.menu_fab_new_lead:
-                IntentUtils.startActivity(getActivity(), CRMDetail.class, null);
+                Log.e(">>>", "hiiiiii");
+                Bundle type = new Bundle();
+                type.putString("type", CRM.Type.Leads.toString());
+                IntentUtils.startActivity(getActivity(), CRMDetail.class, type);
                 break;
             case R.id.menu_fab_new_call_log:
                 IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, null);
@@ -572,6 +585,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onStatusChange(Boolean refreshing) {
+//        if (!refreshing) {
+//            parent().sync().requestSync(CRMPhoneCalls.AUTHORITY);
+//        }
     }
 
     @Override

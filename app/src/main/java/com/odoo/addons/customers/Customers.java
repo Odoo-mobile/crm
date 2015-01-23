@@ -269,8 +269,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 break;
             case R.id.menu_customer_schedule_call:
                 break;
-            case R.id.menu_customer_meetings:
-                break;
+//            case R.id.menu_customer_meetings:
+//                break;
         }
     }
 
