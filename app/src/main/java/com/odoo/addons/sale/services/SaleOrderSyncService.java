@@ -19,16 +19,19 @@
  */
 package com.odoo.addons.sale.services;
 
+import android.content.SyncResult;
 import android.os.Bundle;
 
+import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
 import odoo.ODomain;
 
-public class SaleOrderSyncService extends OSyncService {
+public class SaleOrderSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = SaleOrderSyncService.class.getSimpleName();
 
     @Override
@@ -38,8 +41,16 @@ public class SaleOrderSyncService extends OSyncService {
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-        ODomain domain = new ODomain();
-        domain.add("user_id", "=", user.getUser_id());
-        adapter.setDomain(domain);
+        if (adapter.getModel().getModelName().equals("sale.order")) {
+            ODomain domain = new ODomain();
+            domain.add("user_id", "=", user.getUser_id());
+            adapter.setDomain(domain);
+            adapter.onSyncFinish(this);
+        }
+    }
+
+    @Override
+    public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
+        return new OSyncAdapter(getApplicationContext(), AccountPaymentTerm.class, this, true);
     }
 }
