@@ -27,7 +27,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResUsers;
@@ -76,11 +76,9 @@ public class SalesDetail extends ActionBarActivity {
 
     private void init() {
         mForm = (OForm) findViewById(R.id.saleForm);
-//        OField countOrderLine = (OField) mForm.findViewById(R.id.countLine);
-//        countOrderLine.setOnClickListener(this);
-
+        mForm.setEditable(true);
+        TextView txvType = (TextView) findViewById(R.id.txvType);
         if (extra == null) {
-            mForm.setEditable(true);
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
@@ -91,95 +89,79 @@ public class SalesDetail extends ActionBarActivity {
             }
             if (extra.getString("type").equals(Type.Quotation.toString())) {
                 actionBar.setTitle(R.string.label_quotation);
+                txvType.setText(R.string.label_quotation);
             } else {
                 actionBar.setTitle(R.string.label_sale_orders);
+                txvType.setText(R.string.label_sale_orders);
+                mForm.setEditable(false);
             }
-            mForm.setEditable(false);
             mForm.initForm(record);
         }
+
+        ((OField) mForm.findViewById(R.id.fTotal)).setEditable(false);
     }
 
     private void initAdapter() {
-        mList = (ExpandableHeightGridView) findViewById(R.id.expListOrderLine);
-        mList.setVisibility(View.VISIBLE);
-        record = sale.browse(extra.getInt(OColumn.ROW_ID));
-        List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
-        objects.addAll(lines);
-        mAdapter = new OListAdapter(this, R.layout.sale_order_line_item, objects) {
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View mView = convertView;
-                if (mView == null) {
-                    mView = LayoutInflater.from(SalesDetail.this).inflate(getResource(), parent, false);
+        if (extra != null) {
+            mList = (ExpandableHeightGridView) findViewById(R.id.expListOrderLine);
+            mList.setVisibility(View.VISIBLE);
+            record = sale.browse(extra.getInt(OColumn.ROW_ID));
+            List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
+            objects.addAll(lines);
+            mAdapter = new OListAdapter(this, R.layout.sale_order_line_item, objects) {
+                @Override
+                public View getView(int position, View convertView, ViewGroup parent) {
+                    View mView = convertView;
+                    if (mView == null) {
+                        mView = LayoutInflater.from(SalesDetail.this).inflate(getResource(), parent, false);
+                    }
+                    ODataRow row = (ODataRow) mAdapter.getItem(position);
+//                    OControls.setText(mView, R.id.edtPId, row.getString("product_id"));
+                    OControls.setText(mView, R.id.edtName, row.getString("name"));
+                    OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
+                    OControls.setText(mView, R.id.edtProductPrice, row.getString("price_unit"));
+                    OControls.setText(mView, R.id.edtSubTotal, row.getString("price_subtotal"));
+                    return mView;
                 }
-                ODataRow row = (ODataRow) mAdapter.getItem(position);
-                OControls.setText(mView, R.id.edtName, row.getString("name"));
-                OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
-                OControls.setText(mView, R.id.edtProductPrice, row.getString("price_unit"));
-                OControls.setText(mView, R.id.edtSubTotal, row.getString("price_subtotal"));
-
-                return mView;
-            }
-        };
-        mList.setExpanded(true);
-        mList.setAdapter(mAdapter);
+            };
+            mList.setExpanded(true);
+            mList.setAdapter(mAdapter);
+        }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_sale_detail, menu);
         this.menu = menu;
-        if (!extra.getString("type").equals(Type.SaleOrder.toString())) {
-            toggleMenu((getIntent().getExtras() == null) ? true : false);
+        OField name = (OField) mForm.findViewById(R.id.fname);
+        name.setEditable(false);
+        if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(true);
             menu.findItem(R.id.menu_sale_create_invoice).setVisible(false);
         } else {
             menu.findItem(R.id.menu_sale_save).setVisible(false);
-            menu.findItem(R.id.menu_sale_edit).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
             menu.findItem(R.id.menu_sale_create_invoice).setVisible(true);
         }
         if (extra != null && record.getString("state").equals("cancel")) {
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(true);
             menu.findItem(R.id.menu_sale_save).setVisible(false);
-            menu.findItem(R.id.menu_sale_edit).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
             menu.findItem(R.id.menu_sale_create_invoice).setVisible(false);
             menu.findItem(R.id.menu_sale_cancel_order).setVisible(false);
+            mForm.setEditable(false);
         } else {
             menu.findItem(R.id.menu_sale_cancel_order).setVisible(true);
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(false);
         }
         if (extra != null && record.getString("state").equals("progress"))
             menu.findItem(R.id.menu_sale_create_invoice).setTitle("View Invoice");
-        return true;
-    }
-
-    private void toggleMenu(boolean editModel) {
-        OField paymentTerm = (OField) mForm.findViewById(R.id.fPaymentTerm);
-        OField validityDate = (OField) mForm.findViewById(R.id.fValidityDate);
-        LinearLayout layoutTotal = (LinearLayout) mForm.findViewById(R.id.layoutTotal);
-        if (editModel) {
-            // Create mode (visible: save only)
-            menu.findItem(R.id.menu_sale_edit).setVisible(false);
+        if (extra == null) {
             menu.findItem(R.id.menu_sale_save).setVisible(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
-            OField name = (OField) mForm.findViewById(R.id.fname);
-            name.setEditable(false);
-            paymentTerm.visibleControl(true);
-            validityDate.visibleControl(true);
-            mList.setVisibility(View.VISIBLE);
-            layoutTotal.setVisibility(View.GONE);
-        } else {
-            // display mode (visible: edit, more)
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
-            menu.findItem(R.id.menu_sale_save).setVisible(false);
-            menu.findItem(R.id.menu_sale_edit).setVisible(true);
-            paymentTerm.visibleControl(false);
-            validityDate.visibleControl(false);
-            mList.setVisibility(View.GONE);
-            layoutTotal.setVisibility(View.VISIBLE);
+            menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
+
         }
+        return true;
     }
 
     @Override
@@ -187,28 +169,15 @@ public class SalesDetail extends ActionBarActivity {
         OValues values = mForm.getValues();
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (mForm.getEditable() && getIntent().getExtras() == null)
-                    finish();
-                else {
-                    if (mForm.getEditable()) {
-                        mForm.setEditable(!mForm.getEditable());
-                        toggleMenu(mForm.getEditable());
-                    } else {
-                        finish();
-                    }
-                }
-                break;
-            case R.id.menu_sale_edit:
-                mForm.setEditable(!mForm.getEditable());
-                toggleMenu(mForm.getEditable());
+                finish();
                 break;
             case R.id.menu_sale_save:
                 if (values != null) {
                     if (record != null) {
                         sale.update(record.getInt(OColumn.ROW_ID), values);
-                        toggleMenu(false);
-                        mForm.setEditable(false);
+                        finish();
                     } else {
+                        values.put("name", "/");
                         values.put("create_date", ODateUtils.getUTCDate());
                         values.put("user_id", ResUsers.myId(this));
                         sale.insert(values);
@@ -242,6 +211,13 @@ public class SalesDetail extends ActionBarActivity {
                 break;
             case R.id.menu_sale_new_copy_of_quotation:
                 OLog.log("Quotation");
+                if (record != null) {
+                    values.put("name", "/");
+                    values.put("create_date", ODateUtils.getUTCDate());
+                    values.put("user_id", ResUsers.myId(this));
+                    sale.insert(values);
+                    finish();
+                }
                 break;
             case R.id.menu_sale_create_invoice:
                 if (extra != null && record.getString("state").equals("progress")) {
@@ -267,10 +243,4 @@ public class SalesDetail extends ActionBarActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-//    @Override
-//    public void onClick(View v) {
-//        if (extra != null)
-//            IntentUtils.startActivity(this, SaleOrderLine.class, extra);
-//    }
 }

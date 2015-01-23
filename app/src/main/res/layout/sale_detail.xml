@@ -29,58 +29,76 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <odoo.controls.OField
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:id="@+id/fname"
-                app:fieldName="name"
-                app:showLabel="false"
-                app:showIcon="false"
-                app:fieldTextAppearance="?android:textAppearanceLarge"
-                app:controlLabel="Define the sale"
-                app:fieldTextSize="5sp"
+                android:orientation="horizontal"
                 android:layout_height="wrap_content">
 
-            </odoo.controls.OField>
+                <TextView
+                    android:id="@+id/txvType"
+                    android:layout_width="wrap_content"
+                    android:text="Quotation"
+                    android:gravity="right"
+                    android:padding="@dimen/default_16dp"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:layout_height="match_parent" />
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    android:id="@+id/fname"
+                    app:fieldName="name"
+                    app:showLabel="false"
+                    app:showIcon="false"
+                    app:fieldTextAppearance="?android:textAppearanceLarge"
+                    app:controlLabel="Define the sale"
+                    app:fieldTextSize="5sp"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
             <View style="@style/ViewSeparator" />
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 app:fieldName="partner_id"
-                app:showLabel="false"
-                app:iconResource="@drawable/ic_action_user"
+                app:showLabel="true"
+                app:showIcon="false"
+                app:widgetType="SearchableLive"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 android:layout_height="wrap_content" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <odoo.controls.OField
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    app:fieldName="date_order"
+                    app:showLabel="true"
+                    app:showIcon="false"
+                    app:parsePattern="mmm/dd/yyyy hh:MM a"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    android:layout_height="wrap_content" />
+
+                <odoo.controls.OField
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    app:fieldName="validity_date"
+                    app:showLabel="true"
+                    app:showIcon="false"
+                    app:parsePattern="mmm/dd/yyyy"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
-                app:fieldName="date_order"
-                app:showLabel="false"
-                app:iconResource="@drawable/ic_action_calendar"
-                app:parsePattern="mm/dd/yyyy hh:MM a"
-                app:fieldTextSize="@dimen/text_size_xmedium"
-                app:fieldTextAppearance="?android:textAppearanceMedium"
-                android:layout_height="wrap_content" />
-
-
-            <odoo.controls.OField
-                android:layout_width="match_parent"
-                android:id="@+id/fPaymentTerm"
                 app:fieldName="payment_term"
-                app:showLabel="false"
-                app:iconResource="@drawable/ic_action_calendar"
-                app:fieldTextAppearance="?android:textAppearanceMedium"
+                app:showLabel="true"
                 android:layout_height="wrap_content" />
 
-            <odoo.controls.OField
-                android:layout_width="match_parent"
-                app:fieldName="validity_date"
-                app:showLabel="false"
-                android:id="@+id/fValidityDate"
-                app:iconResource="@drawable/ic_action_calendar"
-                app:fieldTextAppearance="?android:textAppearanceMedium"
-                android:layout_height="wrap_content" />
 
             <View style="@style/ViewSeparator" />
 
@@ -89,19 +107,10 @@
                 android:visibility="gone"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
-            <!--<odoo.controls.OField
-                android:id="@+id/countLine"
-                android:layout_width="match_parent"
-                app:fieldName="order_line_count"
-                app:showLabel="false"
-                app:showIcon="false"
-                app:fieldTextAppearance="?android:textAppearanceMedium"
-                app:fieldTextSize="5sp"
-                android:layout_height="wrap_content" />-->
+
             <View style="@style/ViewSeparator" />
 
             <LinearLayout
-                android:id="@+id/layoutTotal"
                 android:layout_width="match_parent"
                 android:orientation="horizontal"
                 android:layout_height="match_parent">
@@ -116,6 +125,7 @@
                     android:layout_height="match_parent" />
 
                 <odoo.controls.OField
+                    android:id="@+id/fTotal"
                     android:layout_width="wrap_content"
                     app:fieldName="amount_total"
                     app:showLabel="false"
