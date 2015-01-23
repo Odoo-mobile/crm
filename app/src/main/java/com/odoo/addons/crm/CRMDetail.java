@@ -61,9 +61,10 @@ public class CRMDetail extends ActionBarActivity {
     private void init() {
         mForm = (OForm) findViewById(R.id.crmLeadForm);
         if (!extra.containsKey(OColumn.ROW_ID)) {
-            if (extra.getString("type").equals(CRM.Type.Opportunities))
+            if (extra.getString("type").equals(CRM.Type.Opportunities)) {
+                mForm.setEditable(true);
                 findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
-            mForm.setEditable(true);
+            }
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);

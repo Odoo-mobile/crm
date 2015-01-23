@@ -49,6 +49,7 @@ public class OFileManager implements DialogInterface.OnClickListener {
     public static final int REQUEST_AUDIO = 113;
     public static final int REQUEST_FILE = 114;
     private static final int SINGLE_ATTACHMENT_STREAM = 115;
+    private static final long IMAGE_MAX_SIZE = 1572864; // 1.5 MB
     private Context mContext = null;
     private String[] mOptions = null;
     private RequestType requestType = null;
@@ -112,6 +113,10 @@ public class OFileManager implements DialogInterface.OnClickListener {
                 values.put("name", cr.getString(nameIndex));
                 values.put("datas_fname", values.get("name"));
                 values.put("file_size", Long.toString(cr.getLong(fileSize)));
+                String path = getPath(uri);
+                if (path != null) {
+                    values.put("file_size", new File(path).length() + "");
+                }
             }
         }
         if (uri.getScheme().equals("file")) {
@@ -130,17 +135,41 @@ public class OFileManager implements DialogInterface.OnClickListener {
         return values;
     }
 
+    public String getPath(Uri uri) {
+        ContentResolver mCR = mContext.getContentResolver();
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = mCR.query(uri, projection, null, null, null);
+        if (cursor == null) return null;
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        String s = cursor.getString(column_index);
+        cursor.close();
+        return s;
+    }
+
     public OValues handleResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             switch (requestCode) {
                 case REQUEST_CAMERA:
                     OValues values = getURIDetails(newImageUri);
-                    values.put("datas", BitmapUtils.uriToBase64(newImageUri, mContext.getContentResolver()));
-                    return values;
+                    if (values.getLong("file_size") < IMAGE_MAX_SIZE) {
+                        values.put("datas", BitmapUtils.uriToBase64(newImageUri, mContext.getContentResolver()));
+                        return values;
+                    } else {
+                        values = new OValues();
+                        values.put("size_limit_exceed", true);
+                    }
+                    break;
                 case REQUEST_IMAGE:
                     values = getURIDetails(data.getData());
-                    values.put("datas", BitmapUtils.uriToBase64(data.getData(), mContext.getContentResolver()));
-                    return values;
+                    if (values.getLong("file_size") < IMAGE_MAX_SIZE) {
+                        values.put("datas", BitmapUtils.uriToBase64(data.getData(), mContext.getContentResolver()));
+                        return values;
+                    } else {
+                        values = new OValues();
+                        values.put("size_limit_exceed", true);
+                    }
+                    break;
             }
         }
         return null;

@@ -71,6 +71,7 @@ public class PhoneCallDetail extends ActionBarActivity {
 
     private void init() {
         mForm = (OForm) findViewById(R.id.phoneLogForm);
+        mForm.setEditable(true);
         if (extra != null) {
             if (!extra.containsKey(KEY_LOG_CALL_REQUEST)) {
                 // Record request
@@ -91,22 +92,20 @@ public class PhoneCallDetail extends ActionBarActivity {
                 record.put("partner_id", extra.getInt(OColumn.ROW_ID));
                 record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
                 record.put("opportunity_id", extra.getInt(KEY_OPPORTUNITY_ID));
-
-                long start_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_START));
-                long end_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_END));
-                long duration = (end_time - start_time);
-                record.put("duration", ODateUtils.durationToFloat(duration));
-
+                if (extra.containsKey(PhoneStateReceiver.KEY_DURATION_START)) {
+                    long start_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_START));
+                    long end_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_END));
+                    long duration = (end_time - start_time);
+                    record.put("duration", ODateUtils.durationToFloat(duration));
+                }
                 CRMPhoneCallsCategory.Type bound = CRMPhoneCallsCategory.Type.Inbound;
                 if (!extra.getBoolean("in_bound", false)) {
                     bound = CRMPhoneCallsCategory.Type.OutBound;
                 }
                 record.put("categ_id", CRMPhoneCallsCategory.getId(this, bound));
-                mForm.setEditable(true);
                 mForm.initForm(record);
             }
         } else {
-            mForm.setEditable(true);
             mForm.initForm(null);
         }
     }
@@ -115,18 +114,6 @@ public class PhoneCallDetail extends ActionBarActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_phonecall_detail, menu);
         mMenu = menu;
-        if (extra == null) {
-            mMenu.findItem(R.id.menu_phonecall_edit).setVisible(false);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
-        } else {
-            if (extra.containsKey(KEY_LOG_CALL_REQUEST)) {
-                mMenu.findItem(R.id.menu_phonecall_edit).setVisible(false);
-                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
-            } else {
-                mMenu.findItem(R.id.menu_phonecall_save).setVisible(false);
-                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
-            }
-        }
         return true;
     }
 
@@ -134,19 +121,7 @@ public class PhoneCallDetail extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                if (extra != null && mForm.getEditable()) {
-                    mForm.setEditable(false);
-                    mMenu.findItem(R.id.menu_phonecall_edit).setVisible(true);
-                    mMenu.findItem(R.id.menu_phonecall_save).setVisible(false);
-                    actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_arrow_back);
-                } else
-                    finish();
-                break;
-            case R.id.menu_phonecall_edit:
-                mMenu.findItem(R.id.menu_phonecall_edit).setVisible(false);
-                mMenu.findItem(R.id.menu_phonecall_save).setVisible(true);
-                mForm.setEditable(true);
-                actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
+                finish();
                 break;
             case R.id.menu_phonecall_save:
                 OValues values = mForm.getValues();

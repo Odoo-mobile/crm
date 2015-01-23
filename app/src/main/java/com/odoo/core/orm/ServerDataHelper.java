@@ -33,6 +33,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.OArguments;
 import odoo.ODomain;
 import odoo.Odoo;
 
@@ -69,5 +70,46 @@ public class ServerDataHelper {
             e.printStackTrace();
         }
         return items;
+    }
+
+    public Object executeWorkFlow(int server_id, String signal) {
+        try {
+            return mOdoo.exec_workflow(mModel.getModelName(), server_id, signal);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Object callMethod(String method, OArguments args) {
+        return callMethod(method, args, null, null);
+    }
+
+    public Object callMethod(String method, OArguments args, JSONObject context) {
+        return callMethod(mModel.getModelName(), method, args, context, null);
+    }
+
+    public Object callMethod(String method, OArguments args,
+                             JSONObject context, JSONObject kwargs) {
+        return callMethod(mModel.getModelName(), method, args, context, kwargs);
+    }
+
+    public Object callMethod(String model, String method, OArguments args,
+                             JSONObject context, JSONObject kwargs) {
+        try {
+            if (kwargs == null)
+                kwargs = new JSONObject();
+            if (context != null) {
+                args.add(mOdoo.updateContext(context));
+            }
+            JSONObject result = mOdoo.call_kw(model, method, args.getArray(),
+                    kwargs);
+            if (result.has("result")) {
+                return result.get("result");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

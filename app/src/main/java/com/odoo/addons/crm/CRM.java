@@ -38,6 +38,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.customers.Customers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.addons.fragment.BaseFragment;
@@ -68,6 +69,9 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
 
     private String mFilter = null;
 
+    // Customer's data filter
+    private boolean filter_customer_data = false;
+    private int customer_id = -1;
 
     public enum Type {
         Leads, Opportunities
@@ -86,6 +90,13 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         mView = view;
         Bundle extra = getArguments();
         mType = Type.valueOf(extra.getString(KEY_MENU));
+        if (extra != null && extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
+            filter_customer_data = true;
+            customer_id = extra.getInt(Customers.KEY_CUSTOMER_ID);
+            mView.findViewById(R.id.customer_filterContainer).setVisibility(View.VISIBLE);
+            OControls.setText(mView, R.id.customer_name, extra.getString("name"));
+            mView.findViewById(R.id.cancel_filter).setOnClickListener(this);
+        }
         setHasSyncStatusObserver(TAG, this, db());
         initAdapter();
     }
@@ -104,6 +115,11 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     public void onClick(View v) {
 
         switch (v.getId()) {
+            case R.id.cancel_filter:
+                filter_customer_data = false;
+                getLoaderManager().restartLoader(0, null, this);
+                mView.findViewById(R.id.customer_filterContainer).setVisibility(View.GONE);
+                break;
             case R.id.fabButton:
                 Bundle type = new Bundle();
                 type.putString("type", mType.toString());
@@ -140,6 +156,10 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
             args.add("%" + mFilter + "%");
             args.add("%" + mFilter + "%");
         }
+        if (filter_customer_data) {
+            where += " and partner_id = ?";
+            args.add(customer_id + "");
+        }
         whereArgs = args.toArray(new String[args.size()]);
         return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, null);
     }
@@ -160,15 +180,19 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         } else {
             if (db().isEmptyTable()) {
                 onRefresh();
-            } else {
-                OControls.setGone(mView, R.id.loadingProgress);
-                OControls.setGone(mView, R.id.swipe_container);
-                OControls.setVisible(mView, R.id.customer_no_items);
-                setHasSwipeRefreshView(mView, R.id.customer_no_items, this);
-                OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
-                OControls.setText(mView, R.id.title, "No Customers Found");
-                OControls.setText(mView, R.id.subTitle, "");
             }
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    OControls.setGone(mView, R.id.loadingProgress);
+                    OControls.setGone(mView, R.id.swipe_container);
+                    OControls.setVisible(mView, R.id.customer_no_items);
+                    setHasSwipeRefreshView(mView, R.id.customer_no_items, CRM.this);
+                    OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
+                    OControls.setText(mView, R.id.title, "No " + mType.toString() + " Found");
+                    OControls.setText(mView, R.id.subTitle, "");
+                }
+            }, 500);
         }
     }
 

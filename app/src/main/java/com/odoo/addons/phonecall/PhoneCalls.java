@@ -157,15 +157,19 @@ public class PhoneCalls extends BaseFragment implements
         } else {
             if (db().isEmptyTable()) {
                 onRefresh();
-            } else {
-                OControls.setGone(mView, R.id.loadingProgress);
-                OControls.setGone(mView, R.id.swipe_container);
-                OControls.setVisible(mView, R.id.customer_no_items);
-                setHasSwipeRefreshView(mView, R.id.customer_no_items, this);
-                OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
-                OControls.setText(mView, R.id.title, "No Customers Found");
-                OControls.setText(mView, R.id.subTitle, "");
             }
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    OControls.setGone(mView, R.id.loadingProgress);
+                    OControls.setGone(mView, R.id.swipe_container);
+                    OControls.setVisible(mView, R.id.customer_no_items);
+                    setHasSwipeRefreshView(mView, R.id.customer_no_items, PhoneCalls.this);
+                    OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
+                    OControls.setText(mView, R.id.title, "No Customers Found");
+                    OControls.setText(mView, R.id.subTitle, "");
+                }
+            }, 500);
         }
     }
 

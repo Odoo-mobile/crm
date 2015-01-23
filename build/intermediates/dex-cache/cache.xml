@@ -2,11 +2,19 @@
 <items version="2" >
 
     <item
+<<<<<<< HEAD
         jar="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/exploded-aar/master-crm-studio-imp-11686-sla/parallax-effect-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="be32c42afe40b4bab76f71cda0c29e45e4866ba2">
         <dex dex="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/pre-dexed/debug/classes-f2ab057f51121ab98cfa69b37bfa048e51283558.jar" />
+=======
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/com.android.support/cardview-v7/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="00b0b7233e1ec64acebfac40d4983d32d4712426">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-c615b16eec8f5b1c0464f8d60f22318f8b542403.jar" />
+>>>>>>> master-crm-studio-dpr
     </item>
     <item
         jar="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/exploded-aar/master-crm-studio-imp-11686-sla/bottom-sheet-lib/unspecified/classes.jar"
@@ -16,6 +24,7 @@
         <dex dex="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/pre-dexed/debug/classes-a56f5de5ee264da62db74ebdf17a24cde305adf6.jar" />
     </item>
     <item
+<<<<<<< HEAD
         jar="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/exploded-aar/master-crm-studio-imp-11686-sla/calendar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -24,6 +33,9 @@
     </item>
     <item
         jar="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+=======
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
+>>>>>>> master-crm-studio-dpr
         jumboMode="false"
         revision="21.1.2"
         sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
@@ -33,11 +45,40 @@
         jar="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/exploded-aar/master-crm-studio-imp-11686-sla/snackbar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
+<<<<<<< HEAD
         sha1="60b6afea4342b6bb0a3b1bfa498ed86c310c101f">
         <dex dex="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/pre-dexed/debug/classes-2f2cecb689e97f416847dfa19cf4de15771b4cf5.jar" />
     </item>
     <item
         jar="/home/sla/Android/Sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+=======
+        sha1="f49035b2c5c2e2d16c4afdc43d9be72ea2ef2379">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-85721300e71b88a3ce0e0b100f9defeb83132c46.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-0880a525075672a2d60f95e8fcbb63941e686cab.jar" />
+    </item>
+    <item
+        jar="/home/dpr/eclipse-adt/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-6515be3f88e71b7f70573506152fe671c63bb5da.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-d0516043034279ba4991cc0c1bf76d2037d6bc31.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/libs/swipe_library.jar"
+>>>>>>> master-crm-studio-dpr
         jumboMode="false"
         revision="21.1.2"
         sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
@@ -47,13 +88,19 @@
         jar="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/libs/odoo-v2.jar"
         jumboMode="false"
         revision="21.1.2"
+<<<<<<< HEAD
         sha1="557b2102dd35feae7e63cc9bd765d73672096119">
         <dex dex="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/pre-dexed/debug/odoo-v2-8ab806893d8bc6f39144e5f9eadae35d59e3468f.jar" />
+=======
+        sha1="830327283106f98bed4f2b6733ad24974c821681">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-3b09c4627695554122f7a540f6f744bbbf58126a.jar" />
+>>>>>>> master-crm-studio-dpr
     </item>
     <item
         jar="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
         jumboMode="false"
         revision="21.1.2"
+<<<<<<< HEAD
         sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
         <dex dex="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-b17a846b1b8fc1bec4fe48e57dfba85f2b837054.jar" />
     </item>
@@ -77,6 +124,24 @@
         revision="21.1.2"
         sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
         <dex dex="/home/sla/odoo-mobile/master-crm-studio-imp-11686-sla/app/build/intermediates/pre-dexed/debug/classes-e61c9fe62cf48ecd5ad10c0f0526b938abf26e85.jar" />
+=======
+        sha1="60666c080f6a0a36af881ac09aa9525c3e7275c1">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-e22057f80f32a5e0aca625447f6f3582729ef732.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/calendar-lib/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="f302e0d38da0788478aaca725b5ecde6d3e0c4c1">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-9d2a3bae90389ac0565d2764769fd3eaafbfa513.jar" />
+    </item>
+    <item
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="dd9247ea0fabe8ee479638c4b4a23e93752be256">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-465e232793ac2d0feab9f54f6d9fa2395d4cade8.jar" />
+>>>>>>> master-crm-studio-dpr
     </item>
 
 </items>

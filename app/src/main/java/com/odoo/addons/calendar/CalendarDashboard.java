@@ -41,6 +41,7 @@ import android.widget.Toast;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.TodayIcon;
+import com.odoo.addons.crm.CRM;
 import com.odoo.addons.crm.CRMDetail;
 import com.odoo.addons.customers.CustomerDetails;
 import com.odoo.addons.phonecall.PhoneCallDetail;
@@ -93,6 +94,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private OCursorListAdapter mAdapter;
     private boolean syncRequested = false;
     private String mFilter = null;
+
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -147,7 +149,15 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public void onItemDoubleClick(View view, int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
-        IntentUtils.startActivity(getActivity(), EventDetail.class, row.getPrimaryBundleData());
+        String type = row.getString("data_type");
+        Class<?> cls = EventDetail.class;
+        if (type.equals("phone_call")) {
+            cls = PhoneCallDetail.class;
+        }
+        if (type.equals("opportunity")) {
+            cls = CRMDetail.class;
+        }
+        IntentUtils.startActivity(getActivity(), cls, row.getPrimaryBundleData());
     }
 
     @Override
@@ -530,7 +540,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 IntentUtils.startActivity(getActivity(), CustomerDetails.class, null);
                 break;
             case R.id.menu_fab_new_lead:
-                IntentUtils.startActivity(getActivity(), CRMDetail.class, null);
+                Bundle type = new Bundle();
+                type.putString("type", CRM.Type.Leads.toString());
+                IntentUtils.startActivity(getActivity(), CRMDetail.class, type);
                 break;
             case R.id.menu_fab_new_call_log:
                 IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, null);

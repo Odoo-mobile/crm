@@ -265,7 +265,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
             extra.putInt(OColumn.ROW_ID, row_id);
             extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "event");
             if (reminderDate != null) {
-                if (ReminderUtils.get(getApplicationContext()).setReminder(reminderDate, extra)) {
+                if (ReminderUtils.get(getApplicationContext()).resetReminder(reminderDate, extra)) {
                     Log.i(TAG, "Reminder added.");
                 }
             }

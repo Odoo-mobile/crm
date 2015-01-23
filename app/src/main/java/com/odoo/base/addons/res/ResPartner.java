@@ -35,7 +35,8 @@ import com.odoo.core.support.OUser;
 
 import org.json.JSONArray;
 
-public class ResPartner extends OModel {
+public class
+        ResPartner extends OModel {
     public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.res_partner";
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
     OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
