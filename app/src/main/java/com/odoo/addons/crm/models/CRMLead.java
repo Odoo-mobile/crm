@@ -250,7 +250,7 @@ public class CRMLead extends OModel {
 
 
     public void convertToOpportunity(final ODataRow lead, final List<Integer> other_lead_ids,
-                                     final OnConvertDoneListener listener) {
+                                     final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
@@ -311,7 +311,7 @@ public class CRMLead extends OModel {
                 super.onPostExecute(aVoid);
                 dialog.dismiss();
                 if (listener != null) {
-                    listener.OnConvertSuccess();
+                    listener.OnSuccess();
                 }
             }
 
@@ -326,8 +326,58 @@ public class CRMLead extends OModel {
         }.execute();
     }
 
-    public static interface OnConvertDoneListener {
-        public void OnConvertSuccess();
+    public void markWonLost(final String type, final ODataRow record, final OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(mContext);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                OArguments oArguments = new OArguments();
+                oArguments.add(new JSONArray().put(record.getInt("id")));
+                getServerDataHelper().callMethod("case_mark_" + type, oArguments, new JSONObject());
+                CRMCaseStage stage = new CRMCaseStage(mContext, getUser());
+                String key = (type.equals("won")) ? "Won" : "Dead";
+                ODataRow row = stage.browse(null, "name = ?", new String[]{key});
+                if (row != null) {
+                    OValues values = new OValues();
+                    values.put("stage_id", row.getInt(OColumn.ROW_ID));
+                    update(record.getInt(OColumn.ROW_ID), values);
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnSuccess();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnCancelled();
+                }
+            }
+        }.execute();
+
+    }
+
+    public static interface OnOperationSuccessListener {
+        public void OnSuccess();
 
         public void OnCancelled();
     }

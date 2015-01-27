@@ -58,6 +58,7 @@ import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
@@ -82,6 +83,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     private OCursorListAdapter mAdapter;
     private BottomSheet mSheet = null;
     private String mFilter = null;
+    private String wonLost = "won";
 
     // Customer's data filter
     private boolean filter_customer_data = false;
@@ -355,11 +357,12 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
         mSheet.dismiss();
+        convertRequestRecord = row;
+        CRMLead crmLead = (CRMLead) db();
         ResPartner partner = new ResPartner(getActivity(), null);
         switch (menu.getItemId()) {
             case R.id.menu_lead_convert_to_opportunity:
                 if (inNetwork()) {
-                    CRMLead crmLead = (CRMLead) db();
                     if (row.getInt("id") == 0) {
                         OAlert.showWarning(getActivity(), "Need to sync before converting to Opportunity");
                     } else {
@@ -370,7 +373,6 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                                 row.getString(OColumn.ROW_ID)
                         });
                         if (count > 0) {
-                            convertRequestRecord = row;
                             Intent intent = new Intent(getActivity(), ConvertToOpportunityWizard.class);
                             intent.putExtras(row.getPrimaryBundleData());
                             startActivityForResult(intent, REQUEST_CONVERT_WIZARD);
@@ -412,8 +414,19 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                 IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
                 break;
             case R.id.menu_lead_won:
+                if (inNetwork()) {
+                    crmLead.markWonLost(wonLost, row, markDoneListener);
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_lead_lost:
+                wonLost = "lost";
+                if (inNetwork()) {
+                    crmLead.markWonLost(wonLost, row, markDoneListener);
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
                 break;
         }
     }
@@ -427,9 +440,21 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         }
     }
 
-    CRMLead.OnConvertDoneListener convertDoneListener = new CRMLead.OnConvertDoneListener() {
+    CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
-        public void OnConvertSuccess() {
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), StringUtils.capitalizeString(convertRequestRecord.getString("type"))
+                    + " marked " + wonLost, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
+    CRMLead.OnOperationSuccessListener convertDoneListener = new CRMLead.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
             Toast.makeText(getActivity(), "Converted to opportunity", Toast.LENGTH_LONG).show();
         }
 

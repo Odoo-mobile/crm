@@ -26,7 +26,7 @@
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/bottom-sheet-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="f3c0b3794d42dfb19dee4d34bb82048256493e58">
+        sha1="2754be95f9412792bcb4527ee759d6e952b72477">
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-85721300e71b88a3ce0e0b100f9defeb83132c46.jar" />
     </item>
     <item
@@ -61,21 +61,21 @@
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/parallax-effect-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="4a7a9ca37e173c8c5c8915e1bc4dd849fd02a492">
+        sha1="5c272edfabcb610ac0fd884d54397845ddb8679f">
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-3b09c4627695554122f7a540f6f744bbbf58126a.jar" />
     </item>
     <item
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/snackbar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="21073b9eaa22364858f1821c5e40ccf80d9ecdff">
+        sha1="cd5f0138c5a9515088635ad748109b26568cc850">
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-e22057f80f32a5e0aca625447f6f3582729ef732.jar" />
     </item>
     <item
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/calendar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="e84a6ffc8e2e20fc5bb3262865122122e5c76aef">
+        sha1="b5297df08661e10922aceb92948163436aea93bc">
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-9d2a3bae90389ac0565d2764769fd3eaafbfa513.jar" />
     </item>
     <item
