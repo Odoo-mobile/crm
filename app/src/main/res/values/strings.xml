@@ -3,22 +3,19 @@
 
     <string name="app_name">CRM</string>
     <string name="label_today">Today</string>
-    <!-- Sync Labels//-->
+    <!-- Sync Labels// -->
     <string name="sync_label_customers">Customers</string>
     <string name="sync_label_calendar">Calendar</string>
     <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
     <string name="sync_label_quotation_sales_orders">Quotations/Sales Orders</string>
     <string name="sync_label_phonecalls">Logged Calls</string>
-
     <string name="no_notification">No Notification</string>
     <string name="at_the_time_of_event">At the time of event</string>
     <string name="on_the_day_at">On the day at %s</string>
     <string name="day_before_at">The day before at %s</string>
     <string name="minutes_before">%s minutes before</string>
     <string name="custom">Custom...</string>
-
     <string name="error_end_date_small_than_start_date">End date cannot be set before start date.</string>
-
     <string name="label_leads">Leads</string>
     <string name="label_lead">Lead</string>
     <string name="label_opportunities">Opportunities</string>
@@ -43,9 +40,10 @@
     <string name="label_sale_new_copy_of_quotation">New Copy of Quotation</string>
     <string name="label_mark_done">Mark Done</string>
     <string name="label_re_schedule">Re-Schedule</string>
-
     <string-array name="array_conversation_actions">
         <item>Convert to opportunity</item>
         <item>Merge with existing opportunities</item>
     </string-array>
+    <string name="no_network">No Network...</string>
+    <string name="title_activity_sale_add_item">SaleAddItem</string>
 </resources>

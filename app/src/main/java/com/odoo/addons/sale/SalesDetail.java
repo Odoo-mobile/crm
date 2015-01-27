@@ -27,9 +27,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.App;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
@@ -37,6 +39,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.list.OListAdapter;
+import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
@@ -45,15 +48,18 @@ import com.odoo.core.utils.controls.ExpandableHeightGridView;
 import com.odoo.core.utils.logger.OLog;
 import com.odoo.crm.R;
 
+import org.json.JSONArray;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.OArguments;
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
 import static com.odoo.addons.sale.Sales.Type;
 
-public class SalesDetail extends ActionBarActivity {
+public class SalesDetail extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = SalesDetail.class.getSimpleName();
     private Bundle extra;
     private OForm mForm;
@@ -83,6 +89,8 @@ public class SalesDetail extends ActionBarActivity {
         TextView txvType = (TextView) findViewById(R.id.txvType);
         TextView currency = (TextView) findViewById(R.id.currency);
         TextView total_amt = (TextView) findViewById(R.id.fTotal);
+        LinearLayout layoutAddItem = (LinearLayout) findViewById(R.id.layoutAddItem);
+        layoutAddItem.setOnClickListener(this);
         if (extra == null) {
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);
@@ -122,7 +130,6 @@ public class SalesDetail extends ActionBarActivity {
                         mView = LayoutInflater.from(SalesDetail.this).inflate(getResource(), parent, false);
                     }
                     ODataRow row = (ODataRow) mAdapter.getItem(position);
-//                    OControls.setText(mView, R.id.edtPId, row.getString("product_id"));
                     OControls.setText(mView, R.id.edtName, row.getString("name"));
                     OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
                     OControls.setText(mView, R.id.edtProductPrice, row.getString("price_unit"));
@@ -148,11 +155,9 @@ public class SalesDetail extends ActionBarActivity {
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
         }
         if (extra != null && record.getString("state").equals("cancel")) {
-            menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(true);
-            menu.findItem(R.id.menu_sale_save).setVisible(false);
-            menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
-            menu.findItem(R.id.menu_sale_cancel_order).setVisible(false);
-            mForm.setEditable(false);
+            menu.findItem(R.id.menu_sale_save).setVisible(true).setTitle("Copy Quotation");
+            menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
+            mForm.setEditable(true);
         } else {
             menu.findItem(R.id.menu_sale_cancel_order).setVisible(true);
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(false);
@@ -168,6 +173,7 @@ public class SalesDetail extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         OValues values = mForm.getValues();
         ResPartner partner = new ResPartner(this, null);
+        App app = (App) getApplicationContext();
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -176,7 +182,18 @@ public class SalesDetail extends ActionBarActivity {
                 if (values != null) {
                     values.put("partner_name", partner.getName(values.getInt("partner_id")));
                     if (record != null) {
-                        sale.update(record.getInt(OColumn.ROW_ID), values);
+                        if (record.getString("state").equals("cancel")) {
+                            if (app.inNetwork()) {
+                                OArguments args = new OArguments();
+                                args.add(new JSONArray().put(extra.getInt("id")));
+                                sale.getServerDataHelper().callMethod("copy_quotation", args);
+                                Toast.makeText(this, "Copy of quotation...", Toast.LENGTH_LONG).show();
+
+                            } else {
+                                Toast.makeText(this, R.string.no_network, Toast.LENGTH_LONG).show();
+                            }
+                        } else
+                            sale.update(record.getInt(OColumn.ROW_ID), values);
                         finish();
                     } else {
                         values.put("name", "/");
@@ -197,10 +214,12 @@ public class SalesDetail extends ActionBarActivity {
             case R.id.menu_sale_cancel_order:
                 if (values != null) {
                     if (record != null) {
-                        values.put("state", "cancel");
-                        values.put("state_title", sale.getStateTitle(values));
-                        sale.update(record.getInt(OColumn.ROW_ID), values);
-                        Toast.makeText(this, extra.getString("type") + " cancelled", Toast.LENGTH_LONG).show();
+                        if (app.inNetwork()) {
+                            sale.getServerDataHelper().executeWorkFlow(extra.getInt("id"), "cancel");
+                            Toast.makeText(this, extra.getString("type") + " cancelled", Toast.LENGTH_LONG).show();
+                        } else {
+                            Toast.makeText(this, R.string.no_network, Toast.LENGTH_LONG).show();
+                        }
                         finish();
                     }
                 }
@@ -210,27 +229,38 @@ public class SalesDetail extends ActionBarActivity {
                 if (values != null) {
                     if (record != null) {
                         if (extra != null && record.getFloat("amount_total") > 0) {
-                            values.put("state", "manual");
-                            values.put("state_title", sale.getStateTitle(values));
-                            sale.update(record.getInt(OColumn.ROW_ID), values);
-                            finish();
+                            if (app.inNetwork()) {
+                                sale.getServerDataHelper().executeWorkFlow(extra.getInt("id"), "manual");
+                            } else {
+                                Toast.makeText(this, "No network...", Toast.LENGTH_LONG).show();
+                            }
                         } else {
                             OAlert.showWarning(this, "You cannot a sales order which has no line");
                         }
+                        finish();
                     }
                 }
                 break;
-            case R.id.menu_sale_new_copy_of_quotation:
-                OLog.log("Quotation");
-                // FIXME: Open record in edit mode with new flag.
-                if (record != null) {
-                    values.put("name", "/");
-                    values.put("create_date", ODateUtils.getUTCDate());
-                    values.put("user_id", ResUsers.myId(this));
-                    //  sale.insert(values);
-                    finish();
-                }
-                break;
+//            case R.id.menu_sale_new_copy_of_quotation:
+//                OLog.log("Quotation");
+//                // FIXME: Open record in edit mode with new flag.
+//                if (record != null) {
+//                    values.put("name", "/");
+//                    values.put("create_date", ODateUtils.getUTCDate());
+//                    values.put("user_id", ResUsers.myId(this));
+//                    values.put("state", "draft");
+//                    values.put("state_title", sale.getStateTitle(values));
+//                    values.put("currency_id", record.getInt("currency_id"));
+//                    ODataRow currency = sale.currency();
+//                    values.put("currency_symbol", currency.getString("name"));
+//                    values.put("amount_total", record.getFloat("amount_total"));
+//                    values.put("validity_date", record.getString("validity_date"));
+//                    values.put("date_order", record.getString("date_order"));
+//                    values.put("order_line_count", record.getString("order_line_count"));
+//                    sale.insert(values);
+//                    finish();
+//                }
+//                break;
 //            case R.id.menu_sale_create_invoice:
 //                if (extra != null && record.getString("state").equals("progress")) {
 //                    OLog.log("View");
@@ -254,5 +284,11 @@ public class SalesDetail extends ActionBarActivity {
 //                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (extra != null && !record.getString("state").equals("cancel"))
+            IntentUtils.startActivity(this, SaleAddItem.class, extra);
     }
 }
