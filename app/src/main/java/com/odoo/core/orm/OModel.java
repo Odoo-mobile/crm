@@ -951,6 +951,14 @@ public class OModel {
         return new ServerDataHelper(mContext, this, getUser());
     }
 
+    public String getName(int row_id) {
+        ODataRow row = browse(row_id);
+        if (row != null) {
+            return row.getString("name");
+        }
+        return "false";
+    }
+
     public ODataRow quickCreateRecord(ODataRow record) {
         OSyncAdapter syncAdapter = new OSyncAdapter(mContext, getClass(), null, true);
         syncAdapter.setModel(this);

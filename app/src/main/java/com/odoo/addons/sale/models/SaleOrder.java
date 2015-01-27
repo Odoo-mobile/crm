@@ -41,6 +41,7 @@ import com.odoo.core.support.OUser;
 import org.json.JSONArray;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
@@ -95,8 +96,14 @@ public class SaleOrder extends OModel {
     public ODataRow currency() {
         ResCompany company = new ResCompany(mContext, getUser());
         ODataRow row = company.browse(null, "id = ? ", new String[]{getUser().getCompany_id()});
-        if (row != null) {
+        if (row != null && !row.getString("currency_id").equals("false")) {
             return row.getM2ORecord("currency_id").browse();
+        } else {
+            ResCurrency currency = new ResCurrency(mContext, getUser());
+            List<ODataRow> list = currency.select();
+            if (list.size() > 0) {
+                return list.get(0);
+            }
         }
         return null;
     }

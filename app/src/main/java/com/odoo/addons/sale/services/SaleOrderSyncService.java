@@ -24,15 +24,20 @@ import android.os.Bundle;
 
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import odoo.ODomain;
 
 public class SaleOrderSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = SaleOrderSyncService.class.getSimpleName();
+    public Boolean firstSync = false;
 
     @Override
     public OSyncAdapter getSyncAdapter() {
@@ -43,14 +48,34 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("sale.order")) {
             ODomain domain = new ODomain();
+            SaleOrder saleOrder = new SaleOrder(getApplicationContext(), user);
+            List<Integer> newIds = new ArrayList<>();
+            for (ODataRow row : saleOrder.select(new String[]{}, "name = ? and id != ?", new String[]{"/", "0"})) {
+                newIds.add(row.getInt("id"));
+            }
+            if (newIds.size() > 0) {
+                domain.add("id", "in", newIds);
+            }
+            if (!firstSync)
+                adapter.onSyncFinish(this);
             domain.add("user_id", "=", user.getUser_id());
             adapter.setDomain(domain);
-            adapter.onSyncFinish(this);
+        }
+        if (adapter.getModel().getModelName().equals("account.payment.term")) {
+            adapter.onSyncFinish(syncFinishListener);
         }
     }
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
-        return new OSyncAdapter(getApplicationContext(), AccountPaymentTerm.class, this, true);
+        return new OSyncAdapter(getApplicationContext(), AccountPaymentTerm.class, SaleOrderSyncService.this, true);
     }
+
+    ISyncFinishListener syncFinishListener = new ISyncFinishListener() {
+        @Override
+        public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
+            firstSync = true;
+            return new OSyncAdapter(getApplicationContext(), SaleOrder.class, SaleOrderSyncService.this, true);
+        }
+    };
 }

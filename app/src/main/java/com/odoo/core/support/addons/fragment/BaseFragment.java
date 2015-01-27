@@ -69,7 +69,9 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     }
 
     public OUser user() {
-        return OUser.current(getActivity());
+        if (getActivity() != null)
+            return OUser.current(getActivity());
+        return null;
     }
 
     public OdooActivity parent() {

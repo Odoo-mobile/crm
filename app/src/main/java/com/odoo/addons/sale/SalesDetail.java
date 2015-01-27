@@ -28,14 +28,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
@@ -140,29 +143,23 @@ public class SalesDetail extends ActionBarActivity {
         name.setEditable(false);
         if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(true);
-            menu.findItem(R.id.menu_sale_create_invoice).setVisible(false);
         } else {
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
-            menu.findItem(R.id.menu_sale_create_invoice).setVisible(true);
         }
         if (extra != null && record.getString("state").equals("cancel")) {
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(true);
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
-            menu.findItem(R.id.menu_sale_create_invoice).setVisible(false);
             menu.findItem(R.id.menu_sale_cancel_order).setVisible(false);
             mForm.setEditable(false);
         } else {
             menu.findItem(R.id.menu_sale_cancel_order).setVisible(true);
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(false);
         }
-        if (extra != null && record.getString("state").equals("progress"))
-            menu.findItem(R.id.menu_sale_create_invoice).setTitle("View Invoice");
         if (extra == null) {
             menu.findItem(R.id.menu_sale_save).setVisible(true);
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
-
         }
         return true;
     }
@@ -170,12 +167,14 @@ public class SalesDetail extends ActionBarActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         OValues values = mForm.getValues();
+        ResPartner partner = new ResPartner(this, null);
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
                 break;
             case R.id.menu_sale_save:
                 if (values != null) {
+                    values.put("partner_name", partner.getName(values.getInt("partner_id")));
                     if (record != null) {
                         sale.update(record.getInt(OColumn.ROW_ID), values);
                         finish();
@@ -196,11 +195,12 @@ public class SalesDetail extends ActionBarActivity {
                 }
                 break;
             case R.id.menu_sale_cancel_order:
-                OLog.log("Cancel");
                 if (values != null) {
                     if (record != null) {
                         values.put("state", "cancel");
+                        values.put("state_title", sale.getStateTitle(values));
                         sale.update(record.getInt(OColumn.ROW_ID), values);
+                        Toast.makeText(this, extra.getString("type") + " cancelled", Toast.LENGTH_LONG).show();
                         finish();
                     }
                 }
@@ -211,45 +211,47 @@ public class SalesDetail extends ActionBarActivity {
                     if (record != null) {
                         if (extra != null && record.getFloat("amount_total") > 0) {
                             values.put("state", "manual");
+                            values.put("state_title", sale.getStateTitle(values));
                             sale.update(record.getInt(OColumn.ROW_ID), values);
                             finish();
                         } else {
-                            OLog.log("You cannot a sales order which has no line");
+                            OAlert.showWarning(this, "You cannot a sales order which has no line");
                         }
                     }
                 }
                 break;
             case R.id.menu_sale_new_copy_of_quotation:
                 OLog.log("Quotation");
+                // FIXME: Open record in edit mode with new flag.
                 if (record != null) {
                     values.put("name", "/");
                     values.put("create_date", ODateUtils.getUTCDate());
                     values.put("user_id", ResUsers.myId(this));
-                    sale.insert(values);
+                    //  sale.insert(values);
                     finish();
                 }
                 break;
-            case R.id.menu_sale_create_invoice:
-                if (extra != null && record.getString("state").equals("progress")) {
-                    OLog.log("View");
-                    if (values != null) {
-                        if (record != null) {
-                            values.put("state", "done");
-                            sale.update(record.getInt(OColumn.ROW_ID), values);
-                            finish();
-                        }
-                    }
-                } else {
-                    OLog.log("Create");
-                    if (values != null) {
-                        if (record != null) {
-                            values.put("state", "progress");
-                            sale.update(record.getInt(OColumn.ROW_ID), values);
-                            finish();
-                        }
-                    }
-                }
-                break;
+//            case R.id.menu_sale_create_invoice:
+//                if (extra != null && record.getString("state").equals("progress")) {
+//                    OLog.log("View");
+//                    if (values != null) {
+//                        if (record != null) {
+//                            values.put("state", "done");
+//                            sale.update(record.getInt(OColumn.ROW_ID), values);
+//                            finish();
+//                        }
+//                    }
+//                } else {
+//                    OLog.log("Create");
+//                    if (values != null) {
+//                        if (record != null) {
+//                            values.put("state", "progress");
+//                            sale.update(record.getInt(OColumn.ROW_ID), values);
+//                            finish();
+//                        }
+//                    }
+//                }
+//                break;
         }
         return super.onOptionsItemSelected(item);
     }
