@@ -31,6 +31,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -42,6 +43,7 @@ import android.widget.Toast;
 
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
+import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.addons.fragment.BaseFragment;
@@ -353,6 +355,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
         mSheet.dismiss();
+        ResPartner partner = new ResPartner(getActivity(), null);
         switch (menu.getItemId()) {
             case R.id.menu_lead_convert_to_opportunity:
                 if (inNetwork()) {
@@ -382,10 +385,31 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
             case R.id.menu_lead_convert_to_quotation:
                 break;
             case R.id.menu_lead_call_customer:
+                if (!row.getString("partner_id").equals("false")) {
+                    String contact = partner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
+                    if (!contact.equals("false")) {
+                        IntentUtils.requestCall(getActivity(), contact);
+                    } else {
+                        Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "No partner found !", Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_lead_customer_location:
+                if (!row.getString("partner_id").equals("false")) {
+                    String address = partner.getAddress(partner.browse(row.getInt("partner_id")));
+                    if (!address.equals("false") && !TextUtils.isEmpty(address)) {
+                        IntentUtils.redirectToMap(getActivity(), address);
+                    } else {
+                        Toast.makeText(getActivity(), "No location found !", Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), "No partner found !", Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_lead_reschedule:
+                IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
                 break;
             case R.id.menu_lead_won:
                 break;
