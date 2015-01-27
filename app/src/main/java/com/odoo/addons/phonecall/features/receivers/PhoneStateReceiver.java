@@ -104,7 +104,6 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
                     Log.i(TAG, callerNumber + " CALL_STATE_OFFHOOK");
                     mPref.setBoolean(KEY_OFFHOOK, true);
                     // Call Started (received or dialed)
-                    // TODO: Start recording of call
                     callStarted();
                     if (!mPref.getBoolean(KEY_RINGING, false)) {
                         mPref.setBoolean("in_bound", false);

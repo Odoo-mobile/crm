@@ -28,6 +28,7 @@
     <string name="label_phone_calls">Phone calls</string>
     <string name="label_logged_calls">Logged calls</string>
     <string name="label_convert_to_opportunity">Convert to Opportunity</string>
+    <string name="label_create_opportunity">Create Opportunity</string>
     <string name="label_convert_to_quotation">Convert to Quotation</string>
     <string name="label_mark_as_lost">Mark Lost</string>
     <string name="label_mark_as_won">Mark Won</string>
@@ -42,4 +43,9 @@
     <string name="label_sale_new_copy_of_quotation">New Copy of Quotation</string>
     <string name="label_mark_done">Mark Done</string>
     <string name="label_re_schedule">Re-Schedule</string>
+
+    <string-array name="array_conversation_actions">
+        <item>Convert to opportunity</item>
+        <item>Merge with existing opportunities</item>
+    </string-array>
 </resources>

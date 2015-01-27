@@ -154,6 +154,10 @@
             android:name="com.odoo.addons.crm.CRMDetail"
             android:windowSoftInputMode="adjustPan"></activity>
         <activity
+            android:name="com.odoo.addons.crm.ConvertToOpportunityWizard"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:windowSoftInputMode="adjustPan"></activity>
+        <activity
             android:name="com.odoo.addons.phonecall.PhoneCallDetail"
             android:windowSoftInputMode="adjustPan"></activity>
         <activity

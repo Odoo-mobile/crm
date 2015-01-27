@@ -19,8 +19,10 @@
  */
 package com.odoo.addons.crm.models;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 
 import com.odoo.base.addons.res.ResCompany;
@@ -41,8 +43,16 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.JSONUtils;
+import com.odoo.core.utils.OResource;
+import com.odoo.crm.R;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import odoo.OArguments;
 
 public class CRMLead extends OModel {
     public static final String TAG = CRMLead.class.getSimpleName();
@@ -238,4 +248,87 @@ public class CRMLead extends OModel {
         return "false";
     }
 
+
+    public void convertToOpportunity(final ODataRow lead, final List<Integer> other_lead_ids,
+                                     final OnConvertDoneListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(mContext);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    odoo.Odoo odoo = getServerDataHelper().getOdoo();
+                    // Creating wizard record
+                    JSONObject values = new JSONObject();
+                    values.put("name", (other_lead_ids.size() > 0) ? "merge" : "convert");
+                    Object partner_id = false;
+                    ODataRow partner = null;
+                    if (!lead.getString("partner_id").equals("false")) {
+                        ResPartner resPartner = new ResPartner(mContext, getUser());
+                        partner = resPartner.browse(lead.getInt("partner_id"));
+                        partner_id = partner.getInt("id");
+                    }
+                    values.put("action", (partner == null) ? "create" : "exist");
+                    values.put("partner_id", partner_id);
+
+                    JSONObject context = new JSONObject();
+                    context.put("stage_type", "lead");
+                    context.put("active_id", lead.getInt("id"));
+                    other_lead_ids.add(lead.getInt("id"));
+                    context.put("active_ids", JSONUtils.<Integer>toArray(other_lead_ids));
+                    context.put("active_model", "crm.lead");
+                    odoo.updateContext(context);
+                    JSONObject result = odoo.createNew("crm.lead2opportunity.partner", values);
+                    int lead_to_opp_partner_id = result.getInt("result");
+
+                    // Converting lead to opportunity
+                    OArguments arg = new OArguments();
+                    arg.add(lead_to_opp_partner_id);
+                    arg.add(context);
+                    odoo.call_kw("crm.lead2opportunity.partner", "action_apply", arg.get());
+                    OValues val = new OValues();
+                    val.put("type", "opportunity");
+                    for (int id : other_lead_ids) {
+                        update(selectRowId(id), val);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnConvertSuccess();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnCancelled();
+                }
+            }
+        }.execute();
+    }
+
+    public static interface OnConvertDoneListener {
+        public void OnConvertSuccess();
+
+        public void OnCancelled();
+    }
 }

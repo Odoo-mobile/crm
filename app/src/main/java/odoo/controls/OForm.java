@@ -54,6 +54,7 @@ public class OForm extends LinearLayout {
     private ODataRow mRecord = null;
     private Boolean autoUIGenerate = true;
     private int icon_tint_color = 0;
+    private Boolean mFirstModeChange = true;
 
     public OForm(Context context) {
         super(context);
@@ -79,6 +80,9 @@ public class OForm extends LinearLayout {
 
     public void setEditable(Boolean editable) {
         mEditable = editable;
+        if (mEditable) {
+            mFirstModeChange = true;
+        }
         for (String key : mFormFieldControls.keySet()) {
             OField control = mFormFieldControls.get(key);
             control.setEditable(editable);
@@ -87,6 +91,7 @@ public class OForm extends LinearLayout {
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr,
                       int defStyleRes) {
+        mFirstModeChange = true;
         mContext = context;
         if (attrs != null) {
             TypedArray types = mContext.obtainStyledAttributes(attrs,
@@ -250,28 +255,34 @@ public class OForm extends LinearLayout {
 
             @Override
             public void onValueChange(final ODataRow row) {
-                if (!column.isOnChangeBGProcess()) {
-                    new Handler().postDelayed(new Runnable() {
+                if (!mFirstModeChange) {
+                    if (!column.isOnChangeBGProcess()) {
+                        new Handler().postDelayed(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            Object value = model.getOnChangeMethodValue(column, row);
-                            if (value instanceof ODataRow)
-                                fillOnChangeData((ODataRow) value);
-                        }
-                    }, 300);
-                } else {
-                    new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                Object value = model.getOnChangeMethodValue(column, row);
+                                if (value instanceof ODataRow)
+                                    fillOnChangeData((ODataRow) value);
+                            }
+                        }, 300);
+                    } else {
+                        new Handler().postDelayed(new Runnable() {
 
-                        @Override
-                        public void run() {
-                            OnChangeBackground bgProcess = new OnChangeBackground(
-                                    column);
-                            bgProcess.execute(row);
-                        }
-                    }, 300);
+                            @Override
+                            public void run() {
+                                OnChangeBackground bgProcess = new OnChangeBackground(
+                                        column);
+                                bgProcess.execute(row);
+                            }
+                        }, 300);
+                    }
+                }
+                if (mFirstModeChange) {
+                    mFirstModeChange = !mFirstModeChange;
                 }
             }
+
         });
     }
 

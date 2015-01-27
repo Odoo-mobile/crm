@@ -19,8 +19,11 @@
  */
 package com.odoo.addons.crm;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -31,9 +34,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -45,13 +48,19 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.IntentUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.sys.IOnActivityResultListener;
+import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
+import com.odoo.widgets.bottomsheet.BottomSheet;
+import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,19 +68,23 @@ import java.util.List;
 public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindListener,
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
-        IOnSearchViewChangeListener, View.OnClickListener, AdapterView.OnItemClickListener {
+        IOnSearchViewChangeListener, View.OnClickListener, IOnItemClickListener,
+        BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener,
+        IOnBackPressListener, IOnActivityResultListener {
     public static final String TAG = CRM.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
+    public static final int REQUEST_CONVERT_WIZARD = 223;
     private Type mType = Type.Leads;
     private View mView;
     private ListView mList;
     private OCursorListAdapter mAdapter;
-
+    private BottomSheet mSheet = null;
     private String mFilter = null;
 
     // Customer's data filter
     private boolean filter_customer_data = false;
     private int customer_id = -1;
+    private ODataRow convertRequestRecord = null;
 
     public enum Type {
         Leads, Opportunities
@@ -88,6 +101,8 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
+        parent().setOnBackPressListener(this);
+        parent().setOnActivityResultListener(this);
         Bundle extra = getArguments();
         mType = Type.valueOf(extra.getString(KEY_MENU));
         if (extra != null && extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
@@ -107,7 +122,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
-        mList.setOnItemClickListener(this);
+        mAdapter.handleItemClickListener(mList, this);
         getLoaderManager().initLoader(0, null, this);
     }
 
@@ -299,8 +314,114 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemDoubleClick(View view, int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
     }
+
+    @Override
+    public void onItemClick(View view, int position) {
+        showSheet((Cursor) mAdapter.getItem(position));
+    }
+
+    private void showSheet(Cursor data) {
+        ODataRow row = OCursorUtils.toDatarow(data);
+        BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
+        builder.listener(this);
+        builder.setIconColor(_c(R.color.theme_primary_dark));
+        builder.setTextColor(Color.parseColor("#414141"));
+        builder.setData(data);
+        builder.actionListener(this);
+        builder.setActionIcon(R.drawable.ic_action_edit);
+        builder.title(data.getString(data.getColumnIndex("name")));
+        if (row.getString("type").equals("lead"))
+            builder.menu(R.menu.menu_lead_list_sheet);
+        else
+            builder.menu(R.menu.menu_opp_list_sheet);
+        mSheet = builder.create();
+        mSheet.show();
+    }
+
+    @Override
+    public void onSheetActionClick(BottomSheet sheet, Object extras) {
+        mSheet.dismiss();
+        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+        IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
+    }
+
+    @Override
+    public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
+        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+        mSheet.dismiss();
+        switch (menu.getItemId()) {
+            case R.id.menu_lead_convert_to_opportunity:
+                if (inNetwork()) {
+                    CRMLead crmLead = (CRMLead) db();
+                    if (row.getInt("id") == 0) {
+                        OAlert.showWarning(getActivity(), "Need to sync before converting to Opportunity");
+                    } else {
+                        int count = crmLead.count("id != ? and partner_id = ? and " + OColumn.ROW_ID + " != ?"
+                                , new String[]{
+                                "0",
+                                row.getInt("partner_id") + "",
+                                row.getString(OColumn.ROW_ID)
+                        });
+                        if (count > 0) {
+                            convertRequestRecord = row;
+                            Intent intent = new Intent(getActivity(), ConvertToOpportunityWizard.class);
+                            intent.putExtras(row.getPrimaryBundleData());
+                            startActivityForResult(intent, REQUEST_CONVERT_WIZARD);
+                        } else {
+                            crmLead.convertToOpportunity(row, new ArrayList<Integer>(), convertDoneListener);
+                        }
+                    }
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.menu_lead_convert_to_quotation:
+                break;
+            case R.id.menu_lead_call_customer:
+                break;
+            case R.id.menu_lead_customer_location:
+                break;
+            case R.id.menu_lead_reschedule:
+                break;
+            case R.id.menu_lead_won:
+                break;
+            case R.id.menu_lead_lost:
+                break;
+        }
+    }
+
+    @Override
+    public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CONVERT_WIZARD && resultCode == Activity.RESULT_OK) {
+            CRMLead crmLead = (CRMLead) db();
+            List<Integer> ids = data.getIntegerArrayListExtra(ConvertToOpportunityWizard.KEY_LEADS_IDS);
+            crmLead.convertToOpportunity(convertRequestRecord, ids, convertDoneListener);
+        }
+    }
+
+    CRMLead.OnConvertDoneListener convertDoneListener = new CRMLead.OnConvertDoneListener() {
+        @Override
+        public void OnConvertSuccess() {
+            Toast.makeText(getActivity(), "Converted to opportunity", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
+
+    @Override
+    public boolean onBackPressed() {
+        if (mSheet != null && mSheet.isShowing()) {
+            mSheet.dismiss();
+            return false;
+        }
+        return true;
+    }
+
 }

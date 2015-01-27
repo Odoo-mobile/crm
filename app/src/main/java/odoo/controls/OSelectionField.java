@@ -479,7 +479,11 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position,
                                long id) {
-        mValue = items.get(position).get(OColumn.ROW_ID);
+        if (mResourceArray != -1) {
+            mValue = position;
+        } else {
+            mValue = items.get(position).get(OColumn.ROW_ID);
+        }
         setValue(mValue);
     }
 

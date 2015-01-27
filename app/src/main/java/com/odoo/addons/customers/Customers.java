@@ -269,17 +269,23 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 break;
             case R.id.menu_customer_location:
                 String address = ((ResPartner) db()).getAddress(OCursorUtils.toDatarow((Cursor) extras));
-                if (!address.equals("false") || !TextUtils.isEmpty(address))
+                if (!address.equals("false") && !TextUtils.isEmpty(address))
                     IntentUtils.redirectToMap(getActivity(), address);
                 else
                     Toast.makeText(getActivity(), "No location found !", Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_customer_call:
-                IntentUtils.requestCall(getActivity(), (row.getString("phone").equals("false"))
-                        ? row.getString("mobile") : row.getString("phone"));
+                String contact = ResPartner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
+                if (!contact.equals("false"))
+                    IntentUtils.requestCall(getActivity(), contact);
+                else
+                    Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_customer_send_message:
-                IntentUtils.requestMessage(getActivity(), row.getString("email"));
+                if (!row.getString("email").equals("false"))
+                    IntentUtils.requestMessage(getActivity(), row.getString("email"));
+                else
+                    Toast.makeText(getActivity(), "No email found !", Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_customer_schedule_call:
                 Bundle extra = row.getPrimaryBundleData();

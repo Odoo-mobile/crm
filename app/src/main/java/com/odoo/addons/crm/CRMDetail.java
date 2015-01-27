@@ -19,13 +19,16 @@
  */
 package com.odoo.addons.crm;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
+import com.odoo.App;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.base.addons.res.ResUsers;
@@ -33,20 +36,18 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.crm.R;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.OArguments;
 import odoo.controls.OForm;
 
 public class CRMDetail extends ActionBarActivity {
     public static final String TAG = CRMDetail.class.getSimpleName();
+    public static final int REQUEST_CONVERT_WIZARD = 159;
     private Bundle extra;
     private OForm mForm;
     private ODataRow record;
@@ -150,47 +151,52 @@ public class CRMDetail extends ActionBarActivity {
                 }
                 break;
             case R.id.menu_lead_convert_to_opportunity:
-                try {
-                    odoo.Odoo odoo = crmLead.getServerDataHelper().getOdoo();
-                    OValues coValue = new OValues();
-                    List<Integer> ids = new ArrayList<Integer>();
-                    coValue.put("name", "convert");
-                    coValue.put("action", (record.getInt("partner_id") != null) ? "exist"
-                            : "create");
-                    coValue.put(
-                            "partner_id",
-                            (record.getInt("partner_id") != null) ? record.getInt("partner_id") : false);
-                    JSONObject context = new JSONObject();
-                    context.put("stage_type", "lead");
-                    context.put("active_id", record.getInt("id"));
-                    context.put("active_ids",
-                            new JSONArray().put(record.getInt("id")));
-                    context.put("active_model", "crm.lead");
-                    odoo.updateContext(context);
-                    JSONObject args = new JSONObject();
-                    for (String key : coValue.keys()) {
-                        args.put(key, coValue.get(key));
+                if (record.getInt("id") == 0) {
+                    OAlert.showWarning(this, "Need to sync before converting to Opportunity");
+                } else {
+                    App app = (App) getApplicationContext();
+                    if (app.inNetwork()) {
+                        int count = crmLead.count("id != ? and partner_id = ? and " + OColumn.ROW_ID + " != ?"
+                                , new String[]{
+                                "0",
+                                record.getInt("partner_id") + "",
+                                record.getString(OColumn.ROW_ID)
+                        });
+                        if (count > 0) {
+                            Intent intent = new Intent(this, ConvertToOpportunityWizard.class);
+                            intent.putExtras(record.getPrimaryBundleData());
+                            startActivityForResult(intent, REQUEST_CONVERT_WIZARD);
+                        } else {
+                            crmLead.convertToOpportunity(record, new ArrayList<Integer>(), convertDoneListener);
+                        }
+                    } else {
+                        Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
                     }
-                    JSONObject result = odoo.createNew(
-                            "crm.lead2opportunity.partner", args);
-                    int lead_to_opp_partner_id = result
-                            .getInt("result");
-
-                    OArguments arg = new OArguments();
-                    arg.add(lead_to_opp_partner_id);
-                    arg.add(context);
-                    odoo.debug(true);
-                    odoo.call_kw("crm.lead2opportunity.partner",
-                            "action_apply", arg.get());
-                    OValues vals = new OValues();
-                    vals.put("type", "opportunity");
-                    crmLead.update(record.getInt(OColumn.ROW_ID), vals);
-                } catch (Exception e) {
-
                 }
-                finish();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CONVERT_WIZARD && resultCode == RESULT_OK) {
+            List<Integer> ids = data.getIntegerArrayListExtra(ConvertToOpportunityWizard.KEY_LEADS_IDS);
+            crmLead.convertToOpportunity(record, ids, convertDoneListener);
+        }
+    }
+
+    CRMLead.OnConvertDoneListener convertDoneListener = new CRMLead.OnConvertDoneListener() {
+        @Override
+        public void OnConvertSuccess() {
+            Toast.makeText(CRMDetail.this, "Converted to opportunity", Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
 }
