@@ -30,6 +30,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.CalendarUtils;
@@ -43,6 +44,8 @@ import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.notification.ONotificationBuilder;
+import com.odoo.core.utils.reminder.ReminderReceiver;
 import com.odoo.core.utils.reminder.ReminderUtils;
 import com.odoo.crm.R;
 
@@ -123,8 +126,22 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         } else {
             eventForm.initForm(null);
         }
+        Bundle extra = getIntent().getExtras();
+        String action = getIntent().getAction();
+        if (action != null && (action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_DONE) ||
+                action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_RE_SCHEDULE))) {
+            ONotificationBuilder.cancelNotification(this, getIntent().getExtras().getInt(OColumn.ROW_ID));
+            if (action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_DONE)) {
+                int row_id = getIntent().getExtras().getInt(OColumn.ROW_ID);
+                OValues values = new OValues();
+                values.put("is_done", 1);
+                calendarEvent.update(row_id, values);
+                Toast.makeText(this, "Event marked done", Toast.LENGTH_LONG).show();
+                extra.remove(KEY_RESCHEDULE);
+            }
+        }
 
-        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(KEY_RESCHEDULE)) {
+        if (extra != null && extra.containsKey(KEY_RESCHEDULE)) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {

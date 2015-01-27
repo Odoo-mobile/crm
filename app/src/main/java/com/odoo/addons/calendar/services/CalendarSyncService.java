@@ -48,7 +48,7 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         adapter.onSyncFinish(this);
-        
+
     }
 
 
@@ -56,7 +56,7 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
         // Setting reminders to events
         CalendarEvent event = new CalendarEvent(getApplicationContext(), null);
-        List<ODataRow> rows = event.select(null, "has_reminder = ?", new String[]{"false"});
+        List<ODataRow> rows = event.select();
         int count = 0;
         for (ODataRow row : rows) {
             if (row.getBoolean("allday")) {
@@ -70,7 +70,7 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
             if (now.compareTo(start_date) < 0) {
                 Bundle extra = row.getPrimaryBundleData();
                 extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "event");
-                if (ReminderUtils.get(getApplicationContext()).setReminder(start_date, extra)) {
+                if (ReminderUtils.get(getApplicationContext()).resetReminder(start_date, extra)) {
                     OValues values = new OValues();
                     values.put("_is_dirty", "false");
                     values.put("has_reminder", "true");

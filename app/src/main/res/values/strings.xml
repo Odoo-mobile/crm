@@ -40,4 +40,6 @@
     <string name="label_sale_create_invoice">Create Invoice</string>
     <string name="label_sale_cancel_order">Cancel Order</string>
     <string name="label_sale_new_copy_of_quotation">New Copy of Quotation</string>
+    <string name="label_mark_done">Mark Done</string>
+    <string name="label_re_schedule">Re-Schedule</string>
 </resources>

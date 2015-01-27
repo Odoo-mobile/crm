@@ -428,6 +428,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         final int row_id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
         values.put("is_done", (is_done.equals("0")) ? 1 : 0);
         String done_label = (is_done.equals("0")) ? "done" : "undone";
+        ODataRow row = OCursorUtils.toDatarow(cr);
+        Bundle data = row.getPrimaryBundleData();
         switch (menu.getItemId()) {
             // Event menus
             case R.id.menu_events_location:
@@ -440,8 +442,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
                 break;
             case R.id.menu_events_reschedule:
-                ODataRow row = OCursorUtils.toDatarow(cr);
-                Bundle data = row.getPrimaryBundleData();
                 data.putBoolean(EventDetail.KEY_RESCHEDULE, true);
                 IntentUtils.startActivity(getActivity(), EventDetail.class, data);
                 break;
@@ -464,7 +464,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 int partner_id = cr.getInt(cr.getColumnIndex("partner_id"));
                 if (partner_id != 0) {
                     String contact = ResPartner.getContact(getActivity(), partner_id);
-                    if (contact != null) {
+                    if (contact != null && !contact.equals("false")) {
                         IntentUtils.requestCall(getActivity(), contact);
                     } else {
                         Toast.makeText(getActivity(), "No contact found.",
@@ -482,7 +482,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 //TODO: opportunity won in Agenda
                 break;
             case R.id.menu_opp_reschedule:
-                //TODO: opportunity schedule in Agenda
+                IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
                 break;
 
             case R.id.menu_phonecall_reschedule:

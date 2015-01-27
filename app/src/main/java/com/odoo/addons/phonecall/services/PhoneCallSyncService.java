@@ -60,7 +60,7 @@ public class PhoneCallSyncService extends OSyncService implements ISyncFinishLis
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
         CRMPhoneCalls crmPhoneCalls = new CRMPhoneCalls(getApplicationContext(), user);
-        List<ODataRow> rows = crmPhoneCalls.select(null, "has_reminder = ? ", new String[]{"false"});
+        List<ODataRow> rows = crmPhoneCalls.select();
         int count = 0;
         for (ODataRow row : rows) {
             Date start_date = ODateUtils.createDateObject(row.getString("date"),
@@ -70,7 +70,7 @@ public class PhoneCallSyncService extends OSyncService implements ISyncFinishLis
             if (now.compareTo(start_date) < 0) {
                 Bundle extra = row.getPrimaryBundleData();
                 extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
-                if (ReminderUtils.get(getApplicationContext()).setReminder(start_date, extra)) {
+                if (ReminderUtils.get(getApplicationContext()).resetReminder(start_date, extra)) {
                     OValues values = new OValues();
                     values.put("_is_dirty", "false");
                     values.put("has_reminder", "true");

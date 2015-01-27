@@ -24,6 +24,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.features.receivers.PhoneStateReceiver;
@@ -38,6 +39,7 @@ import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
+import com.odoo.core.utils.reminder.ReminderReceiver;
 import com.odoo.core.utils.reminder.ReminderUtils;
 import com.odoo.crm.R;
 
@@ -73,13 +75,31 @@ public class PhoneCallDetail extends ActionBarActivity {
         mForm = (OForm) findViewById(R.id.phoneLogForm);
         mForm.setEditable(true);
         if (extra != null) {
+            String action = getIntent().getAction();
             if (!extra.containsKey(KEY_LOG_CALL_REQUEST)) {
+                if (action != null) {
+                    if (action.equals(ReminderReceiver.ACTION_PHONE_CALL_REMINDER_CALLBACK)) {
+                        String contact = extra.getString("contact");
+                        if (!contact.equals("false")) {
+                            IntentUtils.requestCall(this, contact);
+                        } else {
+                            Toast.makeText(this, "No contact found", Toast.LENGTH_LONG).show();
+                        }
+                        finish();
+                    }
+                    if (action.equals(ReminderReceiver.ACTION_PHONE_CALL_REMINDER_DONE)) {
+                        OValues values = new OValues();
+                        values.put("is_done", 1);
+                        crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
+                        Toast.makeText(this, "Phone call marked done", Toast.LENGTH_LONG).show();
+                    }
+                    ONotificationBuilder.cancelNotification(this, extra.getInt(OColumn.ROW_ID));
+                }
                 // Record request
                 record = crmPhoneCalls.browse(extra.getInt(OColumn.ROW_ID));
                 mForm.initForm(record);
             } else {
                 // Logging new call
-                String action = getIntent().getAction();
                 if (action != null) {
                     ONotificationBuilder.cancelNotification(this, extra.getInt("notification_id"));
                     if (action.equals(PhoneStateReceiver.ACTION_CALL_BACK)) {
@@ -147,16 +167,15 @@ public class PhoneCallDetail extends ActionBarActivity {
                     Date date = ODateUtils.createDateObject(values.getString("date"),
                             ODateUtils.DEFAULT_FORMAT, false);
                     Date now = new Date();
-                    if (now.compareTo(date) < 0) {
-                        values.put("has_reminder", "true");
-                        Bundle extra = row.getPrimaryBundleData();
-                        extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
-                        ReminderUtils.get(getApplicationContext()).setReminder(date, extra);
-                    }
                     if (extra == null)
-                        crmPhoneCalls.insert(values);
+                        extra.putInt(OColumn.ROW_ID, crmPhoneCalls.insert(values));
                     else
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
+                    if (now.compareTo(date) < 0) {
+                        values.put("has_reminder", "true");
+                        extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
+                        ReminderUtils.get(getApplicationContext()).resetReminder(date, extra);
+                    }
                     finish();
                 }
                 break;
