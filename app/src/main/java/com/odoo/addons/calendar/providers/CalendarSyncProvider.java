@@ -89,10 +89,11 @@ public class CalendarSyncProvider extends BaseModelProvider {
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
 
         // Comparing date
-        where = "date >=  ? and date <= ?";
+        where = "date >=  ? and date <= ? and state = ?";
         args.clear();
         args.add(date_start);
         args.add(date_end);
+        args.add("open");
         if (filter != null) {
             where += " and (name like ? or description like ?)";
             args.add(filter);
