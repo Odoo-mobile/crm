@@ -40,9 +40,13 @@ import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.crm.R;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.OArguments;
 import odoo.controls.OForm;
 
 public class CRMDetail extends ActionBarActivity {
@@ -124,6 +128,7 @@ public class CRMDetail extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        odoo.Odoo odoo = crmLead.getServerDataHelper().getOdoo();
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -174,6 +179,17 @@ public class CRMDetail extends ActionBarActivity {
                     }
                 }
                 break;
+            case R.id.menu_mark_won:
+                OArguments oArguments = new OArguments();
+                oArguments.add(new JSONArray().put(record.getInt("id")));
+                crmLead.getServerDataHelper().callMethod("case_mark_won", oArguments, new JSONObject());
+                break;
+            case R.id.menu_mark_lost:
+                oArguments = new OArguments();
+                oArguments.add(new JSONArray().put(record.getInt("id")));
+                crmLead.getServerDataHelper().callMethod("case_mark_lost", oArguments, new JSONObject());
+                break;
+
         }
         return super.onOptionsItemSelected(item);
     }
