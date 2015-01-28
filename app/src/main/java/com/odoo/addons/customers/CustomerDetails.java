@@ -238,7 +238,7 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
                     }
                     if (record != null) {
                         resPartner.update(record.getInt(OColumn.ROW_ID), values);
-                        Toast.makeText(this, "Information Saved", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.toast_information_saved, Toast.LENGTH_LONG).show();
                         mEditMode = !mEditMode;
                         setupActionBar();
                     } else {
@@ -348,7 +348,7 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
             userImage.setColorFilter(null);
             userImage.setImageBitmap(BitmapUtils.getBitmapImage(this, newImage));
         } else {
-            Toast.makeText(this, "Image size is too large.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
         }
     }
 }

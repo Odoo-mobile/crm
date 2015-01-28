@@ -441,7 +441,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             case R.id.menu_events_location:
                 String location = cr.getString(cr.getColumnIndex("location"));
                 if (location.equals("false")) {
-                    Toast.makeText(getActivity(), "No location found !",
+                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found),
                             Toast.LENGTH_LONG).show();
                 } else {
                     IntentUtils.redirectToMap(getActivity(), location);
@@ -459,7 +459,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 address += cr.getString(cr.getColumnIndex("zip"));
                 address = address.replaceAll("false", "");
                 if (TextUtils.isEmpty(address.trim())) {
-                    Toast.makeText(getActivity(), "No location found !",
+                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found),
                             Toast.LENGTH_LONG).show();
                 } else {
                     IntentUtils.redirectToMap(getActivity(), address);
@@ -473,11 +473,11 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                     if (contact != null && !contact.equals("false")) {
                         IntentUtils.requestCall(getActivity(), contact);
                     } else {
-                        Toast.makeText(getActivity(), "No contact found.",
+                        Toast.makeText(getActivity(), _s(R.string.label_no_contact_found),
                                 Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getActivity(), "No contact found.",
+                    Toast.makeText(getActivity(), _s(R.string.label_no_contact_found),
                             Toast.LENGTH_LONG).show();
                 }
                 break;
@@ -486,7 +486,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                     wonLost = "lost";
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.menu_opp_won:
@@ -494,7 +494,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                     wonLost = "won";
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.menu_opp_reschedule:
@@ -510,7 +510,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 final CRMPhoneCalls phone_call = new CRMPhoneCalls(getActivity(), null);
                 phone_call.update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
-                SnackBar.get(getActivity()).text("Event marked " + done_label)
+                SnackBar.get(getActivity()).text(_s(R.string.label_event_marked) + done_label)
                         .actionColor(_c(R.color.theme_primary_light))
                         .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
                         .withAction("undo", new ActionClickListener() {
@@ -528,7 +528,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             case R.id.menu_events_all_done:
                 db().update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
-                SnackBar.get(getActivity()).text("Event marked " + done_label)
+                SnackBar.get(getActivity()).text(_s(R.string.label_event_marked) + done_label)
                         .actionColor(_c(R.color.theme_primary_light))
                         .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
                         .withAction("undo", new ActionClickListener() {
@@ -550,7 +550,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), StringUtils.capitalizeString(convertRequestRecord.getString("type"))
-                    + " marked " + wonLost, Toast.LENGTH_LONG).show();
+                    + _s(R.string.toast_marked) + wonLost, Toast.LENGTH_LONG).show();
         }
 
         @Override
