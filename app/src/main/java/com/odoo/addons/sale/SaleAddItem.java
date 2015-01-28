@@ -4,7 +4,9 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 
+import com.odoo.core.utils.logger.OLog;
 import com.odoo.crm.R;
 
 public class SaleAddItem extends ActionBarActivity {
@@ -12,7 +14,10 @@ public class SaleAddItem extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sale_add_item);
+        setContentView(R.layout.sale_add_item);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        setResult(RESULT_CANCELED);
+        OLog.log(">>>>>>>>>>>>> Additem Activity");
     }
 
 

@@ -19,6 +19,8 @@
  */
 package com.odoo.addons.sale;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -39,13 +41,13 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.list.OListAdapter;
-import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
 import com.odoo.core.utils.logger.OLog;
+import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.crm.R;
 
 import org.json.JSONArray;
@@ -59,8 +61,9 @@ import odoo.controls.OForm;
 
 import static com.odoo.addons.sale.Sales.Type;
 
-public class SalesDetail extends ActionBarActivity implements View.OnClickListener {
+public class SalesDetail extends ActionBarActivity implements View.OnClickListener, IOnActivityResultListener {
     public static final String TAG = SalesDetail.class.getSimpleName();
+    public static final int REQUEST_ADD_ITEM = 323;
     private Bundle extra;
     private OForm mForm;
     private ODataRow record;
@@ -288,7 +291,19 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if (extra != null && !record.getString("state").equals("cancel"))
-            IntentUtils.startActivity(this, SaleAddItem.class, extra);
+        if (extra != null && !record.getString("state").equals("cancel")) {
+//            IntentUtils.startActivity(this, SaleAddItem.class, extra);
+            Intent intent = new Intent(this, SaleAddItem.class);
+            intent.putExtras(extra);
+            startActivityForResult(intent, REQUEST_ADD_ITEM);
+        }
+    }
+
+    @Override
+    public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ADD_ITEM && resultCode == Activity.RESULT_OK) {
+            OLog.log(">>>> data " + data);
+        } else
+            OLog.log(">>>> else " + data);
     }
 }
