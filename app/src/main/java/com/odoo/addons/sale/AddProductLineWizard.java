@@ -9,7 +9,7 @@ import android.view.ViewGroup;
 import com.odoo.core.utils.logger.OLog;
 import com.odoo.crm.R;
 
-public class SaleAddItem extends ActionBarActivity {
+public class AddProductLineWizard extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

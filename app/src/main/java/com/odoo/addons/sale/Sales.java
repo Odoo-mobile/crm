@@ -21,6 +21,7 @@ package com.odoo.addons.sale;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -31,9 +32,9 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -43,13 +44,18 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.IntentUtils;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
+import com.odoo.widgets.bottomsheet.BottomSheet;
+import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,7 +64,7 @@ import java.util.List;
 public class Sales extends BaseFragment implements
         OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener, View.OnClickListener,
-        ISyncStatusObserverListener, AdapterView.OnItemClickListener {
+        ISyncStatusObserverListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener {
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
 
@@ -66,7 +72,7 @@ public class Sales extends BaseFragment implements
     private ListView mList;
     private OCursorListAdapter mAdapter;
     private String mFilter = null;
-
+    private BottomSheet mSheet;
     private Type mType = Type.Quotation;
 
 
@@ -86,6 +92,7 @@ public class Sales extends BaseFragment implements
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        parent().setOnBackPressListener(this);
         mView = view;
         initAdapter();
     }
@@ -95,7 +102,7 @@ public class Sales extends BaseFragment implements
         mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.sale_order_item);
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
-        mList.setOnItemClickListener(this);
+        mAdapter.handleItemClickListener(mList, this);
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
         setHasSyncStatusObserver(TAG, this, db());
         setHasSwipeRefreshView(mView, R.id.swipe_container, this);
@@ -263,11 +270,85 @@ public class Sales extends BaseFragment implements
     }
 
     @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+    public void onItemDoubleClick(View view, int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         Bundle data = row.getPrimaryBundleData();
         data.putString("type", mType.toString());
         IntentUtils.startActivity(getActivity(), SalesDetail.class, data);
     }
 
+    @Override
+    public void onItemClick(View view, int position) {
+        showSheet((Cursor) mAdapter.getItem(position));
+    }
+
+    private void showSheet(Cursor data) {
+        BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
+        builder.listener(this);
+        builder.setIconColor(_c(R.color.theme_primary_dark));
+        builder.setTextColor(Color.parseColor("#414141"));
+        builder.setData(data);
+        builder.actionListener(this);
+        builder.setActionIcon(R.drawable.ic_action_edit);
+        builder.title(data.getString(data.getColumnIndex("name")));
+        if (mType == Type.Quotation)
+            builder.menu(R.menu.menu_quotation_sheet);
+        else
+            builder.menu(R.menu.menu_so_sheet);
+        mSheet = builder.create();
+        mSheet.show();
+    }
+
+    @Override
+    public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
+        mSheet.dismiss();
+        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+        switch (menu.getItemId()) {
+//            case R.id.menu_so_send_by_email:
+//                break;
+            case R.id.menu_quotation_cancel:
+                break;
+            case R.id.menu_so_confirm_sale:
+                if (row.getFloat("amount_total") > 0) {
+                    if (inNetwork()) {
+                        ((SaleOrder) db()).confirmSale(row, confirmSale);
+                    } else {
+                        Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    OAlert.showWarning(getActivity(), "You cannot a sales order which has no line");
+                }
+                break;
+        }
+    }
+
+    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), "Quotation confirmed !", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
+
+    @Override
+    public void onSheetActionClick(BottomSheet sheet, Object extras) {
+        mSheet.dismiss();
+        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+        Bundle data = row.getPrimaryBundleData();
+        data.putString("type", mType.toString());
+        IntentUtils.startActivity(getActivity(), SalesDetail.class, data);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        if (mSheet != null && mSheet.isShowing()) {
+            mSheet.dismiss();
+            return false;
+        }
+        return true;
+    }
 }

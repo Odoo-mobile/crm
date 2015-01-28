@@ -47,4 +47,6 @@
     </string-array>
     <string name="no_network">No Network...</string>
     <string name="title_activity_sale_add_item">SaleAddItem</string>
+    <string name="label_send_by_email">Send by email</string>
+    <string name="label_confirm_sale">Confirm Sale</string>
 </resources>

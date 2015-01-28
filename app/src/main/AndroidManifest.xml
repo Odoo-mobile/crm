@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.odoo.crm" >
+    package="com.odoo.crm">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -34,10 +34,10 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:largeHeap="true"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <activity
             android:name="com.odoo.core.account.OdooLogin"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -51,7 +51,7 @@
         <activity android:name="com.odoo.core.account.About" />
         <activity android:name="com.odoo.core.account.Profile" />
 
-        <service android:name="com.odoo.core.auth.OdooAuthService" >
+        <service android:name="com.odoo.core.auth.OdooAuthService">
             <intent-filter>
                 <action android:name="android.accounts.AccountAuthenticator" />
             </intent-filter>
@@ -74,7 +74,7 @@
         <service
             android:name="com.odoo.addons.customers.services.CustomerSyncService"
             android:exported="true"
-            android:process=":sync" >
+            android:process=":sync">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -92,7 +92,7 @@
         <service
             android:name="com.odoo.addons.calendar.services.CalendarSyncService"
             android:exported="true"
-            android:process=":sync" >
+            android:process=":sync">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -110,7 +110,7 @@
         <service
             android:name="com.odoo.addons.crm.services.CRMLeadSyncService"
             android:exported="true"
-            android:process=":sync" >
+            android:process=":sync">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -128,7 +128,7 @@
         <service
             android:name="com.odoo.addons.sale.services.SaleOrderSyncService"
             android:exported="true"
-            android:process=":sync" >
+            android:process=":sync">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -146,7 +146,7 @@
         <service
             android:name="com.odoo.addons.phonecall.services.PhoneCallSyncService"
             android:exported="true"
-            android:process=":sync" >
+            android:process=":sync">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -184,7 +184,7 @@
         <receiver android:name="com.odoo.core.utils.reminder.ReminderReceiver" />
         <receiver android:name="com.odoo.core.utils.reminder.ReminderActionReceiver" />
         <!-- Phone state receiver// -->
-        <receiver android:name="com.odoo.addons.phonecall.features.receivers.PhoneStateReceiver" >
+        <receiver android:name="com.odoo.addons.phonecall.features.receivers.PhoneStateReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.PHONE_STATE" />
             </intent-filter>
@@ -194,13 +194,9 @@
         </receiver>
 
         <activity
-            android:name="com.odoo.addons.sale.SaleAddItem"
-            android:label="@string/title_activity_sale_add_item"
-            android:parentActivityName="com.odoo.addons.sale.SalesDetail" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.odoo.addons.sale.SalesDetail" />
-        </activity>
+            android:name="com.odoo.addons.sale.AddProductLineWizard"
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:windowSoftInputMode="adjustPan"></activity>
     </application>
 
 </manifest>
