@@ -46,10 +46,7 @@ import com.odoo.crm.R;
 import odoo.controls.fab.FloatingActionButton;
 
 public abstract class BaseFragment extends Fragment implements IBaseFragment {
-
-    public void setTitle(String title) {
-        getActivity().setTitle(title);
-    }
+    private Context mContext;
 
     private OModel syncStatusObserverModel = null;
     private String drawerRefreshTag = null;
@@ -60,34 +57,44 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     private SearchView mSearchView;
     private FloatingActionButton mFab = null;
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mContext = getActivity();
+    }
+
+    public void setTitle(String title) {
+        getActivity().setTitle(title);
+    }
+
     public OModel db() {
         Class<?> model = database();
         if (model != null) {
-            return new OModel(getActivity(), null, user()).createInstance(model);
+            return new OModel(mContext, null, user()).createInstance(model);
         }
         return null;
     }
 
     public OUser user() {
-        if (getActivity() != null)
-            return OUser.current(getActivity());
+        if (mContext != null)
+            return OUser.current(mContext);
         return null;
     }
 
     public OdooActivity parent() {
-        return (OdooActivity) getActivity();
+        return (OdooActivity) mContext;
     }
 
     public String _s(int res_id) {
-        return OResource.string(getActivity(), res_id);
+        return OResource.string(mContext, res_id);
     }
 
     public int _c(int res_id) {
-        return OResource.color(getActivity(), res_id);
+        return OResource.color(mContext, res_id);
     }
 
     public int _dim(int res_id) {
-        return OResource.dimen(getActivity(), res_id);
+        return OResource.dimen(mContext, res_id);
     }
 
     // Sync Observer
@@ -107,10 +114,10 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
                 public void run() {
 
                     boolean syncActive = ContentResolver.isSyncActive(
-                            OUser.current(getActivity()).getAccount(),
+                            OUser.current(mContext).getAccount(),
                             syncStatusObserverModel.authority());
                     boolean syncPending = ContentResolver.isSyncPending(
-                            OUser.current(getActivity()).getAccount(),
+                            OUser.current(mContext).getAccount(),
                             syncStatusObserverModel.authority());
                     boolean refreshing = syncActive | syncPending;
                     if (!refreshing) {
@@ -152,7 +159,7 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     }
 
     public boolean inNetwork() {
-        App app = (App) getActivity().getApplicationContext();
+        App app = (App) mContext.getApplicationContext();
         return app.inNetwork();
     }
 

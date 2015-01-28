@@ -38,6 +38,7 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.StringUtils;
 import com.odoo.crm.R;
 
 import java.util.ArrayList;
@@ -54,6 +55,7 @@ public class CRMDetail extends ActionBarActivity {
     private CRMLead crmLead;
     private ActionBar actionBar;
     private Menu menu;
+    private String wonLost = "won";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +126,7 @@ public class CRMDetail extends ActionBarActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        App app = (App) getApplicationContext();
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -154,7 +157,6 @@ public class CRMDetail extends ActionBarActivity {
                 if (record.getInt("id") == 0) {
                     OAlert.showWarning(this, "Need to sync before converting to Opportunity");
                 } else {
-                    App app = (App) getApplicationContext();
                     if (app.inNetwork()) {
                         int count = crmLead.count("id != ? and partner_id = ? and " + OColumn.ROW_ID + " != ?"
                                 , new String[]{
@@ -174,6 +176,22 @@ public class CRMDetail extends ActionBarActivity {
                     }
                 }
                 break;
+            case R.id.menu_mark_won:
+                if (app.inNetwork()) {
+                    crmLead.markWonLost(wonLost, record, markDoneListener);
+                } else {
+                    Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.menu_mark_lost:
+                wonLost = "lost";
+                if (app.inNetwork()) {
+                    crmLead.markWonLost(wonLost, record, markDoneListener);
+                } else {
+                    Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
+                break;
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -187,9 +205,22 @@ public class CRMDetail extends ActionBarActivity {
         }
     }
 
-    CRMLead.OnConvertDoneListener convertDoneListener = new CRMLead.OnConvertDoneListener() {
+    CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
-        public void OnConvertSuccess() {
+        public void OnSuccess() {
+            Toast.makeText(CRMDetail.this, StringUtils.capitalizeString(record.getString("type"))
+                    + " marked " + wonLost, Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
+    CRMLead.OnOperationSuccessListener convertDoneListener = new CRMLead.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
             Toast.makeText(CRMDetail.this, "Converted to opportunity", Toast.LENGTH_LONG).show();
             finish();
         }
