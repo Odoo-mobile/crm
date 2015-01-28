@@ -43,6 +43,7 @@ import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.TodayIcon;
 import com.odoo.addons.crm.CRM;
 import com.odoo.addons.crm.CRMDetail;
+import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.CustomerDetails;
 import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
@@ -62,6 +63,7 @@ import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
@@ -94,7 +96,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private OCursorListAdapter mAdapter;
     private boolean syncRequested = false;
     private String mFilter = null;
-
+    private String wonLost = "won";
+    private CRMLead crmLead;
+    private ODataRow convertRequestRecord;
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -115,6 +119,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         parent().setOnBackPressListener(this);
         odooCalendar = (OdooCalendar) view.findViewById(R.id.dashboard_calendar);
         odooCalendar.setOdooCalendarDateSelectListener(this);
+        crmLead = new CRMLead(getActivity(), null);
     }
 
     @Override
@@ -429,6 +434,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         values.put("is_done", (is_done.equals("0")) ? 1 : 0);
         String done_label = (is_done.equals("0")) ? "done" : "undone";
         ODataRow row = OCursorUtils.toDatarow(cr);
+        convertRequestRecord = row;
         Bundle data = row.getPrimaryBundleData();
         switch (menu.getItemId()) {
             // Event menus
@@ -476,10 +482,20 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
                 break;
             case R.id.menu_opp_lost:
-                //TODO: opportunity lost in Agenda
+                if (inNetwork()) {
+                    wonLost = "lost";
+                    crmLead.markWonLost(wonLost, row, markDoneListener);
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_opp_won:
-                //TODO: opportunity won in Agenda
+                if (inNetwork()) {
+                    wonLost = "won";
+                    crmLead.markWonLost(wonLost, row, markDoneListener);
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_opp_reschedule:
                 IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
@@ -530,6 +546,18 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         }
     }
 
+    CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), StringUtils.capitalizeString(convertRequestRecord.getString("type"))
+                    + " marked " + wonLost, Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
 
     private void onFabMenuClick(MenuItem item) {
         switch (item.getItemId()) {

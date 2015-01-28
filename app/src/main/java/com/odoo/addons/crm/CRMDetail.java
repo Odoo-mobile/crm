@@ -19,6 +19,7 @@
  */
 package com.odoo.addons.crm;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -48,7 +49,8 @@ import odoo.controls.OForm;
 
 public class CRMDetail extends ActionBarActivity {
     public static final String TAG = CRMDetail.class.getSimpleName();
-    public static final int REQUEST_CONVERT_WIZARD = 159;
+    public static final int REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD = 1223;
+    public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 1224;
     private Bundle extra;
     private OForm mForm;
     private ODataRow record;
@@ -167,7 +169,7 @@ public class CRMDetail extends ActionBarActivity {
                         if (count > 0) {
                             Intent intent = new Intent(this, ConvertToOpportunityWizard.class);
                             intent.putExtras(record.getPrimaryBundleData());
-                            startActivityForResult(intent, REQUEST_CONVERT_WIZARD);
+                            startActivityForResult(intent, REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD);
                         } else {
                             crmLead.convertToOpportunity(record, new ArrayList<Integer>(), convertDoneListener);
                         }
@@ -191,6 +193,15 @@ public class CRMDetail extends ActionBarActivity {
                     Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
                 }
                 break;
+            case R.id.menu_lead_convert_to_quotation:
+                if (app.inNetwork()) {
+                    Intent intent = new Intent(this, ConvertToQuotation.class);
+                    intent.putExtras(record.getPrimaryBundleData());
+                    startActivityForResult(intent, REQUEST_CONVERT_TO_QUOTATION_WIZARD);
+                } else {
+                    Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
+                break;
 
         }
         return super.onOptionsItemSelected(item);
@@ -199,12 +210,27 @@ public class CRMDetail extends ActionBarActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CONVERT_WIZARD && resultCode == RESULT_OK) {
+        if (requestCode == REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD && resultCode == RESULT_OK) {
             List<Integer> ids = data.getIntegerArrayListExtra(ConvertToOpportunityWizard.KEY_LEADS_IDS);
             crmLead.convertToOpportunity(record, ids, convertDoneListener);
         }
+        if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode == Activity.RESULT_OK) {
+            crmLead.createQuotation(record, data.getBooleanExtra("mark_won", false), createQuotationListener);
+        }
     }
 
+    CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(CRMDetail.this, "Quotation created for " +
+                    record.getString("name"), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
     CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {

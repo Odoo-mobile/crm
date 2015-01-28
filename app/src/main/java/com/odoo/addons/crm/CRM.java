@@ -76,7 +76,8 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         IOnBackPressListener, IOnActivityResultListener {
     public static final String TAG = CRM.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
-    public static final int REQUEST_CONVERT_WIZARD = 223;
+    public static final int REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD = 223;
+    public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 224;
     private Type mType = Type.Leads;
     private View mView;
     private ListView mList;
@@ -375,7 +376,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                         if (count > 0) {
                             Intent intent = new Intent(getActivity(), ConvertToOpportunityWizard.class);
                             intent.putExtras(row.getPrimaryBundleData());
-                            startActivityForResult(intent, REQUEST_CONVERT_WIZARD);
+                            parent().startActivityForResult(intent, REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD);
                         } else {
                             crmLead.convertToOpportunity(row, new ArrayList<Integer>(), convertDoneListener);
                         }
@@ -385,6 +386,13 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                 }
                 break;
             case R.id.menu_lead_convert_to_quotation:
+                if (inNetwork()) {
+                    Intent intent = new Intent(getActivity(), ConvertToQuotation.class);
+                    intent.putExtras(row.getPrimaryBundleData());
+                    parent().startActivityForResult(intent, REQUEST_CONVERT_TO_QUOTATION_WIZARD);
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_lead_call_customer:
                 if (!row.getString("partner_id").equals("false")) {
@@ -414,6 +422,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                 IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
                 break;
             case R.id.menu_lead_won:
+                wonLost = "won";
                 if (inNetwork()) {
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
@@ -433,13 +442,29 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
 
     @Override
     public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CONVERT_WIZARD && resultCode == Activity.RESULT_OK) {
+        if (requestCode == REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD && resultCode == Activity.RESULT_OK) {
             CRMLead crmLead = (CRMLead) db();
             List<Integer> ids = data.getIntegerArrayListExtra(ConvertToOpportunityWizard.KEY_LEADS_IDS);
             crmLead.convertToOpportunity(convertRequestRecord, ids, convertDoneListener);
         }
+        if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode == Activity.RESULT_OK) {
+            CRMLead crmLead = (CRMLead) db();
+            crmLead.createQuotation(convertRequestRecord, data.getBooleanExtra("mark_won", false), createQuotationListener);
+        }
     }
 
+    CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), "Quotation created for " +
+                    convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
     CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
