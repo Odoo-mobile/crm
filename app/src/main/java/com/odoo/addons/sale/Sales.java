@@ -291,9 +291,12 @@ public class Sales extends BaseFragment implements
         builder.actionListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);
         builder.title(data.getString(data.getColumnIndex("name")));
-        if (mType == Type.Quotation)
-            builder.menu(R.menu.menu_quotation_sheet);
-        else
+        if (mType == Type.Quotation) {
+            if (data.getString(data.getColumnIndex("state")).equals("cancel"))
+                builder.menu(R.menu.menu_quotation_cancel_sheet);
+            else
+                builder.menu(R.menu.menu_quotation_sheet);
+        } else
             builder.menu(R.menu.menu_so_sheet);
         mSheet = builder.create();
         mSheet.show();
@@ -307,6 +310,14 @@ public class Sales extends BaseFragment implements
 //            case R.id.menu_so_send_by_email:
 //                break;
             case R.id.menu_quotation_cancel:
+                ((SaleOrder) db()).cancelOrder(mType, row, cancelOrder);
+                break;
+            case R.id.menu_quotation_new:
+                if (inNetwork()) {
+                    ((SaleOrder) db()).newCopyQuotation(row, newCopyQuotation);
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                }
                 break;
             case R.id.menu_so_confirm_sale:
                 if (row.getFloat("amount_total") > 0) {
@@ -322,10 +333,32 @@ public class Sales extends BaseFragment implements
         }
     }
 
+    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), mType + " cancelled", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), "Quotation confirmed !", Toast.LENGTH_LONG).show();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
+    SaleOrder.OnOperationSuccessListener newCopyQuotation = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(getActivity(), R.string.label_copy_quotation, Toast.LENGTH_LONG).show();
         }
 
         @Override

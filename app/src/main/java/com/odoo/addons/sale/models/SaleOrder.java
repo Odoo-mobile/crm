@@ -274,6 +274,53 @@ public class SaleOrder extends OModel {
         }.execute();
     }
 
+    public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(mContext);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    OArguments args = new OArguments();
+                    args.add(new JSONArray().put(quotation.getInt("id")));
+                    args.add(new JSONObject());
+                    getServerDataHelper().callMethod("copy_quotation", args);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnSuccess();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnCancelled();
+                }
+            }
+        }.execute();
+    }
+
     public static interface OnOperationSuccessListener {
         public void OnSuccess();
 

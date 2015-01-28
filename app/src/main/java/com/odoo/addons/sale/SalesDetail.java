@@ -191,10 +191,8 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                                 OArguments args = new OArguments();
                                 args.add(new JSONArray().put(extra.getInt("id")));
                                 sale.getServerDataHelper().callMethod("copy_quotation", args);
-                                Toast.makeText(this, "Copy of quotation...", Toast.LENGTH_LONG).show();
-
                             } else {
-                                Toast.makeText(this, R.string.no_network, Toast.LENGTH_LONG).show();
+                                Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
                             }
                         } else
                             sale.update(record.getInt(OColumn.ROW_ID), values);
@@ -234,7 +232,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                             Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
                         }
                     } else {
-                        OAlert.showWarning(this, "You cannot a sales order which has no line");
+                        OAlert.showWarning(this, R.string.label_no_order_line + "");
                     }
                 }
                 break;
@@ -259,7 +257,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(SalesDetail.this, "Quotation confirmed !", Toast.LENGTH_LONG).show();
+            Toast.makeText(SalesDetail.this, R.string.label_quotation_confirm, Toast.LENGTH_LONG).show();
             finish();
         }
 
@@ -272,10 +270,9 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (extra != null && !record.getString("state").equals("cancel")) {
-//            IntentUtils.startActivity(this, SaleAddItem.class, extra);
-            Intent intent = new Intent(this, AddProductLineWizard.class);
-            intent.putExtras(extra);
-            startActivityForResult(intent, REQUEST_ADD_ITEM);
+//            Intent intent = new Intent(this, AddProductLineWizard.class);
+//            intent.putExtras(extra);
+//            startActivityForResult(intent, REQUEST_ADD_ITEM);
         }
     }
 
