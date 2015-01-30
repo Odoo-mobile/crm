@@ -270,9 +270,9 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     @Override
     public void onClick(View v) {
         if (extra != null && !record.getString("state").equals("cancel")) {
-//            Intent intent = new Intent(this, AddProductLineWizard.class);
-//            intent.putExtras(extra);
-//            startActivityForResult(intent, REQUEST_ADD_ITEM);
+            Intent intent = new Intent(this, AddProductLineWizard.class);
+            intent.putExtras(extra);
+            startActivityForResult(intent, REQUEST_ADD_ITEM);
         }
     }
 
