@@ -21,6 +21,7 @@
 
     <string name="label_leads">Leads</string>
     <string name="label_lead">Lead</string>
+    <string name="label_opp">Opportunity</string>
     <string name="label_opportunities">Opportunities</string>
     <string name="label_quotation">Quotations</string>
     <string name="label_opportunity">Opportunity</string>
@@ -43,7 +44,10 @@
     <string name="label_sale_cancel_order">Cancel Order</string>
     <string name="label_sale_new_copy_of_quotation">New Copy of Quotation</string>
     <string name="label_mark_done">Mark Done</string>
+    <string name="label_tag_new">New</string>
+    <string name="label_quotation_created">Quotation Created for</string>
     <string name="label_re_schedule">Re-Schedule</string>
+    <string name="label_sync_warning">Need to sync before converting to Opportunity</string>
 
     <string name="label_no_customer_found">No Customers Found</string>
     <string name="label_no_location_found">No location found !</string>
