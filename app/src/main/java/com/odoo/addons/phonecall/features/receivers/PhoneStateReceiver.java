@@ -33,6 +33,7 @@ import com.odoo.addons.phonecall.features.CustomerFinder;
 import com.odoo.addons.phonecall.features.IOnCustomerFindListener;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.crm.R;
 
@@ -129,7 +130,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
             int notification_id = 55568;
             ONotificationBuilder builder = new ONotificationBuilder(mContext, notification_id);
             data.putInt("notification_id", notification_id);
-            builder.setTitle("Missed call from customer");
+            builder.setTitle(_s(R.string.label_missed_call_from_customer));
             builder.setText(data.getString("name"));
             ONotificationBuilder.NotificationAction callBack =
                     new ONotificationBuilder.NotificationAction(R.drawable.ic_action_phone,
@@ -147,6 +148,10 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
             builder.allowVibrate(false);
             builder.build().show();
         }
+    }
+
+    public String _s(int res_id) {
+        return OResource.string(mContext, res_id);
     }
 
     private void startLogCallActivity(Bundle data) {

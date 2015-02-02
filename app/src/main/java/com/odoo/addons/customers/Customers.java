@@ -77,6 +77,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
     private BottomSheet mSheet = null;
+    private boolean syncRequested = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -153,11 +154,12 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, Customers.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
-                    OControls.setText(mView, R.id.title, "No Customers Found");
+                    OControls.setText(mView, R.id.title, _s(R.string.label_no_customer_found));
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);
-            if (db().isEmptyTable()) {
+            if (db().isEmptyTable() && !syncRequested) {
+                syncRequested = true;
                 onRefresh();
             }
         }
@@ -272,20 +274,20 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 if (!address.equals("false") && !TextUtils.isEmpty(address))
                     IntentUtils.redirectToMap(getActivity(), address);
                 else
-                    Toast.makeText(getActivity(), "No location found !", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found), Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_customer_call:
                 String contact = ResPartner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
                 if (!contact.equals("false"))
                     IntentUtils.requestCall(getActivity(), contact);
                 else
-                    Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.label_no_contact_found), Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_customer_send_message:
                 if (!row.getString("email").equals("false"))
                     IntentUtils.requestMessage(getActivity(), row.getString("email"));
                 else
-                    Toast.makeText(getActivity(), "No email found !", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.label_no_email_found), Toast.LENGTH_LONG).show();
                 break;
             case R.id.menu_customer_schedule_call:
                 Bundle extra = row.getPrimaryBundleData();
