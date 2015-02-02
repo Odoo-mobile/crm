@@ -66,7 +66,7 @@ public class PhoneCallDetail extends ActionBarActivity {
         crmPhoneCalls = new CRMPhoneCalls(this, null);
         OActionBarUtils.setActionBar(this, true);
         actionBar = getSupportActionBar();
-        actionBar.setTitle("Schedule Call");
+        actionBar.setTitle(R.string.label_schedule_call);
         extra = getIntent().getExtras();
         init();
     }
@@ -83,7 +83,7 @@ public class PhoneCallDetail extends ActionBarActivity {
                         if (!contact.equals("false")) {
                             IntentUtils.requestCall(this, contact);
                         } else {
-                            Toast.makeText(this, "No contact found", Toast.LENGTH_LONG).show();
+                            Toast.makeText(this, R.string.label_no_contact_found, Toast.LENGTH_LONG).show();
                         }
                         finish();
                     }
@@ -91,7 +91,7 @@ public class PhoneCallDetail extends ActionBarActivity {
                         OValues values = new OValues();
                         values.put("is_done", 1);
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
-                        Toast.makeText(this, "Phone call marked done", Toast.LENGTH_LONG).show();
+                        Toast.makeText(this, R.string.toast_phone_call_marked_done, Toast.LENGTH_LONG).show();
                     }
                     ONotificationBuilder.cancelNotification(this, extra.getInt(OColumn.ROW_ID));
                 }

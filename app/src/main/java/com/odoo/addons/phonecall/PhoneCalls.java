@@ -65,6 +65,7 @@ public class PhoneCalls extends BaseFragment implements
     private ListView mList;
     private OCursorListAdapter mAdapter;
     private String mFilter = null;
+    private boolean syncRequested = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -155,7 +156,8 @@ public class PhoneCalls extends BaseFragment implements
                 }
             }, 500);
         } else {
-            if (db().isEmptyTable()) {
+            if (db().isEmptyTable() && !syncRequested) {
+                syncRequested = true;
                 onRefresh();
             }
             new Handler().postDelayed(new Runnable() {
@@ -166,7 +168,7 @@ public class PhoneCalls extends BaseFragment implements
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, PhoneCalls.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
-                    OControls.setText(mView, R.id.title, "No Logged calls Found");
+                    OControls.setText(mView, R.id.title, _s(R.string.label_no_logged_calls_found));
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);

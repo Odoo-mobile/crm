@@ -80,7 +80,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         calendarEvent = new CalendarEvent(this, null);
         actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_action_mark_undone);
-        actionBar.setTitle("New Meeting");
+        actionBar.setTitle(R.string.label_new_meeting);
         mView = findViewById(R.id.eventForm);
         event_date_end = (OField) findViewById(R.id.event_date_end);
         event_time_end = (OField) findViewById(R.id.event_end_time);
@@ -105,7 +105,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(OColumn.ROW_ID)) {
             row_id = getIntent().getIntExtra(OColumn.ROW_ID, -1);
             if (row_id != -1) {
-                actionBar.setTitle("Edit Meeting");
+                actionBar.setTitle(R.string.label_edit_meeting);
                 ODataRow record = calendarEvent.browse(row_id);
                 eventForm.initForm(record);
                 allDay.setValue(record.getBoolean("allday"));
@@ -136,7 +136,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                 OValues values = new OValues();
                 values.put("is_done", 1);
                 calendarEvent.update(row_id, values);
-                Toast.makeText(this, "Event marked done", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.toast_event_marked_done, Toast.LENGTH_LONG).show();
                 extra.remove(KEY_RESCHEDULE);
             }
         }

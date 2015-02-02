@@ -45,6 +45,21 @@
     <string name="label_mark_done">Mark Done</string>
     <string name="label_re_schedule">Re-Schedule</string>
 
+    <string name="label_no_customer_found">No Customers Found</string>
+    <string name="label_no_location_found">No location found !</string>
+    <string name="label_no_contact_found">No contact found !</string>
+    <string name="label_no_email_found">No email found !</string>
+    <string name="label_no_logged_calls_found">No Logged calls Found</string>
+    <string name="label_event_marked">Event marked </string>
+    <string name="label_new_meeting">New Meeting</string>
+    <string name="label_edit_meeting">Edit Meeting</string>
+    <string name="label_missed_call_from_customer">Missed call from customer</string>
+
+    <string name="toast_information_saved">Information Saved</string>
+    <string name="toast_phone_call_marked_done">Phone call marked done</string>
+    <string name="toast_event_marked_done">Event marked done</string>
+    <string name="toast_image_size_too_large">Image size is too large.</string>
+    <string name="toast_marked"> marked</string>
     <string-array name="array_conversation_actions">
         <item>Convert to opportunity</item>
         <item>Merge with existing opportunities</item>
