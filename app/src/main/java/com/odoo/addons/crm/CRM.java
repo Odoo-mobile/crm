@@ -85,7 +85,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     private BottomSheet mSheet = null;
     private String mFilter = null;
     private String wonLost = "won";
-
+    private boolean syncRequested = false;
     // Customer's data filter
     private boolean filter_customer_data = false;
     private int customer_id = -1;
@@ -198,7 +198,8 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                 }
             }, 500);
         } else {
-            if (db().isEmptyTable()) {
+            if (db().isEmptyTable() && !syncRequested) {
+                syncRequested = true;
                 onRefresh();
             }
             new Handler().postDelayed(new Runnable() {
@@ -456,7 +457,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), "Quotation created for " +
+            Toast.makeText(getActivity(), R.string.label_quotation_created +
                     convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
         }
 
@@ -480,7 +481,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     CRMLead.OnOperationSuccessListener convertDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), "Converted to opportunity", Toast.LENGTH_LONG).show();
+            Toast.makeText(getActivity(), R.string.label_convert_to_opportunity, Toast.LENGTH_LONG).show();
         }
 
         @Override
