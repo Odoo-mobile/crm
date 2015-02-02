@@ -19,6 +19,8 @@
  */
 package com.odoo.addons.sale;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -27,9 +29,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.App;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
@@ -41,20 +45,26 @@ import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
 import com.odoo.core.utils.logger.OLog;
+import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.crm.R;
+
+import org.json.JSONArray;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import odoo.OArguments;
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
 import static com.odoo.addons.sale.Sales.Type;
 
-public class SalesDetail extends ActionBarActivity {
+public class SalesDetail extends ActionBarActivity implements View.OnClickListener, IOnActivityResultListener {
     public static final String TAG = SalesDetail.class.getSimpleName();
+    public static final int REQUEST_ADD_ITEM = 323;
     private Bundle extra;
     private OForm mForm;
     private ODataRow record;
@@ -83,6 +93,8 @@ public class SalesDetail extends ActionBarActivity {
         TextView txvType = (TextView) findViewById(R.id.txvType);
         TextView currency = (TextView) findViewById(R.id.currency);
         TextView total_amt = (TextView) findViewById(R.id.fTotal);
+        LinearLayout layoutAddItem = (LinearLayout) findViewById(R.id.layoutAddItem);
+        layoutAddItem.setOnClickListener(this);
         if (extra == null) {
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);
@@ -122,7 +134,6 @@ public class SalesDetail extends ActionBarActivity {
                         mView = LayoutInflater.from(SalesDetail.this).inflate(getResource(), parent, false);
                     }
                     ODataRow row = (ODataRow) mAdapter.getItem(position);
-//                    OControls.setText(mView, R.id.edtPId, row.getString("product_id"));
                     OControls.setText(mView, R.id.edtName, row.getString("name"));
                     OControls.setText(mView, R.id.edtProductQty, row.getString("product_uom_qty"));
                     OControls.setText(mView, R.id.edtProductPrice, row.getString("price_unit"));
@@ -148,11 +159,9 @@ public class SalesDetail extends ActionBarActivity {
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
         }
         if (extra != null && record.getString("state").equals("cancel")) {
-            menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(true);
-            menu.findItem(R.id.menu_sale_save).setVisible(false);
-            menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
-            menu.findItem(R.id.menu_sale_cancel_order).setVisible(false);
-            mForm.setEditable(false);
+            menu.findItem(R.id.menu_sale_save).setVisible(true).setTitle("Copy Quotation");
+            menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
+            mForm.setEditable(true);
         } else {
             menu.findItem(R.id.menu_sale_cancel_order).setVisible(true);
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(false);
@@ -168,6 +177,7 @@ public class SalesDetail extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         OValues values = mForm.getValues();
         ResPartner partner = new ResPartner(this, null);
+        App app = (App) getApplicationContext();
         switch (item.getItemId()) {
             case android.R.id.home:
                 finish();
@@ -176,7 +186,16 @@ public class SalesDetail extends ActionBarActivity {
                 if (values != null) {
                     values.put("partner_name", partner.getName(values.getInt("partner_id")));
                     if (record != null) {
-                        sale.update(record.getInt(OColumn.ROW_ID), values);
+                        if (record.getString("state").equals("cancel")) {
+                            if (app.inNetwork()) {
+                                OArguments args = new OArguments();
+                                args.add(new JSONArray().put(extra.getInt("id")));
+                                sale.getServerDataHelper().callMethod("copy_quotation", args);
+                            } else {
+                                Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                            }
+                        } else
+                            sale.update(record.getInt(OColumn.ROW_ID), values);
                         finish();
                     } else {
                         values.put("name", "/");
@@ -195,64 +214,73 @@ public class SalesDetail extends ActionBarActivity {
                 }
                 break;
             case R.id.menu_sale_cancel_order:
-                if (values != null) {
-                    if (record != null) {
-                        values.put("state", "cancel");
-                        values.put("state_title", sale.getStateTitle(values));
-                        sale.update(record.getInt(OColumn.ROW_ID), values);
-                        Toast.makeText(this, extra.getString("type") + " cancelled", Toast.LENGTH_LONG).show();
-                        finish();
-                    }
-                }
-                break;
-            case R.id.menu_sale_confirm_sale:
-                OLog.log("Confirm");
-                if (values != null) {
-                    if (record != null) {
-                        if (extra != null && record.getFloat("amount_total") > 0) {
-                            values.put("state", "manual");
-                            values.put("state_title", sale.getStateTitle(values));
-                            sale.update(record.getInt(OColumn.ROW_ID), values);
-                            finish();
-                        } else {
-                            OAlert.showWarning(this, "You cannot a sales order which has no line");
-                        }
-                    }
-                }
-                break;
-            case R.id.menu_sale_new_copy_of_quotation:
-                OLog.log("Quotation");
-                // FIXME: Open record in edit mode with new flag.
                 if (record != null) {
-                    values.put("name", "/");
-                    values.put("create_date", ODateUtils.getUTCDate());
-                    values.put("user_id", ResUsers.myId(this));
-                    //  sale.insert(values);
+                    if (app.inNetwork()) {
+                        sale.cancelOrder(Sales.Type.valueOf(extra.getString("type")), record, cancelOrder);
+                    } else {
+                        Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                    }
                     finish();
                 }
                 break;
-//            case R.id.menu_sale_create_invoice:
-//                if (extra != null && record.getString("state").equals("progress")) {
-//                    OLog.log("View");
-//                    if (values != null) {
-//                        if (record != null) {
-//                            values.put("state", "done");
-//                            sale.update(record.getInt(OColumn.ROW_ID), values);
-//                            finish();
-//                        }
-//                    }
-//                } else {
-//                    OLog.log("Create");
-//                    if (values != null) {
-//                        if (record != null) {
-//                            values.put("state", "progress");
-//                            sale.update(record.getInt(OColumn.ROW_ID), values);
-//                            finish();
-//                        }
-//                    }
-//                }
-//                break;
+            case R.id.menu_sale_confirm_sale:
+                if (record != null) {
+                    if (extra != null && record.getFloat("amount_total") > 0) {
+                        if (app.inNetwork()) {
+                            sale.confirmSale(record, confirmSale);
+                        } else {
+                            Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                        }
+                    } else {
+                        OAlert.showWarning(this, R.string.label_no_order_line + "");
+                    }
+                }
+                break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(SalesDetail.this, StringUtils.capitalizeString(extra.getString("type"))
+                    + " cancelled", Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
+
+    SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
+        @Override
+        public void OnSuccess() {
+            Toast.makeText(SalesDetail.this, R.string.label_quotation_confirm, Toast.LENGTH_LONG).show();
+            finish();
+        }
+
+        @Override
+        public void OnCancelled() {
+
+        }
+    };
+
+    @Override
+    public void onClick(View v) {
+        if (extra != null && !record.getString("state").equals("cancel")) {
+            Intent intent = new Intent(this, AddProductLineWizard.class);
+            intent.putExtras(extra);
+            startActivityForResult(intent, REQUEST_ADD_ITEM);
+        }
+    }
+
+    @Override
+    public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_ADD_ITEM && resultCode == Activity.RESULT_OK) {
+            OLog.log(">>>> data " + data);
+        } else
+            OLog.log(">>>> else " + data);
     }
 }

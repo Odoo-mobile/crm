@@ -19,9 +19,12 @@
  */
 package com.odoo.addons.sale.models;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 
+import com.odoo.addons.sale.Sales;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
@@ -37,11 +40,16 @@ import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.OResource;
+import com.odoo.crm.R;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
+
+import odoo.OArguments;
 
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
@@ -156,5 +164,166 @@ public class SaleOrder extends OModel {
             e.printStackTrace();
         }
         return " (No lines)";
+    }
+
+    public void cancelOrder(final Sales.Type type, final ODataRow quotation, final OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(mContext);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    if (type == Sales.Type.SaleOrder) {
+                        OArguments args = new OArguments();
+                        args.add(new JSONArray().put(quotation.getInt("id")));
+                        args.add(new JSONObject());
+                        getServerDataHelper().callMethod("action_cancel", args);
+                    } else {
+                        getServerDataHelper().executeWorkFlow(quotation.getInt("id"), "cancel");
+                    }
+                    OValues values = new OValues();
+                    values.put("state", "cancel");
+                    values.put("state_title", getStateTitle(values));
+                    values.put("_is_dirty", "false");
+                    update(quotation.getInt(OColumn.ROW_ID), values);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnSuccess();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnCancelled();
+                }
+            }
+        }.execute();
+    }
+
+    public void confirmSale(final ODataRow quotation, final OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(mContext);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    OArguments args = new OArguments();
+                    args.add(new JSONArray().put(quotation.getInt("id")));
+                    args.add(new JSONObject());
+                    getServerDataHelper().callMethod("action_button_confirm", args);
+                    OValues values = new OValues();
+                    values.put("state", "manual");
+                    values.put("state_title", getStateTitle(values));
+                    values.put("_is_dirty", "false");
+                    update(quotation.getInt(OColumn.ROW_ID), values);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnSuccess();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnCancelled();
+                }
+            }
+        }.execute();
+    }
+
+    public void newCopyQuotation(final ODataRow quotation, final OnOperationSuccessListener listener) {
+        new AsyncTask<Void, Void, Void>() {
+            private ProgressDialog dialog;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                dialog = new ProgressDialog(mContext);
+                dialog.setTitle(R.string.title_please_wait);
+                dialog.setMessage(OResource.string(mContext, R.string.title_working));
+                dialog.setCancelable(false);
+                dialog.show();
+            }
+
+            @Override
+            protected Void doInBackground(Void... params) {
+                try {
+                    OArguments args = new OArguments();
+                    args.add(new JSONArray().put(quotation.getInt("id")));
+                    args.add(new JSONObject());
+                    getServerDataHelper().callMethod("copy_quotation", args);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                super.onPostExecute(aVoid);
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnSuccess();
+                }
+            }
+
+            @Override
+            protected void onCancelled() {
+                super.onCancelled();
+                dialog.dismiss();
+                if (listener != null) {
+                    listener.OnCancelled();
+                }
+            }
+        }.execute();
+    }
+
+    public static interface OnOperationSuccessListener {
+        public void OnSuccess();
+
+        public void OnCancelled();
     }
 }
