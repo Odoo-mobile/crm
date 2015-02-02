@@ -82,7 +82,7 @@
                     <odoo.controls.OField
                         android:layout_width="wrap_content"
                         app:fieldName="date_action"
-                        app:parsePattern="mm/dd/yyyy"
+                        app:parsePattern="MMM dd yyyy"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
                         app:showIcon="false"
                         app:fieldTextSize="@dimen/text_size_xmedium"
@@ -102,7 +102,7 @@
                     app:fieldName="date_deadline"
                     app:fieldTextAppearance="?android:textAppearanceMedium"
                     app:showIcon="false"
-                    app:parsePattern="mm/dd/yyyy"
+                    app:parsePattern="MMM dd yyyy"
                     app:fieldTextSize="@dimen/text_size_xmedium"
                     android:layout_height="wrap_content"></odoo.controls.OField>
 
@@ -111,8 +111,7 @@
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
-                app:fieldName="partner_name"
-                app:iconResource="@drawable/ic_action_user"
+                app:fieldName="contact_name"
                 app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
@@ -120,9 +119,8 @@
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
-                app:fieldName="partner_id"
+                app:fieldName="partner_name"
                 app:fieldTextSize="@dimen/text_size_xmedium"
-                app:widgetType="SearchableLive"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
@@ -133,11 +131,18 @@
 
             <odoo.controls.OField
                 android:layout_width="match_parent"
-                app:fieldName="contact_name"
+                app:fieldName="partner_id"
+                app:iconResource="@drawable/ic_action_user"
                 app:fieldTextSize="@dimen/text_size_xmedium"
+                app:widgetType="SearchableLive"
                 android:layout_height="wrap_content">
 
             </odoo.controls.OField>
+
+            <View
+                style="@style/ViewSeparator"
+                android:layout_marginLeft="72dp" />
+
 
             <odoo.controls.OField
                 android:layout_width="match_parent"

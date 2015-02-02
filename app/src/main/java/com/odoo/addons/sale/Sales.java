@@ -169,7 +169,7 @@ public class Sales extends BaseFragment implements
             args.add("%" + mFilter + "%");
         }
         whereArgs = args.toArray(new String[args.size()]);
-        return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, null);
+        return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, "date_order DESC");
     }
 
     @Override

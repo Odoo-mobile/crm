@@ -13,10 +13,7 @@
         android:id="@+id/menu_lead_customer_location"
         android:icon="@drawable/ic_action_location"
         android:title="Customer Location"></item>
-    <item
-        android:id="@+id/menu_lead_reschedule"
-        android:icon="@drawable/ic_action_reschedule"
-        android:title="Re-schedule"></item>
+
     <item
         android:id="@+id/menu_lead_lost"
         android:icon="@drawable/ic_action_mark_lost"
