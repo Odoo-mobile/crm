@@ -44,6 +44,8 @@
     <string name="label_tag_new">New</string>
     <string name="label_quotation_created">Quotation Created for</string>
     <string name="label_re_schedule">Re-Schedule</string>
+<<<<<<< HEAD
+=======
     <string name="label_sync_warning">Need to sync before converting to Opportunity</string>
 
     <string name="label_no_customer_found">No Customers Found</string>
@@ -61,6 +63,7 @@
     <string name="toast_event_marked_done">Event marked done</string>
     <string name="toast_image_size_too_large">Image size is too large.</string>
     <string name="toast_marked"> marked</string>
+>>>>>>> master-crm-studio-dpr
     <string-array name="array_conversation_actions">
         <item>Convert to opportunity</item>
         <item>Merge with existing opportunities</item>

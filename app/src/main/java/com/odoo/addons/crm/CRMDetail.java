@@ -77,7 +77,7 @@ public class CRMDetail extends ActionBarActivity {
                 findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
             }
             mForm.initForm(null);
-            actionBar.setTitle(R.string.label_new);
+            actionBar.setTitle(R.string.label_tag_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
         } else {
             initFormValues();
