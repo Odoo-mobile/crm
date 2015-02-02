@@ -53,6 +53,7 @@ public class ConvertToQuotation extends ActionBarActivity implements View.OnClic
         findViewById(R.id.create_quotation).setOnClickListener(this);
         findViewById(R.id.cancel).setOnClickListener(this);
         crmLead = new CRMLead(this, null);
+
         ODataRow lead = crmLead.browse(extra.getInt(OColumn.ROW_ID));
     }
 
@@ -61,7 +62,9 @@ public class ConvertToQuotation extends ActionBarActivity implements View.OnClic
         switch (v.getId()) {
             case R.id.create_quotation:
                 boolean mark_won = convert_form.getValues().getBoolean("mark_won");
+                int partner_id = convert_form.getValues().getInt("partner_id");
                 Intent data = new Intent();
+                data.putExtra("partner_id", partner_id);
                 data.putExtra("mark_won", mark_won);
                 setResult(RESULT_OK, data);
                 finish();

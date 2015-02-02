@@ -38,6 +38,18 @@
                 android:layout_height="wrap_content">
 
                 <odoo.controls.OField
+                    android:id="@+id/partner"
+                    app:fieldName="partner_id"
+                    app:showIcon="false"
+                    app:showLabel="false"
+                    app:controlLabel="Customer"
+                    app:widgetType="SearchableLive"
+                    app:fieldLabelColor="@color/body_text_3"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+
+                <odoo.controls.OField
                     android:id="@+id/mark_won"
                     app:fieldName="mark_won"
                     app:showIcon="false"

@@ -59,6 +59,7 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.logger.OLog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
@@ -80,6 +81,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 224;
     private Type mType = Type.Leads;
     private View mView;
+    private int mLocal_id = 0;
     private ListView mList;
     private OCursorListAdapter mAdapter;
     private BottomSheet mSheet = null;
@@ -181,7 +183,8 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
             args.add(customer_id + "");
         }
         whereArgs = args.toArray(new String[args.size()]);
-        return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, null);
+
+        return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, "date_action DESC");
     }
 
     @Override
@@ -232,7 +235,6 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         String date = ODateUtils.convertToDefault(row.getString("create_date"),
                 ODateUtils.DEFAULT_FORMAT, "MMMM, dd");
         OControls.setText(view, R.id.create_date, date);
-
         // Controls for opportunity
         if (mType == Type.Opportunities) {
             view.findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
@@ -358,6 +360,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     @Override
     public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+        mLocal_id = row.getInt(OColumn.ROW_ID);
         mSheet.dismiss();
         convertRequestRecord = row;
         CRMLead crmLead = (CRMLead) db();
@@ -482,6 +485,9 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), R.string.label_convert_to_opportunity, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(getActivity(), CRMDetail.class);
+            intent.putExtra(OColumn.ROW_ID, mLocal_id);
+            startActivity(intent);
         }
 
         @Override
