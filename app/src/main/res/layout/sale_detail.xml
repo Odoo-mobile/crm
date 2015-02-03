@@ -86,16 +86,6 @@
                     app:fieldTextAppearance="?android:textAppearanceSmall"
                     android:layout_height="wrap_content" />
 
-                <odoo.controls.OField
-                    android:layout_width="0dp"
-                    android:layout_weight="1"
-                    app:fieldName="validity_date"
-                    app:showLabel="true"
-                    app:showIcon="false"
-                    app:parsePattern="MMM dd, yyyy"
-                    app:fieldTextSize="@dimen/text_size_medium"
-                    app:fieldTextAppearance="?android:textAppearanceSmall"
-                    android:layout_height="wrap_content" />
             </LinearLayout>
 
             <View style="@style/ViewSeparator" />

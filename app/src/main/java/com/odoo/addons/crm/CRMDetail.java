@@ -247,7 +247,11 @@ public class CRMDetail extends ActionBarActivity {
     CRMLead.OnOperationSuccessListener convertDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(CRMDetail.this, "Converted to opportunity", Toast.LENGTH_LONG).show();
+            Toast.makeText(CRMDetail.this, R.string.label_convert_to_opportunity, Toast.LENGTH_LONG).show();
+            Intent intent = new Intent(CRMDetail.this, CRMDetail.class);
+            intent.putExtra(OColumn.ROW_ID, record.getInt(OColumn.ROW_ID));
+            startActivity(intent);
+
             finish();
         }
 
