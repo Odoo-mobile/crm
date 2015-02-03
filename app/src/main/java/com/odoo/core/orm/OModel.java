@@ -75,6 +75,7 @@ public class OModel {
     private HashMap<String, Field> mDeclaredFields = new HashMap<>();
     private OdooVersion mOdooVersion = null;
     private static OModelRegistry modelRegistry = new OModelRegistry();
+    private String default_name_column = "name";
 
     // Relation record command
     public enum Command {
@@ -135,6 +136,14 @@ public class OModel {
 
     public void close() {
         // FIXME: Is close method required ???
+    }
+
+    public void setDefaultNameColumn(String nameColumn) {
+        default_name_column = nameColumn;
+    }
+
+    public String getDefaultNameColumn() {
+        return default_name_column;
     }
 
     public OModel setModelName(String model_name) {
@@ -735,6 +744,10 @@ public class OModel {
         return row_id;
     }
 
+    public int selectServerId(int row_id) {
+        return browse(row_id).getInt("id");
+    }
+
     public int selectRowId(int server_id) {
         List<ODataRow> rows = select(new String[]{OColumn.ROW_ID}, "id = ?", new String[]{server_id + ""});
         if (rows.size() > 0) {
@@ -965,6 +978,7 @@ public class OModel {
         ODomain domain = new ODomain();
         domain.add("id", "=", record.getInt("id"));
         syncAdapter.setDomain(domain);
+        syncAdapter.checkForWriteCreateDate(false);
         syncAdapter.onPerformSync(getUser().getAccount(), null, authority(), null, new SyncResult());
         return browse(null, "id = ?", new String[]{record.getString("id")});
     }

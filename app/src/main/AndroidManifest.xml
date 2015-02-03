@@ -62,11 +62,13 @@
         </service>
 
         <provider
+            android:multiprocess="true"
             android:name="com.odoo.core.orm.provider.BaseModelProvider"
             android:authorities="com.odoo.core.crm.provider.content" />
 
         <!-- Sync Provider & Service  // -->
         <provider
+            android:multiprocess="true"
             android:name="com.odoo.addons.customers.providers.CustomersSyncProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.res_partner"
             android:label="@string/sync_label_customers" />
@@ -85,6 +87,7 @@
         </service>
 
         <provider
+            android:multiprocess="true"
             android:name="com.odoo.addons.calendar.providers.CalendarSyncProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.calendar_event"
             android:label="@string/sync_label_calendar" />
@@ -103,6 +106,7 @@
         </service>
 
         <provider
+            android:multiprocess="true"
             android:name="com.odoo.addons.crm.providers.CRMLeadProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.crm_lead"
             android:label="@string/sync_label_lead_opportunities" />
@@ -123,6 +127,7 @@
         <provider
             android:name="com.odoo.addons.sale.providers.SaleOrderProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.sale_order"
+            android:multiprocess="true"
             android:label="@string/sync_label_quotation_sales_orders" />
 
         <service
@@ -141,6 +146,7 @@
         <provider
             android:name="com.odoo.addons.phonecall.providers.PhoneCallProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.crm_phonecall"
+            android:multiprocess="true"
             android:label="@string/sync_label_phonecalls" />
 
         <service
@@ -195,7 +201,6 @@
 
         <activity
             android:name="com.odoo.addons.sale.AddProductLineWizard"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
             android:windowSoftInputMode="adjustPan"></activity>
     </application>
 

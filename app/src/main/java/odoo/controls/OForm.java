@@ -55,6 +55,7 @@ public class OForm extends LinearLayout {
     private Boolean autoUIGenerate = true;
     private int icon_tint_color = 0;
     private Boolean mFirstModeChange = true;
+    private OValues extraValues = new OValues();
 
     public OForm(Context context) {
         super(context);
@@ -87,6 +88,7 @@ public class OForm extends LinearLayout {
             OField control = mFormFieldControls.get(key);
             control.setEditable(editable);
         }
+        mFirstModeChange = false;
     }
 
     private void init(Context context, AttributeSet attrs, int defStyleAttr,
@@ -215,6 +217,7 @@ public class OForm extends LinearLayout {
             }
             values.put(key, val);
         }
+        values.addAll(extraValues.toDataRow().getAll());
         return values;
     }
 
@@ -279,7 +282,7 @@ public class OForm extends LinearLayout {
                     }
                 }
                 if (mFirstModeChange) {
-                    mFirstModeChange = !mFirstModeChange;
+                    mFirstModeChange = false;
                 }
             }
 
@@ -292,6 +295,8 @@ public class OForm extends LinearLayout {
                 if (mFormFieldControls.containsKey(key)) {
                     OField fld = mFormFieldControls.get(key);
                     fld.setValue(values.get(key));
+                } else {
+                    extraValues.put(key, values.get(key));
                 }
             }
         }

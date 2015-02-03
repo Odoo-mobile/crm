@@ -1,95 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:orientation="vertical"
-    android:paddingTop="@dimen/activity_vertical_margin"
-    android:paddingBottom="@dimen/activity_vertical_margin">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Select Product"
-        android:textAppearance="?android:textAppearanceMedium" />
-
-
-    <Spinner
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/spnProduct"
-        android:layout_gravity="center_horizontal" />
-
-    <View style="@style/ViewSeparator" />
+    android:layout_marginTop="@dimen/statusBarHeight"
+    android:background="#ebebeb"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#ffffff"
         android:orientation="horizontal"
-        android:layout_height="wrap_content">
+        android:paddingLeft="0dp"
+        android:paddingRight="0dp">
 
-        <LinearLayout
+        <ImageView
+            android:id="@+id/search_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:src="@drawable/ic_action_search"
+            android:tint="#414141" />
+
+        <EditText
+            android:id="@+id/edt_searchable_input"
             android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
+            android:background="@android:color/transparent"
+            android:ellipsize="end"
+            android:fontFamily="@string/font_normal"
+            android:gravity="center_vertical"
+            android:hint="Search"
+            android:singleLine="true"
+            android:textAppearance="?android:attr/textAppearanceMedium">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quantity"
-                android:textAppearance="?android:textAppearanceMedium" />
+            <requestFocus />
+        </EditText>
 
-            <EditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:id="@+id/edtQty"
-                android:gravity="right"
-                android:textAppearance="?android:textAppearanceMedium" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Unit Price"
-                android:textAppearance="?android:textAppearanceMedium" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="500.00"
-                android:gravity="right"
-                android:inputType="number"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:id="@+id/txvPrice" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sub Total"
-                android:textAppearance="?android:textAppearanceMedium" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="500.00"
-                android:inputType="number"
-                android:textAppearance="?android:textAppearanceMedium"
-                android:gravity="right"
-                android:id="@+id/txvSubTotal" />
-        </LinearLayout>
+        <ImageView
+            android:id="@+id/done"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:background="?android:attr/selectableItemBackground"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:src="@drawable/ic_action_action_done_all"
+            android:tint="#414141" />
     </LinearLayout>
+
+    <View style="@style/ViewSeparator" />
+
+    <include
+        android:id="@+id/loading_progress"
+        layout="@layout/listview_data_loading_progress"
+        android:visibility="gone" />
+
+    <ListView
+        android:id="@+id/searchable_items"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"></ListView>
+
 </LinearLayout>

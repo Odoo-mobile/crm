@@ -24,6 +24,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 
+import com.odoo.App;
 import com.odoo.addons.sale.Sales;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCurrency;
@@ -32,6 +33,7 @@ import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
+import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.annotation.Odoo;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.ODate;
@@ -57,6 +59,7 @@ public class SaleOrder extends OModel {
     private Context mContext;
     OColumn name = new OColumn("name", OVarchar.class);
     OColumn date_order = new OColumn("Date", ODateTime.class);
+    @Odoo.onChange(method = "onPartnerIdChange", bg_process = true)
     OColumn partner_id = new OColumn("Customer", ResPartner.class,
             OColumn.RelationType.ManyToOne).setRequired();
     OColumn user_id = new OColumn("Salesperson", ResUsers.class,
@@ -88,6 +91,11 @@ public class SaleOrder extends OModel {
     OColumn order_line_count = new OColumn("Total Lines", OVarchar.class)
             .setLocalColumn();
 
+    OColumn partner_invoice_id = new OColumn("partner_invoice_id", OVarchar.class).setLocalColumn();
+    OColumn partner_shipping_id = new OColumn("partner_shipping_id", OVarchar.class).setLocalColumn();
+    OColumn pricelist_id = new OColumn("pricelist_id", OVarchar.class).setLocalColumn();
+    OColumn fiscal_position = new OColumn("fiscal_position", OVarchar.class).setLocalColumn();
+
     public SaleOrder(Context context, OUser user) {
         super(context, "sale.order", user);
         mContext = context;
@@ -100,6 +108,45 @@ public class SaleOrder extends OModel {
     @Override
     public Uri uri() {
         return buildURI(AUTHORITY);
+    }
+
+    public ODataRow onPartnerIdChange(ODataRow row) {
+        ODataRow data = new ODataRow();
+        try {
+            ResPartner partner = new ResPartner(mContext, getUser());
+            AccountPaymentTerm term = new AccountPaymentTerm(mContext, getUser());
+            ODataRow customer = partner.browse(row.getInt(OColumn.ROW_ID));
+            App app = (App) mContext.getApplicationContext();
+            if (app.inNetwork()) {
+                ServerDataHelper helper = getServerDataHelper();
+                OArguments args = new OArguments();
+                args.add(new JSONArray());
+                args.add(customer.getInt("id"));
+                JSONObject res = ((JSONObject) helper.callMethod("onchange_partner_id", args, new JSONObject()))
+                        .getJSONObject("value");
+                if (res.has("partner_invoice_id"))
+                    data.put("partner_invoice_id", res.get("partner_invoice_id"));
+                if (res.has("partner_shipping_id"))
+                    data.put("partner_shipping_id", res.get("partner_shipping_id"));
+                if (res.has("pricelist_id"))
+                    data.put("pricelist_id", res.get("pricelist_id"));
+                if (res.has("payment_term") && !res.getString("payment_term").equals("false"))
+                    data.put("payment_term", term.selectRowId(res.getInt("payment_term")));
+                if (res.has("fiscal_position")) {
+                    data.put("fiscal_position", res.get("fiscal_position"));
+                }
+                partner.update(customer.getInt(OColumn.ROW_ID), data.toValues());
+            } else {
+                data.put("partner_invoice_id", customer.get("partner_invoice_id"));
+                data.put("partner_shipping_id", customer.get("partner_shipping_id"));
+                data.put("pricelist_id", customer.get("pricelist_id"));
+                data.put("payment_term", customer.get("payment_term"));
+                data.put("fiscal_position", customer.get("fiscal_position"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return data;
     }
 
     public ODataRow currency() {

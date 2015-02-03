@@ -30,7 +30,7 @@ import com.odoo.core.support.OUser;
 
 public class SalesOrderLine extends OModel {
     public static final String TAG = SalesOrderLine.class.getSimpleName();
-    OColumn product_id = new OColumn("Product Id", ProductProduct.class,
+    OColumn product_id = new OColumn("Product", ProductProduct.class,
             OColumn.RelationType.ManyToOne);
     OColumn name = new OColumn("Description ", OText.class);
     OColumn product_uom_qty = new OColumn("Quantity", OInteger.class);

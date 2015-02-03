@@ -121,7 +121,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         for (ODataRow label : items) {
             RadioButton rdoBtn = new RadioButton(mContext);
             rdoBtn.setLayoutParams(params);
-            rdoBtn.setText(label.getString("name"));
+            rdoBtn.setText(label.getString(mModel.getDefaultNameColumn()));
             if (textSize > -1) {
                 rdoBtn.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
             }
@@ -250,12 +250,12 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                         mResourceArray);
                 ODataRow row = new ODataRow();
                 row.put(OColumn.ROW_ID, -1);
-                row.put("name", "Nothing Selected");
+                row.put(mModel.getDefaultNameColumn(), "Nothing Selected");
                 items.add(row);
                 for (int i = 0; i < items_list.length; i++) {
                     row = new ODataRow();
                     row.put(OColumn.ROW_ID, i);
-                    row.put("name", items_list[i]);
+                    row.put(mModel.getDefaultNameColumn(), items_list[i]);
                     items.add(row);
                 }
             } else {
@@ -321,7 +321,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                             else if (mValue instanceof Integer)
                                 row = getRecordData((Integer) mValue);
                         }
-                        txvView.setText(row.getString("name"));
+                        txvView.setText(row.getString(mModel.getDefaultNameColumn()));
                         if (txvView.getTag() != null) {
                             AlertDialog dialog = (AlertDialog) txvView.getTag();
                             dialog.dismiss();
@@ -367,12 +367,12 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                         row = getRecordData(row_id);
                     } else {
                         row = new ODataRow();
-                        row.put("name", "No " + mCol.getLabel() + " selected");
+                        row.put(mModel.getDefaultNameColumn(), "No " + mCol.getLabel() + " selected");
                     }
                 }
             }
-            if (!row.getString("name").equals("false"))
-                txvView.setText(row.getString("name"));
+            if (!row.getString(mModel.getDefaultNameColumn()).equals("false"))
+                txvView.setText(row.getString(mModel.getDefaultNameColumn()));
         }
         if (mValueUpdateListener != null && mValue != -1) {
             mValueUpdateListener.onValueUpdate(row);
@@ -471,7 +471,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 v = LayoutInflater.from(mContext).inflate(
                         android.R.layout.simple_list_item_1, parent, false);
             ODataRow row = getItem(position);
-            OControls.setText(v, android.R.id.text1, row.getString("name"));
+            OControls.setText(v, android.R.id.text1, row.getString(mModel.getDefaultNameColumn()));
             return v;
         }
     }
@@ -564,11 +564,11 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             where = whr.toString();
             args = args_list.toArray(new String[args_list.size()]);
         }
-        List<ODataRow> rows = rel_model.select(new String[]{"name"}, where,
-                args, "name");
+        List<ODataRow> rows = rel_model.select(new String[]{rel_model.getDefaultNameColumn()}, where,
+                args, rel_model.getDefaultNameColumn());
         ODataRow row = new ODataRow();
         row.put(OColumn.ROW_ID, -1);
-        row.put("name", "No " + column.getLabel() + " selected");
+        row.put(rel_model.getDefaultNameColumn(), "No " + column.getLabel() + " selected");
         items.add(row);
         items.addAll(rows);
         return items;

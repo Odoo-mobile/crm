@@ -130,22 +130,22 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    android:text="Add an item"
+                    android:text="Manage order lines"
                     android:textAppearance="?android:textAppearanceMedium"
                     android:layout_height="match_parent" />
 
             </LinearLayout>
 
-            <com.odoo.core.utils.controls.ExpandableHeightGridView
+            <odoo.controls.ExpandableListControl
                 android:id="@+id/expListOrderLine"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
                 android:visibility="gone"
                 android:layout_marginTop="@dimen/default_8dp"
                 android:layout_marginBottom="@dimen/default_8dp"
-                android:numColumns="1"
-                android:verticalSpacing="@dimen/default_8dp"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
 
+            </odoo.controls.ExpandableListControl>
 
             <LinearLayout
                 android:layout_width="match_parent"

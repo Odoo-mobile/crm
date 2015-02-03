@@ -103,7 +103,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
                 for (int i = 0; i < arrays.length; i++) {
                     ODataRow row = new ODataRow();
                     row.put(OColumn.ROW_ID, i);
-                    row.put("name", arrays[i]);
+                    row.put(mRelModel.getDefaultNameColumn(), arrays[i]);
                     objects.add(row);
                 }
             } else {
@@ -128,7 +128,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
                                 false);
                     ODataRow row = (ODataRow) objects.get(position);
                     OControls.setText(v, android.R.id.text1,
-                            row.getString("name"));
+                            row.getString(mRelModel.getDefaultNameColumn()));
                     if (row.contains(OColumn.ROW_ID)
                             && selected_position == row.getInt(OColumn.ROW_ID)) {
                         v.setBackgroundColor(getResources().getColor(
@@ -231,7 +231,7 @@ public class SearchableItemActivity extends ActionBarActivity implements
             try {
                 ServerDataHelper helper = mRelModel.getServerDataHelper();
                 ODomain domain = new ODomain();
-                domain.add("name", "ilike", params[0]);
+                domain.add(mRelModel.getDefaultNameColumn(), "ilike", params[0]);
                 if (mCol != null) {
                     for (String key : mCol.getDomains().keySet()) {
                         OColumn.ColumnDomain dom = mCol.getDomains().get(key);

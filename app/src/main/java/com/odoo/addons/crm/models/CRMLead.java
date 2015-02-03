@@ -63,7 +63,7 @@ public class CRMLead extends OModel {
 
     @Odoo.onChange(method = "partnerIdOnChange")
     OColumn partner_id = new OColumn("Customer", ResPartner.class,
-            OColumn.RelationType.ManyToOne);
+            OColumn.RelationType.ManyToOne).addDomain("customer", "=", "true");
     OColumn name = new OColumn("Name", OVarchar.class).setSize(64)
             .setRequired();
     OColumn email_from = new OColumn("Email", OVarchar.class).setSize(128);

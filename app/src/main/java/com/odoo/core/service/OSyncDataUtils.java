@@ -96,7 +96,7 @@ public class OSyncDataUtils {
 
             // getting local dirty records if server records length = 0
             if (records.length() <= 0) {
-                for (ODataRow row : mModel.select(new String[]{"name"}, "_is_dirty = ? and _is_active = ?",
+                for (ODataRow row : mModel.select(new String[]{mModel.getDefaultNameColumn()}, "_is_dirty = ? and _is_active = ?",
                         new String[]{"true", "true"})) {
                     serverIds.add(row.getInt("id"));
                 }
@@ -203,7 +203,7 @@ public class OSyncDataUtils {
                                     if (!recordsId.contains(recKey)) {
                                         OValues m2oValue = new OValues();
                                         m2oValue.put("id", m2oData.get(0));
-                                        m2oValue.put("name", m2oData.get(1));
+                                        m2oValue.put(m2o_model.getDefaultNameColumn(), m2oData.get(1));
                                         m2oValue.put("_is_dirty", "false");
                                         m2oRowId = m2o_model.insertOrUpdate(m2oData.getInt(0),
                                                 m2oValue);

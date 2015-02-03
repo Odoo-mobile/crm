@@ -1,106 +1,289 @@
 package com.odoo.addons.sale;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.TextView;
+import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.core.orm.ODataRow;
-import com.odoo.core.utils.OActionBarUtils;
-import com.odoo.core.utils.logger.OLog;
+import com.odoo.core.orm.ServerDataHelper;
+import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooFields;
+import com.odoo.core.support.list.OListAdapter;
+import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.OResource;
 import com.odoo.crm.R;
 
-public class AddProductLineWizard extends ActionBarActivity implements AdapterView.OnItemSelectedListener, TextWatcher {
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-    TextView txvUnitPrice, txvSubTotal;
-    EditText edtQty;
-    Spinner spnProduct;
-    ProductProduct mProduct;
-    ArrayAdapter mAdapter;
+import odoo.ODomain;
+import odoo.controls.IOnQuickRecordCreateListener;
+
+public class AddProductLineWizard extends ActionBarActivity implements
+        AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
+        OListAdapter.OnSearchChange, IOnQuickRecordCreateListener {
+
+    private ProductProduct productProduct;
+    private EditText edt_searchable_input;
+    private ListView mList = null;
+    private OListAdapter mAdapter;
+    private List<Object> objects = new ArrayList<>();
+    private List<Object> localItems = new ArrayList<>();
+    private int selected_position = -1;
+    private LiveSearch mLiveDataLoader = null;
+    private OColumn mCol = null;
+    private HashMap<String, Float> lineValues = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sale_add_item);
-        OActionBarUtils.setActionBar(this, true);
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Add Order Line");
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         setResult(RESULT_CANCELED);
-        init();
-    }
-
-    private void init() {
-        mProduct = new ProductProduct(this, null);
-        txvUnitPrice = (TextView) findViewById(R.id.txvPrice);
-        txvSubTotal = (TextView) findViewById(R.id.txvSubTotal);
-        edtQty = (EditText) findViewById(R.id.edtQty);
-        edtQty.addTextChangedListener(this);
-        spnProduct = (Spinner) findViewById(R.id.spnProduct);
-        mAdapter = new ArrayAdapter(this, R.layout.support_simple_spinner_dropdown_item);
-        for (ODataRow row : mProduct.select()) {
-            mAdapter.add(row.getString("name_template"));
+        productProduct = new ProductProduct(this, null);
+        edt_searchable_input = (EditText) findViewById(R.id.edt_searchable_input);
+        edt_searchable_input.addTextChangedListener(this);
+        findViewById(R.id.done).setOnClickListener(this);
+        Bundle extra = getIntent().getExtras();
+        if (extra != null) {
+            mList = (ListView) findViewById(R.id.searchable_items);
+            mList.setOnItemClickListener(this);
+            localItems.addAll(productProduct.select());
+            objects.addAll(localItems);
+            for (String key : extra.keySet()) {
+                lineValues.put(key, extra.getFloat(key));
+            }
+            mAdapter = new OListAdapter(this,
+                    R.layout.sale_product_line_item, objects) {
+                @Override
+                public View getView(int position, View convertView,
+                                    ViewGroup parent) {
+                    View v = convertView;
+                    if (v == null)
+                        v = getLayoutInflater().inflate(getResource(), parent,
+                                false);
+                    final ODataRow row = (ODataRow) objects.get(position);
+                    Float qty = (lineValues.containsKey(row.getString("id")) &&
+                            lineValues.get(row.getString("id")) > 0) ? lineValues.get(row.getString("id")) : 0;
+                    if (qty <= 0) {
+                        OControls.setGone(v, R.id.productQty);
+                        OControls.setGone(v, R.id.remove_qty);
+                    } else {
+                        OControls.setVisible(v, R.id.remove_qty);
+                        v.findViewById(R.id.remove_qty).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                Float lineQty = lineValues.get(row.getString("id"));
+                                lineValues.put(row.getString("id"), lineQty - 1);
+                                mAdapter.notifiyDataChange(objects);
+                            }
+                        });
+                        OControls.setVisible(v, R.id.productQty);
+                        OControls.setText(v, R.id.productQty, qty + " ");
+                    }
+                    OControls.setText(v, R.id.productName,
+                            row.getString(productProduct.getDefaultNameColumn()));
+                    if (row.contains(OColumn.ROW_ID)
+                            && selected_position == row.getInt(OColumn.ROW_ID)) {
+                        v.setBackgroundColor(getResources().getColor(
+                                R.color.control_pressed));
+                    } else {
+                        v.setBackgroundColor(Color.TRANSPARENT);
+                    }
+                    return v;
+                }
+            };
+            mAdapter.setOnSearchChange(this);
+            mList.setAdapter(mAdapter);
+        } else {
+            finish();
         }
-        spnProduct.setAdapter(mAdapter);
-        spnProduct.setOnItemSelectedListener(this);
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_sale_add_item, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == R.id.menu_sale_add_item_done) {
-            OLog.log(">>>>>>>>>>> Submit");
-            Intent intent = new Intent();
-            intent.putExtra("Item", "Done");
-            setResult(RESULT_OK, intent);
+    public void onItemClick(AdapterView<?> parent, View view, int position,
+                            long id) {
+        ODataRow data = (ODataRow) objects.get(position);
+        int row_id = productProduct.selectRowId(data.getInt("id"));
+        if (row_id != -1) {
+            data.put(OColumn.ROW_ID, row_id);
         }
-        finish();
-        return true;
+        if (!data.contains(OColumn.ROW_ID)) {
+            QuickCreateRecordProcess quickCreateRecordProcess = new QuickCreateRecordProcess(this);
+            quickCreateRecordProcess.execute(data);
+        } else {
+            onRecordCreated(data);
+        }
     }
 
     @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        txvUnitPrice.setText("500.00");
-        edtQty.setText("1");
-        txvSubTotal.setText("500.00");
+    public void onRecordCreated(ODataRow row) {
+        Float count = ((lineValues.containsKey(row.getString("id")))
+                ? lineValues.get(row.getString("id")) : 0);
+        lineValues.put(row.getString("id"), ++count);
+        mAdapter.notifiyDataChange(objects);
     }
 
     @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    public void beforeTextChanged(CharSequence s, int start, int count,
+                                  int after) {
 
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        if (s != null && count != 0)
-            txvSubTotal.setText("" + Integer.parseInt(s + "") * 500);
-        else
-            txvSubTotal.setText("");
+        mAdapter.getFilter().filter(s);
+        ImageView imgView = (ImageView) findViewById(R.id.search_icon);
+        if (s.length() > 0) {
+            imgView.setImageResource(R.drawable.ic_action_navigation_close);
+            imgView.setOnClickListener(this);
+            imgView.setClickable(true);
+        } else {
+            imgView.setClickable(false);
+            imgView.setImageResource(R.drawable.ic_action_search);
+            imgView.setOnClickListener(null);
+        }
     }
 
     @Override
     public void afterTextChanged(Editable s) {
 
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.done:
+                Bundle data = new Bundle();
+                for (String key : lineValues.keySet()) {
+                    data.putFloat(key, lineValues.get(key));
+                }
+                Intent intent = new Intent();
+                intent.putExtras(data);
+                setResult(RESULT_OK, intent);
+                finish();
+                break;
+            default:
+                setResult(RESULT_CANCELED);
+                finish();
+        }
+    }
+
+    @Override
+    public void onSearchChange(List<Object> newRecords) {
+        if (newRecords.size() <= 2) {
+            if (mLiveDataLoader != null)
+                mLiveDataLoader.cancel(true);
+            if (edt_searchable_input.getText().length() >= 2) {
+                mLiveDataLoader = new LiveSearch();
+                mLiveDataLoader.execute(edt_searchable_input.getText()
+                        .toString());
+            }
+        }
+    }
+
+
+    private class LiveSearch extends AsyncTask<String, Void, List<ODataRow>> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            findViewById(R.id.loading_progress).setVisibility(View.VISIBLE);
+            mList.setVisibility(View.GONE);
+        }
+
+        @Override
+        protected List<ODataRow> doInBackground(String... params) {
+            try {
+                ServerDataHelper helper = productProduct.getServerDataHelper();
+                ODomain domain = new ODomain();
+//                domain.add(productProduct.getDefaultNameColumn(), "ilike", params[0]);
+                domain.add("id", "not in", productProduct.getServerIds());
+                if (mCol != null) {
+                    for (String key : mCol.getDomains().keySet()) {
+                        // domain.add("sale_ok", "=", true);
+                    }
+                }
+                OdooFields fields = new OdooFields(productProduct.getColumns());
+                //return helper.searchRecords(fields, domain, 10);
+                return helper.nameSearch(params[0], domain, 10);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(List<ODataRow> result) {
+            super.onPostExecute(result);
+            findViewById(R.id.loading_progress).setVisibility(View.GONE);
+            mList.setVisibility(View.VISIBLE);
+            if (result != null && result.size() > 0) {
+                objects.clear();
+                objects.addAll(localItems);
+                objects.addAll(result);
+                mAdapter.notifiyDataChange(objects);
+            }
+        }
+
+        @Override
+        protected void onCancelled() {
+            super.onCancelled();
+            findViewById(R.id.loading_progress).setVisibility(View.GONE);
+            mList.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private class QuickCreateRecordProcess extends AsyncTask<ODataRow, Void, ODataRow> {
+
+        private ProgressDialog progressDialog;
+        IOnQuickRecordCreateListener mOnQuickRecordCreateListener = null;
+
+        public QuickCreateRecordProcess(IOnQuickRecordCreateListener listener) {
+            mOnQuickRecordCreateListener = listener;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(AddProductLineWizard.this);
+            progressDialog.setTitle(R.string.title_please_wait);
+            progressDialog.setMessage(OResource.string(AddProductLineWizard.this, R.string.title_working));
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ODataRow doInBackground(ODataRow... params) {
+            try {
+                Thread.sleep(700);
+                return productProduct.quickCreateRecord(params[0]);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ODataRow data) {
+            super.onPostExecute(data);
+            if (data != null && mOnQuickRecordCreateListener != null) {
+                mOnQuickRecordCreateListener.onRecordCreated(data);
+            }
+            progressDialog.dismiss();
+        }
+    }
+
 }

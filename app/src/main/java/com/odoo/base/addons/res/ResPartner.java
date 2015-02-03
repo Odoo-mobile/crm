@@ -22,6 +22,7 @@ package com.odoo.base.addons.res;
 import android.content.Context;
 import android.net.Uri;
 
+import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -53,12 +54,18 @@ public class
     OColumn parent_id = new OColumn("Related Company", ResPartner.class, OColumn.RelationType.ManyToOne)
             .addDomain("is_company", "=", true);
     OColumn country_id = new OColumn("Country", ResCountry.class, OColumn.RelationType.ManyToOne);
-
+    OColumn customer = new OColumn("Customer", OBoolean.class);
     OColumn comment = new OColumn("Internal Note", OText.class);
     @Odoo.Functional(store = true, depends = {"parent_id"}, method = "storeCompanyName")
     OColumn company_name = new OColumn("Company Name", OVarchar.class).setSize(100)
             .setLocalColumn();
     OColumn large_image = new OColumn("Image", OBlob.class).setDefaultValue("false").setLocalColumn();
+
+    OColumn partner_invoice_id = new OColumn("partner_invoice_id", OVarchar.class).setLocalColumn();
+    OColumn partner_shipping_id = new OColumn("partner_shipping_id", OVarchar.class).setLocalColumn();
+    OColumn pricelist_id = new OColumn("pricelist_id", OVarchar.class).setLocalColumn();
+    OColumn fiscal_position = new OColumn("fiscal_position", OVarchar.class).setLocalColumn();
+    OColumn payment_term = new OColumn("Payment Term", AccountPaymentTerm.class, OColumn.RelationType.ManyToOne).setLocalColumn();
 
     public ResPartner(Context context, OUser user) {
         super(context, "res.partner", user);

@@ -19,6 +19,8 @@
  */
 package com.odoo.core.orm.fields;
 
+import com.odoo.core.utils.logger.OLog;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;

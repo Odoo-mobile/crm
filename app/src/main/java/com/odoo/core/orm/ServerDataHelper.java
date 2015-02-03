@@ -53,6 +53,32 @@ public class ServerDataHelper {
             mOdoo = OSyncAdapter.createOdooInstance(mContext, model.getUser());
     }
 
+    public List<ODataRow> nameSearch(String name, ODomain domain, int limit) {
+        List<ODataRow> items = new ArrayList<>();
+        try {
+            if (mApp.inNetwork()) {
+                JSONObject kwargs = new JSONObject();
+                kwargs.put("name", name);
+                kwargs.put("args", domain.getArray());
+                kwargs.put("operator", "ilike");
+                JSONArray records = (JSONArray) callMethod("name_search", new OArguments(),
+                        null, kwargs);
+                if (records.length() > 0) {
+                    for (int i = 0; i < records.length(); i++) {
+                        ODataRow row = new ODataRow();
+                        JSONArray record = records.getJSONArray(i);
+                        row.put("id", record.get(0));
+                        row.put(mModel.getDefaultNameColumn(), record.get(1));
+                        items.add(row);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return items;
+    }
+
     public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int limit) {
         List<ODataRow> items = new ArrayList<>();
         try {
