@@ -61,6 +61,8 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
+        if (savedInstanceState == null)
+            parent().setHasActionBarSpinner(false);
     }
 
     public void setTitle(String title) {

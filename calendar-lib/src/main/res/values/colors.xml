@@ -7,5 +7,5 @@
     <color name="day_date_selected">#88009688</color>
     <color name="day_indicator_selected">#88009688</color>
     <color name="date_focused">#009688</color>
-
+    <color name="date_data_focus">#33B5E5</color>
 </resources>

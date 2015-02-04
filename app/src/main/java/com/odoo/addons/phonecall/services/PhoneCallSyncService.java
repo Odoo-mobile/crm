@@ -19,6 +19,7 @@
  */
 package com.odoo.addons.phonecall.services;
 
+import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,10 +42,12 @@ import odoo.ODomain;
 
 public class PhoneCallSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = PhoneCallSyncService.class.getSimpleName();
+    private Context mContext;
 
     @Override
-    public OSyncAdapter getSyncAdapter() {
-        return new OSyncAdapter(getApplicationContext(), CRMPhoneCalls.class, this, true);
+    public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
+        mContext = context;
+        return new OSyncAdapter(context, CRMPhoneCalls.class, service, true);
     }
 
     @Override
@@ -59,7 +62,7 @@ public class PhoneCallSyncService extends OSyncService implements ISyncFinishLis
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
-        CRMPhoneCalls crmPhoneCalls = new CRMPhoneCalls(getApplicationContext(), user);
+        CRMPhoneCalls crmPhoneCalls = new CRMPhoneCalls(mContext, user);
         List<ODataRow> rows = crmPhoneCalls.select();
         int count = 0;
         for (ODataRow row : rows) {
@@ -70,7 +73,7 @@ public class PhoneCallSyncService extends OSyncService implements ISyncFinishLis
             if (now.compareTo(start_date) < 0) {
                 Bundle extra = row.getPrimaryBundleData();
                 extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
-                if (ReminderUtils.get(getApplicationContext()).resetReminder(start_date, extra)) {
+                if (ReminderUtils.get(mContext).resetReminder(start_date, extra)) {
                     OValues values = new OValues();
                     values.put("_is_dirty", "false");
                     values.put("has_reminder", "true");

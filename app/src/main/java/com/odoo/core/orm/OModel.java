@@ -983,4 +983,17 @@ public class OModel {
         return browse(null, "id = ?", new String[]{record.getString("id")});
     }
 
+    public ODataRow countGroupBy(String column, String group_by, String having, String[] args) {
+        String sql = "select count(*) as total, " + column;
+        sql += " from " + getTableName() + " group by " + group_by + " having " + having;
+        List<ODataRow> data = query(sql, args);
+        if (data.size() > 0) {
+            return data.get(0);
+        } else {
+            ODataRow row = new ODataRow();
+            row.put("total", 0);
+            return row;
+        }
+    }
+
 }

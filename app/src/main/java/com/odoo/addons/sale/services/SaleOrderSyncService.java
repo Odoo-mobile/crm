@@ -19,6 +19,7 @@
  */
 package com.odoo.addons.sale.services;
 
+import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 
@@ -40,8 +41,8 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
     public Boolean firstSync = false;
 
     @Override
-    public OSyncAdapter getSyncAdapter() {
-        return new OSyncAdapter(getApplicationContext(), SaleOrder.class, this, true);
+    public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
+        return new OSyncAdapter(context, SaleOrder.class, service, true);
     }
 
     @Override

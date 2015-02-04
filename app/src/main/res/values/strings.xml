@@ -16,6 +16,7 @@
     <string name="minutes_before">%s minutes before</string>
     <string name="custom">Custom...</string>
     <string name="error_end_date_small_than_start_date">End date cannot be set before start date.</string>
+    <string name="label_all">All</string>
     <string name="label_leads">Leads</string>
     <string name="label_lead">Lead</string>
     <string name="label_opp">Opportunity</string>

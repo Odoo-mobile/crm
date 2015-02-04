@@ -68,7 +68,8 @@ public class CalendarSyncProvider extends BaseModelProvider {
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
 
         // Comparing date_start and date_end
-        where = "(date_start >= ? and date_start <= ?) and (date_end >= ? and date_end <= ?)";
+        //where = "(date(date_start) >= ? and date(date_start) <= ?) or (date(date_end) >= ? and date(date_end) <= ?)";
+        where = "(date(date_start) BETWEEN ? AND ? OR date(date_end) BETWEEN ? AND ?)";
         args.add(date_start);
         args.add(date_end);
         args.add(date_start);
@@ -89,7 +90,7 @@ public class CalendarSyncProvider extends BaseModelProvider {
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
 
         // Comparing date
-        where = "date >=  ? and date <= ? and state = ?";
+        where = "date(date) >=  ? and date(date) <= ? and state = ?";
         args.clear();
         args.add(date_start);
         args.add(date_end);
@@ -109,7 +110,7 @@ public class CalendarSyncProvider extends BaseModelProvider {
         MatrixCursor opportunity_separator = new MatrixCursor(
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
         // Comparing with create_date and date_action and type
-        where = "(date_deadline >= ? and date_deadline <= ? or date_action >= ? and date_action <= ?) and type = ?";
+        where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? and date(date_action) <= ?) and type = ?";
         args.clear();
         args.add(date_start);
         args.add(date_end);

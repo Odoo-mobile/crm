@@ -22,6 +22,7 @@ package com.odoo.addons.calendar;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -36,7 +37,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
@@ -59,10 +62,12 @@ import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
+import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
@@ -82,7 +87,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         OCursorListAdapter.OnViewBindListener, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, BottomSheetListeners.OnSheetActionClickListener,
         BottomSheetListeners.OnSheetMenuCreateListener, EventListener,
-        IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener {
+        IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener, AdapterView.OnItemSelectedListener {
     public static final String TAG = CalendarDashboard.class.getSimpleName();
     public static final String KEY = "key_calendar_dashboard";
     public static final String KEY_DATE = "key_date";
@@ -99,9 +104,26 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private String wonLost = "won";
     private CRMLead crmLead;
     private ODataRow convertRequestRecord;
+    private Spinner navSpinner;
+    private OListAdapter navSpinnerAdapter;
+    private FilterType mFilterType = FilterType.All;
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
+    }
+
+    private enum FilterType {
+        All(R.string.label_all), Meetings(R.string.label_meetings),
+        Opportunities(R.string.label_opportunity), PhoneCalls(R.string.label_phone_calls);
+        int str_id = 0;
+
+        FilterType(int type) {
+            str_id = type;
+        }
+
+        public String getString(Context context) {
+            return OResource.string(context, str_id);
+        }
     }
 
     @Override
@@ -117,9 +139,101 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         mView = view;
         setHasFloatingButton(view, R.id.fabButton, null, this);
         parent().setOnBackPressListener(this);
+        parent().setHasActionBarSpinner(true);
+        navSpinner = parent().getActionBarSpinner();
+        initActionSpinner();
         odooCalendar = (OdooCalendar) view.findViewById(R.id.dashboard_calendar);
-        odooCalendar.setOdooCalendarDateSelectListener(this);
         crmLead = new CRMLead(getActivity(), null);
+        odooCalendar.setOdooCalendarDateSelectListener(this);
+    }
+
+    private void initActionSpinner() {
+        List<Object> spinnerItems = new ArrayList<>();
+        ODataRow row = new ODataRow();
+        row.put("key", FilterType.All.toString());
+        row.put("name", FilterType.All.getString(getActivity()));
+        spinnerItems.add(row);
+        row = new ODataRow();
+        row.put("key", FilterType.Meetings.toString());
+        row.put("name", FilterType.Meetings.getString(getActivity()));
+        spinnerItems.add(row);
+        row = new ODataRow();
+        row.put("key", FilterType.Opportunities.toString());
+        row.put("name", FilterType.Opportunities.getString(getActivity()));
+        spinnerItems.add(row);
+        row = new ODataRow();
+        row.put("key", FilterType.PhoneCalls.toString());
+        row.put("name", FilterType.PhoneCalls.getString(getActivity()));
+        spinnerItems.add(row);
+        navSpinnerAdapter = new OListAdapter(getActivity(), R.layout.base_simple_list_item_1, spinnerItems) {
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getActivity()).inflate(R.layout.base_simple_list_item_1_selected
+                            , parent, false);
+                }
+                return getSpinnerView(getItem(position), position, convertView, parent);
+            }
+
+            @Override
+            public View getDropDownView(int position, View convertView, ViewGroup parent) {
+                if (convertView == null) {
+                    convertView = LayoutInflater.from(getActivity()).inflate(getResource(), parent, false);
+                }
+                return getSpinnerView(getItem(position), position, convertView, parent);
+            }
+        };
+        navSpinner.setAdapter(navSpinnerAdapter);
+        navSpinner.setOnItemSelectedListener(this);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        ODataRow row = (ODataRow) navSpinnerAdapter.getItem(position);
+        mFilterType = FilterType.valueOf(row.getString("key"));
+        if (mFilterDate != null)
+            getLoaderManager().restartLoader(0, null, this);
+    }
+
+    private View getSpinnerView(Object row, int pos, View view, ViewGroup parent) {
+        ODataRow r = (ODataRow) row;
+        OControls.setText(view, android.R.id.text1, r.getString("name"));
+        return view;
+    }
+
+    @Override
+    public List<OdooCalendar.DateDataObject> weekDataInfo(
+            List<SysCal.DateInfo> week_dates) {
+        List<OdooCalendar.DateDataObject> items = new ArrayList<>();
+        CalendarEvent event = (CalendarEvent) db();
+        CRMPhoneCalls calls = new CRMPhoneCalls(getActivity(), event.getUser());
+        CRMLead lead = new CRMLead(getActivity(), event.getUser());
+        for (SysCal.DateInfo date : week_dates) {
+            String date_str = date.getDateString();
+            int total = 0;
+            // Checking for events
+            total += event.countGroupBy("date_start", "date(date_start)"
+                    , "date(date_start) = ?", new String[]{date_str}).getInt("total");
+            total += event.countGroupBy("date_end", "date(date_end)"
+                    , "date(date_end) = ?", new String[]{date_str}).getInt("total");
+
+            // Checking for phone calls
+            total += calls.countGroupBy("date", "date(date)", "date(date) = ?", new String[]{date_str})
+                    .getInt("total");
+
+            // Leads
+            total += lead.countGroupBy("date_deadline", "date(date_deadline)",
+                    "date(date_deadline) = ?", new String[]{date_str}).getInt("total");
+            total += lead.countGroupBy("date_deadline", "date(date_deadline)",
+                    "date(date_deadline) = ?", new String[]{date_str}).getInt("total");
+            items.add(new OdooCalendar.DateDataObject(date_str, (total > 0)));
+        }
+        return items;
     }
 
     @Override
@@ -135,7 +249,12 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         initAdapter();
         mFilterDate = ODateUtils.convertToUTC(date.getYear() + "-" +
                 date.getMonth() + "-" + date.getDate() + " 00:00:00", ODateUtils.DEFAULT_FORMAT);
-        getLoaderManager().restartLoader(0, null, this);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                getLoaderManager().restartLoader(0, null, CalendarDashboard.this);
+            }
+        }, 500);
         return calendarView;
     }
 
@@ -332,13 +451,52 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
         List<String> args = new ArrayList<>();
+        String where = "";
+        String date_end = ODateUtils.getDateDayBeforeAfterUTC(mFilterDate, 1);
         args.add(mFilterDate);
+        CalendarEvent event = (CalendarEvent) db();
+        Uri uri = event.agendaUri();
+        switch (mFilterType) {
+            case PhoneCalls:
+                CRMPhoneCalls phoneCalls = new CRMPhoneCalls(getActivity(), db().getUser());
+                uri = phoneCalls.uri();
+                where = "date(date) >=  ? and date(date) <= ? and state = ?";
+                args.add(date_end);
+                args.add("open");
+                if (mFilter != null) {
+                    where += " and (name like ? or description like ?)";
+                    args.add("%" + mFilter + "%");
+                }
+                break;
+            case Opportunities:
+                CRMLead leads = new CRMLead(getActivity(), db().getUser());
+                uri = leads.uri();
+                where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? and date(date_action) <= ?) and type = ?";
+                args.add(date_end);
+                args.add(mFilterDate);
+                args.add(date_end);
+                args.add("opportunity");
+                if (mFilter != null) {
+                    where += " and (name like ? or description like ?)";
+                    args.add("%" + mFilter + "%");
+                }
+                break;
+            case Meetings:
+                uri = db().uri();
+                where = "(date(date_start) BETWEEN ? AND ? OR date(date_end) BETWEEN ? AND ?)";
+                args.add(date_end);
+                args.add(mFilterDate);
+                args.add(date_end);
+                if (mFilter != null) {
+                    where += " and name like ?";
+                }
+                break;
+        }
         if (mFilter != null) {
             args.add("%" + mFilter + "%");
         }
-        CalendarEvent event = (CalendarEvent) db();
-        return new CursorLoader(getActivity(), event.agendaUri(),
-                null, "", args.toArray(new String[args.size()]), null);
+        return new CursorLoader(getActivity(), uri,
+                null, where, args.toArray(new String[args.size()]), null);
     }
 
     @Override

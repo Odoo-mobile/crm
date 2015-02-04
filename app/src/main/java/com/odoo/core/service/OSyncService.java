@@ -21,6 +21,7 @@ package com.odoo.core.service;
 
 import android.app.Service;
 import android.content.AbstractThreadedSyncAdapter;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -33,16 +34,28 @@ public abstract class OSyncService extends Service {
     public static final String TAG = OSyncService.class.getSimpleName();
     private static final Object sSyncAdapterLock = new Object();
     private AbstractThreadedSyncAdapter sSyncAdapter = null;
+    private Context mContext;
+    private OSyncService service;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        mContext = getApplicationContext();
+        service = this;
         Log.i(TAG, "Service created");
         synchronized (sSyncAdapterLock) {
             if (sSyncAdapter == null) {
-                sSyncAdapter = getSyncAdapter();
+                sSyncAdapter = getSyncAdapter(service, mContext);
             }
         }
+    }
+
+    public void setService(OSyncService service) {
+        this.service = service;
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
     }
 
     @Override
@@ -59,7 +72,7 @@ public abstract class OSyncService extends Service {
         return sSyncAdapter.getSyncAdapterBinder();
     }
 
-    public abstract OSyncAdapter getSyncAdapter();
+    public abstract OSyncAdapter getSyncAdapter(OSyncService service, Context context);
 
     public abstract void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user);
 }

@@ -3,20 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:weightSum="3" >
+    android:weightSum="3">
 
     <android.support.v4.view.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
-        android:layout_height="95dp" >
-    </android.support.v4.view.ViewPager>
+        android:layout_height="75dp"></android.support.v4.view.ViewPager>
 
     <LinearLayout
         android:id="@+id/events_container_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#cccccc"
-        android:orientation="vertical" >
-    </LinearLayout>
+        android:orientation="vertical"></LinearLayout>
 
 </LinearLayout>

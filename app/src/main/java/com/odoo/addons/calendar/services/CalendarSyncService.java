@@ -19,11 +19,15 @@
  */
 package com.odoo.addons.calendar.services;
 
+import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
+import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.phonecall.models.CRMPhoneCalls;
+import com.odoo.addons.phonecall.services.PhoneCallSyncService;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -31,6 +35,7 @@ import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
+import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.reminder.ReminderUtils;
 
@@ -41,14 +46,18 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
     public static final String TAG = CalendarSyncService.class.getSimpleName();
 
     @Override
-    public OSyncAdapter getSyncAdapter() {
-        return new OSyncAdapter(getApplicationContext(), CalendarEvent.class, this, true);
+    public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
+        return new OSyncAdapter(context, CalendarEvent.class, service, true);
     }
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-        adapter.onSyncFinish(this);
-
+        if (adapter.getModel().getModelName().equals("calendar.event")) {
+            adapter.onSyncFinish(this);
+        } else if (adapter.getModel().getModelName().equals(
+                new CRMPhoneCalls(getApplicationContext(), user).getModelName())) {
+            SyncUtils.get(getApplicationContext(), user).requestSync(CRMLead.AUTHORITY);
+        }
     }
 
 
@@ -80,6 +89,10 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
             }
         }
         Log.i(TAG, count + " reminder updated");
-        return null;
+
+        // Syncing PhoneCalls
+        PhoneCallSyncService phoneCallSyncService = new PhoneCallSyncService();
+        OSyncAdapter adapter = phoneCallSyncService.getSyncAdapter(this, getApplicationContext());
+        return adapter;
     }
 }

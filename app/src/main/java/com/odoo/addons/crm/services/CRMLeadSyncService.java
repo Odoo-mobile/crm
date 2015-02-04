@@ -19,6 +19,7 @@
  */
 package com.odoo.addons.crm.services;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.odoo.addons.crm.models.CRMLead;
@@ -32,8 +33,8 @@ public class CRMLeadSyncService extends OSyncService {
     public static final String TAG = CRMLeadSyncService.class.getSimpleName();
 
     @Override
-    public OSyncAdapter getSyncAdapter() {
-        return new OSyncAdapter(getApplicationContext(), CRMLead.class, this, true);
+    public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
+        return new OSyncAdapter(context, CRMLead.class, service, true);
     }
 
     @Override

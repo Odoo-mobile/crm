@@ -19,6 +19,7 @@
  */
 package com.odoo.addons.customers.services;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import com.odoo.base.addons.res.ResPartner;
@@ -32,8 +33,8 @@ public class CustomerSyncService extends OSyncService {
     public static final String TAG = CustomerSyncService.class.getSimpleName();
 
     @Override
-    public OSyncAdapter getSyncAdapter() {
-        return new OSyncAdapter(getApplicationContext(), ResPartner.class, this, true);
+    public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
+        return new OSyncAdapter(context, ResPartner.class, service, true);
     }
 
     @Override

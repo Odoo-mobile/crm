@@ -32,6 +32,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
@@ -41,6 +42,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.odoo.core.account.ManageAccounts;
@@ -72,6 +74,7 @@ public class OdooActivity extends ActionBarActivity {
     public static final String KEY_NEW_USER_NAME = "key_new_account_username";
     public static final String KEY_CURRENT_DRAWER_ITEM = "key_drawer_item_index";
     public static final String KEY_APP_TITLE = "key_app_title";
+    public static final String KEY_HAS_ACTIONBAR_SPINNER = "key_has_actionbar_spinner";
     public static final Integer REQUEST_ACCOUNT_CREATE = 1101;
     public static final Integer REQUEST_ACCOUNTS_MANAGE = 1102;
 
@@ -84,8 +87,9 @@ public class OdooActivity extends ActionBarActivity {
     private LinearLayout mDrawerItemContainer = null;
     private Boolean mAccountBoxExpanded = false;
     private Bundle mSavedInstanceState = null;
-
+    private Spinner spinner_nav = null;
     private Integer mDrawerSelectedIndex = -1;
+    private Boolean mHasActionBarSpinner = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -162,7 +166,7 @@ public class OdooActivity extends ActionBarActivity {
                     setTitle(item.getTitle());
                 }
                 loadDrawerItemInstance(item.getInstance(), item.getExtra());
-            }else{
+            } else {
                 closeDrawer();
             }
         }
@@ -492,6 +496,7 @@ public class OdooActivity extends ActionBarActivity {
                 }
             }, DRAWER_ITEM_LAUNCH_DELAY);
         } else {
+            mHasActionBarSpinner = savedInstanceState.getBoolean(KEY_HAS_ACTIONBAR_SPINNER);
             mDrawerSelectedIndex = savedInstanceState.getInt(KEY_CURRENT_DRAWER_ITEM);
             setTitle(savedInstanceState.getString(KEY_APP_TITLE));
             focusOnDrawerItem(mDrawerSelectedIndex);
@@ -510,12 +515,36 @@ public class OdooActivity extends ActionBarActivity {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putInt(KEY_CURRENT_DRAWER_ITEM, mDrawerSelectedIndex);
         outState.putString(KEY_APP_TITLE, getTitle().toString());
+        outState.putBoolean(KEY_HAS_ACTIONBAR_SPINNER, mHasActionBarSpinner);
         super.onSaveInstanceState(outState);
     }
 
 
     public SyncUtils sync() {
         return SyncUtils.get(this);
+    }
+
+    /**
+     * Actionbar Spinner handler
+     */
+
+    public void setHasActionBarSpinner(Boolean hasActionBarSpinner) {
+        ActionBar actionBar = getSupportActionBar();
+        if (hasActionBarSpinner) {
+            findViewById(R.id.spinner_nav).setVisibility(View.VISIBLE);
+            actionBar.setDisplayShowTitleEnabled(false);
+        } else {
+            findViewById(R.id.spinner_nav).setVisibility(View.GONE);
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
+        mHasActionBarSpinner = hasActionBarSpinner;
+    }
+
+    public Spinner getActionBarSpinner() {
+        if (mHasActionBarSpinner) {
+            return (Spinner) findViewById(R.id.spinner_nav);
+        }
+        return null;
     }
 
 }
