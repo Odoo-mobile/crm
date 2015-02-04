@@ -39,7 +39,6 @@ public class CalendarSyncProvider extends BaseModelProvider {
     public static final String TAG = CalendarSyncProvider.class.getSimpleName();
     public static final int FULL_AGENDA = 114;
 
-
     @Override
     public boolean onCreate() {
         String path = new CalendarEvent(getContext(), null).getModelName().toLowerCase(Locale.getDefault());
