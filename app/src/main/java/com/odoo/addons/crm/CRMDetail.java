@@ -215,7 +215,7 @@ public class CRMDetail extends ActionBarActivity {
             crmLead.convertToOpportunity(record, ids, convertDoneListener);
         }
         if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode == Activity.RESULT_OK) {
-            crmLead.createQuotation(record, data.getBooleanExtra("mark_won", false), createQuotationListener);
+            crmLead.createQuotation(record,data.getStringExtra("partner_id"), data.getBooleanExtra("mark_won", false), createQuotationListener);
         }
     }
 

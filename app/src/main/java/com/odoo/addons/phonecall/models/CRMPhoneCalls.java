@@ -82,7 +82,8 @@ public class CRMPhoneCalls extends OModel {
     OColumn reminder_datetime = new OColumn("Reminder type", ODateTime.class)
             .setDefaultValue("false").setLocalColumn();
 
-
+    OColumn color_index = new OColumn("Color index", OInteger.class).setSize(5)
+            .setLocalColumn().setDefaultValue(6);
     public CRMPhoneCalls(Context context, OUser user) {
         super(context, "crm.phonecall", user);
     }

@@ -35,4 +35,9 @@ public class ResCurrency extends OModel {
         super(context, "res.currency", user);
     }
 
+    public static String getSymbol(Context context,int row_id){
+        ResCurrency resCurrency= new ResCurrency(context, null);
+        return resCurrency.browse(row_id).getString("symbol");
+    }
+
 }

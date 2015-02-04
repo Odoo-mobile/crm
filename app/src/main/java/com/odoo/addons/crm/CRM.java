@@ -59,7 +59,6 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
-import com.odoo.core.utils.logger.OLog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
@@ -453,7 +452,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         }
         if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode == Activity.RESULT_OK) {
             CRMLead crmLead = (CRMLead) db();
-            crmLead.createQuotation(convertRequestRecord, data.getBooleanExtra("mark_won", false), createQuotationListener);
+            crmLead.createQuotation(convertRequestRecord, data.getStringExtra("partner_id"), data.getBooleanExtra("mark_won", false), createQuotationListener);
         }
     }
 
