@@ -131,6 +131,8 @@ public class CRMLead extends OModel {
     OColumn is_done = new OColumn("Mark as Done", OInteger.class)
             .setLocalColumn().setDefaultValue("0");
 
+    OColumn color_index = new OColumn("Color index", OInteger.class).setSize(5)
+            .setLocalColumn().setDefaultValue(7);
 
     public CRMLead(Context context, OUser user) {
         super(context, "crm.lead", user);
@@ -384,7 +386,7 @@ public class CRMLead extends OModel {
     }
 
 
-    public void createQuotation(final ODataRow lead, final boolean close, final OnOperationSuccessListener listener) {
+    public void createQuotation(final ODataRow lead, final String partnerId, final boolean close, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
 
@@ -405,7 +407,7 @@ public class CRMLead extends OModel {
                     // Creating wizard record
                     JSONObject values = new JSONObject();
                     Object partner_id = false;
-                    if (!lead.getString("partner_id").equals("false")) {
+                    if (!lead.getString("partner_id").equals("false") || partnerId != null) {
                         ResPartner resPartner = new ResPartner(mContext, getUser());
                         ODataRow partner = resPartner.browse(lead.getInt("partner_id"));
                         partner_id = partner.getInt("id");

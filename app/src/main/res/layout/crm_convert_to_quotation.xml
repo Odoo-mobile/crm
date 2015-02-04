@@ -42,7 +42,6 @@
                     app:fieldName="partner_id"
                     app:showIcon="false"
                     app:showLabel="false"
-                    app:controlLabel="Customer"
                     app:widgetType="SearchableLive"
                     app:fieldLabelColor="@color/body_text_3"
                     app:fieldTextAppearance="?android:textAppearanceMedium"

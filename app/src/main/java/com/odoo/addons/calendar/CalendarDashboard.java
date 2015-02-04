@@ -22,6 +22,7 @@ package com.odoo.addons.calendar;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,16 +39,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
+import com.odoo.addons.calendar.utils.CalendarUtils;
 import com.odoo.addons.calendar.utils.TodayIcon;
 import com.odoo.addons.crm.CRMDetail;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
+import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.calendar.SysCal;
 import com.odoo.calendar.view.OdooCalendar;
@@ -77,6 +82,7 @@ import com.odoo.widgets.snackbar.listeners.ActionClickListener;
 import com.odoo.widgets.snackbar.listeners.EventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CalendarDashboard extends BaseFragment implements View.OnClickListener,
@@ -247,8 +253,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
         mDateInfo = date;
         initAdapter();
-        mFilterDate = ODateUtils.convertToUTC(date.getYear() + "-" +
-                date.getMonth() + "-" + date.getDate() + " 00:00:00", ODateUtils.DEFAULT_FORMAT);
+        mFilterDate = date.getDateString(); //ODateUtils.convertToUTC(date.getDateString() + " 00:00:00", ODateUtils.DEFAULT_FORMAT);
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -394,12 +399,18 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public void onViewBind(View view, Cursor cursor, ODataRow row) {
         String type = row.getString("data_type");
+        GradientDrawable shape = (GradientDrawable) getActivity().getResources()
+                .getDrawable(R.drawable.circle_mask_secondary);
         int icon = -1;
+
+        ImageView iconView = (ImageView) view.findViewById(R.id.event_icon);
         if (type.equals("separator")) {
             OControls.setText(view, R.id.list_separator, row.getString("name"));
         } else {
+            String colorCode = CalendarUtils.getColorData(row.getInt("color_index")).
+                    getString("code");
             String date = "false";
-
+            String desc = null;
             date_start = row.getString("date_start");
             date_end = row.getString("date_end");
             if (!date_start.equals("false")) {
@@ -414,30 +425,45 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             }
 
             if (type.equals("event")) {
+                desc = row.getString("description");
+                shape.setColor(Color.parseColor(colorCode));
                 icon = R.drawable.ic_action_event;
                 if (row.getString("allday").equals("false")) {
                     date = row.getString("date_start");
                     view.findViewById(R.id.allDay).setVisibility(View.GONE);
                 } else {
-                    view.findViewById(R.id.allDay).setVisibility(View.VISIBLE);
+                    TextView allDayTag = (TextView) view.findViewById(R.id.allDay);
+                    allDayTag.setTextColor(Color.parseColor(colorCode));
+                    allDayTag.setVisibility(View.VISIBLE);
                 }
             }
 
             if (type.equals("phone_call")) {
                 icon = R.drawable.ic_action_phone;
                 date = row.getString("date");
+                desc = row.getString("description");
             }
             if (type.equals("opportunity")) {
                 icon = R.drawable.ic_action_opportunities;
+                desc = row.getString("planned_revenue") + " "
+                        + ResCurrency.getSymbol(getActivity(), row.getInt("company_currency")) +
+                        " at " + row.getString("probability") + " %";
+                OControls.setText(view, R.id.event_description, desc);
             }
 
             if (!date.equals("false")) {
+                Date dateNow = new Date();
+                Date eventDate = ODateUtils.createDateObject(date, ODateUtils.DEFAULT_FORMAT, false);
                 date = ODateUtils.convertToDefault(date, ODateUtils.DEFAULT_FORMAT, "hh:mm a");
                 OControls.setText(view, R.id.event_time, date);
+                if (dateNow.after(eventDate) && !row.getBoolean("is_done")) {
+                    OControls.setTextColor(view, R.id.event_time, Color.parseColor("#800000"));
+                }
             }
-            OControls.setText(view, R.id.event_description, row.getString("description"));
+            OControls.setText(view, R.id.event_description, desc);
             Boolean is_done = row.getString("is_done").equals("1");
             OControls.setImage(view, R.id.event_icon, icon);
+            iconView.setBackgroundDrawable(shape);
             if (is_done) {
                 int title_color = (is_done) ? Color.LTGRAY : Color.parseColor("#414141");
                 int time_color = (is_done) ? Color.LTGRAY : _c(R.color.theme_secondary_light);
@@ -462,7 +488,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
         List<String> args = new ArrayList<>();
         String where = "";
-        String date_end = ODateUtils.getDateDayBeforeAfterUTC(mFilterDate, 1);
+        String date_end = ODateUtils.getDateDayBeforeAfterUTC(mFilterDate + " 00:00:00", 1);
         args.add(mFilterDate);
         CalendarEvent event = (CalendarEvent) db();
         Uri uri = event.agendaUri();
@@ -493,10 +519,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 break;
             case Meetings:
                 uri = db().uri();
-                where = "(date(date_start) BETWEEN ? AND ? OR date(date_end) BETWEEN ? AND ?)";
-                args.add(date_end);
+                where = "(date(date_start) <= ? and date(date_end) >= ? )";
                 args.add(mFilterDate);
-                args.add(date_end);
                 if (mFilter != null) {
                     where += " and name like ?";
                 }

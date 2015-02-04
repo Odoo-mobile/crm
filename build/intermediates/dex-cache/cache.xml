@@ -2,9 +2,22 @@
 <items version="2" >
 
     <item
+<<<<<<< HEAD
+<<<<<<< HEAD
+        jar="/home/dso/odoo-mobile/master-crm-studio-fix-3942-dso/app/build/intermediates/exploded-aar/master-crm-studio-fix-3942-dso/calendar-lib/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="7869c7002be95f7e058629a1026f81779ea4de6b">
+        <dex dex="/home/dso/odoo-mobile/master-crm-studio-fix-3942-dso/app/build/intermediates/pre-dexed/debug/classes-82b8c6e3c2ccd3e91bd9729636294add01d4b856.jar" />
+=======
         jar="/home/nip/odoo-mobile/master-crm-studio-imp-11906-nip/app/build/intermediates/exploded-aar/master-crm-studio-imp-11906-nip/calendar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
+=======
+        jar="/home/nip/odoo-mobile/master-crm-studio-imp-11906-nip/app/build/intermediates/exploded-aar/master-crm-studio-imp-11906-nip/calendar-lib/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+>>>>>>> master-crm-studio-dpr
         sha1="a41b002d7a42d1282164b122bb05218639207e58">
         <dex dex="/home/nip/odoo-mobile/master-crm-studio-imp-11906-nip/app/build/intermediates/pre-dexed/debug/classes-da64e7bd2b02d81972041c2d48388566187505d0.jar" />
     </item>
@@ -84,6 +97,10 @@
         revision="21.1.2"
         sha1="00b0b7233e1ec64acebfac40d4983d32d4712426">
         <dex dex="/home/nip/odoo-mobile/master-crm-studio-imp-11906-nip/app/build/intermediates/pre-dexed/debug/classes-b5553b4d2bc3031ea0ba5b7f23f46356db4cdd04.jar" />
+<<<<<<< HEAD
+>>>>>>> [IMP] Improve calender dashboard
+=======
+>>>>>>> master-crm-studio-dpr
     </item>
 
 </items>

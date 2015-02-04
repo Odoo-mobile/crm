@@ -54,9 +54,8 @@ public class CalendarSyncProvider extends BaseModelProvider {
         if (match != FULL_AGENDA) {
             return super.query(events.uri(), base_projection, selection, selectionArgs, sortOrder);
         }
-
         String date_start = selectionArgs[0];
-        String date_end = ODateUtils.getDateDayBeforeAfterUTC(date_start, 1);
+        String date_end = ODateUtils.getDateDayBeforeAfterUTC(date_start + " 00:00:00", 1);
         String filter = null;
         if (selectionArgs.length > 1)
             filter = selectionArgs[1];
@@ -67,12 +66,11 @@ public class CalendarSyncProvider extends BaseModelProvider {
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
 
         // Comparing date_start and date_end
-        //where = "(date(date_start) >= ? and date(date_start) <= ?) or (date(date_end) >= ? and date(date_end) <= ?)";
-        where = "(date(date_start) BETWEEN ? AND ? OR date(date_end) BETWEEN ? AND ?)";
+       // where = "(date(date_start) BETWEEN ? AND ? OR date(date_end) BETWEEN ? AND ?)";
+        where = "(date(date_start) <= ? and date(date_end) >= ? )";
         args.add(date_start);
-        args.add(date_end);
         args.add(date_start);
-        args.add(date_end);
+
         if (filter != null) {
             where += " and name like ?";
             args.add(filter);
