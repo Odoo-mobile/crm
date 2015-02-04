@@ -68,4 +68,8 @@
         <attr name="shadowColor" format="integer" />
     </declare-styleable>
 
+    <!--<declare-styleable name="Actionbar">-->
+    <!--<attr name="titleTextAppearance" format="reference"></attr>-->
+    <!--</declare-styleable>-->
+
 </resources>

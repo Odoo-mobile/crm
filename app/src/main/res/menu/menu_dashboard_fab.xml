@@ -6,16 +6,7 @@
         android:icon="@drawable/ic_action_event"
         android:title="Meeting"></item>
     <item
-        android:id="@+id/menu_fab_new_lead"
-        android:icon="@drawable/ic_action_leads"
-        android:title="Lead"></item>
-    <item
         android:id="@+id/menu_fab_new_call_log"
         android:icon="@drawable/ic_action_phone"
         android:title="Schedule call"></item>
-    <item
-        android:id="@+id/menu_fab_new_customer"
-        android:icon="@drawable/ic_action_user_add"
-        android:title="Customer"></item>
-
 </menu>
