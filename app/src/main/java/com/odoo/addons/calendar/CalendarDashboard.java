@@ -44,10 +44,8 @@ import android.widget.Toast;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.TodayIcon;
-import com.odoo.addons.crm.CRM;
 import com.odoo.addons.crm.CRMDetail;
 import com.odoo.addons.crm.models.CRMLead;
-import com.odoo.addons.customers.CustomerDetails;
 import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.base.addons.res.ResPartner;
@@ -107,6 +105,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private Spinner navSpinner;
     private OListAdapter navSpinnerAdapter;
     private FilterType mFilterType = FilterType.All;
+    private String date_start = "false";
+    private String date_end = "false";
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -399,6 +399,16 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             OControls.setText(view, R.id.list_separator, row.getString("name"));
         } else {
             String date = "false";
+
+            date_start = row.getString("date_start");
+            date_end = row.getString("date_end");
+            if (!date_start.equals("false")) {
+                date_start = ODateUtils.convertToDefault(row.getString("date_start"), ODateUtils.DEFAULT_FORMAT, "dd-MM-yyyy");
+            }
+            if (!date_end.equals("false")) {
+                date_end = ODateUtils.convertToDefault(row.getString("date_end"), ODateUtils.DEFAULT_FORMAT, "dd-MM-yyyy");
+            }
+
             if (row.getString("description").equals("false")) {
                 row.put("description", "");
             }
@@ -721,14 +731,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         switch (item.getItemId()) {
             case R.id.menu_fab_new_event:
                 createEvent();
-                break;
-            case R.id.menu_fab_new_customer:
-                IntentUtils.startActivity(getActivity(), CustomerDetails.class, null);
-                break;
-            case R.id.menu_fab_new_lead:
-                Bundle type = new Bundle();
-                type.putString("type", CRM.Type.Leads.toString());
-                IntentUtils.startActivity(getActivity(), CRMDetail.class, type);
                 break;
             case R.id.menu_fab_new_call_log:
                 IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, null);
