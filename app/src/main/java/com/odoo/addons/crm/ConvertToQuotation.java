@@ -26,7 +26,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.odoo.addons.crm.models.CRMLead;
-import com.odoo.core.utils.logger.OLog;
+import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.fields.OColumn;
 import com.odoo.crm.R;
 
 import odoo.controls.OField;
@@ -42,26 +43,29 @@ public class ConvertToQuotation extends ActionBarActivity implements View.OnClic
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        OLog.log(">>>>>>>>>>>>>>>>>>>>>");
         setContentView(R.layout.crm_convert_to_quotation);
-        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
         getSupportActionBar().hide();
         setResult(RESULT_CANCELED);
         extra = getIntent().getExtras();
+        crmLead = new CRMLead(this, null);
+        ODataRow lead = crmLead.browse(extra.getInt(OColumn.ROW_ID));
+        ODataRow customer = new ODataRow();
+        customer.put("partner_id", lead.getInt("partner_id"));
         convert_form = (OForm) findViewById(R.id.convert_form);
         convert_form.setEditable(true);
-        convert_form.initForm(null);
+        convert_form.initForm(customer);
         findViewById(R.id.create_quotation).setOnClickListener(this);
         findViewById(R.id.cancel).setOnClickListener(this);
-        crmLead = new CRMLead(this, null);
-//        ODataRow lead = crmLead.browse(extra.getInt(OColumn.ROW_ID));
+
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.create_quotation:
-                if (convert_form.getValues().getInt("partner_id") < 0) {
+                if (convert_form.getValues().getInt("partner_id") <= 0) {
                     OField partner = (OField) convert_form.findViewById(R.id.partner);
                     partner.setError("Select Partner");
                     partner.requestFocus();

@@ -43,6 +43,7 @@ import android.widget.Toast;
 
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
@@ -368,7 +369,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
             case R.id.menu_lead_convert_to_opportunity:
                 if (inNetwork()) {
                     if (row.getInt("id") == 0) {
-                        OAlert.showWarning(getActivity(), "Need to sync before converting to Opportunity");
+                        OAlert.showWarning(getActivity(),OResource.string(getActivity(), R.string.label_sync_warning));
                     } else {
                         int count = crmLead.count("id != ? and partner_id = ? and " + OColumn.ROW_ID + " != ?"
                                 , new String[]{
@@ -459,8 +460,9 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), R.string.label_quotation_created +
+            Toast.makeText(getActivity(),OResource.string(getActivity(), R.string.label_quotation_created) + " "+
                     convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
+            parent().sync().requestSync(SaleOrder.AUTHORITY);
         }
 
         @Override

@@ -106,7 +106,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private View calendarView = null;
     private ListView dashboardListView;
     private View mView;
-    private SysCal.DateInfo mDateInfo = null;
     private String mFilterDate;
     private OCursorListAdapter mAdapter;
     private boolean syncRequested = false;
@@ -257,7 +256,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         dashboardListView = (ListView) calendarView
                 .findViewById(R.id.items_container);
         setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
-        mDateInfo = date;
         initAdapter();
         mFilterDate = date.getDateString(); //ODateUtils.convertToUTC(date.getDateString() + " 00:00:00", ODateUtils.DEFAULT_FORMAT);
         new Handler().postDelayed(new Runnable() {
