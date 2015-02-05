@@ -32,6 +32,7 @@ import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODate;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OInteger;
+import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
@@ -65,6 +66,12 @@ public class CalendarEvent extends OModel {
     OColumn description = new OColumn("Description", OText.class);
     OColumn location = new OColumn("Location", OText.class);
 
+    OColumn _class = new OColumn("Privacy", OSelection.class)
+            .addSelection("public", "Public")
+            .addSelection("private", "Private")
+            .addSelection("confidential", "Public for Employees")
+            .setDefaultValue("public");
+
     @Odoo.Functional(store = true, depends = {"date", "start_date",
             "start_datetime"}, method = "storeStartDate")
     OColumn date_start = new OColumn("Start Date", ODateTime.class)
@@ -80,9 +87,6 @@ public class CalendarEvent extends OModel {
 
     OColumn is_done = new OColumn("Mark as Done", OInteger.class)
             .setLocalColumn().setDefaultValue("0");
-//
-//    OColumn geo_location_id = new OColumn("GEO Location", GEOLocations.class,
-//            RelationType.ManyToOne).setLocalColumn();
 
     OColumn color_index = new OColumn("Color index", OInteger.class).setSize(5)
             .setLocalColumn().setDefaultValue(0);
@@ -104,6 +108,8 @@ public class CalendarEvent extends OModel {
                 setModelName("crm.meeting");
             }
         }
+        // Setting 'class' variable name not allowed in java.
+        _class.setName("class");
     }
 
     @Override

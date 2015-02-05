@@ -19,17 +19,17 @@
  */
 package com.odoo.core.orm.fields;
 
-import com.odoo.core.utils.logger.OLog;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class OColumn {
     public static final String TAG = OColumn.class.getSimpleName();
     public static final String ROW_ID = "_id";
+    private LinkedHashMap<String, String> mSelectionMap = new LinkedHashMap<>();
 
     public static enum RelationType {
         OneToMany,
@@ -285,6 +285,15 @@ public class OColumn {
         if (functional_store_depends != null)
             return Arrays.asList(functional_store_depends);
         return new ArrayList<String>();
+    }
+
+    public HashMap<String, String> getSelectionMap() {
+        return mSelectionMap;
+    }
+
+    public OColumn addSelection(String key, String value) {
+        mSelectionMap.put(key, value);
+        return this;
     }
 
     @Override

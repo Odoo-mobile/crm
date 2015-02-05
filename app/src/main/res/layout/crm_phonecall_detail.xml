@@ -24,7 +24,7 @@
         <odoo.controls.OForm
             android:id="@+id/phoneLogForm"
             app:modelName="crm.phonecall"
-            app:controlIconTint="@color/theme_primary"
+            app:controlIconTint="@color/body_text_2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
@@ -70,6 +70,7 @@
                 android:layout_marginLeft="72dp" />
 
             <odoo.controls.OField
+                android:id="@+id/opportunity_id"
                 android:layout_width="match_parent"
                 app:fieldName="opportunity_id"
                 app:widgetType="Searchable"
@@ -79,11 +80,44 @@
 
             </odoo.controls.OField>
 
+            <LinearLayout
+                android:visibility="gone"
+                android:id="@+id/opportunity_action_container"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <odoo.controls.OForm
+                    android:id="@+id/opportunity_action_form"
+                    android:layout_width="match_parent"
+                    app:modelName="crm.lead"
+                    android:orientation="vertical"
+                    android:layout_height="wrap_content">
+
+                    <odoo.controls.OField
+                        app:fieldName="date_action"
+                        app:parsePattern="MMM dd, yyyy"
+                        app:iconResource="@drawable/ic_action_next_action"
+                        android:layout_width="match_parent"
+                        app:iconTint="@color/body_text_3"
+                        app:fieldTextSize="@dimen/text_size_xmedium"
+                        android:layout_height="wrap_content"></odoo.controls.OField>
+
+                    <odoo.controls.OField
+                        app:showLabel="false"
+                        app:fieldTextSize="@dimen/text_size_xmedium"
+                        app:fieldName="title_action"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"></odoo.controls.OField>
+                </odoo.controls.OForm>
+            </LinearLayout>
+
             <View
                 style="@style/ViewSeparator"
                 android:layout_marginLeft="72dp" />
 
             <odoo.controls.OField
+                android:id="@+id/phoneCallDate"
                 android:layout_width="match_parent"
                 app:fieldName="date"
                 app:parsePattern="MMM, dd hh:mm a"

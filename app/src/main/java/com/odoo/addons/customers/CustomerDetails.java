@@ -303,12 +303,12 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
                 ODomain domain = new ODomain();
                 domain.add("id", "=", params[0]);
                 JSONObject result = odoo.search_read(resPartner.getModelName(),
-                        new OdooFields(new String[]{"image"}).get(),
+                        new OdooFields(new String[]{"image_medium"}).get(),
                         domain.get());
                 JSONObject records = result.getJSONArray("records")
                         .getJSONObject(0);
-                if (!records.getString("image").equals("false")) {
-                    image = records.getString("image");
+                if (!records.getString("image_medium").equals("false")) {
+                    image = records.getString("image_medium");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

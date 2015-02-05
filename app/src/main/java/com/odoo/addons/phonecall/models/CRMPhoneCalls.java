@@ -33,6 +33,7 @@ import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
+import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
@@ -50,7 +51,11 @@ public class CRMPhoneCalls extends OModel {
     OColumn partner_id = new OColumn("Contact", ResPartner.class,
             OColumn.RelationType.ManyToOne).setRequired();
     OColumn description = new OColumn("Description", OText.class);
-    OColumn state = new OColumn("status", OVarchar.class);
+    OColumn state = new OColumn("status", OSelection.class)
+            .addSelection("open", "Confirmed")
+            .addSelection("cancel", "Cancelled")
+            .addSelection("pending", "Pending")
+            .addSelection("done", "Held");
     OColumn name = new OColumn("Call summary", OVarchar.class).setRequired();
     OColumn duration = new OColumn("Duration", OFloat.class);
     OColumn categ_id = new OColumn("Category", CRMPhoneCallsCategory.class,
@@ -84,6 +89,7 @@ public class CRMPhoneCalls extends OModel {
 
     OColumn color_index = new OColumn("Color index", OInteger.class).setSize(5)
             .setLocalColumn().setDefaultValue(6);
+
     public CRMPhoneCalls(Context context, OUser user) {
         super(context, "crm.phonecall", user);
     }

@@ -89,7 +89,7 @@ public class CalendarSyncProvider extends BaseModelProvider {
         where = "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)";
         args.clear();
         args.add(date_start);
-        args.add(date_end);
+        args.add(date_start);
         args.add("open");
         args.add("pending");
         if (filter != null) {
@@ -110,9 +110,9 @@ public class CalendarSyncProvider extends BaseModelProvider {
         where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? and date(date_action) <= ?) and type = ?";
         args.clear();
         args.add(date_start);
-        args.add(date_end);
         args.add(date_start);
-        args.add(date_end);
+        args.add(date_start);
+        args.add(date_start);
         args.add("opportunity");
         if (filter != null) {
             where += " and (name like ? or description like ?)";

@@ -46,6 +46,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OM2ORecord;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.utils.OControls;
 
 import java.util.ArrayList;
@@ -258,6 +259,21 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                     row.put(mModel.getDefaultNameColumn(), items_list[i]);
                     items.add(row);
                 }
+            } else if (mCol.getType().isAssignableFrom(OSelection.class)) {
+                List<ODataRow> rows = new ArrayList<>();
+                Object defaultVal = mCol.getDefaultValue();
+                for (String key : mCol.getSelectionMap().keySet()) {
+                    String val = mCol.getSelectionMap().get(key);
+                    ODataRow row = new ODataRow();
+                    row.put("key", key);
+                    row.put("name", val);
+                    if (defaultVal != null && defaultVal.toString().equals(val)) {
+                        rows.add(0, row);
+                    } else {
+                        rows.add(row);
+                    }
+                }
+                items.addAll(rows);
             } else {
                 items.addAll(getRecordItems(mModel, mCol));
             }
@@ -267,6 +283,16 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     private int getPos() {
         if (mResourceArray != -1 && mValue != null) {
             return Integer.parseInt(mValue.toString());
+        } else if (mCol.getType().isAssignableFrom(OSelection.class)) {
+            if (items.size() <= 0) {
+                createItems();
+            }
+            for (ODataRow item : items) {
+                int index = items.indexOf(item);
+                if (item.getString("key").equals(mValue.toString())) {
+                    return index;
+                }
+            }
         } else {
             ODataRow rec = getValueForM2O();
             if (rec != null) {
@@ -334,6 +360,9 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 if (mResourceArray != -1) {
                     mSpinner.setSelection(getPos());
                     row = items.get(getPos());
+                } else if (mCol.getType().isAssignableFrom(OSelection.class)) {
+                    int pos = getPos();
+                    mSpinner.setSelection(pos);
                 } else {
                     Integer row_id = null;
                     if (mValue instanceof OM2ORecord) {
@@ -353,7 +382,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 }
             }
         } else {
-            if (mResourceArray != -1) {
+            if (mResourceArray != -1 || mCol.getType().isAssignableFrom(OSelection.class)) {
                 row = items.get(getPos());
             } else {
                 if (mValue instanceof OM2ORecord) {
@@ -481,6 +510,9 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                                long id) {
         if (mResourceArray != -1) {
             mValue = position;
+        } else if (mCol.getType().isAssignableFrom(OSelection.class)) {
+            ODataRow row = mAdapter.getItem(position);
+            mValue = row.getString("key");
         } else {
             mValue = items.get(position).get(OColumn.ROW_ID);
         }
@@ -564,7 +596,8 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             where = whr.toString();
             args = args_list.toArray(new String[args_list.size()]);
         }
-        List<ODataRow> rows = rel_model.select(new String[]{rel_model.getDefaultNameColumn()}, where,
+        List<ODataRow> rows = new ArrayList<>();
+        rows = rel_model.select(new String[]{rel_model.getDefaultNameColumn()}, where,
                 args, rel_model.getDefaultNameColumn());
         ODataRow row = new ODataRow();
         row.put(OColumn.ROW_ID, -1);

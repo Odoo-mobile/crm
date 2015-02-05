@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.App;
+import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -192,7 +193,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
         }
         Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
-        model.setLastSyncDateTimeToNow();
+        IrModel irModel = new IrModel(mContext, user);
+        irModel.setLastSyncDateTimeToNow(model);
 
         // Performing next sync if any in service
         if (mSyncFinishListeners.containsKey(model.getModelName())) {

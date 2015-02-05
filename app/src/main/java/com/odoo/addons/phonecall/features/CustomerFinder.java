@@ -49,6 +49,7 @@ public class CustomerFinder {
     }
 
     public void findCustomer(Boolean isDialed, String callerNumber) {
+        Log.i(TAG, "Finding customer for " + callerNumber);
         dialed = isDialed;
         customerFinderTask = new CustomerFinderTask();
         customerFinderTask.execute(callerNumber);
@@ -90,10 +91,11 @@ public class CustomerFinder {
                         for (ODataRow row : partners) {
                             String phone = row.getString("phone").trim();
                             String mobile = row.getString("mobile").trim();
-                            String contact = (phone.equals("false") || TextUtils
-                                    .isEmpty(phone)) ? mobile : phone;
-                            if (contact.replaceAll(" ", "").contains(number) ||
-                                    number.contains(contact.replaceAll(" ", ""))) {
+                            String contact = ((phone.equals("false") || TextUtils
+                                    .isEmpty(phone)) ? mobile : phone).trim().replaceAll(" ", "")
+                                    .replace("+", "");
+                            String num = number.trim().replaceAll(" ", "").replace("+", "");
+                            if (num.contains(contact) || contact.contains(num)) {
                                 return resPartner.quickCreateRecord(row);
                             }
                         }

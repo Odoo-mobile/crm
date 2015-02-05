@@ -197,7 +197,8 @@ public class OModel {
             try {
                 field.setAccessible(true);
                 column = (OColumn) field.get(this);
-                column.setName(field.getName());
+                if (column.getName() == null)
+                    column.setName(field.getName());
                 Boolean validField = compatibleField(field);
                 if (validField) {
                     // Functional Method
@@ -361,10 +362,11 @@ public class OModel {
         mDeclaredFields.clear();
         for (Field field : fields) {
             if (field.getType().isAssignableFrom(OColumn.class)) {
-                mDeclaredFields.put(field.getName(), field);
+                String name = field.getName();
                 try {
                     OColumn column = getColumn(field);
                     if (column != null) {
+                        name = column.getName();
                         if (column.getRelationType() != null) {
                             mRelationColumns.add(column);
                         }
@@ -380,6 +382,7 @@ public class OModel {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                mDeclaredFields.put(name, field);
             }
         }
     }
@@ -579,15 +582,6 @@ public class OModel {
             return records.get(0).getString("last_synced");
         }
         return null;
-    }
-
-    public void setLastSyncDateTimeToNow() {
-        Log.i(TAG, "Model Sync Update : " + getModelName());
-        IrModel model = new IrModel(mContext, mUser);
-        OValues values = new OValues();
-        values.put("model", getModelName());
-        values.put("last_synced", ODateUtils.getUTCDate());
-        model.insertOrUpdate("model = ?", new String[]{getModelName()}, values);
     }
 
     public List<ODataRow> select() {

@@ -24,6 +24,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
 import com.odoo.addons.crm.models.CRMLead;
@@ -45,9 +46,10 @@ import com.odoo.crm.R;
 
 import java.util.Date;
 
+import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class PhoneCallDetail extends ActionBarActivity {
+public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFieldValueChangeListener {
     public static final String TAG = PhoneCallDetail.class.getSimpleName();
     public static final String KEY_LOG_CALL_REQUEST = "key_log_call_request";
     public static final String KEY_PHONE_NUMBER = "key_phone_number";
@@ -58,6 +60,11 @@ public class PhoneCallDetail extends ActionBarActivity {
     private ODataRow record;
     private CRMPhoneCalls crmPhoneCalls;
     private Menu mMenu;
+    private OField phoneCallDate, opportunity_id;
+    private String logType = "done";
+    private Boolean updateOpportunity = false;
+    private CRMLead crmLead = null;
+    private OForm opportunity_action_form;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,13 +73,19 @@ public class PhoneCallDetail extends ActionBarActivity {
         crmPhoneCalls = new CRMPhoneCalls(this, null);
         OActionBarUtils.setActionBar(this, true);
         actionBar = getSupportActionBar();
-        actionBar.setTitle(R.string.label_schedule_call);
+        actionBar.setTitle(R.string.label_log_call);
         extra = getIntent().getExtras();
+        crmLead = new CRMLead(this, null);
         init();
     }
 
     private void init() {
         mForm = (OForm) findViewById(R.id.phoneLogForm);
+        opportunity_action_form = (OForm) findViewById(R.id.opportunity_action_form);
+        phoneCallDate = (OField) findViewById(R.id.phoneCallDate);
+        opportunity_id = (OField) findViewById(R.id.opportunity_id);
+        opportunity_id.setOnValueChangeListener(this);
+        phoneCallDate.setOnValueChangeListener(this);
         mForm.setEditable(true);
         if (extra != null) {
             String action = getIntent().getAction();
@@ -111,7 +124,9 @@ public class PhoneCallDetail extends ActionBarActivity {
                 ODataRow record = new ODataRow();
                 record.put("partner_id", extra.getInt(OColumn.ROW_ID));
                 record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
-                record.put("opportunity_id", extra.getInt(KEY_OPPORTUNITY_ID));
+                int opp_id = extra.getInt(KEY_OPPORTUNITY_ID);
+                record.put("opportunity_id", opp_id);
+                //TODO
                 if (extra.containsKey(PhoneStateReceiver.KEY_DURATION_START)) {
                     long start_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_START));
                     long end_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_END));
@@ -150,11 +165,17 @@ public class PhoneCallDetail extends ActionBarActivity {
                     ResPartner partner = new ResPartner(this, null);
                     ODataRow row = partner.browse(values.getInt("partner_id"));
                     values.put("customer_name", row.getString("name"));
-                    CRMLead crmLead = new CRMLead(this, null);
                     ODataRow lead = crmLead.browse(values.getInt("opportunity_id"));
                     values.put("lead_name", "false");
                     if (lead != null) {
                         values.put("lead_name", lead.getString("name"));
+                    }
+                    if (updateOpportunity) {
+                        OValues opp_values = opportunity_action_form.getValues();
+                        if (opp_values != null) {
+                            // FIXME: What about reminder on date_action??
+                            crmLead.update(lead.getInt(OColumn.ROW_ID), opp_values);
+                        }
                     }
                     values.put("call_type", "false");
                     CRMPhoneCallsCategory category = new CRMPhoneCallsCategory(this, null);
@@ -162,7 +183,7 @@ public class PhoneCallDetail extends ActionBarActivity {
                     if (categ_id != null) {
                         values.put("call_type", categ_id.getString("name"));
                     }
-                    values.put("state", "pending");
+                    values.put("state", logType);
 
                     Date date = ODateUtils.createDateObject(values.getString("date"),
                             ODateUtils.DEFAULT_FORMAT, false);
@@ -170,8 +191,7 @@ public class PhoneCallDetail extends ActionBarActivity {
                     if (extra == null) {
                         extra = new Bundle();
                         extra.putInt(OColumn.ROW_ID, crmPhoneCalls.insert(values));
-                    }
-                    else
+                    } else
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
                     if (now.compareTo(date) < 0) {
                         values.put("has_reminder", "true");
@@ -183,5 +203,32 @@ public class PhoneCallDetail extends ActionBarActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFieldValueChange(OField field, Object value) {
+        if (field.getFieldName().equals("opportunity_id")) {
+            ODataRow lead = (ODataRow) value;
+            updateOpportunity = false;
+            if (!lead.getString("type").equals("lead")) {
+                updateOpportunity = true;
+                opportunity_action_form.setEditable(true);
+                opportunity_action_form.initForm(lead);
+            }
+            findViewById(R.id.opportunity_action_container).setVisibility(
+                    (updateOpportunity) ? View.VISIBLE : View.GONE);
+        } else {
+            if (!value.toString().equals("now()")) {
+                Date selectedDate = ODateUtils.createDateObject(value.toString(), ODateUtils.DEFAULT_FORMAT, false);
+                Date now = new Date();
+                if (now.compareTo(selectedDate) >= 0) {
+                    actionBar.setTitle(R.string.label_log_call);
+                    logType = "done";
+                } else {
+                    logType = "open";
+                    actionBar.setTitle(R.string.label_schedule_call);
+                }
+            }
+        }
     }
 }

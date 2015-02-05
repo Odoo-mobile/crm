@@ -26,6 +26,7 @@
     <string name="label_sale_orders">Sales Orders</string>
     <string name="label_phone_calls">Phone calls</string>
     <string name="label_logged_calls">Logged calls</string>
+    <string name="label_log_call">Log Call</string>
     <string name="label_convert_to_opportunity">Convert to Opportunity</string>
     <string name="label_create_opportunity">Create Opportunity</string>
     <string name="label_convert_to_quotation">Create Quotation</string>
