@@ -29,6 +29,7 @@
             android:layout_height="wrap_content">
 
             <odoo.controls.OForm
+                app:controlIconTint="@color/body_text_3"
                 android:id="@+id/eventForm"
                 android:layout_width="match_parent"
                 android:orientation="vertical"
@@ -54,7 +55,7 @@
                     app:showLabel="false"
                     app:fieldTextSize="@dimen/text_size_xmedium"
                     app:fieldTextColor="@color/body_text_2"
-                    app:iconTint="@color/icon_tint"
+                    app:iconTint="@color/body_text_3"
                     app:iconResource="@drawable/ic_action_time_clock"
                     android:layout_height="wrap_content">
 
@@ -147,9 +148,24 @@
 
                 <odoo.controls.OField
                     android:layout_width="match_parent"
-                    app:iconTint="@color/icon_tint"
-                    app:fieldName="location"
+                    app:iconTint="@color/body_text_3"
+                    app:fieldName="class"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
                     app:showLabel="false"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    app:iconResource="@drawable/ic_action_lock"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    app:fieldName="location"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    app:showLabel="false"
+                    app:iconTint="@color/body_text_3"
                     app:fieldTextSize="@dimen/text_size_xmedium"
                     app:iconResource="@drawable/ic_action_location"
                     android:layout_height="wrap_content"></odoo.controls.OField>
@@ -177,7 +193,7 @@
                         android:layout_marginRight="3dp"
                         android:paddingBottom="5dp"
                         android:src="@drawable/ic_action_bell"
-                        android:tint="#5e5e5e" />
+                        android:tint="@color/body_text_3" />
 
                     <TextView
                         android:id="@+id/reminderTypeName"
@@ -238,9 +254,10 @@
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     app:fieldName="description"
-                    app:iconTint="@color/icon_tint"
                     app:showLabel="false"
+                    app:iconTint="@color/body_text_3"
                     app:fieldTextSize="@dimen/text_size_xmedium"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
                     app:iconResource="@drawable/ic_action_notes_content"
                     android:layout_height="wrap_content"></odoo.controls.OField>
             </odoo.controls.OForm>

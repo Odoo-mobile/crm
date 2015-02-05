@@ -19,9 +19,7 @@
  */
 package com.odoo.addons.calendar;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -51,7 +49,6 @@ import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.CalendarUtils;
 import com.odoo.addons.calendar.utils.TodayIcon;
 import com.odoo.addons.crm.CRMDetail;
-import com.odoo.addons.crm.ConvertToQuotation;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
@@ -75,7 +72,6 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
-import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
@@ -95,17 +91,16 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         OCursorListAdapter.OnViewBindListener, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, BottomSheetListeners.OnSheetActionClickListener,
         BottomSheetListeners.OnSheetMenuCreateListener, EventListener,
-        IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener,
-        AdapterView.OnItemSelectedListener, IOnActivityResultListener {
+        IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener, AdapterView.OnItemSelectedListener {
     public static final String TAG = CalendarDashboard.class.getSimpleName();
     public static final String KEY = "key_calendar_dashboard";
     public static final String KEY_DATE = "key_date";
-    public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 224;
     private BottomSheet mSheet = null;
     private OdooCalendar odooCalendar;
     private View calendarView = null;
     private ListView dashboardListView;
     private View mView;
+    private SysCal.DateInfo mDateInfo = null;
     private String mFilterDate;
     private OCursorListAdapter mAdapter;
     private boolean syncRequested = false;
@@ -116,6 +111,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private Spinner navSpinner;
     private OListAdapter navSpinnerAdapter;
     private FilterType mFilterType = FilterType.All;
+    private String date_start = "false";
+    private String date_end = "false";
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -254,6 +251,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         dashboardListView = (ListView) calendarView
                 .findViewById(R.id.items_container);
         setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
+        mDateInfo = date;
         initAdapter();
         mFilterDate = date.getDateString(); //ODateUtils.convertToUTC(date.getDateString() + " 00:00:00", ODateUtils.DEFAULT_FORMAT);
         new Handler().postDelayed(new Runnable() {
@@ -312,8 +310,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         }
         BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
         builder.listener(this);
-        builder.setIconColor(_c(R.color.body_text_2));
-        builder.setTextColor(_c(R.color.body_text_1));
+        builder.setIconColor(_c(R.color.theme_primary_dark));
+        builder.setTextColor(Color.parseColor("#414141"));
         builder.setData(data);
         builder.actionListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);
@@ -382,7 +380,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         if (type.equals("opportunity")) {
         }
         if (mark_done != null) {
-            mark_done.setTitle("Undone");
+            mark_done.setTitle("Mark Undone");
             mark_done.setIcon(R.drawable.ic_action_mark_undone);
         }
     }
@@ -411,9 +409,16 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         } else {
             String colorCode = CalendarUtils.getColorData(row.getInt("color_index")).
                     getString("code");
-            shape.setColor(Color.parseColor(colorCode));
             String date = "false";
             String desc = null;
+            date_start = row.getString("date_start");
+            date_end = row.getString("date_end");
+            if (!date_start.equals("false")) {
+                date_start = ODateUtils.convertToDefault(row.getString("date_start"), ODateUtils.DEFAULT_FORMAT, "dd-MM-yyyy");
+            }
+            if (!date_end.equals("false")) {
+                date_end = ODateUtils.convertToDefault(row.getString("date_end"), ODateUtils.DEFAULT_FORMAT, "dd-MM-yyyy");
+            }
 
             if (row.getString("description").equals("false")) {
                 row.put("description", "");
@@ -421,6 +426,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
             if (type.equals("event")) {
                 desc = row.getString("description");
+                shape.setColor(Color.parseColor(colorCode));
                 icon = R.drawable.ic_action_event;
                 if (row.getString("allday").equals("false")) {
                     date = row.getString("date_start");
@@ -431,6 +437,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                     allDayTag.setVisibility(View.VISIBLE);
                 }
             }
+
             if (type.equals("phone_call")) {
                 icon = R.drawable.ic_action_phone;
                 date = row.getString("date");
@@ -441,9 +448,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 desc = row.getString("planned_revenue") + " "
                         + ResCurrency.getSymbol(getActivity(), row.getInt("company_currency")) +
                         " at " + row.getString("probability") + " %";
-                if (!row.getString("title_action").equals("false")) {
-                    desc += "\n" + row.getString("title_action");
-                }
                 OControls.setText(view, R.id.event_description, desc);
             }
 
@@ -453,24 +457,24 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 date = ODateUtils.convertToDefault(date, ODateUtils.DEFAULT_FORMAT, "hh:mm a");
                 OControls.setText(view, R.id.event_time, date);
                 if (dateNow.after(eventDate) && !row.getBoolean("is_done")) {
-                    colorCode = "#cc0000";
+                    OControls.setTextColor(view, R.id.event_time, Color.parseColor("#800000"));
                 }
             }
             OControls.setText(view, R.id.event_description, desc);
             Boolean is_done = row.getString("is_done").equals("1");
             OControls.setImage(view, R.id.event_icon, icon);
             iconView.setBackgroundDrawable(shape);
-            int title_color = (is_done) ? Color.LTGRAY : Color.parseColor("#414141");
-            int time_color = (is_done) ? Color.LTGRAY : Color.parseColor(colorCode);
-            int desc_color = (is_done) ? Color.LTGRAY : _c(R.color.body_text_2);
-            int allDay_color = (is_done) ? Color.LTGRAY : Color.parseColor(colorCode);
-            OControls.setTextColor(view, R.id.event_name, title_color);
-            OControls.setTextColor(view, R.id.event_time, time_color);
-            OControls.setTextColor(view, R.id.event_description, desc_color);
-            OControls.setTextColor(view, R.id.allDay, allDay_color);
             if (is_done) {
+                int title_color = (is_done) ? Color.LTGRAY : Color.parseColor("#414141");
+                int time_color = (is_done) ? Color.LTGRAY : _c(R.color.theme_secondary_light);
+                int desc_color = (is_done) ? Color.LTGRAY : Color.parseColor("#aaaaaa");
+                int allDay_color = (is_done) ? Color.LTGRAY : _c(R.color.theme_secondary);
                 view.findViewById(R.id.event_icon).setBackgroundResource(
                         R.drawable.circle_mask_gray);
+                OControls.setTextColor(view, R.id.event_name, title_color);
+                OControls.setTextColor(view, R.id.event_time, time_color);
+                OControls.setTextColor(view, R.id.event_description, desc_color);
+                OControls.setTextColor(view, R.id.allDay, allDay_color);
                 OControls.setTextViewStrikeThrough(view, R.id.event_name);
                 OControls.setTextViewStrikeThrough(view, R.id.event_time);
                 OControls.setTextViewStrikeThrough(view, R.id.event_description);
@@ -492,10 +496,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             case PhoneCalls:
                 CRMPhoneCalls phoneCalls = new CRMPhoneCalls(getActivity(), db().getUser());
                 uri = phoneCalls.uri();
-                where = "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)";
+                where = "date(date) >=  ? and date(date) <= ? and state = ?";
                 args.add(date_end);
                 args.add("open");
-                args.add("pending");
                 if (mFilter != null) {
                     where += " and (name like ? or description like ?)";
                     args.add("%" + mFilter + "%");
@@ -504,8 +507,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             case Opportunities:
                 CRMLead leads = new CRMLead(getActivity(), db().getUser());
                 uri = leads.uri();
-                where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or " +
-                        "date(date_action) >= ? and date(date_action) <= ?) and type = ?";
+                where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? and date(date_action) <= ?) and type = ?";
                 args.add(date_end);
                 args.add(mFilterDate);
                 args.add(date_end);
@@ -595,8 +597,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private void onFabClick() {
         BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
         builder.listener(this);
-        builder.setIconColor(_c(R.color.body_text_2));
-        builder.setTextColor(_c(R.color.body_text_1));
+        builder.setIconColor(_c(R.color.theme_secondary_dark));
+        builder.setTextColor(Color.parseColor("#414141"));
         ODataRow data = new ODataRow();
         data.put("fab", true);
         builder.setData(data);
@@ -638,7 +640,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
                 break;
             case R.id.menu_events_reschedule:
-//                data.putBoolean(EventDetail.KEY_RESCHEDULE, true);
+                data.putBoolean(EventDetail.KEY_RESCHEDULE, true);
                 IntentUtils.startActivity(getActivity(), EventDetail.class, data);
                 break;
             // Opportunity menus
@@ -676,8 +678,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                     wonLost = "lost";
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
-                    Toast.makeText(getActivity(), _s(R.string.toast_network_required),
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.menu_opp_won:
@@ -685,26 +686,36 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                     wonLost = "won";
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
-                    Toast.makeText(getActivity(), _s(R.string.toast_network_required),
-                            Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.menu_opp_reschedule:
-                IntentUtils.startActivity(getActivity(), CRMDetail.class,
-                        row.getPrimaryBundleData());
+                IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
                 break;
 
             case R.id.menu_phonecall_reschedule:
                 row = OCursorUtils.toDatarow(cr);
-                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
-                        row.getPrimaryBundleData());
+                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, row.getPrimaryBundleData());
                 break;
             // All done menu
             case R.id.menu_phonecall_all_done:
                 final CRMPhoneCalls phone_call = new CRMPhoneCalls(getActivity(), null);
-                values.put("state", "done");
                 phone_call.update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
+                SnackBar.get(getActivity()).text(_s(R.string.label_event_marked) + done_label)
+                        .actionColor(_c(R.color.theme_primary_light))
+                        .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
+                        .withAction("undo", new ActionClickListener() {
+
+                            @Override
+                            public void onActionClicked(SnackbarBuilder snackbar) {
+                                values.put("is_done", (values.getString("is_done")
+                                        .equals("0")) ? 1 : 0);
+                                phone_call.update(row_id, values);
+                                getLoaderManager().restartLoader(0, null,
+                                        CalendarDashboard.this);
+                            }
+                        }).withEventListener(this).show();
                 break;
             case R.id.menu_events_all_done:
                 db().update(row_id, values);
@@ -723,16 +734,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                                         CalendarDashboard.this);
                             }
                         }).withEventListener(this).show();
-                break;
-            case R.id.menu_lead_convert_to_quotation:
-                if (inNetwork()) {
-                    Intent intent = new Intent(getActivity(), ConvertToQuotation.class);
-                    intent.putExtras(row.getPrimaryBundleData());
-                    parent().startActivityForResult(intent, REQUEST_CONVERT_TO_QUOTATION_WIZARD);
-                } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required,
-                            Toast.LENGTH_LONG).show();
-                }
                 break;
         }
     }
@@ -846,28 +847,4 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         data.putString(KEY_DATE, mFilterDate);
         IntentUtils.startActivity(getActivity(), EventDetail.class, data);
     }
-
-    @Override
-    public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD &&
-                resultCode == Activity.RESULT_OK) {
-            CRMLead crmLead = (CRMLead) db();
-            crmLead.createQuotation(convertRequestRecord, data.getStringExtra("partner_id"),
-                    data.getBooleanExtra("mark_won", false), createQuotationListener);
-        }
-    }
-
-    CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.
-            OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(getActivity(), R.string.label_quotation_created +
-                    convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
-        }
-
-        @Override
-        public void OnCancelled() {
-
-        }
-    };
 }

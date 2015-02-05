@@ -44,6 +44,7 @@ import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OHtml;
 import com.odoo.core.orm.fields.types.OInteger;
+import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OTimestamp;
 import com.odoo.core.orm.fields.types.OVarchar;
@@ -337,6 +338,9 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             // FIXME: WebView type
             if (type_class.isAssignableFrom(OHtml.class)) {
                 return FieldType.Text;
+            }
+            if (type_class.isAssignableFrom(OSelection.class)) {
+                return FieldType.Selection;
             }
             // ManyToOne
             if (mColumn.getRelationType() != null

@@ -138,6 +138,7 @@ public class CRMDetail extends ActionBarActivity {
                 break;
             case R.id.menu_lead_save:
                 OValues values = mForm.getValues();
+                // FIXME: What about reminder on date_action??
                 if (values != null) {
                     if (record != null) {
                         crmLead.update(record.getInt(OColumn.ROW_ID), values);

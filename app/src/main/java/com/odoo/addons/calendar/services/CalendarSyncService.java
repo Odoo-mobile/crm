@@ -44,7 +44,7 @@ import java.util.List;
 
 public class CalendarSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = CalendarSyncService.class.getSimpleName();
-
+    public static final int SYNC_SLEEP_DELAY = 2000;
     @Override
     public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
         return new OSyncAdapter(context, CalendarEvent.class, service, true);
@@ -56,6 +56,12 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
             adapter.onSyncFinish(this);
         } else if (adapter.getModel().getModelName().equals(
                 new CRMPhoneCalls(getApplicationContext(), user).getModelName())) {
+            try {
+                Log.i(TAG, "Sleeping for sometime before sync opportunities");
+                Thread.sleep(SYNC_SLEEP_DELAY);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             SyncUtils.get(getApplicationContext(), user).requestSync(CRMLead.AUTHORITY);
         }
     }
@@ -89,7 +95,12 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
             }
         }
         Log.i(TAG, count + " reminder updated");
-
+        try {
+            Log.i(TAG, "Sleeping for sometime before sync phone calls");
+            Thread.sleep(SYNC_SLEEP_DELAY);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         // Syncing PhoneCalls
         PhoneCallSyncService phoneCallSyncService = new PhoneCallSyncService();
         OSyncAdapter adapter = phoneCallSyncService.getSyncAdapter(this, getApplicationContext());

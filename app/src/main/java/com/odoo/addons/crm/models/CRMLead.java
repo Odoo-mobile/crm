@@ -110,7 +110,7 @@ public class CRMLead extends OModel {
     OColumn ref = new OColumn("Reference", OVarchar.class);
     OColumn ref2 = new OColumn("Reference 2", OVarchar.class);
     OColumn date_deadline = new OColumn("Expected Closing", ODate.class);
-    OColumn date_action = new OColumn("Next Action Date", ODate.class);
+    OColumn date_action = new OColumn("Next Action", ODate.class);
     OColumn title_action = new OColumn("Next Action", OVarchar.class);
     OColumn planned_cost = new OColumn("Planned Cost", OFloat.class).setSize(20);
 
