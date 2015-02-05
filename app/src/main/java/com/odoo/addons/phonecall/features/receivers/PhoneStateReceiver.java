@@ -32,6 +32,7 @@ import com.odoo.addons.phonecall.features.CallerWindow;
 import com.odoo.addons.phonecall.features.CustomerFinder;
 import com.odoo.addons.phonecall.features.IOnCustomerFindListener;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
@@ -61,22 +62,24 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext = context;
-        mPref = new OPreferenceManager(context);
-        if (callerWindow == null)
-            callerWindow = new CallerWindow(context);
-        customerFinder = new CustomerFinder(context);
-        customerFinder.setOnCustomerFindListener(this);
-        if (mPref.getBoolean(KEY_RECEIVED, true) && !callerWindow.isShowing()) {
-            mPref.setBoolean(KEY_RECEIVED, false);
-        }
-        if (!mPref.getBoolean(KEY_RECEIVED, false)) {
-            telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
-            Bundle bundle = intent.getExtras();
-            callerNumber = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
-            if (callerNumber != null) {
-                telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        if(OUser.current(mContext)!=null) {
+            mPref = new OPreferenceManager(context);
+            if (callerWindow == null)
+                callerWindow = new CallerWindow(context);
+            customerFinder = new CustomerFinder(context);
+            customerFinder.setOnCustomerFindListener(this);
+            if (mPref.getBoolean(KEY_RECEIVED, true) && !callerWindow.isShowing()) {
+                mPref.setBoolean(KEY_RECEIVED, false);
             }
-            mPref.setBoolean(KEY_RECEIVED, true);
+            if (!mPref.getBoolean(KEY_RECEIVED, false)) {
+                telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
+                Bundle bundle = intent.getExtras();
+                callerNumber = bundle.getString(TelephonyManager.EXTRA_INCOMING_NUMBER);
+                if (callerNumber != null) {
+                    telephonyManager.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+                }
+                mPref.setBoolean(KEY_RECEIVED, true);
+            }
         }
     }
 

@@ -74,7 +74,7 @@ public class Sales extends BaseFragment implements
     private String mFilter = null;
     private BottomSheet mSheet;
     private Type mType = Type.Quotation;
-
+    private Boolean mSyncRequested = false;
 
     public enum Type {
         Quotation,
@@ -186,7 +186,8 @@ public class Sales extends BaseFragment implements
                 }
             }, 500);
         } else {
-            if (db().isEmptyTable()) {
+            if (db().isEmptyTable() && !mSyncRequested) {
+                mSyncRequested = true;
                 onRefresh();
             }
             new Handler().postDelayed(new Runnable() {

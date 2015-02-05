@@ -55,6 +55,7 @@ import com.odoo.addons.crm.ConvertToQuotation;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.calendar.SysCal;
@@ -100,7 +101,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public static final String TAG = CalendarDashboard.class.getSimpleName();
     public static final String KEY = "key_calendar_dashboard";
     public static final String KEY_DATE = "key_date";
-    public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 224;
+    public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 229;
     private BottomSheet mSheet = null;
     private OdooCalendar odooCalendar;
     private View calendarView = null;
@@ -149,6 +150,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         setHasFloatingButton(view, R.id.fabButton, null, this);
         parent().setOnBackPressListener(this);
         parent().setHasActionBarSpinner(true);
+        parent().setOnActivityResultListener(this);
         navSpinner = parent().getActionBarSpinner();
         initActionSpinner();
         odooCalendar = (OdooCalendar) view.findViewById(R.id.dashboard_calendar);
@@ -741,7 +743,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         @Override
         public void OnSuccess() {
             Toast.makeText(getActivity(), StringUtils.capitalizeString(convertRequestRecord.getString("type"))
-                    + _s(R.string.toast_marked) + wonLost, Toast.LENGTH_LONG).show();
+                    + " " + _s(R.string.toast_marked) + " " + wonLost, Toast.LENGTH_LONG).show();
         }
 
         @Override
@@ -851,7 +853,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD &&
                 resultCode == Activity.RESULT_OK) {
-            CRMLead crmLead = (CRMLead) db();
             crmLead.createQuotation(convertRequestRecord, data.getStringExtra("partner_id"),
                     data.getBooleanExtra("mark_won", false), createQuotationListener);
         }
@@ -861,8 +862,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), R.string.label_quotation_created +
+            Toast.makeText(getActivity(), _s(R.string.label_quotation_created) + " " +
                     convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
+            parent().sync().requestSync(SaleOrder.AUTHORITY);
         }
 
         @Override

@@ -4,11 +4,11 @@
     <item
         android:id="@+id/menu_opp_call_customer"
         android:icon="@drawable/ic_action_phone"
-        android:title="Call Customer"></item>
+        android:title="Call"></item>
     <item
         android:id="@+id/menu_opp_customer_location"
         android:icon="@drawable/ic_action_location"
-        android:title="Customer Location"></item>
+        android:title="Location"></item>
     <item
         android:id="@+id/menu_opp_reschedule"
         android:icon="@drawable/ic_action_reschedule"
