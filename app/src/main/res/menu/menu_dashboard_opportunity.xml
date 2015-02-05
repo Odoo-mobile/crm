@@ -21,5 +21,9 @@
         android:id="@+id/menu_opp_lost"
         android:icon="@drawable/ic_action_mark_lost"
         android:title="Mark Lost"></item>
+    <item
+        android:id="@+id/menu_lead_convert_to_quotation"
+        android:icon="@drawable/ic_action_quotation"
+        android:title="@string/label_convert_to_quotation"></item>
 
 </menu>

@@ -406,15 +406,10 @@ public class CRMLead extends OModel {
                     odoo.Odoo odoo = getServerDataHelper().getOdoo();
                     // Creating wizard record
                     JSONObject values = new JSONObject();
-                    Object partner_id = false;
-                    if (!lead.getString("partner_id").equals("false") || partnerId != null) {
-                        ResPartner resPartner = new ResPartner(mContext, getUser());
-                        ODataRow partner = resPartner.browse(lead.getInt("partner_id"));
-                        partner_id = partner.getInt("id");
-                    }
-                    values.put("partner_id", partner_id);
+                    ResPartner resPartner = new ResPartner(mContext, getUser());
+                    ODataRow partner = resPartner.browse(new String[]{},Integer.parseInt(partnerId));
+                    values.put("partner_id", partner.getInt("id"));
                     values.put("close", close);
-
                     JSONObject context = new JSONObject();
                     context.put("stage_type", lead.getString("type"));
                     context.put("active_id", lead.getInt("id"));

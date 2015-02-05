@@ -32,13 +32,16 @@ import android.widget.Toast;
 import com.odoo.App;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 import com.odoo.crm.R;
 
@@ -158,7 +161,7 @@ public class CRMDetail extends ActionBarActivity {
                 break;
             case R.id.menu_lead_convert_to_opportunity:
                 if (record.getInt("id") == 0) {
-                    OAlert.showWarning(this, "Need to sync before converting to Opportunity");
+                    OAlert.showWarning(this, OResource.string(this, R.string.label_sync_warning));
                 } else {
                     if (app.inNetwork()) {
                         int count = crmLead.count("id != ? and partner_id = ? and " + OColumn.ROW_ID + " != ?"
@@ -220,12 +223,17 @@ public class CRMDetail extends ActionBarActivity {
         }
     }
 
-    CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
+    CRMLead.OnOperationSuccessListener createQuotationListener =
+            new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(CRMDetail.this, "Quotation created for " +
+            Toast.makeText(CRMDetail.this, OResource.string(CRMDetail.this,
+                    R.string.label_quotation_created) + " " +
                     record.getString("name"), Toast.LENGTH_LONG).show();
+            SyncUtils sync = new SyncUtils(CRMDetail.this, crmLead.getUser());
+            sync.requestSync(SaleOrder.AUTHORITY);
         }
+
 
         @Override
         public void OnCancelled() {
