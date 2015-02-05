@@ -27,6 +27,8 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
+import odoo.ODomain;
+
 public class CRMPhoneCallsCategory extends OModel {
     public static final String TAG = CRMPhoneCallsCategory.class.getSimpleName();
 
@@ -41,6 +43,14 @@ public class CRMPhoneCallsCategory extends OModel {
         if (getOdooVersion().getVersion_number() < 9) {
             setModelName("crm.case.categ");
         }
+    }
+
+
+    @Override
+    public ODomain defaultDomain() {
+        ODomain domain = new ODomain();
+        domain.add("object_id.model", "=", getModelName());
+        return domain;
     }
 
     public static int getId(Context context, Type type) {

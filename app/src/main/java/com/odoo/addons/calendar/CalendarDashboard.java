@@ -409,6 +409,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         } else {
             String colorCode = CalendarUtils.getColorData(row.getInt("color_index")).
                     getString("code");
+            shape.setColor(Color.parseColor(colorCode));
             String date = "false";
             String desc = null;
             date_start = row.getString("date_start");
@@ -426,7 +427,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
             if (type.equals("event")) {
                 desc = row.getString("description");
-                shape.setColor(Color.parseColor(colorCode));
                 icon = R.drawable.ic_action_event;
                 if (row.getString("allday").equals("false")) {
                     date = row.getString("date_start");
@@ -457,24 +457,24 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 date = ODateUtils.convertToDefault(date, ODateUtils.DEFAULT_FORMAT, "hh:mm a");
                 OControls.setText(view, R.id.event_time, date);
                 if (dateNow.after(eventDate) && !row.getBoolean("is_done")) {
-                    OControls.setTextColor(view, R.id.event_time, Color.parseColor("#800000"));
+                    colorCode = "#cc0000";
                 }
             }
             OControls.setText(view, R.id.event_description, desc);
             Boolean is_done = row.getString("is_done").equals("1");
             OControls.setImage(view, R.id.event_icon, icon);
             iconView.setBackgroundDrawable(shape);
-            if (is_done) {
-                int title_color = (is_done) ? Color.LTGRAY : Color.parseColor("#414141");
-                int time_color = (is_done) ? Color.LTGRAY : _c(R.color.theme_secondary_light);
-                int desc_color = (is_done) ? Color.LTGRAY : Color.parseColor("#aaaaaa");
-                int allDay_color = (is_done) ? Color.LTGRAY : _c(R.color.theme_secondary);
+            int title_color = (is_done) ? Color.LTGRAY : Color.parseColor("#414141");
+            int time_color = (is_done) ? Color.LTGRAY : Color.parseColor(colorCode);
+            int desc_color = (is_done) ? Color.LTGRAY : _c(R.color.body_text_2);
+            int allDay_color = (is_done) ? Color.LTGRAY : Color.parseColor(colorCode);
+            OControls.setTextColor(view, R.id.event_name, title_color);
+            OControls.setTextColor(view, R.id.event_time, time_color);
+            OControls.setTextColor(view, R.id.event_description, desc_color);
+            OControls.setTextColor(view, R.id.allDay, allDay_color);
+            if(is_done) {
                 view.findViewById(R.id.event_icon).setBackgroundResource(
                         R.drawable.circle_mask_gray);
-                OControls.setTextColor(view, R.id.event_name, title_color);
-                OControls.setTextColor(view, R.id.event_time, time_color);
-                OControls.setTextColor(view, R.id.event_description, desc_color);
-                OControls.setTextColor(view, R.id.allDay, allDay_color);
                 OControls.setTextViewStrikeThrough(view, R.id.event_name);
                 OControls.setTextViewStrikeThrough(view, R.id.event_time);
                 OControls.setTextViewStrikeThrough(view, R.id.event_description);
@@ -496,9 +496,10 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             case PhoneCalls:
                 CRMPhoneCalls phoneCalls = new CRMPhoneCalls(getActivity(), db().getUser());
                 uri = phoneCalls.uri();
-                where = "date(date) >=  ? and date(date) <= ? and state = ?";
+                where = "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)";
                 args.add(date_end);
                 args.add("open");
+                args.add("pending");
                 if (mFilter != null) {
                     where += " and (name like ? or description like ?)";
                     args.add("%" + mFilter + "%");

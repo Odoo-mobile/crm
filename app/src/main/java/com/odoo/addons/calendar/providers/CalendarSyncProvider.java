@@ -66,7 +66,6 @@ public class CalendarSyncProvider extends BaseModelProvider {
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
 
         // Comparing date_start and date_end
-       // where = "(date(date_start) BETWEEN ? AND ? OR date(date_end) BETWEEN ? AND ?)";
         where = "(date(date_start) <= ? and date(date_end) >= ? )";
         args.add(date_start);
         args.add(date_start);
@@ -78,7 +77,7 @@ public class CalendarSyncProvider extends BaseModelProvider {
         Cursor eventCR = getContext().getContentResolver().query(events.uri(),
                 base_projection, where, args.toArray(new String[args.size()]), "is_done, date_start");
         if (eventCR.getCount() > 0)
-            event_separator.addRow(new String[]{"0", "separator", "Events"});
+            event_separator.addRow(new String[]{"0", "separator", "Meetings"});
 
 
         // Getting phone calls
@@ -87,11 +86,12 @@ public class CalendarSyncProvider extends BaseModelProvider {
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
 
         // Comparing date
-        where = "date(date) >=  ? and date(date) <= ? and state = ?";
+        where = "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)";
         args.clear();
         args.add(date_start);
         args.add(date_end);
         args.add("open");
+        args.add("pending");
         if (filter != null) {
             where += " and (name like ? or description like ?)";
             args.add(filter);

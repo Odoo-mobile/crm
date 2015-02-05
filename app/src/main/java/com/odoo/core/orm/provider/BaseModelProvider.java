@@ -79,6 +79,8 @@ public class BaseModelProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs, String sortOrder) {
         setModel(uri);
+        if (mModel == null)
+            return null;
         String[] projection = removeRelationColumns(base_projection);
         int match = matcher.match(uri);
         SQLiteQueryBuilder builder = new SQLiteQueryBuilder();

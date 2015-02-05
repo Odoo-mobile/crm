@@ -167,8 +167,10 @@ public class PhoneCallDetail extends ActionBarActivity {
                     Date date = ODateUtils.createDateObject(values.getString("date"),
                             ODateUtils.DEFAULT_FORMAT, false);
                     Date now = new Date();
-                    if (extra == null)
+                    if (extra == null) {
+                        extra = new Bundle();
                         extra.putInt(OColumn.ROW_ID, crmPhoneCalls.insert(values));
+                    }
                     else
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
                     if (now.compareTo(date) < 0) {
