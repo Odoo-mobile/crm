@@ -161,6 +161,20 @@
                     android:layout_marginLeft="72dp" />
 
                 <odoo.controls.OField
+                    android:id="@+id/opportunity_id"
+                    android:layout_width="match_parent"
+                    app:fieldName="opportunity_id"
+                    app:widgetType="Searchable"
+                    android:visibility="gone"
+                    app:iconResource="@drawable/ic_action_opportunities"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <odoo.controls.OField
                     android:layout_width="match_parent"
                     app:fieldName="location"
                     app:fieldTextAppearance="?android:textAppearanceMedium"

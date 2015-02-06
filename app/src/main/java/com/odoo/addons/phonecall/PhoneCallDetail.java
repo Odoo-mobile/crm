@@ -90,6 +90,21 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
         if (extra != null) {
             String action = getIntent().getAction();
             if (!extra.containsKey(KEY_LOG_CALL_REQUEST)) {
+
+                if (extra.containsKey("opp_id")) {
+                    ODataRow opp_rec = new ODataRow();
+                    opp_rec.put("opportunity_id", extra.getInt("opp_id"));
+                    boolean partner_edit = true;
+                    if (!crmLead.browse(extra.getInt("opp_id")).getString("partner_id").equals("false")) {
+                        opp_rec.put("partner_id", crmLead.browse(extra.getInt("opp_id")).getInt("partner_id"));
+                        partner_edit = false;
+                    }
+                    mForm.initForm(opp_rec);
+                    ((OField) mForm.findViewById(R.id.partner_id)).setEditable(partner_edit);
+                    ((OField) mForm.findViewById(R.id.opportunity_id)).setEditable(false);
+                    return;
+                }
+
                 if (action != null) {
                     if (action.equals(ReminderReceiver.ACTION_PHONE_CALL_REMINDER_CALLBACK)) {
                         String contact = extra.getString("contact");
@@ -141,6 +156,8 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                 mForm.initForm(record);
             }
         } else {
+
+
             mForm.initForm(null);
         }
     }
@@ -188,7 +205,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     Date date = ODateUtils.createDateObject(values.getString("date"),
                             ODateUtils.DEFAULT_FORMAT, false);
                     Date now = new Date();
-                    if (extra == null) {
+                    if (extra == null || extra.containsKey("opp_id")) {
                         extra = new Bundle();
                         extra.putInt(OColumn.ROW_ID, crmPhoneCalls.insert(values));
                     } else
