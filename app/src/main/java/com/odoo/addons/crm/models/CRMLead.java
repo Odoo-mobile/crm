@@ -340,6 +340,7 @@ public class CRMLead extends OModel {
             OValues values = new OValues();
             values.put("stage_id", row.getInt(OColumn.ROW_ID));
             values.put("stage_name", row.getString("name"));
+            values.put("probability", row.getFloat("probability"));
             update(record.getInt(OColumn.ROW_ID), values);
         }
     }

@@ -83,7 +83,6 @@ import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import com.odoo.widgets.snackbar.SnackBar;
 import com.odoo.widgets.snackbar.SnackbarBuilder;
-import com.odoo.widgets.snackbar.listeners.ActionClickListener;
 import com.odoo.widgets.snackbar.listeners.EventListener;
 
 import java.util.ArrayList;
@@ -97,7 +96,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         ISyncStatusObserverListener, BottomSheetListeners.OnSheetActionClickListener,
         BottomSheetListeners.OnSheetMenuCreateListener, EventListener,
         IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener,
-        AdapterView.OnItemSelectedListener, IOnActivityResultListener {
+        AdapterView.OnItemSelectedListener, IOnActivityResultListener, OCursorListAdapter.BeforeBindUpdateData {
     public static final String TAG = CalendarDashboard.class.getSimpleName();
     public static final String KEY = "key_calendar_dashboard";
     public static final String KEY_DATE = "key_date";
@@ -117,6 +116,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private Spinner navSpinner;
     private OListAdapter navSpinnerAdapter;
     private FilterType mFilterType = FilterType.All;
+
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -270,6 +270,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private void initAdapter() {
         mAdapter = new OCursorListAdapter(getActivity(), null,
                 R.layout.calendar_dashboard_item_view);
+        mAdapter.setBeforeBindUpdateData(this);
         mAdapter.setOnViewBindListener(this);
         mAdapter.setOnViewCreateListener(this);
         dashboardListView.setAdapter(mAdapter);
@@ -323,6 +324,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         builder.setOnSheetMenuCreateListener(this);
         switch (type) {
             case Event:
+                builder.setOnSheetMenuCreateListener(this);
                 builder.menu(R.menu.menu_dashboard_events);
                 break;
             case PhoneCall:
@@ -374,18 +376,11 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         String is_done = cr.getString(cr.getColumnIndex("is_done"));
         if (is_done.equals("0"))
             return;
+
         MenuItem mark_done = null;
         if (type.equals("event")) {
             mark_done = menu.findItem(R.id.menu_events_all_done);
-        }
-        if (type.equals("phone_call")) {
-            mark_done = menu.findItem(R.id.menu_phonecall_all_done);
-        }
-        if (type.equals("opportunity")) {
-        }
-        if (mark_done != null) {
-            mark_done.setTitle("Undone");
-            mark_done.setIcon(R.drawable.ic_action_mark_undone);
+            mark_done.setVisible(false);
         }
     }
 
@@ -398,6 +393,18 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         }
         return LayoutInflater.from(getActivity()).inflate(
                 R.layout.calendar_dashboard_item_view, view, false);
+    }
+
+    @Override
+    public ODataRow updateDataRow(Cursor cr) {
+        ODataRow row = OCursorUtils.toDatarow(cr);
+        String type = row.getString("data_type");
+        ODataRow record = new ODataRow();
+        if (type.equals("opportunity")) {
+            record.put("stage_id",
+                    crmLead.browse(new String[]{"stage_id"}, row.getInt(OColumn.ROW_ID)).get("stage_id"));
+        }
+        return record;
     }
 
     @Override
@@ -440,6 +447,18 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             }
             if (type.equals("opportunity")) {
                 icon = R.drawable.ic_action_opportunities;
+                ODataRow stage_id = row.getM2ORecord("stage_id").browse();
+                float probability = -1;
+                if (!stage_id.toString().equals("false")) {
+                    probability = stage_id.getFloat("probability");
+                }
+                if (probability == 0) {
+                    // Lost
+                    icon = R.drawable.ic_action_mark_lost;
+                } else if (probability >= 100) {
+                    // Won
+                    icon = R.drawable.ic_action_mark_won;
+                }
                 desc = row.getString("planned_revenue") + " "
                         + ResCurrency.getSymbol(getActivity(), row.getInt("company_currency")) +
                         " at " + row.getString("probability") + " %";
@@ -707,24 +726,16 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 values.put("state", "done");
                 phone_call.update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
+                SnackBar.get(getActivity()).text(_s(R.string.toast_phone_call_marked_done) + " " + done_label)
+                        .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
+                        .withEventListener(this).show();
                 break;
             case R.id.menu_events_all_done:
                 db().update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
-                SnackBar.get(getActivity()).text(_s(R.string.label_event_marked) + done_label)
-                        .actionColor(_c(R.color.theme_primary_light))
+                SnackBar.get(getActivity()).text(_s(R.string.label_event_marked) + " " + done_label)
                         .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
-                        .withAction("undo", new ActionClickListener() {
-
-                            @Override
-                            public void onActionClicked(SnackbarBuilder snackbar) {
-                                values.put("is_done", (values.getString("is_done")
-                                        .equals("0")) ? 1 : 0);
-                                db().update(row_id, values);
-                                getLoaderManager().restartLoader(0, null,
-                                        CalendarDashboard.this);
-                            }
-                        }).withEventListener(this).show();
+                        .withEventListener(this).show();
                 break;
             case R.id.menu_lead_convert_to_quotation:
                 if (inNetwork()) {

@@ -59,7 +59,7 @@
     <string name="label_missed_call_from_customer">Missed call from customer</string>
 
     <string name="toast_information_saved">Information Saved</string>
-    <string name="toast_phone_call_marked_done">Phone call marked done</string>
+    <string name="toast_phone_call_marked_done">Phone call held</string>
     <string name="toast_event_marked_done">Event marked done</string>
     <string name="toast_image_size_too_large">Image size is too large.</string>
     <string name="toast_marked"> marked</string>
