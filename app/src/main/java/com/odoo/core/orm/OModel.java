@@ -34,6 +34,7 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OInteger;
+import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.provider.BaseModelProvider;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
@@ -65,7 +66,7 @@ public class OModel {
     public static final String KEY_UPDATE_IDS = "key_update_ids";
     public static final String KEY_INSERT_IDS = "key_insert_ids";
     public static final int INVALID_ROW_ID = -1;
-    private static OSQLite sqLite = null;
+    public static OSQLite sqLite = null;
     private Context mContext;
     private OUser mUser;
     private String model_name = null;
@@ -541,6 +542,15 @@ public class OModel {
     }
 
     // Database Operations
+
+    public String getLabel(String column, String key) {
+        OColumn col = getColumn(column);
+        if (col.getType().isAssignableFrom(OSelection.class)) {
+            return col.getSelectionMap().get(key);
+        }
+        return "false";
+    }
+
     public ODataRow browse(int row_id) {
         return browse(null, row_id);
     }

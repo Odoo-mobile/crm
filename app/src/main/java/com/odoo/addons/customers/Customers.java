@@ -22,7 +22,6 @@ package com.odoo.addons.customers;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.LoaderManager;
@@ -177,8 +176,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         }
         BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
         builder.listener(this);
-        builder.setIconColor(_c(R.color.theme_primary_dark));
-        builder.setTextColor(Color.parseColor("#414141"));
+        builder.setIconColor(_c(R.color.body_text_2));
+        builder.setTextColor(_c(R.color.body_text_2));
         builder.setData(data);
         builder.actionListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);

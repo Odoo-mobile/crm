@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -138,9 +137,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
 
         switch (v.getId()) {
             case R.id.cancel_filter:
-                filter_customer_data = false;
-                getLoaderManager().restartLoader(0, null, this);
-                mView.findViewById(R.id.customer_filterContainer).setVisibility(View.GONE);
+                getActivity().getSupportFragmentManager().popBackStack();
                 break;
             case R.id.fabButton:
                 Bundle type = new Bundle();
@@ -336,8 +333,8 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         ODataRow row = OCursorUtils.toDatarow(data);
         BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
         builder.listener(this);
-        builder.setIconColor(_c(R.color.theme_primary_dark));
-        builder.setTextColor(Color.parseColor("#414141"));
+        builder.setIconColor(_c(R.color.body_text_2));
+        builder.setTextColor(_c(R.color.body_text_2));
         builder.setData(data);
         builder.actionListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);
@@ -369,7 +366,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
             case R.id.menu_lead_convert_to_opportunity:
                 if (inNetwork()) {
                     if (row.getInt("id") == 0) {
-                        OAlert.showWarning(getActivity(),OResource.string(getActivity(), R.string.label_sync_warning));
+                        OAlert.showWarning(getActivity(), OResource.string(getActivity(), R.string.label_sync_warning));
                     } else {
                         int count = crmLead.count("id != ? and partner_id = ? and " + OColumn.ROW_ID + " != ?"
                                 , new String[]{
@@ -460,7 +457,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(),OResource.string(getActivity(), R.string.label_quotation_created) + " "+
+            Toast.makeText(getActivity(), OResource.string(getActivity(), R.string.label_quotation_created) + " " +
                     convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
             parent().sync().requestSync(SaleOrder.AUTHORITY);
         }

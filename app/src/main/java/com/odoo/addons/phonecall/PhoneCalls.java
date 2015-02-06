@@ -99,7 +99,7 @@ public class PhoneCalls extends BaseFragment implements
         String date = ODateUtils.convertToDefault(row.getString("date"),
                 ODateUtils.DEFAULT_FORMAT, "MMM, dd hh:mm a");
         OControls.setText(view, R.id.date, date);
-        OControls.setText(view, R.id.state, row.getString("state"));
+        OControls.setText(view, R.id.state, db().getLabel("state", row.getString("state")));
         if (!row.getString("description").equals("false")) {
             OControls.setVisible(view, R.id.description);
             OControls.setText(view, R.id.description, row.getString("description"));

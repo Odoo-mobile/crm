@@ -49,6 +49,7 @@ import com.odoo.core.account.ManageAccounts;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
+import com.odoo.core.orm.OModel;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
@@ -350,6 +351,7 @@ public class OdooActivity extends ActionBarActivity {
 
                         // Logging in to other account
                         OdooAccountManager.login(OdooActivity.this, user.getAndroidName());
+                        OModel.sqLite = null;
 
                         mAccountBoxExpanded = false;
                         accountBoxToggle();

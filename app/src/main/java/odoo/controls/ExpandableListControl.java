@@ -26,8 +26,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.odoo.core.utils.logger.OLog;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +53,6 @@ public class ExpandableListControl extends LinearLayout
     @Override
     public void onAdapterDataChange(List<Object> items) {
         removeAllViews();
-        OLog.log(">>>>>>>>>>> Called" + items.size());
         for (int i = 0; i < items.size(); i++) {
             View view = mAdapter.getView(i, null, this);
             addView(view);
