@@ -697,14 +697,18 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                         .show(new OChoiceDialog.OnChoiceSelectListener() {
                             @Override
                             public void choiceSelected(int position, String value) {
-                                Toast.makeText(getActivity(), position + " : " + value, Toast.LENGTH_LONG).show();
-                                //TODO: Take opp id from => row.getPrimaryBundleData()
+                                int opp_id = row.getInt(OColumn.ROW_ID);
                                 switch (position) {
-                                    case 0: // Schedule/Log call
-                                        // FIXME: DSO (Redirect to log call with opp id)
+                                    case 0:
+                                        Bundle extra = new Bundle();
+                                        extra.putInt("opp_id", opp_id);
+                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
                                         break;
                                     case 1: // Schedule meeting
-                                        // FIXME: DSO (Redirect to meeting with opp id)
+                                        Bundle data = new Bundle();
+                                        data.putString(KEY_DATE, mFilterDate);
+                                        data.putInt("opp_id", opp_id);
+                                        IntentUtils.startActivity(getActivity(), EventDetail.class, data);
                                         break;
                                 }
                             }

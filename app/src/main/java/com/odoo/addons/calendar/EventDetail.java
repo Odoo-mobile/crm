@@ -149,6 +149,9 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                 }
             }, 500);
         }
+        if (extra != null && extra.containsKey("opp_id")) {
+            eventForm.findViewById(R.id.opportunity_id).setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
