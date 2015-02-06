@@ -408,7 +408,7 @@ public class CRMLead extends OModel {
                     // Creating wizard record
                     JSONObject values = new JSONObject();
                     ResPartner resPartner = new ResPartner(mContext, getUser());
-                    ODataRow partner = resPartner.browse(new String[]{},Integer.parseInt(partnerId));
+                    ODataRow partner = resPartner.browse(new String[]{}, Integer.parseInt(partnerId));
                     values.put("partner_id", partner.getInt("id"));
                     values.put("close", close);
                     JSONObject context = new JSONObject();

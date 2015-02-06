@@ -2,11 +2,11 @@
 <items version="2" >
 
     <item
-        jar="/home/dso/odoo-mobile/master-crm-studio-fix-3942-dso/app/build/intermediates/exploded-aar/master-crm-studio-fix-3942-dso/bottom-sheet-lib/unspecified/classes.jar"
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/bottom-sheet-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="0e8fc9879f2eb1bdbe3e04cb3cb11fa986b51659">
-        <dex dex="/home/dso/odoo-mobile/master-crm-studio-fix-3942-dso/app/build/intermediates/pre-dexed/debug/classes-dff4928c2d190571b74d7c9e78733632557a032e.jar" />
+        sha1="143b03ec6c04fcb90f22a7999890d20053e2ba1c">
+        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-85721300e71b88a3ce0e0b100f9defeb83132c46.jar" />
     </item>
 
 </items>

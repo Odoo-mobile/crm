@@ -65,6 +65,10 @@
             android:multiprocess="true"
             android:name="com.odoo.core.orm.provider.BaseModelProvider"
             android:authorities="com.odoo.core.crm.provider.content" />
+        <provider
+            android:multiprocess="true"
+            android:name="com.odoo.base.addons.ir.providers.IrModelProvider"
+            android:authorities="com.odoo.core.crm.provider.content.sync.ir_model" />
 
         <!-- Sync Provider & Service  // -->
         <provider

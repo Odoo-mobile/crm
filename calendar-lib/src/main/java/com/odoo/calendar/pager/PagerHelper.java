@@ -175,6 +175,15 @@ public class PagerHelper implements OnPageChangeListener, OnClickListener {
                     weekDates
             );
         }
+        ViewGroup cDays = (ViewGroup) current_week_view_days;
+        for (int i = 0; i < cDays.getChildCount(); i++) {
+            DateInfo cDate = (DateInfo) cDays.getChildAt(i)
+                    .findViewById(R.id.day_indicator).getTag();
+            if (cDate.isToday()) {
+                cDays.getChildAt(i).findViewById(R.id.day_indicator)
+                        .setBackgroundColor(Color.TRANSPARENT);
+            }
+        }
         for (int j = 0; j < currentDays.getChildCount(); j++) {
             DateInfo dateInfo = (DateInfo) currentDays.getChildAt(j).findViewById(R.id.day_indicator).getTag();
             Boolean hasData = false;
@@ -197,15 +206,6 @@ public class PagerHelper implements OnPageChangeListener, OnClickListener {
                             .setBackgroundColor(Color.TRANSPARENT);
             }
         }
-        ViewGroup cDays = (ViewGroup) current_week_view_days;
-        for (int i = 0; i < cDays.getChildCount(); i++) {
-            DateInfo cDate = (DateInfo) cDays.getChildAt(i)
-                    .findViewById(R.id.day_indicator).getTag();
-            if (cDate.isToday()) {
-                cDays.getChildAt(i).findViewById(R.id.day_indicator)
-                        .setBackgroundColor(Color.TRANSPARENT);
-            }
-        }
         recent_focused = v;
         DateInfo dt = (DateInfo) v.findViewById(R.id.day_indicator).getTag();
         if (mOdooCalendarDateSelectListener != null) {
@@ -216,16 +216,17 @@ public class PagerHelper implements OnPageChangeListener, OnClickListener {
             }
         }
         day_of_week = dt.getIndex();
-        focusView(v);
+        focusView(v, dateDataObjects.get(dt.getIndex()).getHasData());
     }
 
-    private void focusView(View day) {
+    private void focusView(View day, Boolean hasData) {
         ((TextView) day.findViewById(R.id.day_name)).setTextColor(res
                 .getColor(R.color.date_focused));
         ((TextView) day.findViewById(R.id.day_date)).setTextColor(res
                 .getColor(R.color.date_focused));
-        day.findViewById(R.id.day_indicator).setBackgroundResource(
-                R.drawable.focused_week_day);
+        if (hasData)
+            day.findViewById(R.id.day_indicator).setBackgroundResource(
+                    R.drawable.focused_week_day);
     }
 
     private void resetView(View day) {

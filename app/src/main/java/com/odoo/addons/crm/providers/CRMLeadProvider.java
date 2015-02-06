@@ -19,8 +19,22 @@
  */
 package com.odoo.addons.crm.providers;
 
+import android.net.Uri;
+
+import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.core.orm.provider.BaseModelProvider;
 
 public class CRMLeadProvider extends BaseModelProvider {
     public static final String TAG = CRMLeadProvider.class.getSimpleName();
+
+    @Override
+    public void setModel(Uri uri) {
+        super.setModel(uri);
+        mModel = new CRMLead(getContext(), getUser(uri));
+    }
+
+    @Override
+    public String authority() {
+        return CRMLead.AUTHORITY;
+    }
 }

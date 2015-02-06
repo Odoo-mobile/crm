@@ -44,7 +44,6 @@ import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
-import com.odoo.core.utils.logger.OLog;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.core.utils.reminder.ReminderReceiver;
 import com.odoo.core.utils.reminder.ReminderUtils;
@@ -275,8 +274,6 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
             if (row_id != -1) {
                 Log.i(TAG, "Event updated");
                 //FIXME:  meeting.put("is_done", "false");
-                OLog.log(">>>>>>>>>> "+ meeting.toString());
-                OLog.log(">>>>>>>>>>>>>>>>> " + meeting.getString("class"));
                 calendarEvent.update(row_id, meeting);
             } else {
                 Log.i(TAG, "Event created");

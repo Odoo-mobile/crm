@@ -19,8 +19,22 @@
  */
 package com.odoo.addons.phonecall.providers;
 
+import android.net.Uri;
+
+import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.core.orm.provider.BaseModelProvider;
 
 public class PhoneCallProvider extends BaseModelProvider {
     public static final String TAG = PhoneCallProvider.class.getSimpleName();
+
+    @Override
+    public void setModel(Uri uri) {
+        super.setModel(uri);
+        mModel = new CRMPhoneCalls(getContext(), getUser(uri));
+    }
+
+    @Override
+    public String authority() {
+        return CRMPhoneCalls.AUTHORITY;
+    }
 }

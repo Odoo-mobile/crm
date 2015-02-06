@@ -193,9 +193,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             e.printStackTrace();
         }
         Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
-        IrModel irModel = new IrModel(mContext, user);
-        irModel.setLastSyncDateTimeToNow(model);
-
+        if (createRelationRecords) {
+            IrModel irModel = new IrModel(mContext, user);
+            irModel.setLastSyncDateTimeToNow(model);
+        }
         // Performing next sync if any in service
         if (mSyncFinishListeners.containsKey(model.getModelName())) {
             OSyncAdapter adapter = mSyncFinishListeners.get(model.getModelName())

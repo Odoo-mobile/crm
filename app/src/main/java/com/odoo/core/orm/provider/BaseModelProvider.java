@@ -28,11 +28,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
+import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.logger.OLog;
 
 import java.io.InvalidObjectException;
 import java.util.Arrays;
@@ -44,7 +47,7 @@ public class BaseModelProvider extends ContentProvider {
     public final static String KEY_USERNAME = "key_username";
     private final int COLLECTION = 1;
     private final int SINGLE_ROW = 2;
-    private OModel mModel = null;
+    protected OModel mModel = null;
     public UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     public static Uri buildURI(String authority, String model, String username) {
@@ -66,19 +69,28 @@ public class BaseModelProvider extends ContentProvider {
         return null;
     }
 
+    public OUser getUser(Uri uri) {
+        String username = uri.getQueryParameter(KEY_USERNAME);
+        return OdooAccountManager.getDetails(getContext(), username);
+    }
+
     public void setModel(Uri uri) {
-        String authority = (authority() != null) ? authority() : uri.getAuthority();
         String path = uri.getQueryParameter(KEY_MODEL);
         String username = uri.getQueryParameter(KEY_USERNAME);
-        matcher.addURI(authority, path, COLLECTION);
-        matcher.addURI(authority, path + "/#", SINGLE_ROW);
         mModel = OModel.get(getContext(), path, username);
         assert mModel != null;
+    }
+
+    private void setMatcher(Uri uri) {
+        String authority = (authority() != null) ? authority() : uri.getAuthority();
+        matcher.addURI(authority, mModel.getModelName(), COLLECTION);
+        matcher.addURI(authority, mModel.getModelName() + "/#", SINGLE_ROW);
     }
 
     @Override
     public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs, String sortOrder) {
         setModel(uri);
+        setMatcher(uri);
         if (mModel == null)
             return null;
         String[] projection = removeRelationColumns(base_projection);
@@ -107,6 +119,8 @@ public class BaseModelProvider extends ContentProvider {
         }
         Context ctx = getContext();
         assert ctx != null;
+        if (cr == null)
+            OLog.log(">>>>>>>>>> " + uri);
         cr.setNotificationUri(ctx.getContentResolver(), uri);
         return cr;
     }
@@ -136,6 +150,7 @@ public class BaseModelProvider extends ContentProvider {
     @Override
     public Uri insert(Uri uri, ContentValues all_values) {
         setModel(uri);
+        setMatcher(uri);
         ContentValues[] values = generateValues(all_values);
         ContentValues value_to_insert = values[0];
         value_to_insert.put("_write_date", ODateUtils.getUTCDate());
@@ -171,6 +186,7 @@ public class BaseModelProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         int count = 0;
         setModel(uri);
+        setMatcher(uri);
         int match = matcher.match(uri);
         switch (match) {
             case COLLECTION:
@@ -194,6 +210,7 @@ public class BaseModelProvider extends ContentProvider {
     @Override
     public int update(Uri uri, ContentValues all_values, String selection, String[] selectionArgs) {
         setModel(uri);
+        setMatcher(uri);
         ContentValues[] values = generateValues(all_values);
         ContentValues value_to_update = values[0];
         if (!value_to_update.containsKey("_write_date")) {

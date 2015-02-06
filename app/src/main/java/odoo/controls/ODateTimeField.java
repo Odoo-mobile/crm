@@ -114,7 +114,7 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
             txvText.setText(getDate(mValue.toString(), mParsePattern));
         }
         if (textSize > -1) {
-            txvText.setTextSize(TypedValue.COMPLEX_UNIT_PX,textSize);
+            txvText.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         }
         if (appearance > -1) {
             txvText.setTextAppearance(mContext, appearance);
@@ -126,8 +126,10 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
     @Override
     public void setValue(Object value) {
         mValue = value;
-        if (value == null || value.toString().equals("false"))
+        if (value == null || value.toString().equals("false")) {
+            txvText.setText("No Value");
             return;
+        }
         txvText.setText(getDate(mValue.toString(), mParsePattern));
         if (mValueUpdateListener != null) {
             mValueUpdateListener.onValueUpdate(value);

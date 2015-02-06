@@ -229,19 +229,18 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             int total = 0;
             // Checking for events
             total += event.countGroupBy("date_start", "date(date_start)"
-                    , "date(date_start) = ?", new String[]{date_str}).getInt("total");
-            total += event.countGroupBy("date_end", "date(date_end)"
-                    , "date(date_end) = ?", new String[]{date_str}).getInt("total");
+                    , "(date(date_start) <= ? and date(date_end) >= ? )", new String[]{date_str, date_str}).getInt("total");
 
             // Checking for phone calls
-            total += calls.countGroupBy("date", "date(date)", "date(date) = ?", new String[]{date_str})
+            total += calls.countGroupBy("date", "date(date)",
+                    "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)",
+                    new String[]{date_str, date_str, "open", "pending"})
                     .getInt("total");
 
             // Leads
             total += lead.countGroupBy("date_deadline", "date(date_deadline)",
-                    "date(date_deadline) = ?", new String[]{date_str}).getInt("total");
-            total += lead.countGroupBy("date_deadline", "date(date_deadline)",
-                    "date(date_deadline) = ?", new String[]{date_str}).getInt("total");
+                    "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? and date(date_action) <= ?) and type = ?",
+                    new String[]{date_str, date_str, date_str, date_str, "opportunity"}).getInt("total");
             items.add(new OdooCalendar.DateDataObject(date_str, (total > 0)));
         }
         return items;
@@ -605,35 +604,15 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.fabButton:
-                onFabClick();
-                break;
             case R.id.dashboard_no_item_view:
                 createEvent();
                 break;
         }
     }
 
-    private void onFabClick() {
-        BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
-        builder.listener(this);
-        builder.setIconColor(_c(R.color.body_text_2));
-        builder.setTextColor(_c(R.color.body_text_1));
-        ODataRow data = new ODataRow();
-        data.put("fab", true);
-        builder.setData(data);
-        builder.title(_s(R.string.label_new));
-        builder.menu(R.menu.menu_dashboard_fab);
-        mSheet = builder.create();
-        mSheet.show();
-    }
-
     @Override
     public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
         dismissSheet(sheet);
-        if (extras instanceof ODataRow) {
-            onFabMenuClick(menu);
-            return;
-        }
         actionEvent(menu, (Cursor) extras);
     }
 
@@ -763,17 +742,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         }
     };
 
-    private void onFabMenuClick(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_fab_new_event:
-                createEvent();
-                break;
-            case R.id.menu_fab_new_call_log:
-                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, null);
-                break;
-        }
-    }
-
     private void dismissSheet(final BottomSheet sheet) {
         new Handler().postDelayed(new Runnable() {
 
@@ -809,6 +777,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public void onStatusChange(Boolean refreshing) {
         getLoaderManager().restartLoader(0, null, this);
+        setSwipeRefreshing(refreshing);
     }
 
     @Override

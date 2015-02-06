@@ -19,8 +19,22 @@
  */
 package com.odoo.addons.sale.providers;
 
+import android.net.Uri;
+
+import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.orm.provider.BaseModelProvider;
 
 public class SaleOrderProvider extends BaseModelProvider {
     public static final String TAG = SaleOrderProvider.class.getSimpleName();
+
+    @Override
+    public void setModel(Uri uri) {
+        super.setModel(uri);
+        mModel = new SaleOrder(getContext(), getUser(uri));
+    }
+
+    @Override
+    public String authority() {
+        return SaleOrder.AUTHORITY;
+    }
 }

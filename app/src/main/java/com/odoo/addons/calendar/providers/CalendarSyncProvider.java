@@ -46,13 +46,20 @@ public class CalendarSyncProvider extends BaseModelProvider {
         return super.onCreate();
     }
 
+
+    @Override
+    public void setModel(Uri uri) {
+        super.setModel(uri);
+        mModel = new CalendarEvent(getContext(), getUser(uri));
+    }
+
     @Override
     public Cursor query(Uri uri, String[] base_projection, String selection, String[] selectionArgs,
                         String sortOrder) {
         int match = matcher.match(uri);
         CalendarEvent events = new CalendarEvent(getContext(), null);
         if (match != FULL_AGENDA) {
-            return super.query(events.uri(), base_projection, selection, selectionArgs, sortOrder);
+            return super.query(uri, base_projection, selection, selectionArgs, sortOrder);
         }
         String date_start = selectionArgs[0];
         String date_end = ODateUtils.getDateDayBeforeAfterUTC(date_start + " 00:00:00", 1);

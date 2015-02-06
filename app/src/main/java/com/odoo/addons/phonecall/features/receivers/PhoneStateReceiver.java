@@ -51,6 +51,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
     public static final String KEY_OFFHOOK = "phone_state_offhook";
     public static final String KEY_DURATION_START = "key_duration_start";
     public static final String KEY_DURATION_END = "key_duration_end";
+    public static final String KEY_ACTIVITY_STARTED = "key_activity_started";
     private String callerNumber = null;
     private TelephonyManager telephonyManager;
     private OPreferenceManager mPref;
@@ -62,7 +63,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
     @Override
     public void onReceive(Context context, Intent intent) {
         mContext = context;
-        if(OUser.current(mContext)!=null) {
+        if (OUser.current(mContext) != null) {
             mPref = new OPreferenceManager(context);
             if (callerWindow == null)
                 callerWindow = new CallerWindow(context);
@@ -158,7 +159,8 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
     }
 
     private void startLogCallActivity(Bundle data) {
-        if (data != null) {
+        if (data != null && !mPref.getBoolean(KEY_ACTIVITY_STARTED, false)) {
+            mPref.setBoolean(KEY_ACTIVITY_STARTED, true);
             Intent intent = new Intent(mContext, PhoneCallDetail.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             data.putBoolean(PhoneCallDetail.KEY_LOG_CALL_REQUEST, true);
@@ -186,6 +188,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
             extra.putInt("opportunity_id", row_id);
             row.put("caller_contact", callerNumber);
             callerWindow.show(dialed, row);
+            mPref.setBoolean(KEY_ACTIVITY_STARTED, false);
         }
     }
 }

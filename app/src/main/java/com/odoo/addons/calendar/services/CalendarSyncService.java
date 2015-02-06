@@ -45,6 +45,7 @@ import java.util.List;
 public class CalendarSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = CalendarSyncService.class.getSimpleName();
     public static final int SYNC_SLEEP_DELAY = 2000;
+
     @Override
     public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
         return new OSyncAdapter(context, CalendarEvent.class, service, true);

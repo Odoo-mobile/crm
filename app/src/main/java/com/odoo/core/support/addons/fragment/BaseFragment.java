@@ -111,22 +111,17 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
         /** Callback invoked with the sync adapter status changes. */
         @Override
         public void onStatusChanged(int which) {
+            boolean refreshing = false;
+            switch (which) {
+                case ContentResolver.SYNC_OBSERVER_TYPE_PENDING:
+                case ContentResolver.SYNC_OBSERVER_TYPE_ACTIVE:
+                    refreshing = true;
+            }
+            final boolean finalRefreshing = refreshing;
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-
-                    boolean syncActive = ContentResolver.isSyncActive(
-                            OUser.current(mContext).getAccount(),
-                            syncStatusObserverModel.authority());
-                    boolean syncPending = ContentResolver.isSyncPending(
-                            OUser.current(mContext).getAccount(),
-                            syncStatusObserverModel.authority());
-                    boolean refreshing = syncActive | syncPending;
-                    if (!refreshing) {
-                        //FIXME: how to refresh drawer items ??
-                        //parent().refreshDrawer(drawerRefreshTag);
-                    }
-                    mSyncStatusObserverListener.onStatusChange(refreshing);
+                    mSyncStatusObserverListener.onStatusChange(finalRefreshing);
                 }
             });
         }

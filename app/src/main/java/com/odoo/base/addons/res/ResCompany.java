@@ -21,6 +21,7 @@ package com.odoo.base.addons.res;
 
 import android.content.Context;
 
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OVarchar;
@@ -35,5 +36,11 @@ public class ResCompany extends OModel {
 
     public ResCompany(Context context, OUser user) {
         super(context, "res.company", user);
+    }
+
+    public static ODataRow getCurrency(Context context) {
+        ResCompany company = new ResCompany(context, null);
+        int row_id = company.selectRowId(Integer.parseInt(company.getUser().getCompany_id()));
+        return company.browse(row_id).getM2ORecord("currency_id").browse();
     }
 }

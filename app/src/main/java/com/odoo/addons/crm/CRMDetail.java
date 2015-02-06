@@ -27,12 +27,14 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.App;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.sale.models.SaleOrder;
+import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
@@ -86,7 +88,11 @@ public class CRMDetail extends ActionBarActivity {
             initFormValues();
         }
         mForm.setEditable(true);
-
+        TextView currency_symbol = (TextView) findViewById(R.id.currency_symbol);
+        ODataRow currency = ResCompany.getCurrency(this);
+        if (currency != null) {
+            currency_symbol.setText(currency.getString("symbol"));
+        }
     }
 
     private void initFormValues() {
@@ -225,21 +231,21 @@ public class CRMDetail extends ActionBarActivity {
 
     CRMLead.OnOperationSuccessListener createQuotationListener =
             new CRMLead.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(CRMDetail.this, OResource.string(CRMDetail.this,
-                    R.string.label_quotation_created) + " " +
-                    record.getString("name"), Toast.LENGTH_LONG).show();
-            SyncUtils sync = new SyncUtils(CRMDetail.this, crmLead.getUser());
-            sync.requestSync(SaleOrder.AUTHORITY);
-        }
+                @Override
+                public void OnSuccess() {
+                    Toast.makeText(CRMDetail.this, OResource.string(CRMDetail.this,
+                            R.string.label_quotation_created) + " " +
+                            record.getString("name"), Toast.LENGTH_LONG).show();
+                    SyncUtils sync = new SyncUtils(CRMDetail.this, crmLead.getUser());
+                    sync.requestSync(SaleOrder.AUTHORITY);
+                }
 
 
-        @Override
-        public void OnCancelled() {
+                @Override
+                public void OnCancelled() {
 
-        }
-    };
+                }
+            };
     CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {

@@ -22,6 +22,8 @@ package com.odoo.addons.calendar.models;
 import android.content.Context;
 import android.net.Uri;
 
+import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.OModel;
@@ -98,6 +100,13 @@ public class CalendarEvent extends OModel {
 
     OColumn user_id = new OColumn("Owner", ResUsers.class, OColumn.RelationType.ManyToOne);
     OColumn partner_ids = new OColumn("Attendees", ResPartner.class, OColumn.RelationType.ManyToMany);
+
+
+    // PhoneCalls link
+    OColumn phonecall_id = new OColumn("Phonecalls", CRMPhoneCalls.class, OColumn.RelationType.ManyToOne);
+    //Opportunities id
+    OColumn opportunity_id = new OColumn("Opportunities", CRMLead.class, OColumn.RelationType.ManyToOne)
+            .addDomain("type", "=", "opportunity");
 
     public CalendarEvent(Context context, OUser user) {
         super(context, "calendar.event", user);

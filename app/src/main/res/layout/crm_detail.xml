@@ -50,52 +50,71 @@
                 android:visibility="gone"
                 android:layout_height="wrap_content">
 
+                <TextView
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:text="Expected Revenue"
+                    android:textAllCaps="true"
+                    android:textColor="#414141"
+                    android:paddingLeft="@dimen/default_16dp"
+                    android:layout_width="match_parent"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:layout_height="wrap_content" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:orientation="horizontal"
                     android:paddingLeft="16dp"
-                    android:paddingTop="@dimen/default_16dp"
                     android:paddingRight="@dimen/default_16dp"
                     android:paddingBottom="@dimen/default_16dp"
-                    android:layout_height="wrap_content">
+                    android:layout_height="56dp">
+
 
                     <odoo.controls.OField
                         app:fieldLabelTextAppearance="?android:textAppearanceSmall"
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
                         app:fieldName="planned_revenue"
+                        app:showLabel="false"
                         app:showIcon="false"
                         app:withOutSidePadding="false"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
                         app:fieldTextSize="@dimen/text_size_xmedium"
                         android:layout_height="wrap_content"></odoo.controls.OField>
 
+                    <TextView
+                        android:id="@+id/currency_symbol"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/body_text_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent" />
 
                     <TextView
                         android:textAppearance="?android:textAppearanceMedium"
                         android:textStyle="bold"
                         android:text=" at "
-                        android:gravity="bottom"
-                        android:paddingBottom="5dp"
+                        android:paddingRight="@dimen/default_8dp"
+                        android:paddingLeft="5dp"
+                        android:gravity="center_vertical"
                         android:textColor="@color/body_text_3"
-                        android:layout_width="0dp"
-                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
                         android:layout_height="match_parent" />
+
 
                     <odoo.controls.OField
                         app:withOutSidePadding="false"
-                        app:controlLabel=" "
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
                         app:fieldName="probability"
+                        app:showLabel="false"
                         app:fieldTextAppearance="?android:textAppearanceMedium"
                         app:showIcon="false"
                         app:fieldTextSize="@dimen/text_size_xmedium"
-                        android:layout_height="wrap_content"></odoo.controls.OField>
+                        android:layout_height="match_parent"></odoo.controls.OField>
 
                     <TextView
                         android:textAppearance="?android:textAppearanceMedium"
                         android:text=" % "
                         android:textColor="@color/body_text_2"
-                        android:gravity="bottom"
+                        android:gravity="center_vertical"
                         android:layout_width="0dp"
                         android:layout_weight="1"
                         android:layout_height="match_parent" />
@@ -104,7 +123,7 @@
                 <View style="@style/ViewSeparator" />
 
                 <odoo.controls.OField
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     app:fieldName="date_action"
                     app:parsePattern="MMM dd, yyyy"
                     app:fieldTextAppearance="?android:textAppearanceMedium"
@@ -113,9 +132,10 @@
                     android:layout_height="wrap_content"></odoo.controls.OField>
 
                 <odoo.controls.OField
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     app:fieldName="title_action"
                     app:showLabel="false"
+                    app:withTopPadding="false"
                     app:fieldTextAppearance="?android:textAppearanceMedium"
                     app:fieldTextSize="@dimen/text_size_xmedium"
                     android:layout_height="wrap_content"></odoo.controls.OField>
@@ -125,7 +145,7 @@
                     android:layout_marginLeft="72dp" />
 
                 <odoo.controls.OField
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     app:fieldName="date_deadline"
                     app:fieldTextAppearance="?android:textAppearanceMedium"
                     app:parsePattern="MMM dd, yyyy"
