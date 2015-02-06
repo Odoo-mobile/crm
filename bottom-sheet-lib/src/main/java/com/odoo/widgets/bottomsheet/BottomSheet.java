@@ -131,7 +131,11 @@ public class BottomSheet extends RelativeLayout {
                             false);
             for (int j = 0; j < 3; j++) {
                 if (index < mMenu.size()) {
-                    row_view.addView(getMenuView(mMenu.getItem(index), row_view));
+                    if(mMenu.getItem(j).isVisible()) {
+                        row_view.addView(getMenuView(mMenu.getItem(index), row_view));
+                    }else{
+                        row_view.addView(getDummyMenuView(row_view));
+                    }
                 } else
                     row_view.addView(getDummyMenuView(row_view));
                 index++;

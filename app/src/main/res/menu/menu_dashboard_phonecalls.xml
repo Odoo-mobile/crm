@@ -12,6 +12,6 @@
     <item
         android:id="@+id/menu_phonecall_all_done"
         android:icon="@drawable/ic_action_done_all"
-        android:title="Mark Done"></item>
+        android:title="Held"></item>
 
 </menu>
