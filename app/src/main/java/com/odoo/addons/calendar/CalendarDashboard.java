@@ -76,6 +76,7 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
@@ -623,7 +624,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         final int row_id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
         values.put("is_done", (is_done.equals("0")) ? 1 : 0);
         String done_label = (is_done.equals("0")) ? "done" : "undone";
-        ODataRow row = OCursorUtils.toDatarow(cr);
+        final ODataRow row = OCursorUtils.toDatarow(cr);
         convertRequestRecord = row;
         Bundle data = row.getPrimaryBundleData();
         switch (menu.getItemId()) {
@@ -638,7 +639,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
                 break;
             case R.id.menu_events_reschedule:
-//                data.putBoolean(EventDetail.KEY_RESCHEDULE, true);
                 IntentUtils.startActivity(getActivity(), EventDetail.class, data);
                 break;
             // Opportunity menus
@@ -690,14 +690,52 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
                 break;
             case R.id.menu_opp_reschedule:
-                IntentUtils.startActivity(getActivity(), CRMDetail.class,
-                        row.getPrimaryBundleData());
+                List<String> choices = new ArrayList<>();
+                choices.add("Schedule/Log calls");
+                choices.add("Schedule Meeting");
+                OChoiceDialog.get(getActivity()).withOptions(choices)
+                        .show(new OChoiceDialog.OnChoiceSelectListener() {
+                            @Override
+                            public void choiceSelected(int position, String value) {
+                                Toast.makeText(getActivity(), position + " : " + value, Toast.LENGTH_LONG).show();
+                                //TODO: Take opp id from => row.getPrimaryBundleData()
+                                switch (position) {
+                                    case 0: // Schedule/Log call
+                                        // FIXME: DSO (Redirect to log call with opp id)
+                                        break;
+                                    case 1: // Schedule meeting
+                                        // FIXME: DSO (Redirect to meeting with opp id)
+                                        break;
+                                }
+                            }
+                        });
                 break;
 
             case R.id.menu_phonecall_reschedule:
-                row = OCursorUtils.toDatarow(cr);
-                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
-                        row.getPrimaryBundleData());
+                choices = new ArrayList<>();
+                choices.add("Schedule other call");
+                choices.add("Schedule a meeting");
+                choices.add("Re-Schedule call");
+                OChoiceDialog.get(getActivity()).withOptions(choices)
+                        .show(new OChoiceDialog.OnChoiceSelectListener() {
+                            @Override
+                            public void choiceSelected(int position, String value) {
+                                Toast.makeText(getActivity(), position + " : " + value, Toast.LENGTH_LONG).show();
+                                //TODO: Take phone call id from => row.getPrimaryBundleData()
+                                switch (position) {
+                                    case 0: // Schedule other call
+                                        // FIXME: DSO (Redirect to log call with current scheduled call's summary and create new one)
+                                        break;
+                                    case 1: // Schedule meeting
+                                        // FIXME: DSO (Redirect to meeting with phone call id)
+                                        break;
+                                    case 2: // Only open in edit mode
+                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
+                                                row.getPrimaryBundleData());
+                                        break;
+                                }
+                            }
+                        });
                 break;
             // All done menu
             case R.id.menu_phonecall_all_done:

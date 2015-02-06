@@ -8,7 +8,7 @@
     <item
         android:id="@+id/menu_phonecall_reschedule"
         android:icon="@drawable/ic_action_reschedule"
-        android:title="Re-schedule"></item>
+        android:title="Schedule"></item>
     <item
         android:id="@+id/menu_phonecall_all_done"
         android:icon="@drawable/ic_action_done_all"

@@ -12,7 +12,7 @@
     <item
         android:id="@+id/menu_opp_reschedule"
         android:icon="@drawable/ic_action_reschedule"
-        android:title="Re-schedule"></item>
+        android:title="Schedule"></item>
     <item
         android:id="@+id/menu_opp_won"
         android:icon="@drawable/ic_action_mark_won"
