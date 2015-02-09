@@ -104,6 +104,18 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     ((OField) mForm.findViewById(R.id.opportunity_id)).setEditable(false);
                     return;
                 }
+//                if(extra.containsKey("call_id")){
+//                    ODataRow call_row = new ODataRow();
+//                    call_row = crmPhoneCalls.browse(extra.getInt("call_id"));
+//                    if(!call_row.getString("opportunity_id").contains("false")){
+//                        call_row.put("opportunity_id",call_row.getString("opportunity_id"));
+//                    }
+//                    if(!call_row.getString("opportunity_id").contains("false")){
+//                        call_row.put("partner_id",call_row.getString("partner_id"));
+//                    }
+//                    mForm.initForm(call_row);
+//                    return;
+//                }
 
                 if (action != null) {
                     if (action.equals(ReminderReceiver.ACTION_PHONE_CALL_REMINDER_CALLBACK)) {
@@ -205,9 +217,8 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     Date date = ODateUtils.createDateObject(values.getString("date"),
                             ODateUtils.DEFAULT_FORMAT, false);
                     Date now = new Date();
-                    if (extra == null || extra.containsKey("opp_id")) {
-                        extra = new Bundle();
-                        extra.putInt(OColumn.ROW_ID, crmPhoneCalls.insert(values));
+                    if (extra == null || extra.containsKey("opp_id") || extra.containsKey("call_id")) {
+                        crmPhoneCalls.insert(values);
                     } else
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
                     if (now.compareTo(date) < 0) {
