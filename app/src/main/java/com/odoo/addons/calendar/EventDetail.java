@@ -100,9 +100,9 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         // OnClicks
         findViewById(R.id.event_color).setOnClickListener(this);
         findViewById(R.id.reminderForEvent).setOnClickListener(this);
-
+        Bundle extra = getIntent().getExtras();
         eventForm = (OForm) mView;
-        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey(OColumn.ROW_ID)) {
+        if (extra != null) {
             row_id = getIntent().getIntExtra(OColumn.ROW_ID, -1);
             if (row_id != -1) {
                 actionBar.setTitle(R.string.label_edit_meeting);
@@ -121,12 +121,19 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                         ODateUtils.DEFAULT_TIME_FORMAT));
                 colorSelected(CalendarUtils.getColorData(record.getInt("color_index")));
             } else {
-                eventForm.initForm(null);
+                ODataRow opp_data = null;
+                OField opp_field = (OField) findViewById(R.id.opportunity_id);
+                if (extra != null && extra.containsKey("opp_id")) {
+                    opp_field.setVisibility(View.VISIBLE);
+                    opp_data = new ODataRow();
+                    opp_data.put("opportunity_id", extra.getInt("opp_id"));
+                }
+                eventForm.initForm(opp_data);
+                opp_field.setEditable(false);
             }
         } else {
             eventForm.initForm(null);
         }
-        Bundle extra = getIntent().getExtras();
         String action = getIntent().getAction();
         if (action != null && (action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_DONE) ||
                 action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_RE_SCHEDULE))) {
@@ -148,9 +155,6 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                     onClick(findViewById(R.id.reminderForEvent));
                 }
             }, 500);
-        }
-        if (extra != null && extra.containsKey("opp_id")) {
-            eventForm.findViewById(R.id.opportunity_id).setVisibility(View.VISIBLE);
         }
     }
 
@@ -227,6 +231,9 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         meeting.put("description", values.get("description"));
         meeting.put("class", values.get("class"));
         meeting.put("color_index", mEventColorCode);
+        if (values.contains("opportunity_id")) {
+            meeting.put("opportunity_id", values.get("opportunity_id"));
+        }
         if (calendarEvent.getColumn("date") == null) {
             //v7+
             if (values.getBoolean("allday")) {

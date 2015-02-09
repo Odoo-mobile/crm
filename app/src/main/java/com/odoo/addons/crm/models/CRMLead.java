@@ -236,8 +236,15 @@ public class CRMLead extends OModel {
     }
 
     public String storeAssigneeName(OValues vals) {
-        return (!vals.getString("user_id").equals("false")) ? "Me"
-                : "Unassigned";
+        try {
+            if (!vals.getString("user_id").equals("false")) {
+                JSONArray user_id = new JSONArray(vals.getString("user_id"));
+                return user_id.getString(1);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "Unassigned";
     }
 
     public String storeStageName(OValues values) {

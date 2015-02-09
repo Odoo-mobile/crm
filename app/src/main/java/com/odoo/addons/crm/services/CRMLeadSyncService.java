@@ -27,8 +27,6 @@ import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
-import odoo.ODomain;
-
 public class CRMLeadSyncService extends OSyncService {
     public static final String TAG = CRMLeadSyncService.class.getSimpleName();
 
@@ -39,13 +37,6 @@ public class CRMLeadSyncService extends OSyncService {
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-        if (adapter.getModel().getModelName().equals("crm.lead")) {
-            ODomain domain = new ODomain();
-            domain.add("|");
-            domain.add("user_id", "=", user.getUser_id());
-            domain.add("user_id", "=", false);
-            adapter.setDomain(domain);
-        }
     }
 
 }

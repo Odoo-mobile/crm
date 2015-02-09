@@ -449,7 +449,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 icon = R.drawable.ic_action_opportunities;
                 ODataRow stage_id = row.getM2ORecord("stage_id").browse();
                 float probability = -1;
-                if (!stage_id.toString().equals("false")) {
+                if (!stage_id.getString("probability").equals("false")) {
                     probability = stage_id.getFloat("probability");
                 }
                 if (probability == 0) {
@@ -717,9 +717,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
             case R.id.menu_phonecall_reschedule:
                 choices = new ArrayList<>();
-                choices.add("Schedule other call");
-                choices.add("Schedule a meeting");
                 choices.add("Re-Schedule call");
+                choices.add("Schedule other call");
                 OChoiceDialog.get(getActivity()).withOptions(choices)
                         .show(new OChoiceDialog.OnChoiceSelectListener() {
                             @Override
@@ -727,15 +726,13 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                                 Toast.makeText(getActivity(), position + " : " + value, Toast.LENGTH_LONG).show();
                                 //TODO: Take phone call id from => row.getPrimaryBundleData()
                                 switch (position) {
-                                    case 0: // Schedule other call
-                                        // FIXME: DSO (Redirect to log call with current scheduled call's summary and create new one)
-                                        break;
-                                    case 1: // Schedule meeting
-                                        // FIXME: DSO (Redirect to meeting with phone call id)
-                                        break;
-                                    case 2: // Only open in edit mode
+                                    case 0: // Re-Schedule
                                         IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
                                                 row.getPrimaryBundleData());
+
+                                        break;
+                                    case 1: // Schedule other call
+                                        // FIXME: DSO (Redirect to meeting with phone call id)
                                         break;
                                 }
                             }

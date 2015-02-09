@@ -63,6 +63,7 @@ public class CRMDetail extends ActionBarActivity {
     private ActionBar actionBar;
     private Menu menu;
     private String wonLost = "won";
+    private String type = "lead";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class CRMDetail extends ActionBarActivity {
         mForm = (OForm) findViewById(R.id.crmLeadForm);
         if (!extra.containsKey(OColumn.ROW_ID)) {
             if (extra.getString("type").equals(CRM.Type.Opportunities.toString())) {
+                type = "opportunity";
                 findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
             }
             mForm.initForm(null);
@@ -146,6 +148,7 @@ public class CRMDetail extends ActionBarActivity {
                 OValues values = mForm.getValues();
                 // FIXME: What about reminder on date_action??
                 if (values != null) {
+                    values.put("type", type);
                     if (record != null) {
                         crmLead.update(record.getInt(OColumn.ROW_ID), values);
                     } else {

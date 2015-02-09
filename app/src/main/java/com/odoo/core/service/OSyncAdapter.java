@@ -38,6 +38,7 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.logger.OLog;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -135,9 +136,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             domain.append(model.defaultDomain());
 
             if (checkForWriteCreateDate) {
+                List<Integer> serverIds = model.getServerIds();
                 // Model Create date domain filters
                 if (model.checkForCreateDate() && checkForDataLimit) {
-                    List<Integer> serverIds = model.getServerIds();
                     if (serverIds.size() > 0) {
                         if (model.checkForWriteDate()
                                 && !model.isEmptyTable()) {
@@ -148,9 +149,6 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                     int data_limit = preferenceManager.getInt("sync_data_limit", 60);
                     domain.add("create_date", ">=", ODateUtils.getDateBefore(data_limit));
-                    if (serverIds.size() > 0) {
-                        domain.add("id", "not in", new JSONArray(serverIds.toString()));
-                    }
                 }
                 // Model write date domain filters
                 if (model.checkForWriteDate() && !model.isEmptyTable() && createRelationRecords) {
@@ -159,8 +157,12 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                         domain.add("write_date", ">", last_sync_date);
                     }
                 }
+                if (model.checkForCreateDate() && checkForDataLimit && serverIds.size() > 0) {
+                    domain.add("id", "not in", new JSONArray(serverIds.toString()));
+                }
 
             }
+            OLog.log(domain.get() + " <<");
             // Getting data
             JSONObject response = mOdoo.search_read(model.getModelName(),
                     getFields(model), domain.get(), 0, mSyncDataLimit, "create_date", "DESC");
