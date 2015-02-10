@@ -24,7 +24,7 @@
         <odoo.controls.OForm
             android:id="@+id/saleForm"
             android:orientation="vertical"
-            app:controlIconTint="@color/theme_primary"
+            app:controlIconTint="@color/body_text_3"
             app:modelName="sale.order"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -60,7 +60,7 @@
                 android:layout_width="match_parent"
                 app:fieldName="partner_id"
                 app:showLabel="true"
-                app:showIcon="false"
+                app:iconResource="@drawable/ic_action_user"
                 app:widgetType="SearchableLive"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
                 android:layout_height="wrap_content" />
@@ -80,7 +80,7 @@
                     app:fieldName="date_order"
                     app:defaultValue="now()"
                     app:showLabel="true"
-                    app:showIcon="false"
+                    app:iconResource="@drawable/ic_action_time_clock"
                     app:parsePattern="MMM dd yyyy, hh:MM a"
                     app:fieldTextSize="@dimen/text_size_medium"
                     app:fieldTextAppearance="?android:textAppearanceSmall"
@@ -107,13 +107,16 @@
                 android:paddingLeft="@dimen/default_16dp"
                 android:paddingRight="@dimen/default_16dp"
                 android:id="@+id/layoutAddItem"
+                android:paddingTop="@dimen/default_8dp"
+                android:paddingBottom="@dimen/default_8dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:layout_height="match_parent">
 
                 <ImageView
                     android:layout_width="wrap_content"
-                    android:src="@drawable/ic_action_add"
+                    android:src="@drawable/ic_action_edit"
                     android:padding="2dp"
-                    android:tint="#c8080808"
+                    android:tint="@color/android_orange_dark"
                     android:layout_height="match_parent" />
 
                 <TextView
@@ -121,7 +124,10 @@
                     android:layout_weight="1"
                     android:gravity="center_vertical"
                     android:text="Manage order lines"
-                    android:textAppearance="?android:textAppearanceMedium"
+                    android:textAllCaps="true"
+                    android:textColor="@color/android_orange_dark"
+                    android:textStyle="bold"
+                    android:textAppearance="?android:textAppearanceSmall"
                     android:layout_height="match_parent" />
 
             </LinearLayout>
@@ -146,7 +152,88 @@
                 <TextView
                     android:layout_width="0dp"
                     android:layout_weight="1"
-                    android:padding="@dimen/default_16dp"
+                    android:padding="@dimen/default_8dp"
+                    android:text="Untaxed Amount:"
+                    android:gravity="center_vertical|right"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/untaxedTotal"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical|right"
+                    android:minWidth="80dp"
+                    android:fontFamily="@string/font_normal"
+                    android:textColor="@color/body_text_1"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/currency1"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:paddingRight="@dimen/default_16dp"
+                    android:paddingLeft="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:padding="@dimen/default_8dp"
+                    android:text="Taxes :"
+                    android:gravity="center_vertical|right"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/taxesTotal"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical|right"
+                    android:fontFamily="@string/font_normal"
+                    android:minWidth="80dp"
+                    android:textColor="@color/body_text_1"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/currency2"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:paddingRight="@dimen/default_16dp"
+                    android:paddingLeft="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:padding="@dimen/default_8dp"
+                    android:textStyle="bold"
                     android:text="Total:"
                     android:gravity="center_vertical|right"
                     android:textAppearance="?android:textAppearanceMedium"
@@ -154,20 +241,26 @@
 
                 <TextView
                     android:id="@+id/fTotal"
-                    android:paddingBottom="@dimen/default_16dp"
-                    android:paddingTop="@dimen/default_16dp"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
                     android:layout_width="wrap_content"
-                    android:gravity="center_vertical"
+                    android:gravity="center_vertical|right"
                     android:fontFamily="@string/font_normal"
+                    android:minWidth="80dp"
+                    android:textStyle="bold"
                     android:textColor="@color/body_text_1"
                     android:textAppearance="?android:textAppearanceMedium"
                     android:layout_height="match_parent" />
 
                 <TextView
-                    android:id="@+id/currency"
-                    android:padding="@dimen/default_16dp"
+                    android:id="@+id/currency3"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:paddingRight="@dimen/default_16dp"
+                    android:paddingLeft="@dimen/default_8dp"
                     android:layout_width="wrap_content"
                     android:gravity="center_vertical"
+                    android:textStyle="bold"
                     android:textAppearance="?android:textAppearanceMedium"
                     android:layout_height="match_parent" />
 

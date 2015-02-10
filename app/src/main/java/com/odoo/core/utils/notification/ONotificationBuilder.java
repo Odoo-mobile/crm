@@ -24,12 +24,17 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.media.RingtoneManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
+import com.odoo.core.account.BaseSettings;
+import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.OResource;
 import com.odoo.crm.R;
 
 import java.util.ArrayList;
@@ -45,14 +50,17 @@ public class ONotificationBuilder {
     private String title, text, bigText;
     private boolean mOnGoing = false, mAutoCancel = true;
     private Intent resultIntent = null;
-    private int icon = R.drawable.ic_odoo_o;
+    private int icon = R.drawable.ic_odoo_o_white;
+    private int small_icon = R.drawable.ic_odoo_o_white;
     private List<NotificationAction> mActions = new ArrayList<ONotificationBuilder.NotificationAction>();
     private int notification_id = 0;
     private Boolean withVibrate = true;
+    private OPreferenceManager mPref;
 
     public ONotificationBuilder(Context context, int notification_id) {
         mContext = context;
         this.notification_id = notification_id;
+        mPref = new OPreferenceManager(context);
     }
 
     public ONotificationBuilder setTitle(String title) {
@@ -101,9 +109,17 @@ public class ONotificationBuilder {
         mNotificationBuilder = new NotificationCompat.Builder(mContext);
         mNotificationBuilder.setContentTitle(title);
         mNotificationBuilder.setContentText(text);
-        mNotificationBuilder.setSmallIcon(icon);
+        mNotificationBuilder.setContentInfo(text);
+        mNotificationBuilder.setSmallIcon(small_icon);
+        Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(), this.icon);
+        Bitmap newIcon = Bitmap.createBitmap(icon.getWidth(), icon.getHeight(), icon.getConfig());
+        Canvas canvas = new Canvas(newIcon);
+        canvas.drawColor(OResource.color(mContext, R.color.theme_primary));
+        canvas.drawBitmap(icon, 0, 0, null);
+        mNotificationBuilder.setLargeIcon(newIcon);
         mNotificationBuilder.setAutoCancel(mAutoCancel);
         mNotificationBuilder.setOngoing(mOnGoing);
+        mNotificationBuilder.setColor(OResource.color(mContext, R.color.theme_secondary));
         if (bigText != null) {
             NotificationCompat.BigTextStyle notiStyle = new NotificationCompat.BigTextStyle();
             notiStyle.setBigContentTitle(title);
@@ -114,8 +130,7 @@ public class ONotificationBuilder {
     }
 
     private void setSoundForNotification() {
-        Uri uri = RingtoneManager
-                .getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        Uri uri = BaseSettings.getNotificationRingTone(mContext);
         mNotificationBuilder.setSound(uri);
     }
 
@@ -133,8 +148,8 @@ public class ONotificationBuilder {
         init();
         if (withVibrate) {
             setVibrateForNotification();
-            setSoundForNotification();
         }
+        setSoundForNotification();
         if (resultIntent != null) {
             _setResultIntent();
         }

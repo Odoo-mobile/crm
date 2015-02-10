@@ -20,23 +20,42 @@
 package com.odoo.addons.crm.services;
 
 import android.content.Context;
+import android.content.SyncResult;
 import android.os.Bundle;
 
+import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
-public class CRMLeadSyncService extends OSyncService {
+public class CRMLeadSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = CRMLeadSyncService.class.getSimpleName();
+    private Context mContext;
+    private OSyncService service;
 
     @Override
     public OSyncAdapter getSyncAdapter(OSyncService service, Context context) {
+        mContext = context;
+        this.service = service;
         return new OSyncAdapter(context, CRMLead.class, service, true);
     }
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
+        if (adapter.getModel().getModelName().equals("crm.lead"))
+            adapter.onSyncFinish(this);
     }
 
+    @Override
+    public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
+        CRMLead crmLead = new CRMLead(mContext, user);
+        for (ODataRow row : crmLead.select(new String[]{})) {
+            crmLead.setReminder(row.getInt(OColumn.ROW_ID));
+        }
+        return new OSyncAdapter(mContext, CRMCaseStage.class, service, true);
+    }
 }

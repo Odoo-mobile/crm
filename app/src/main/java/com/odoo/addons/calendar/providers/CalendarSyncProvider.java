@@ -114,7 +114,8 @@ public class CalendarSyncProvider extends BaseModelProvider {
         MatrixCursor opportunity_separator = new MatrixCursor(
                 new String[]{OColumn.ROW_ID, "data_type", "name"});
         // Comparing with create_date and date_action and type
-        where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? and date(date_action) <= ?) and type = ?";
+        where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? " +
+                "and date(date_action) <= ?) and type = ?";
         args.clear();
         args.add(date_start);
         args.add(date_start);

@@ -41,7 +41,6 @@ import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.core.utils.reminder.ReminderReceiver;
-import com.odoo.core.utils.reminder.ReminderUtils;
 import com.odoo.crm.R;
 
 import java.util.Date;
@@ -59,7 +58,6 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
     private OForm mForm;
     private ODataRow record;
     private CRMPhoneCalls crmPhoneCalls;
-    private Menu mMenu;
     private OField phoneCallDate, opportunity_id;
     private String logType = "done";
     private Boolean updateOpportunity = false;
@@ -104,18 +102,6 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     ((OField) mForm.findViewById(R.id.opportunity_id)).setEditable(false);
                     return;
                 }
-//                if(extra.containsKey("call_id")){
-//                    ODataRow call_row = new ODataRow();
-//                    call_row = crmPhoneCalls.browse(extra.getInt("call_id"));
-//                    if(!call_row.getString("opportunity_id").contains("false")){
-//                        call_row.put("opportunity_id",call_row.getString("opportunity_id"));
-//                    }
-//                    if(!call_row.getString("opportunity_id").contains("false")){
-//                        call_row.put("partner_id",call_row.getString("partner_id"));
-//                    }
-//                    mForm.initForm(call_row);
-//                    return;
-//                }
 
                 if (action != null) {
                     if (action.equals(ReminderReceiver.ACTION_PHONE_CALL_REMINDER_CALLBACK)) {
@@ -129,8 +115,10 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     }
                     if (action.equals(ReminderReceiver.ACTION_PHONE_CALL_REMINDER_DONE)) {
                         OValues values = new OValues();
-                        values.put("is_done", 1);
+                        values.put("is_done", "1");
+                        values.put("state", "done");
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
+                        crmPhoneCalls.setReminder(extra.getInt(OColumn.ROW_ID));
                         Toast.makeText(this, R.string.toast_phone_call_marked_done, Toast.LENGTH_LONG).show();
                     }
                     ONotificationBuilder.cancelNotification(this, extra.getInt(OColumn.ROW_ID));
@@ -148,28 +136,25 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                         finish();
                     }
                 }
-                ODataRow record = new ODataRow();
-                record.put("partner_id", extra.getInt(OColumn.ROW_ID));
-                record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
+                ODataRow data_record = new ODataRow();
+                data_record.put("partner_id", extra.getInt(OColumn.ROW_ID));
+                data_record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
                 int opp_id = extra.getInt(KEY_OPPORTUNITY_ID);
-                record.put("opportunity_id", opp_id);
-                //TODO
+                data_record.put("opportunity_id", opp_id);
                 if (extra.containsKey(PhoneStateReceiver.KEY_DURATION_START)) {
                     long start_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_START));
                     long end_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_END));
                     long duration = (end_time - start_time);
-                    record.put("duration", ODateUtils.durationToFloat(duration));
+                    data_record.put("duration", ODateUtils.durationToFloat(duration));
                 }
                 CRMPhoneCallsCategory.Type bound = CRMPhoneCallsCategory.Type.Inbound;
                 if (!extra.getBoolean("in_bound", false)) {
                     bound = CRMPhoneCallsCategory.Type.OutBound;
                 }
-                record.put("categ_id", CRMPhoneCallsCategory.getId(this, bound));
-                mForm.initForm(record);
+                data_record.put("categ_id", CRMPhoneCallsCategory.getId(this, bound));
+                mForm.initForm(data_record);
             }
         } else {
-
-
             mForm.initForm(null);
         }
     }
@@ -177,7 +162,6 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_phonecall_detail, menu);
-        mMenu = menu;
         return true;
     }
 
@@ -195,15 +179,15 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     ODataRow row = partner.browse(values.getInt("partner_id"));
                     values.put("customer_name", row.getString("name"));
                     ODataRow lead = crmLead.browse(values.getInt("opportunity_id"));
-                    values.put("lead_name", "false");
+                    values.put("lead_name", "");
                     if (lead != null) {
                         values.put("lead_name", lead.getString("name"));
                     }
                     if (updateOpportunity) {
                         OValues opp_values = opportunity_action_form.getValues();
                         if (opp_values != null) {
-                            // FIXME: What about reminder on date_action??
                             crmLead.update(lead.getInt(OColumn.ROW_ID), opp_values);
+                            crmLead.setReminder(lead.getInt(OColumn.ROW_ID));
                         }
                     }
                     values.put("call_type", "false");
@@ -213,18 +197,13 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                         values.put("call_type", categ_id.getString("name"));
                     }
                     values.put("state", logType);
-
-                    Date date = ODateUtils.createDateObject(values.getString("date"),
-                            ODateUtils.DEFAULT_FORMAT, false);
-                    Date now = new Date();
-                    if (extra == null || extra.containsKey("opp_id") || extra.containsKey("call_id")) {
-                        crmPhoneCalls.insert(values);
-                    } else
+                    if (extra == null || extra.containsKey("opp_id")
+                            || extra.containsKey(KEY_LOG_CALL_REQUEST) || extra.containsKey("call_id")) {
+                        int row_id = crmPhoneCalls.insert(values);
+                        crmPhoneCalls.setReminder(row_id);
+                    } else {
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
-                    if (now.compareTo(date) < 0) {
-                        values.put("has_reminder", "true");
-                        extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
-                        ReminderUtils.get(getApplicationContext()).resetReminder(date, extra);
+                        crmPhoneCalls.setReminder(extra.getInt(OColumn.ROW_ID));
                     }
                     finish();
                 }

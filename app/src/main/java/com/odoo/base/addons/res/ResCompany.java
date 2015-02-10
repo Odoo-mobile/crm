@@ -43,4 +43,19 @@ public class ResCompany extends OModel {
         int row_id = company.selectRowId(Integer.parseInt(company.getUser().getCompany_id()));
         return company.browse(row_id).getM2ORecord("currency_id").browse();
     }
+
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowDeleteRecordInLocal() {
+        return false;
+    }
 }

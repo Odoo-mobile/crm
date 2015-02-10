@@ -64,6 +64,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
     public void onReceive(Context context, Intent intent) {
         mContext = context;
         if (OUser.current(mContext) != null) {
+            Log.v(TAG, "Phone state received.");
             mPref = new OPreferenceManager(context);
             if (callerWindow == null)
                 callerWindow = new CallerWindow(context);
@@ -71,6 +72,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
             customerFinder.setOnCustomerFindListener(this);
             if (mPref.getBoolean(KEY_RECEIVED, true) && !callerWindow.isShowing()) {
                 mPref.setBoolean(KEY_RECEIVED, false);
+                mPref.setBoolean(KEY_RINGING, false);
             }
             if (!mPref.getBoolean(KEY_RECEIVED, false)) {
                 telephonyManager = (TelephonyManager) context.getSystemService(Context.TELEPHONY_SERVICE);
@@ -103,7 +105,11 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
                     } else {
                         startLogCallActivity(extra);
                     }
-                    callerWindow.dismiss();
+                    if (callerWindow != null)
+                        callerWindow.dismiss();
+                    callerWindow = null;
+                    customerFinder = null;
+                    extra = null;
                     break;
                 case TelephonyManager.CALL_STATE_OFFHOOK:
                     Log.i(TAG, callerNumber + " CALL_STATE_OFFHOOK");
@@ -112,7 +118,8 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
                     callStarted();
                     if (!mPref.getBoolean(KEY_RINGING, false)) {
                         mPref.setBoolean("in_bound", false);
-                        customerFinder.findCustomer(true, callerNumber);
+                        if (customerFinder != null)
+                            customerFinder.findCustomer(true, callerNumber);
                     }
                     break;
                 case TelephonyManager.CALL_STATE_RINGING:
@@ -121,7 +128,8 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
                     mPref.setBoolean(KEY_OFFHOOK, false);
                     mPref.setBoolean("notified", false);
                     mPref.setBoolean("in_bound", true);
-                    customerFinder.findCustomer(false, callerNumber);
+                    if (customerFinder != null)
+                        customerFinder.findCustomer(false, callerNumber);
                     break;
             }
         }
@@ -135,6 +143,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
             ONotificationBuilder builder = new ONotificationBuilder(mContext, notification_id);
             data.putInt("notification_id", notification_id);
             builder.setTitle(_s(R.string.label_missed_call_from_customer));
+            builder.setIcon(R.drawable.ic_action_user);
             builder.setText(data.getString("name"));
             ONotificationBuilder.NotificationAction callBack =
                     new ONotificationBuilder.NotificationAction(R.drawable.ic_action_phone,
@@ -180,6 +189,7 @@ public class PhoneStateReceiver extends BroadcastReceiver implements IOnCustomer
     @Override
     public void onCustomerFind(Boolean dialed, ODataRow row) {
         if (row != null) {
+            extra = new Bundle();
             extra = row.getPrimaryBundleData();
             callStarted();
             extra.putString("name", row.getString("name"));

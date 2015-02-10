@@ -189,6 +189,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.odoo.addons.sale.SalesDetail"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" />
         <!-- Reminder Receivers// -->
         <receiver android:name="com.odoo.core.utils.reminder.ReminderReceiver" />

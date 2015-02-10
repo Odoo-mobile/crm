@@ -78,4 +78,7 @@
     <string name="label_no_order_line">You cannot confirm a sales order which has no line</string>
     <string name="label_quotation_confirm">Quotation confirmed !</string>
     <string name="label_new_copy_quotation">New Copy of Quotation</string>
+
+    <!-- Working day start time -->
+    <string name="default_day_start_time">09:00:00</string>
 </resources>

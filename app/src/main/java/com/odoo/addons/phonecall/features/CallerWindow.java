@@ -51,6 +51,7 @@ public class CallerWindow {
         mPref = new OPreferenceManager(context);
         windowManager = (WindowManager) context.getSystemService(Activity.WINDOW_SERVICE);
         keyguardManager = (KeyguardManager) context.getSystemService(Context.KEYGUARD_SERVICE);
+        mPref.setBoolean(KEY_CALLER_WINDOW, false);
     }
 
     private WindowManager.LayoutParams getWindowParams() {

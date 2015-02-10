@@ -54,7 +54,7 @@ public class DateTimePicker {
 
     public void show() {
         if (mBuilder.getType() == Type.Time) {
-            mTimePicker = new TimePicker(mContext);
+            mTimePicker = new TimePicker(mContext, mBuilder.getTime());
             mTimePicker.setPickerCallback(callBack);
             mTimePicker.show();
         } else {
@@ -76,7 +76,7 @@ public class DateTimePicker {
         public void onDatePick(String date) {
             mDatePicker.dismiss();
             if (mBuilder.getType() == Type.DateTime) {
-                mTimePicker = new TimePicker(mContext);
+                mTimePicker = new TimePicker(mContext, null);
                 mTimePicker.setPickerCallback(callBack);
                 mTimePicker.show();
             }
@@ -89,9 +89,25 @@ public class DateTimePicker {
         private Type mType = Type.DateTime;
         private PickerCallBack mCallback;
         private String mDialogTitle = null;
+        private String time = null;
 
         public Builder(Context context) {
             mContext = context;
+        }
+
+        public Builder setTime(String time) {
+            this.time = time;
+            return this;
+        }
+
+        public Calendar getTime() {
+            if (time != null) {
+                Date dt = ODateUtils.createDateObject(time, ODateUtils.DEFAULT_TIME_FORMAT, true);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dt);
+                return cal;
+            }
+            return null;
         }
 
         public Builder setType(Type type) {
@@ -188,9 +204,9 @@ public class DateTimePicker {
         private PickerCallBack mCallback;
         private TimePickerDialog mDialog = null;
 
-        public TimePicker(Context context) {
+        public TimePicker(Context context, Calendar time) {
 
-            final Calendar c = Calendar.getInstance();
+            final Calendar c = (time != null) ? time : Calendar.getInstance();
             int hour = c.get(Calendar.HOUR_OF_DAY);
             int minute = c.get(Calendar.MINUTE);
             mDialog = new TimePickerDialog(context, this, hour, minute, false);

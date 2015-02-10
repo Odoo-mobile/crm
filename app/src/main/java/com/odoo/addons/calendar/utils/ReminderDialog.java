@@ -81,7 +81,7 @@ public class ReminderDialog implements AdapterView.OnItemClickListener {
                         String.format(OResource.string(mContext, R.string.minutes_before), "10"), 10));
                 break;
         }
-        //FIXME: reminders.add(new ReminderItem(4, OResource.string(mContext, R.string.custom), -1));
+        //TODO Custom reminder: reminders.add(new ReminderItem(4, OResource.string(mContext, R.string.custom), -1));
         reminderTypes.addAll(reminders);
     }
 
@@ -164,7 +164,7 @@ public class ReminderDialog implements AdapterView.OnItemClickListener {
                 mDialog.dismiss();
                 break;
             case 4:
-                // Custom... TODO: Opening custom dialog
+                // TODO: Open custom dialog for reminder config
                 break;
         }
     }
