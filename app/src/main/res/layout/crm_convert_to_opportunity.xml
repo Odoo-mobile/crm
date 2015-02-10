@@ -41,7 +41,7 @@
                     android:id="@+id/conversation_action"
                     app:fieldName="conversation_action"
                     app:showIcon="false"
-                    app:controlLabel="Conversion Action"
+                    app:controlLabel="@string/label_conversion_action"
                     app:fieldType="Selection"
                     app:defaultValue="2"
                     app:fieldLabelColor="@color/body_text_3"
@@ -69,7 +69,9 @@
                         android:layout_width="match_parent"
                         android:numColumns="1"
                         android:id="@+id/opportunities"
-                        android:layout_height="wrap_content"></com.odoo.core.utils.controls.ExpandableHeightGridView>
+                        android:layout_height="wrap_content">
+
+                        </com.odoo.core.utils.controls.ExpandableHeightGridView>
                 </LinearLayout>
             </odoo.controls.OForm>
         </LinearLayout>

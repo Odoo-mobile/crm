@@ -4,14 +4,14 @@
     <item
         android:id="@+id/menu_events_location"
         android:icon="@drawable/ic_action_location"
-        android:title="Location"></item>
+        android:title="@string/label_location"></item>
     <item
         android:id="@+id/menu_events_reschedule"
         android:icon="@drawable/ic_action_reschedule"
-        android:title="Re-schedule"></item>
+        android:title="@string/label_re_schedule"></item>
     <item
         android:id="@+id/menu_events_all_done"
         android:icon="@drawable/ic_action_done_all"
-        android:title="Mark Done"></item>
+        android:title="@string/label_mark_as_won"></item>
 
 </menu>

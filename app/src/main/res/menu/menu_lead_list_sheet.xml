@@ -8,14 +8,14 @@
     <item
         android:id="@+id/menu_lead_call_customer"
         android:icon="@drawable/ic_action_phone"
-        android:title="Call Customer"></item>
+        android:title="@string/label_call"></item>
     <item
         android:id="@+id/menu_lead_customer_location"
         android:icon="@drawable/ic_action_location"
-        android:title="Customer Location"></item>
+        android:title="@string/label_location"></item>
 
     <item
         android:id="@+id/menu_lead_lost"
         android:icon="@drawable/ic_action_mark_lost"
-        android:title="Mark Lost"></item>
+        android:title="@string/label_mark_as_won"></item>
 </menu>

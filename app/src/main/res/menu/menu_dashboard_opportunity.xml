@@ -4,23 +4,23 @@
     <item
         android:id="@+id/menu_opp_call_customer"
         android:icon="@drawable/ic_action_phone"
-        android:title="Call"></item>
+        android:title="@string/label_call"></item>
     <item
         android:id="@+id/menu_opp_customer_location"
         android:icon="@drawable/ic_action_location"
-        android:title="Location"></item>
+        android:title="@string/label_location"></item>
     <item
         android:id="@+id/menu_opp_reschedule"
         android:icon="@drawable/ic_action_reschedule"
-        android:title="Schedule"></item>
+        android:title="@string/label_schedule_call"></item>
     <item
         android:id="@+id/menu_opp_won"
         android:icon="@drawable/ic_action_mark_won"
-        android:title="Mark Won"></item>
+        android:title="@string/label_mark_as_won"></item>
     <item
         android:id="@+id/menu_opp_lost"
         android:icon="@drawable/ic_action_mark_lost"
-        android:title="Mark Lost"></item>
+        android:title="@string/label_mark_as_lost"></item>
     <item
         android:id="@+id/menu_lead_convert_to_quotation"
         android:icon="@drawable/ic_action_quotation"
