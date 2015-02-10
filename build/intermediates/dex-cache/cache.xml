@@ -33,7 +33,7 @@
         jar="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/exploded-aar/master-crm-studio-schedule-meeting-call-dso/calendar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="8ecaf0f8c32f2ae892dc84206f9574307ed60f82">
+        sha1="ec184e884ca7ee535a9ad4fb2f78c0789c4cc875">
         <dex dex="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/pre-dexed/debug/classes-d4bb306c2374b2c21a5ed021f230434fbda822fa.jar" />
     </item>
     <item
@@ -54,14 +54,14 @@
         jar="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/exploded-aar/master-crm-studio-schedule-meeting-call-dso/bottom-sheet-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="fb193bd56a2d99b4557b901ae595462c288d5364">
+        sha1="3747c7fb6ec4ac96d8a5a4df8aa12a5defee0cce">
         <dex dex="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/pre-dexed/debug/classes-9acd15cfb7bb74ad300576fd3fc6a354913cdab7.jar" />
     </item>
     <item
         jar="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/exploded-aar/master-crm-studio-schedule-meeting-call-dso/parallax-effect-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="93a85ed8a372b23771aa1645a96e9b391851449d">
+        sha1="525e6a0c8c8818cce98f3ab1269cc097e8e3a973">
         <dex dex="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/pre-dexed/debug/classes-9686a5a130a43a19d423350b75c6a9cbafa2ea86.jar" />
     </item>
     <item
@@ -82,7 +82,7 @@
         jar="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/exploded-aar/master-crm-studio-schedule-meeting-call-dso/snackbar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="c7b246f88fe0f6c664fe03d74cc7e1da5916ec61">
+        sha1="b4849ed18b081982b17ba0f861d9f54cc536c403">
         <dex dex="/home/dso/odoo-mobile/master-crm-studio-schedule-meeting-call-dso/app/build/intermediates/pre-dexed/debug/classes-ce795ce8401f2a4b636647e56b3a7ab6e3c44550.jar" />
     </item>
 

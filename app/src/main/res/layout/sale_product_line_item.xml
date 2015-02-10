@@ -31,7 +31,7 @@
         android:fontFamily="@string/font_normal"
         android:textColor="@color/body_text_2"
         android:gravity="center_vertical"
-        android:hint="Search"
+        android:hint="@string/label_search"
         android:singleLine="true"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 

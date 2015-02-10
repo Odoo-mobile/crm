@@ -35,8 +35,9 @@
     <string name="label_mark_as_won">Mark Won</string>
     <string name="label_location">Location</string>
     <string name="label_call">Call</string>
+    <string name="label_call_held">Held</string>
     <string name="label_message">Message</string>
-    <string name="label_schedule_call">Schedule Call</string>
+    <string name="label_schedule_call">Schedule</string>
     <string name="label_meetings">Meeting</string>
     <string name="label_sale_confirm_sale">Confirm Sale</string>
     <string name="label_sale_create_invoice">Create Invoice</string>
@@ -47,16 +48,20 @@
     <string name="label_quotation_created">Quotation Created for</string>
     <string name="label_re_schedule">Re-Schedule</string>
     <string name="label_sync_warning">Need to sync before converting to Opportunity</string>
-
     <string name="label_no_customer_found">No Customers Found</string>
     <string name="label_no_location_found">No location found !</string>
     <string name="label_no_contact_found">No contact found !</string>
     <string name="label_no_email_found">No email found !</string>
     <string name="label_no_logged_calls_found">No Logged calls Found</string>
-    <string name="label_event_marked">Event marked </string>
+    <string name="label_event_marked">Event marked</string>
     <string name="label_new_meeting">New Meeting</string>
     <string name="label_edit_meeting">Edit Meeting</string>
     <string name="label_missed_call_from_customer">Missed call from customer</string>
+    <string name="label_manage_order_lines">Manage order lines</string>
+    <string name="label_define_lead">Define the lead</string>
+    <string name="label_expected_revenue">Expected Revenue</string>
+    <string name="label_at"> at </string>
+    <string name="label_conversion_action"> Conversion Action </string>
 
     <string name="toast_information_saved">Information Saved</string>
     <string name="toast_phone_call_marked_done">Phone call held</string>

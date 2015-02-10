@@ -35,7 +35,7 @@
                 app:showLabel="false"
                 app:showIcon="false"
                 app:fieldTextAppearance="?android:textAppearanceMedium"
-                app:controlLabel="Define the lead"
+                app:controlLabel="@string/label_define_lead"
                 app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">
 
@@ -52,7 +52,7 @@
 
                 <TextView
                     android:textAppearance="?android:textAppearanceSmall"
-                    android:text="Expected Revenue"
+                    android:text="@string/label_expected_revenue"
                     android:textAllCaps="true"
                     android:textColor="#414141"
                     android:paddingLeft="@dimen/default_16dp"
@@ -92,7 +92,7 @@
                     <TextView
                         android:textAppearance="?android:textAppearanceMedium"
                         android:textStyle="bold"
-                        android:text=" at "
+                        android:text="@string/label_at"
                         android:paddingRight="@dimen/default_8dp"
                         android:paddingLeft="5dp"
                         android:gravity="center_vertical"

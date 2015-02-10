@@ -14,7 +14,7 @@
         android:title="@string/label_location" />
     <item
         android:id="@+id/menu_customer_call"
-        android:icon="@drawable/ic_action_calls"
+        android:icon="@drawable/ic_action_phone"
         android:title="@string/label_call" />
     <item
         android:id="@+id/menu_customer_send_message"
