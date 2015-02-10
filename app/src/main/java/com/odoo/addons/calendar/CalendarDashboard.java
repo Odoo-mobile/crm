@@ -725,6 +725,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                             public void choiceSelected(int position, String value) {
                                 Toast.makeText(getActivity(), position + " : " + value, Toast.LENGTH_LONG).show();
                                 //TODO: Take phone call id from => row.getPrimaryBundleData()
+                                int call_id = row.getInt(OColumn.ROW_ID);
                                 switch (position) {
                                     case 0: // Re-Schedule
                                         IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
@@ -732,7 +733,10 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
                                         break;
                                     case 1: // Schedule other call
-                                        // FIXME: DSO (Redirect to meeting with phone call id)
+                                        Bundle extra = row.getPrimaryBundleData();
+                                        extra.putInt("call_id", row.getInt(OColumn.ROW_ID) );
+                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
+                                                extra);
                                         break;
                                 }
                             }
