@@ -357,20 +357,24 @@ public class OdooActivity extends ActionBarActivity {
                         accountBoxToggle();
                         mDrawerLayout.closeDrawer(Gravity.START);
                         // Restarting activity
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent intent = getIntent();
-                                finish();
-                                startActivity(intent);
-                            }
-                        }, DRAWER_ITEM_LAUNCH_DELAY);
+                        restartActivity();
                     }
                 });
                 mDrawerAccountContainer.addView(view);
             }
         }
         accountListDefaultItems();
+    }
+
+    private void restartActivity() {
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(OdooActivity.this, OdooActivity.class);
+                finish();
+                startActivity(intent);
+            }
+        }, DRAWER_ITEM_LAUNCH_DELAY);
     }
 
     private void accountListDefaultItems() {
@@ -454,7 +458,8 @@ public class OdooActivity extends ActionBarActivity {
                     accountBoxToggle();
                 }
                 OdooAccountManager.login(this, data.getStringExtra(KEY_NEW_USER_NAME));
-                setupAccountBox();
+                OModel.sqLite = null;
+                restartActivity();
             }
             if (requestCode == REQUEST_ACCOUNTS_MANAGE) {
                 startActivity(new Intent(this, OdooLogin.class));

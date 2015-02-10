@@ -67,6 +67,7 @@ public class CustomerFinder {
         @Override
         protected ODataRow doInBackground(String... params) {
             String number = params[0];
+            Log.d(TAG, "Checking for number " + number + " in database");
             mContactLast2Chars = number.substring(number.length() - 2);
             mContactLast3Chars = number.substring(number.length() - 3);
             String where = "phone like ? or phone like ? or mobile like ? or mobile like ?";

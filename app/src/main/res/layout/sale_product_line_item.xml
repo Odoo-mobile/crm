@@ -10,7 +10,7 @@
 
     <TextView
         android:id="@+id/productQty"
-        android:layout_width="32dp"
+        android:layout_width="wrap_content"
         android:layout_height="32dp"
         android:background="@drawable/circle_mask_secondary"
         android:fontFamily="@string/font_condensed"

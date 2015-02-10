@@ -27,6 +27,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.annotation.Odoo;
@@ -38,11 +39,15 @@ import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.provider.BaseModelProvider;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
+import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OListUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.StringUtils;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.InvalidObjectException;
 import java.lang.annotation.Annotation;
@@ -136,7 +141,7 @@ public class OModel {
     }
 
     public void close() {
-        // FIXME: Is close method required ???
+        // Any operation when closing database
     }
 
     public void setDefaultNameColumn(String nameColumn) {
@@ -1000,4 +1005,39 @@ public class OModel {
         }
     }
 
+    public boolean isInstalledOnServer(String module_name) {
+        try {
+            App app = (App) mContext.getApplicationContext();
+            IrModel model = new IrModel(mContext, getUser());
+            List<ODataRow> modules = model.select(null, "name = ?", new String[]{module_name.trim()});
+            if (modules.size() > 0) {
+                if (modules.get(0).getString("state").equals("installed")) {
+                    return true;
+                }
+            }
+            if (app.inNetwork()) {
+                odoo.Odoo odoo = app.getOdoo(getUser());
+                OdooFields fields = new OdooFields(new String[]{"state", "name"});
+                ODomain domain = new ODomain();
+                domain.add("name", "=", module_name);
+                JSONArray result = odoo.search_read("ir.module.module", fields.get(), domain.get())
+                        .getJSONArray("records");
+                if (result.length() > 0) {
+                    JSONObject record = result.getJSONObject(0);
+                    if (record.getString("state").equals("installed")) {
+                        OValues values = new OValues();
+                        values.put("id", record.getInt("id"));
+                        values.put("name", record.getString("name"));
+                        values.put("state", record.getString("state"));
+                        model.insertOrUpdate(record.getInt("id"), values);
+                        return true;
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

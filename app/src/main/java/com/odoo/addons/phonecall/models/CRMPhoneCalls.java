@@ -21,10 +21,12 @@ package com.odoo.addons.phonecall.models;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.annotation.Odoo;
@@ -37,15 +39,19 @@ import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.reminder.ReminderUtils;
 
 import org.json.JSONArray;
+
+import java.util.Date;
 
 import odoo.ODomain;
 
 public class CRMPhoneCalls extends OModel {
     public static final String TAG = CRMPhoneCalls.class.getSimpleName();
     public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.crm_phonecall";
-
+    private Context mContext;
     OColumn user_id = new OColumn("Responsible", ResUsers.class,
             OColumn.RelationType.ManyToOne).setRequired();
     OColumn partner_id = new OColumn("Contact", ResPartner.class,
@@ -92,6 +98,7 @@ public class CRMPhoneCalls extends OModel {
 
     public CRMPhoneCalls(Context context, OUser user) {
         super(context, "crm.phonecall", user);
+        mContext = context;
     }
 
     @Override
@@ -152,5 +159,22 @@ public class CRMPhoneCalls extends OModel {
             e.printStackTrace();
         }
         return "false";
+    }
+
+    public void setReminder(int row_id) {
+        ODataRow row = browse(row_id);
+        Date start_date = ODateUtils.createDateObject(row.getString("date"),
+                ODateUtils.DEFAULT_FORMAT, false);
+        Date now = new Date();
+        if (now.compareTo(start_date) < 0) {
+            Bundle extra = row.getPrimaryBundleData();
+            extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
+            if (ReminderUtils.get(mContext).resetReminder(start_date, extra)) {
+                OValues values = new OValues();
+                values.put("_is_dirty", "false");
+                values.put("has_reminder", "true");
+                update(row_id, values);
+            }
+        }
     }
 }

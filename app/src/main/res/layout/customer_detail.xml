@@ -52,7 +52,6 @@
                 android:paddingBottom="@dimen/default_16dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-                <!-- TODO: Customer detail form//-->
                 <odoo.controls.OForm
                     android:id="@+id/customerForm"
                     android:layout_width="match_parent"

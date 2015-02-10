@@ -23,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.text.TextUtils;
 
 import com.odoo.base.addons.res.ResCompany;
@@ -30,6 +31,7 @@ import com.odoo.base.addons.res.ResCountry;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.base.addons.res.ResUsers;
+import com.odoo.core.account.BaseSettings;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -44,12 +46,15 @@ import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
+import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.reminder.ReminderUtils;
 import com.odoo.crm.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Date;
 import java.util.List;
 
 import odoo.OArguments;
@@ -105,8 +110,8 @@ public class CRMLead extends OModel {
      * Only used for type opportunity
      */
 
-    OColumn probability = new OColumn("Success Rate (%)", OFloat.class).setSize(20);
-    OColumn planned_revenue = new OColumn("Expected Revenue", OFloat.class).setSize(20);
+    OColumn probability = new OColumn("Success Rate (%)", OFloat.class).setSize(20).setDefaultValue("0.0");
+    OColumn planned_revenue = new OColumn("Expected Revenue", OFloat.class).setSize(20).setDefaultValue("0.0");
     OColumn ref = new OColumn("Reference", OVarchar.class);
     OColumn ref2 = new OColumn("Reference 2", OVarchar.class);
     OColumn date_deadline = new OColumn("Expected Closing", ODate.class);
@@ -352,6 +357,43 @@ public class CRMLead extends OModel {
         }
     }
 
+    /**
+     * Setting reminder for lead/opportunity
+     *
+     * @param row_id
+     */
+    public void setReminder(int row_id) {
+        ODataRow row = browse(row_id);
+        String time = " " + BaseSettings.getDayStartTime(mContext);
+        Date now = new Date();
+        Bundle extra = row.getPrimaryBundleData();
+        extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "opportunity");
+        if (!row.getString("date_deadline").equals("false")) {
+            row.put("date_deadline", row.getString("date_deadline") + time);
+            Date date_deadline = ODateUtils.createDateObject(row.getString("date_deadline"),
+                    ODateUtils.DEFAULT_FORMAT, false);
+            if (now.compareTo(date_deadline) < 0) {
+                extra.putBoolean("expiry_date", true);
+                if (ReminderUtils.get(mContext).resetReminder(date_deadline, extra)) {
+                    // Nothing to do. Reminder set for expiry date
+                }
+            }
+        }
+
+        if (!row.getString("date_action").equals("false")) {
+            row.put("date_action", row.getString("date_action") + time);
+            Date date_action = ODateUtils.createDateObject(row.getString("date_action"),
+                    ODateUtils.DEFAULT_FORMAT, false);
+            if (now.compareTo(date_action) < 0) {
+                extra.putBoolean("expiry_date", false);
+                if (ReminderUtils.get(mContext).resetReminder(date_action, extra)) {
+                    // Nothing to do. Reminder set for next date action
+                }
+            }
+
+        }
+    }
+
     public void markWonLost(final String type, final ODataRow record, final OnOperationSuccessListener listener) {
         new AsyncTask<Void, Void, Void>() {
             private ProgressDialog dialog;
@@ -460,11 +502,7 @@ public class CRMLead extends OModel {
                     listener.OnCancelled();
                 }
             }
-        }
-
-                .
-
-                        execute();
+        }.execute();
     }
 
     public static interface OnOperationSuccessListener {

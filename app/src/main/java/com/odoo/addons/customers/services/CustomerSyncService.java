@@ -27,8 +27,6 @@ import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
-import odoo.ODomain;
-
 public class CustomerSyncService extends OSyncService {
     public static final String TAG = CustomerSyncService.class.getSimpleName();
 
@@ -39,12 +37,5 @@ public class CustomerSyncService extends OSyncService {
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-        ODomain domain = new ODomain();
-        domain.add("|");
-        domain.add("|");
-        domain.add("opportunity_ids.user_id", "=", user.getUser_id());
-        domain.add("sale_order_ids.user_id", "=", user.getUser_id());
-        domain.add("id", "in", adapter.getModel().getServerIds());
-        adapter.setDomain(domain);
     }
 }

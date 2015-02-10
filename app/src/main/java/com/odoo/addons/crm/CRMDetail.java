@@ -104,6 +104,7 @@ public class CRMDetail extends ActionBarActivity {
         }
         if (!record.getString("type").equals("lead")) {
             actionBar.setTitle(R.string.label_opportunity);
+            type = "opportunity";
             findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
         } else {
             actionBar.setTitle(R.string.label_lead);
@@ -146,11 +147,12 @@ public class CRMDetail extends ActionBarActivity {
                 break;
             case R.id.menu_lead_save:
                 OValues values = mForm.getValues();
-                // FIXME: What about reminder on date_action??
                 if (values != null) {
                     values.put("type", type);
+                    int row_id;
                     if (record != null) {
                         crmLead.update(record.getInt(OColumn.ROW_ID), values);
+                        row_id = record.getInt(OColumn.ROW_ID);
                     } else {
                         values.put("create_date", ODateUtils.getUTCDate());
                         values.put("user_id", ResUsers.myId(this));
@@ -162,8 +164,9 @@ public class CRMDetail extends ActionBarActivity {
                         }
                         values.put("display_name", values.getString("partner_name"));
                         values.put("assignee_name", crmLead.getUser().getName());
-                        crmLead.insert(values);
+                        row_id = crmLead.insert(values);
                     }
+                    crmLead.setReminder(row_id);
                     finish();
 
                 }

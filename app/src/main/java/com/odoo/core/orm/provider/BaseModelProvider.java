@@ -35,7 +35,6 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
-import com.odoo.core.utils.logger.OLog;
 
 import java.io.InvalidObjectException;
 import java.util.Arrays;
@@ -119,8 +118,6 @@ public class BaseModelProvider extends ContentProvider {
         }
         Context ctx = getContext();
         assert ctx != null;
-        if (cr == null)
-            OLog.log(">>>>>>>>>> " + uri);
         cr.setNotificationUri(ctx.getContentResolver(), uri);
         return cr;
     }

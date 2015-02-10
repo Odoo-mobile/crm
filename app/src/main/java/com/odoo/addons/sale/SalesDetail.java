@@ -39,18 +39,16 @@ import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
 import com.odoo.base.addons.res.ResPartner;
-import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
-import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
-import com.odoo.core.utils.logger.OLog;
 import com.odoo.crm.R;
 
 import org.json.JSONArray;
@@ -80,8 +78,11 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     private ExpandableListControl.ExpandableListAdapter mAdapter;
     private List<Object> objects = new ArrayList<>();
     private HashMap<String, Float> lineValues = new HashMap<>();
-    private TextView txvType, currency, total_amt;
+    private HashMap<String, Integer> lineIds = new HashMap<>();
+    private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt;
     private ODataRow currencyObj;
+    private ResPartner partner = null;
+    private String mSOType = "";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -94,15 +95,23 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         currencyObj = sale.currency();
         init();
         initAdapter();
+        partner = new ResPartner(this, null);
     }
 
     private void init() {
         mForm = (OForm) findViewById(R.id.saleForm);
         mForm.setEditable(true);
         txvType = (TextView) findViewById(R.id.txvType);
-        currency = (TextView) findViewById(R.id.currency);
-        currency.setText(currencyObj.getString("name"));
+        currency1 = (TextView) findViewById(R.id.currency1);
+        currency2 = (TextView) findViewById(R.id.currency2);
+        currency3 = (TextView) findViewById(R.id.currency3);
+        String currencySymbol = currencyObj.getString("symbol");
+        untaxedAmt = (TextView) findViewById(R.id.untaxedTotal);
+        taxesAmt = (TextView) findViewById(R.id.taxesTotal);
         total_amt = (TextView) findViewById(R.id.fTotal);
+        untaxedAmt.setText("0.00");
+        taxesAmt.setText("0.00");
+        total_amt.setText("0.00");
         LinearLayout layoutAddItem = (LinearLayout) findViewById(R.id.layoutAddItem);
         layoutAddItem.setOnClickListener(this);
         if (extra == null) {
@@ -127,10 +136,16 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                 txvType.setText(R.string.label_sale_orders);
                 mForm.setEditable(false);
             }
-            currency.setText(record.getM2ORecord("currency_id").browse().getString("name"));
+            currencySymbol = record.getM2ORecord("currency_id").browse().getString("symbol");
+            untaxedAmt.setText(String.format("%.2f", record.getFloat("amount_untaxed")));
+            taxesAmt.setText(String.format("%.2f", record.getFloat("amount_tax")));
             total_amt.setText(String.format("%.2f", record.getFloat("amount_total")));
             mForm.initForm(record);
         }
+        mSOType = txvType.getText().toString();
+        currency1.setText(currencySymbol);
+        currency2.setText(currencySymbol);
+        currency3.setText(currencySymbol);
     }
 
     private void initAdapter() {
@@ -138,11 +153,11 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         mList = (ExpandableListControl) findViewById(R.id.expListOrderLine);
         mList.setVisibility(View.VISIBLE);
         if (extra != null) {
-            record = sale.browse(extra.getInt(OColumn.ROW_ID));
             List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
             for (ODataRow line : lines) {
-                lineValues.put(line.getM2ORecord("product_id").browse().getString("id"),
-                        line.getFloat("product_uom_qty"));
+                String product_id = line.getM2ORecord("product_id").browse().getString("id");
+                lineValues.put(product_id, line.getFloat("product_uom_qty"));
+                lineIds.put(product_id, line.getInt("id"));
             }
             objects.addAll(lines);
         }
@@ -191,7 +206,6 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         OValues values = mForm.getValues();
-        ResPartner partner = new ResPartner(this, null);
         App app = (App) getApplicationContext();
         switch (item.getItemId()) {
             case android.R.id.home:
@@ -201,38 +215,8 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                 if (values != null) {
                     if (app.inNetwork()) {
                         values.put("partner_name", partner.getName(values.getInt("partner_id")));
-                        //TODO: Mange order lines
-                        for (Object line : objects) {
-                            ODataRow row = (ODataRow) line;
-                            OLog.log(">>>>>>>>> " + row);
-                        }
-                        if (false == true) {
-                            if (record != null) {
-                                if (record.getString("state").equals("cancel")) {
-                                    if (app.inNetwork()) {
-                                        OArguments args = new OArguments();
-                                        args.add(new JSONArray().put(extra.getInt("id")));
-                                        sale.getServerDataHelper().callMethod("copy_quotation", args);
-                                    } else {
-                                        Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                                    }
-                                } else
-                                    sale.update(record.getInt(OColumn.ROW_ID), values);
-                                finish();
-                            } else {
-                                values.put("name", "/");
-                                values.put("create_date", ODateUtils.getUTCDate());
-                                values.put("user_id", ResUsers.myId(this));
-                                values.put("state", "draft");
-                                values.put("state_title", sale.getStateTitle(values));
-                                values.put("currency_symbol", currencyObj.getString("name"));
-                                values.put("currency_id", currencyObj.getInt(OColumn.ROW_ID));
-                                values.put("order_line_count", "(No Lines)");
-                                values.put("amount_total", "0.0");
-                                sale.insert(values);
-                                finish();
-                            }
-                        }
+                        SaleOrderOperation saleOrderOperation = new SaleOrderOperation();
+                        saleOrderOperation.execute(values);
                     } else {
                         Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
                     }
@@ -263,6 +247,104 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class SaleOrderOperation extends AsyncTask<OValues, Void, Boolean> {
+
+        private ProgressDialog mDialog;
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            mDialog = new ProgressDialog(SalesDetail.this);
+            mDialog.setTitle(R.string.title_working);
+            mDialog.setMessage("Creating lines");
+            mDialog.setCancelable(false);
+            mDialog.show();
+        }
+
+        @Override
+        protected Boolean doInBackground(OValues... params) {
+            try {
+                Thread.sleep(500);
+                OValues values = params[0];
+                // Creating oneToMany order lines
+                JSONArray order_line = new JSONArray();
+                for (Object line : objects) {
+                    JSONArray o_line = new JSONArray();
+                    ODataRow row = (ODataRow) line;
+                    String product_id = row.getString("product_id");
+                    o_line.put((lineIds.containsKey(product_id)) ? 1 : 0);
+                    o_line.put((lineIds.containsKey(product_id)) ? lineIds.get(product_id) : false);
+                    if (lineIds.containsKey(product_id)) {
+                        JSONObject line_data = new JSONObject();
+                        line_data.put("product_uom_qty", row.get("product_uom_qty"));
+                        line_data.put("product_uos_qty", row.get("product_uos_qty"));
+                        o_line.put(line_data);
+                    } else
+                        o_line.put(JSONUtils.toJSONObject(row));
+                    order_line.put(o_line);
+                    lineIds.remove(product_id);
+                }
+                if (lineIds.size() > 0) {
+                    for (String key : lineIds.keySet()) {
+                        JSONArray o_line = new JSONArray();
+                        o_line.put(2);
+                        o_line.put(lineIds.get(key));
+                        o_line.put(false);
+                        order_line.put(o_line);
+                    }
+                }
+                Thread.sleep(500);
+                JSONObject data = new JSONObject();
+                data.put("name", values.getString("name"));
+                data.put("partner_id", partner.selectServerId(values.getInt("partner_id")));
+                data.put("date_order", values.getString("date_order"));
+                data.put("payment_term", values.get("payment_term"));
+                data.put("order_line", order_line);
+
+                if (record == null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDialog.setMessage("Creating " + mSOType);
+                        }
+                    });
+                    Thread.sleep(500);
+                    int new_id = sale.getServerDataHelper().createOnServer(data);
+                    values.put("id", new_id);
+                    sale.insert(values);
+                    ODataRow record = new ODataRow();
+                    record.put("id", new_id);
+                    sale.quickCreateRecord(record);
+                } else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDialog.setMessage("Updating " + mSOType);
+                        }
+                    });
+                    Thread.sleep(500);
+                    sale.getServerDataHelper().updateOnServer(data, record.getInt("id"));
+                    sale.quickCreateRecord(record);
+                }
+                return true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            super.onPostExecute(success);
+            mDialog.dismiss();
+            if (success) {
+                Toast.makeText(SalesDetail.this, (record != null) ? mSOType + " updated"
+                        : mSOType + " created", Toast.LENGTH_LONG).show();
+                finish();
+            }
+        }
     }
 
     SaleOrder.OnOperationSuccessListener cancelOrder = new SaleOrder.OnOperationSuccessListener() {
@@ -337,6 +419,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
 
     private class OnProductChange extends AsyncTask<HashMap<String, Float>, Void, List<ODataRow>> {
         private ProgressDialog progressDialog;
+        private String warning = null;
 
         @Override
         protected void onPreExecute() {
@@ -357,6 +440,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                 ResPartner partner = new ResPartner(SalesDetail.this, sale.getUser());
                 ODataRow customer = partner.browse(mForm.getValues().getInt("partner_id"));
                 ServerDataHelper helper = saleLine.getServerDataHelper();
+                boolean stockInstalled = saleLine.isInstalledOnServer("stock");
                 for (String key : params[0].keySet()) {
                     ODataRow product = productProduct.browse(productProduct.selectRowId(Integer.parseInt(key)));
                     Float qty = params[0].get(key);
@@ -375,21 +459,45 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     arguments.add(true); // update_tax
                     arguments.add(customer.getString("date_order")); // date order
                     arguments.add(false); // packaging
-                    arguments.add(customer.getString("fiscal_position"));// fiscal position
+                    Object fiscal_position = (customer.getString("fiscal_position").equals("false"))
+                            ? false : customer.getString("fiscal_position");
+                    arguments.add(fiscal_position);// fiscal position
                     arguments.add(false); // flag
-
+                    if (stockInstalled) {
+                        arguments.add(false);
+                    }
                     JSONObject context = new JSONObject();
                     context.put("partner_id", customer.getInt("id"));
                     context.put("quantity", qty);
                     context.put("pricelist", pricelist);
-                    JSONObject res = ((JSONObject) helper.callMethod("product_id_change", arguments, context))
-                            .getJSONObject("value");
+                    String method = (stockInstalled) ? "product_id_change_with_wh" : "product_id_change";
+                    JSONObject response = ((JSONObject) helper.callMethod(method, arguments, context));
+                    JSONObject res = response.getJSONObject("value");
+                    if (response.has("warning") && !response.getString("warning").equals("false")) {
+                        JSONObject warning_data = response.getJSONObject("warning");
+                        if (warning_data.has("message"))
+                            warning = warning_data.getString("message");
+                    }
                     OValues values = new OValues();
                     values.put("product_id", product.getInt("id"));
                     values.put("name", res.get("name"));
                     values.put("product_uom_qty", res.get("product_uos_qty"));
+                    values.put("product_uom", res.get("product_uom"));
                     values.put("price_unit", res.get("price_unit"));
+                    values.put("product_uos_qty", res.getDouble("product_uos_qty"));
+                    values.put("product_uos", false);
                     values.put("price_subtotal", res.getDouble("price_unit") * res.getDouble("product_uos_qty"));
+                    JSONArray tax_id = new JSONArray();
+                    tax_id.put(6);
+                    tax_id.put(false);
+                    tax_id.put(res.getJSONArray("tax_id"));
+                    values.put("tax_id", new JSONArray().put(tax_id));
+                    values.put("th_weight", (res.has("th_weight")) ? res.get("th_weight") : 0);
+                    values.put("discount", (res.has("discount")) ? res.get("discount") : 0);
+                    if (stockInstalled) {
+                        values.put("route_id", (res.has("route_id")) ? res.get("route_id") : false);
+                        values.put("delay", res.get("delay"));
+                    }
                     if (extra != null)
                         values.put("order_id", extra.getInt(OColumn.ROW_ID));
                     items.add(values.toDataRow());
@@ -412,8 +520,12 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     total += rec.getFloat("price_subtotal");
                 }
                 total_amt.setText(String.format("%.2f", total));
+                untaxedAmt.setText(total_amt.getText());
             }
             progressDialog.dismiss();
+            if (warning != null) {
+                OAlert.showWarning(SalesDetail.this, warning.trim());
+            }
         }
     }
 

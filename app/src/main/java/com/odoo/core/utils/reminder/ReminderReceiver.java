@@ -26,8 +26,11 @@ import android.os.Bundle;
 
 import com.odoo.addons.calendar.EventDetail;
 import com.odoo.addons.calendar.models.CalendarEvent;
+import com.odoo.addons.crm.CRMDetail;
+import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
+import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
@@ -135,6 +138,22 @@ public class ReminderReceiver extends BroadcastReceiver {
                     );
             builder.addAction(actionReSchedule);
 
+        }
+        if (type.equals("opportunity")) {
+            boolean reminderOnExpiryDate = data.getBoolean("expiry_date");
+            icon = R.drawable.ic_action_opportunities;
+            resultClass = CRMDetail.class;
+            CRMLead lead = new CRMLead(context, null);
+            int row_id = data.getInt(OColumn.ROW_ID);
+            record = lead.browse(row_id);
+            String desc = record.getString("planned_revenue") + " "
+                    + ResCurrency.getSymbol(context, record.getInt("company_currency")) +
+                    " at " + record.getString("probability") + " %";
+            if (!record.getString("title_action").equals("false")) {
+                desc += "\n" + record.getString("title_action");
+            }
+            record.put("description", desc);
+            //FIXME: Add reminder actions
         }
         if (record != null) {
             builder.setAutoCancel(true);

@@ -283,7 +283,6 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
             }
             if (row_id != -1) {
                 Log.i(TAG, "Event updated");
-                //FIXME:  meeting.put("is_done", "false");
                 calendarEvent.update(row_id, meeting);
             } else {
                 Log.i(TAG, "Event created");

@@ -33,6 +33,11 @@ public class ResUsers extends OModel {
     OColumn login = new OColumn("User Login name", OVarchar.class);
 
     @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
+
+    @Override
     public boolean allowUpdateRecordOnServer() {
         return false;
     }

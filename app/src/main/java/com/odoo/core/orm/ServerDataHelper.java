@@ -142,4 +142,26 @@ public class ServerDataHelper {
         }
         return false;
     }
+
+
+    public int createOnServer(JSONObject data) {
+        try {
+            JSONObject result = mOdoo.createNew(mModel.getModelName(), data);
+            return result.getInt("result");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return OModel.INVALID_ROW_ID;
+    }
+
+    public int updateOnServer(JSONObject data, Integer id) {
+        try {
+            if (mOdoo.updateValues(mModel.getModelName(), data, id)) {
+                return mModel.selectRowId(id);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return OModel.INVALID_ROW_ID;
+    }
 }

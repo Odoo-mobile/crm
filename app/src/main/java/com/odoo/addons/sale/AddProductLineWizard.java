@@ -60,48 +60,26 @@ public class AddProductLineWizard extends ActionBarActivity implements
         if (extra != null) {
             mList = (ListView) findViewById(R.id.searchable_items);
             mList.setOnItemClickListener(this);
-            localItems.addAll(productProduct.select());
-            objects.addAll(localItems);
             for (String key : extra.keySet()) {
                 lineValues.put(key, extra.getFloat(key));
             }
+            for (Object local : productProduct.select()) {
+                ODataRow product = (ODataRow) local;
+                if (lineValues.containsKey(product.getString("id") + "")) {
+                    localItems.add(0, product);
+                } else {
+                    localItems.add(product);
+                }
+            }
+            objects.addAll(localItems);
             mAdapter = new OListAdapter(this,
                     R.layout.sale_product_line_item, objects) {
                 @Override
-                public View getView(int position, View convertView,
-                                    ViewGroup parent) {
+                public View getView(int position, View convertView, ViewGroup parent) {
                     View v = convertView;
                     if (v == null)
-                        v = getLayoutInflater().inflate(getResource(), parent,
-                                false);
-                    final ODataRow row = (ODataRow) objects.get(position);
-                    Float qty = (lineValues.containsKey(row.getString("id")) &&
-                            lineValues.get(row.getString("id")) > 0) ? lineValues.get(row.getString("id")) : 0;
-                    if (qty <= 0) {
-                        OControls.setGone(v, R.id.productQty);
-                        OControls.setGone(v, R.id.remove_qty);
-                    } else {
-                        OControls.setVisible(v, R.id.remove_qty);
-                        v.findViewById(R.id.remove_qty).setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                Float lineQty = lineValues.get(row.getString("id"));
-                                lineValues.put(row.getString("id"), lineQty - 1);
-                                mAdapter.notifiyDataChange(objects);
-                            }
-                        });
-                        OControls.setVisible(v, R.id.productQty);
-                        OControls.setText(v, R.id.productQty, qty + " ");
-                    }
-                    OControls.setText(v, R.id.productName,
-                            row.getString(productProduct.getDefaultNameColumn()));
-                    if (row.contains(OColumn.ROW_ID)
-                            && selected_position == row.getInt(OColumn.ROW_ID)) {
-                        v.setBackgroundColor(getResources().getColor(
-                                R.color.control_pressed));
-                    } else {
-                        v.setBackgroundColor(Color.TRANSPARENT);
-                    }
+                        v = getLayoutInflater().inflate(getResource(), parent, false);
+                    generateView(v, position);
                     return v;
                 }
             };
@@ -109,6 +87,37 @@ public class AddProductLineWizard extends ActionBarActivity implements
             mList.setAdapter(mAdapter);
         } else {
             finish();
+        }
+    }
+
+    private void generateView(View v, int position) {
+        final ODataRow row = (ODataRow) objects.get(position);
+        Float qty = (lineValues.containsKey(row.getString("id")) &&
+                lineValues.get(row.getString("id")) > 0) ? lineValues.get(row.getString("id")) : 0;
+        if (qty <= 0) {
+            OControls.setGone(v, R.id.productQty);
+            OControls.setGone(v, R.id.remove_qty);
+        } else {
+            OControls.setVisible(v, R.id.remove_qty);
+            v.findViewById(R.id.remove_qty).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Float lineQty = lineValues.get(row.getString("id"));
+                    lineValues.put(row.getString("id"), lineQty - 1);
+                    mAdapter.notifiyDataChange(objects);
+                }
+            });
+            OControls.setVisible(v, R.id.productQty);
+            OControls.setText(v, R.id.productQty, qty + " ");
+        }
+        OControls.setText(v, R.id.productName,
+                row.getString(productProduct.getDefaultNameColumn()));
+        if (row.contains(OColumn.ROW_ID)
+                && selected_position == row.getInt(OColumn.ROW_ID)) {
+            v.setBackgroundColor(getResources().getColor(
+                    R.color.control_pressed));
+        } else {
+            v.setBackgroundColor(Color.TRANSPARENT);
         }
     }
 

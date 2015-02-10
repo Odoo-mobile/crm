@@ -28,6 +28,7 @@ import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.addons.phonecall.services.PhoneCallSyncService;
+import com.odoo.core.account.BaseSettings;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -76,8 +77,8 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
         int count = 0;
         for (ODataRow row : rows) {
             if (row.getBoolean("allday")) {
-                //FIXME add setting option for start day of user
-                row.put("date_start", row.getString("date_start") + " 03:30:00");
+                String defaultTime = BaseSettings.getDayStartTime(getApplicationContext());
+                row.put("date_start", row.getString("date_start") + " " + defaultTime);
             }
             Date start_date = ODateUtils.createDateObject(row.getString("date_start"),
                     ODateUtils.DEFAULT_FORMAT, false);

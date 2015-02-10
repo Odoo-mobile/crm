@@ -240,7 +240,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
             // Leads
             total += lead.countGroupBy("date_deadline", "date(date_deadline)",
-                    "(date(date_deadline) >= ? and date(date_deadline) <= ? or date(date_action) >= ? and date(date_action) <= ?) and type = ?",
+                    "(date(date_deadline) >= ? and date(date_deadline) <= ? or " +
+                            "date(date_action) >= ? and date(date_action) <= ?) and type = ?",
                     new String[]{date_str, date_str, date_str, date_str, "opportunity"}).getInt("total");
             items.add(new OdooCalendar.DateDataObject(date_str, (total > 0)));
         }
@@ -449,8 +450,11 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 icon = R.drawable.ic_action_opportunities;
                 ODataRow stage_id = row.getM2ORecord("stage_id").browse();
                 float probability = -1;
-                if (!stage_id.getString("probability").equals("false")) {
-                    probability = stage_id.getFloat("probability");
+                if (stage_id != null && !stage_id.getString("probability").equals("false")
+                        && (stage_id.getString("type").equals("opportunity") ||
+                        stage_id.getString("type").equals("both"))) {
+                    if (!stage_id.getString("name").equals("New"))
+                        probability = stage_id.getFloat("probability");
                 }
                 if (probability == 0) {
                     // Lost
@@ -555,7 +559,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor cr) {
         mAdapter.changeCursor(cr);
-        OControls.setVisible(calendarView, R.id.dashboard_progress);
         new Handler().postDelayed(new Runnable() {
 
             @Override
@@ -724,7 +727,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                             @Override
                             public void choiceSelected(int position, String value) {
                                 Toast.makeText(getActivity(), position + " : " + value, Toast.LENGTH_LONG).show();
-                                //TODO: Take phone call id from => row.getPrimaryBundleData()
                                 int call_id = row.getInt(OColumn.ROW_ID);
                                 switch (position) {
                                     case 0: // Re-Schedule
@@ -734,7 +736,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                                         break;
                                     case 1: // Schedule other call
                                         Bundle extra = row.getPrimaryBundleData();
-                                        extra.putInt("call_id", row.getInt(OColumn.ROW_ID) );
+                                        extra.putInt("call_id", row.getInt(OColumn.ROW_ID));
                                         IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
                                                 extra);
                                         break;

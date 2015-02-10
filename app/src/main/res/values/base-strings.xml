@@ -126,4 +126,5 @@
     <string name="about_Company_line3">Licenced under the terms of <a href="http://www.gnu.org/licenses/agpl.html/">GNU Affero General Public License</a></string>
     <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
     <string name="app_version_name">Version</string>
+    <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
 </resources>
