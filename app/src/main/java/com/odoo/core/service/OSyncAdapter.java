@@ -63,15 +63,16 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     private HashMap<String, ODomain> mDomain = new HashMap<>();
     private OPreferenceManager preferenceManager;
     private Odoo mOdoo;
-    private HashMap<String, List<Integer>> relationDataIds = new HashMap<>();
     private HashMap<String, ISyncFinishListener> mSyncFinishListeners = new HashMap<>();
 
-    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service, boolean autoInitialize) {
+    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service,
+                        boolean autoInitialize) {
         super(context, autoInitialize);
         init(context, model, service);
     }
 
-    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service, boolean autoInitialize, boolean allowParallelSyncs) {
+    public OSyncAdapter(Context context, Class<? extends OModel> model, OSyncService service,
+                        boolean autoInitialize, boolean allowParallelSyncs) {
         super(context, autoInitialize, allowParallelSyncs);
         init(context, model, service);
     }
@@ -222,7 +223,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             model.close();
             ODomain domain = new ODomain();
             domain.add("id", "in", record.getUniqueIds());
-            syncData(rel_model, user, domain, result, false, false);
+            syncData(rel_model, user, domain, result, false, true);
             // Updating manyToOne record with their relation record row_id
             switch (record.getRelationType()) {
                 case ManyToOne:
