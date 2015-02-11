@@ -175,12 +175,11 @@ public class PagerHelper implements OnPageChangeListener, OnClickListener {
                     weekDates
             );
         }
-        ViewGroup cDays = (ViewGroup) current_week_view_days;
-        for (int i = 0; i < cDays.getChildCount(); i++) {
-            DateInfo cDate = (DateInfo) cDays.getChildAt(i)
+        for (int i = 0; i < currentDays.getChildCount(); i++) {
+            DateInfo cDate = (DateInfo) currentDays.getChildAt(i)
                     .findViewById(R.id.day_indicator).getTag();
             if (cDate.isToday()) {
-                cDays.getChildAt(i).findViewById(R.id.day_indicator)
+                currentDays.getChildAt(i).findViewById(R.id.day_indicator)
                         .setBackgroundColor(Color.TRANSPARENT);
             }
         }

@@ -19,9 +19,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.OdooActivity;
-import com.odoo.base.addons.ir.IrModel;
+import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooInstancesSelectorDialog;
 import com.odoo.core.support.OdooLoginHelper;
@@ -430,11 +431,14 @@ public class OdooLogin extends ActionBarActivity implements View.OnClickListener
         protected Boolean doInBackground(OUser... params) {
             mUser = params[0];
             if (OdooAccountManager.createAccount(OdooLogin.this, params[0])) {
-                // Dummy Count call for creating database for user.
-                // This will solve the issue to cursor loader in lower version < api 21
-                IrModel model = new IrModel(OdooLogin.this, mUser);
-                model.count(null, null);
+                mUser = OdooAccountManager.getDetails(OdooLogin.this, mUser.getAndroidName());
                 try {
+                    // Syncing company details
+                    ODataRow company_details = new ODataRow();
+                    company_details.put("id", mUser.getCompany_id());
+                    ResCompany company = new ResCompany(OdooLogin.this, mUser);
+                    company.quickCreateRecord(company_details);
+
                     Thread.sleep(500);
                 } catch (Exception e) {
                     e.printStackTrace();

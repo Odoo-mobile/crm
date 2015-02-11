@@ -258,7 +258,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 .findViewById(R.id.items_container);
         setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
         initAdapter();
-        mFilterDate = date.getDateString(); //ODateUtils.convertToUTC(date.getDateString() + " 00:00:00", ODateUtils.DEFAULT_FORMAT);
+        mFilterDate = date.getDateString();
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

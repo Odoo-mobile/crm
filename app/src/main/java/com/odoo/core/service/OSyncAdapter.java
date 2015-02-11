@@ -131,6 +131,9 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             ODomain domain = new ODomain();
             domain.append(model.defaultDomain());
+            if(domain_filter!=null){
+                domain.append(domain_filter);
+            }
 
             if (checkForWriteCreateDate) {
                 List<Integer> serverIds = model.getServerIds();
@@ -223,7 +226,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             model.close();
             ODomain domain = new ODomain();
             domain.add("id", "in", record.getUniqueIds());
-            syncData(rel_model, user, domain, result, false, true);
+            syncData(rel_model, user, domain, result, false, false);
             // Updating manyToOne record with their relation record row_id
             switch (record.getRelationType()) {
                 case ManyToOne:

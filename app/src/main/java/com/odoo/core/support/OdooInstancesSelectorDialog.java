@@ -52,6 +52,7 @@ public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListe
     private AlertDialog.Builder builder;
     private OnInstanceSelectListener mOnInstanceSelectListener = null;
     private OUser mUser;
+    private List<ImageLoader> imageLoaderLists = new ArrayList<>();
 
     public OdooInstancesSelectorDialog(Context context, OUser user) {
         mContext = context;
@@ -87,7 +88,9 @@ public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListe
         OControls.setText(view, R.id.txvInstanceName, instance.getCompanyName());
         String imageURL = instance.getInstanceUrl() + "/web/binary/company_logo?dbname=" + instance.getDatabaseName();
         ImageLoader imageLoader = new ImageLoader(position, imageURL, R.id.imgInstance);
+        imageLoaderLists.add(imageLoader);
         imageLoader.execute();
+
     }
 
     public void showDialog() {
@@ -116,8 +119,12 @@ public class OdooInstancesSelectorDialog implements AdapterView.OnItemClickListe
         OdooInstance instance = mAdapter.getItem(position);
         if (dialog != null)
             dialog.dismiss();
-        if (mOnInstanceSelectListener != null)
+        if (mOnInstanceSelectListener != null) {
+            for (ImageLoader imageLoader : imageLoaderLists) {
+                imageLoader.cancel(true);
+            }
             mOnInstanceSelectListener.instanceSelected(instance, mUser);
+        }
     }
 
     public void setOnInstanceSelectListener(OnInstanceSelectListener listener) {

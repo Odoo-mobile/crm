@@ -87,12 +87,6 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
             }
         }
         Log.i(TAG, count + " reminder updated");
-        try {
-            Log.i(TAG, "Sleeping for sometime before sync phone calls and sales order");
-            Thread.sleep(SYNC_SLEEP_DELAY);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
         // Syncing phone calls and sales order
         SyncUtils.get(getApplicationContext(), user).requestSync(CRMPhoneCalls.AUTHORITY);
         SyncUtils.get(getApplicationContext(), user).requestSync(CRMLead.AUTHORITY);

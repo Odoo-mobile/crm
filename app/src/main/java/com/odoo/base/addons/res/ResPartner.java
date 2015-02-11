@@ -36,8 +36,6 @@ import com.odoo.core.support.OUser;
 
 import org.json.JSONArray;
 
-import odoo.ODomain;
-
 public class
         ResPartner extends OModel {
     public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.res_partner";
@@ -112,16 +110,5 @@ public class
         if (!row.getString("zip").equals("false"))
             add += " - " + row.getString("zip") + " ";
         return add;
-    }
-
-    @Override
-    public ODomain defaultDomain() {
-        ODomain domain = new ODomain();
-        domain.add("|");
-        domain.add("|");
-        domain.add("opportunity_ids.user_id", "=", getUser().getUser_id());
-        domain.add("sale_order_ids.user_id", "=", getUser().getUser_id());
-        domain.add("id", "in", getServerIds());
-        return domain;
     }
 }

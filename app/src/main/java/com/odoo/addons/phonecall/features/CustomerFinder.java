@@ -66,7 +66,7 @@ public class CustomerFinder {
 
         @Override
         protected ODataRow doInBackground(String... params) {
-            String number = params[0];
+            String number = params[0].trim().replaceAll(" ", "").replace("+", "");
             Log.d(TAG, "Checking for number " + number + " in database");
             mContactLast2Chars = number.substring(number.length() - 2);
             mContactLast3Chars = number.substring(number.length() - 3);
@@ -74,7 +74,23 @@ public class CustomerFinder {
             String[] args = new String[]{"%" + mContactLast2Chars,
                     "%" + mContactLast3Chars, "%" + mContactLast2Chars,
                     "%" + mContactLast3Chars};
-            ODataRow partner = resPartner.browse(null, where, args);
+            ODataRow partner = null;
+            for (ODataRow row : resPartner.select(null, where, args)) {
+                String partnerPhone = row.getString("phone").trim().replaceAll(" ", "")
+                        .replace("+", "");
+                String partnerMobile = row.getString("mobile").trim().replaceAll(" ", "")
+                        .replace("+", "");
+                if (!partnerPhone.equals("false") &&
+                        (partnerPhone.contains(number) || number.contains(partnerPhone))) {
+                    partner = row;
+                    break;
+                }
+                if (!partnerMobile.equals("false") &&
+                        (partnerMobile.contains(number) || number.contains(partnerMobile))) {
+                    partner = row;
+                    break;
+                }
+            }
             if (partner == null) {
                 ServerDataHelper helper = resPartner.getServerDataHelper();
                 try {
@@ -95,8 +111,7 @@ public class CustomerFinder {
                             String contact = ((phone.equals("false") || TextUtils
                                     .isEmpty(phone)) ? mobile : phone).trim().replaceAll(" ", "")
                                     .replace("+", "");
-                            String num = number.trim().replaceAll(" ", "").replace("+", "");
-                            if (num.contains(contact) || contact.contains(num)) {
+                            if (number.contains(contact) || contact.contains(number)) {
                                 return resPartner.quickCreateRecord(row);
                             }
                         }
