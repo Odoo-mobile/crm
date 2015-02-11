@@ -726,8 +726,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                         .show(new OChoiceDialog.OnChoiceSelectListener() {
                             @Override
                             public void choiceSelected(int position, String value) {
-                                Toast.makeText(getActivity(), position + " : " + value, Toast.LENGTH_LONG).show();
-                                int call_id = row.getInt(OColumn.ROW_ID);
                                 switch (position) {
                                     case 0: // Re-Schedule
                                         IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,

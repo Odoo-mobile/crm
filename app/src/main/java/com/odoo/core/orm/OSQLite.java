@@ -104,7 +104,7 @@ public class OSQLite extends SQLiteOpenHelper {
         }
     }
 
-    private void registerModelsClassPath() {
+    private synchronized void registerModelsClassPath() {
         OSQLHelper sqlHelper = new OSQLHelper(mContext);
         List<OModel> modelsClassPath = sqlHelper.getAllModels(getModels());
         for (OModel model : modelsClassPath) {
@@ -112,10 +112,6 @@ public class OSQLite extends SQLiteOpenHelper {
             String path = model.getClass().getName();
             // Setting class path
             mPref.putString(key, path);
-            List<String> server_cols = getColumns(path, true);
-            mPref.putStringSet(key + ".server", server_cols);
-            List<String> local_cols = getColumns(path, false);
-            mPref.putStringSet(key + ".local", local_cols);
         }
         Log.i(TAG, modelsClassPath.size() + " models path registered.");
     }

@@ -80,7 +80,7 @@
         <service
             android:name="com.odoo.addons.customers.services.CustomerSyncService"
             android:exported="true"
-            android:process=":sync">
+            android:process=":sync_customer">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -99,7 +99,7 @@
         <service
             android:name="com.odoo.addons.calendar.services.CalendarSyncService"
             android:exported="true"
-            android:process=":sync">
+            android:process=":sync_agenda">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -118,7 +118,7 @@
         <service
             android:name="com.odoo.addons.crm.services.CRMLeadSyncService"
             android:exported="true"
-            android:process=":sync">
+            android:process=":sync_leads">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -137,7 +137,7 @@
         <service
             android:name="com.odoo.addons.sale.services.SaleOrderSyncService"
             android:exported="true"
-            android:process=":sync">
+            android:process=":sync_sale_orders">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>
@@ -156,7 +156,7 @@
         <service
             android:name="com.odoo.addons.phonecall.services.PhoneCallSyncService"
             android:exported="true"
-            android:process=":sync">
+            android:process=":sync_phone_calls">
             <intent-filter>
                 <action android:name="android.content.SyncAdapter" />
             </intent-filter>

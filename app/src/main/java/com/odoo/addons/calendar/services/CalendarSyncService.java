@@ -27,7 +27,6 @@ import android.util.Log;
 import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
-import com.odoo.addons.phonecall.services.PhoneCallSyncService;
 import com.odoo.core.account.BaseSettings;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
@@ -56,15 +55,6 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("calendar.event")) {
             adapter.onSyncFinish(this);
-        } else if (adapter.getModel().getModelName().equals(
-                new CRMPhoneCalls(getApplicationContext(), user).getModelName())) {
-            try {
-                Log.i(TAG, "Sleeping for sometime before sync opportunities");
-                Thread.sleep(SYNC_SLEEP_DELAY);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            SyncUtils.get(getApplicationContext(), user).requestSync(CRMLead.AUTHORITY);
         }
     }
 
@@ -98,14 +88,14 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
         }
         Log.i(TAG, count + " reminder updated");
         try {
-            Log.i(TAG, "Sleeping for sometime before sync phone calls");
+            Log.i(TAG, "Sleeping for sometime before sync phone calls and sales order");
             Thread.sleep(SYNC_SLEEP_DELAY);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // Syncing PhoneCalls
-        PhoneCallSyncService phoneCallSyncService = new PhoneCallSyncService();
-        OSyncAdapter adapter = phoneCallSyncService.getSyncAdapter(this, getApplicationContext());
-        return adapter;
+        // Syncing phone calls and sales order
+        SyncUtils.get(getApplicationContext(), user).requestSync(CRMPhoneCalls.AUTHORITY);
+        SyncUtils.get(getApplicationContext(), user).requestSync(CRMLead.AUTHORITY);
+        return null;
     }
 }

@@ -80,8 +80,8 @@ public class OModel {
     private List<OColumn> mFunctionalColumns = new ArrayList<>();
     private HashMap<String, Field> mDeclaredFields = new HashMap<>();
     private OdooVersion mOdooVersion = null;
-    private static OModelRegistry modelRegistry = new OModelRegistry();
     private String default_name_column = "name";
+    public static OModelRegistry modelRegistry = new OModelRegistry();
 
     // Relation record command
     public enum Command {
@@ -441,14 +441,13 @@ public class OModel {
 
     public static OModel get(Context context, String model_name, String username) {
         OModel model = modelRegistry.getModel(model_name, username);
+        OUser user = OdooAccountManager.getDetails(context, username);
         if (model == null) {
             try {
                 OPreferenceManager pfManager = new OPreferenceManager(context);
-                Class<?> model_class = Class.forName(pfManager.getString(
-                        model_name, null));
+                Class<?> model_class = Class.forName(pfManager.getString(model_name, null));
                 if (model_class != null) {
-                    model = new OModel(context, model_name, OdooAccountManager.getDetails(context, username))
-                            .createInstance(model_class);
+                    model = new OModel(context, model_name, user).createInstance(model_class);
                     if (model != null) {
                         modelRegistry.register(model);
                     }
