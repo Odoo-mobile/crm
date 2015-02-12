@@ -202,10 +202,16 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
         public void onClick(View v) {
             builder = new DateTimePicker.Builder(mContext);
             if (mFieldType == FieldType.Date) {
+                if (getValue() != null && !getValue().toString().equals("false"))
+                    builder.setDate(getValue().toString());
                 builder.setType(DateTimePicker.Type.Date);
             } else if (mFieldType == FieldType.Time) {
+                if (getValue() != null && !getValue().toString().equals("false"))
+                    builder.setTime(getValue().toString());
                 builder.setType(DateTimePicker.Type.Time);
             } else {
+                if (getValue() != null && !getValue().toString().equals("false"))
+                    builder.setDateTime(getValue().toString());
                 builder.setType(DateTimePicker.Type.DateTime);
             }
             builder.setCallBack(ODateTimeField.this);

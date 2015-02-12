@@ -58,7 +58,7 @@ public class DateTimePicker {
             mTimePicker.setPickerCallback(callBack);
             mTimePicker.show();
         } else {
-            mDatePicker = new DatePicker(mContext);
+            mDatePicker = new DatePicker(mContext, mBuilder.getDate());
             mDatePicker.setPickerCallback(callBack);
             mDatePicker.show();
         }
@@ -76,7 +76,7 @@ public class DateTimePicker {
         public void onDatePick(String date) {
             mDatePicker.dismiss();
             if (mBuilder.getType() == Type.DateTime) {
-                mTimePicker = new TimePicker(mContext, null);
+                mTimePicker = new TimePicker(mContext, mBuilder.getTime());
                 mTimePicker.setPickerCallback(callBack);
                 mTimePicker.show();
             }
@@ -90,9 +90,16 @@ public class DateTimePicker {
         private PickerCallBack mCallback;
         private String mDialogTitle = null;
         private String time = null;
+        private String date = null;
+        private String dateTime = null;
 
         public Builder(Context context) {
             mContext = context;
+        }
+
+        public Builder setDate(String date) {
+            this.date = date;
+            return this;
         }
 
         public Builder setTime(String time) {
@@ -100,9 +107,29 @@ public class DateTimePicker {
             return this;
         }
 
+        public Builder setDateTime(String dateTime) {
+            if (dateTime != null) {
+                date = ODateUtils.parseDate(dateTime, ODateUtils.DEFAULT_FORMAT,
+                        ODateUtils.DEFAULT_DATE_FORMAT);
+                time = ODateUtils.parseDate(dateTime, ODateUtils.DEFAULT_FORMAT,
+                        ODateUtils.DEFAULT_TIME_FORMAT);
+            }
+            return this;
+        }
+
+        public Calendar getDate() {
+            if (date != null) {
+                Date dt = ODateUtils.createDateObject(date, ODateUtils.DEFAULT_DATE_FORMAT, false);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dt);
+                return cal;
+            }
+            return null;
+        }
+
         public Calendar getTime() {
             if (time != null) {
-                Date dt = ODateUtils.createDateObject(time, ODateUtils.DEFAULT_TIME_FORMAT, true);
+                Date dt = ODateUtils.createDateObject(time, ODateUtils.DEFAULT_TIME_FORMAT, false);
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(dt);
                 return cal;
@@ -155,8 +182,8 @@ public class DateTimePicker {
         private boolean called = false;
         private Dialog mDialog;
 
-        public DatePicker(Context context) {
-            final Calendar c = Calendar.getInstance();
+        public DatePicker(Context context, Calendar date) {
+            final Calendar c = (date != null) ? date : Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
             int month = c.get(Calendar.MONTH);
             int day = c.get(Calendar.DAY_OF_MONTH);
