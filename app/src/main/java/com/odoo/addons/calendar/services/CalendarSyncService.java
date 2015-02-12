@@ -54,7 +54,7 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("calendar.event")) {
-            adapter.onSyncFinish(this);
+            adapter.onSyncFinish(this).syncDataLimit(50);
         }
     }
 

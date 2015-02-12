@@ -347,7 +347,7 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
             userImage.setScaleType(ImageView.ScaleType.CENTER_CROP);
             userImage.setColorFilter(null);
             userImage.setImageBitmap(BitmapUtils.getBitmapImage(this, newImage));
-        } else {
+        } else if (values != null) {
             Toast.makeText(this, R.string.toast_image_size_too_large, Toast.LENGTH_LONG).show();
         }
     }

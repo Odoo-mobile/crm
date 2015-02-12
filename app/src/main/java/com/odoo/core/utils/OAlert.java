@@ -21,6 +21,7 @@ package com.odoo.core.utils;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 
 import com.odoo.crm.R;
 
@@ -29,6 +30,10 @@ public class OAlert {
 
     private enum Type {
         Alert, Warning, Error
+    }
+
+    public static enum ConfirmType {
+        POSITIVE, NEGATIVE
     }
 
     public static void showAlert(Context context, String message) {
@@ -59,5 +64,40 @@ public class OAlert {
         mBuilder.setMessage(message);
         mBuilder.setPositiveButton(R.string.label_ok, null);
         mBuilder.create().show();
+    }
+
+    public static void showConfirm(Context context, String message, final OnAlertConfirmListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Confirm");
+        builder.setMessage(message);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (listener != null) {
+                    listener.onConfirmChoiceSelect(ConfirmType.POSITIVE);
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (listener != null) {
+                    listener.onConfirmChoiceSelect(ConfirmType.NEGATIVE);
+                }
+            }
+        });
+        builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+                if(listener!=null){
+                    listener.onConfirmChoiceSelect(ConfirmType.NEGATIVE);
+                }
+            }
+        });
+        builder.create().show();
+    }
+
+    public static interface OnAlertConfirmListener {
+        public void onConfirmChoiceSelect(ConfirmType type);
     }
 }

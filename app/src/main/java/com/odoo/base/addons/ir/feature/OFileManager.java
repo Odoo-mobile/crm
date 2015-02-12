@@ -49,7 +49,7 @@ public class OFileManager implements DialogInterface.OnClickListener {
     public static final int REQUEST_AUDIO = 113;
     public static final int REQUEST_FILE = 114;
     private static final int SINGLE_ATTACHMENT_STREAM = 115;
-    private static final long IMAGE_MAX_SIZE = 1572864; // 1.5 MB
+    private static final long IMAGE_MAX_SIZE = 1000000; // 1 MB
     private Context mContext = null;
     private String[] mOptions = null;
     private RequestType requestType = null;
@@ -152,24 +152,14 @@ public class OFileManager implements DialogInterface.OnClickListener {
             switch (requestCode) {
                 case REQUEST_CAMERA:
                     OValues values = getURIDetails(newImageUri);
-                    if (values.getLong("file_size") < IMAGE_MAX_SIZE) {
-                        values.put("datas", BitmapUtils.uriToBase64(newImageUri, mContext.getContentResolver()));
-                        return values;
-                    } else {
-                        values = new OValues();
-                        values.put("size_limit_exceed", true);
-                    }
-                    break;
+                    values.put("datas", BitmapUtils.uriToBase64(newImageUri,
+                            mContext.getContentResolver(), true));
+                    return values;
                 case REQUEST_IMAGE:
                     values = getURIDetails(data.getData());
-                    if (values.getLong("file_size") < IMAGE_MAX_SIZE) {
-                        values.put("datas", BitmapUtils.uriToBase64(data.getData(), mContext.getContentResolver()));
-                        return values;
-                    } else {
-                        values = new OValues();
-                        values.put("size_limit_exceed", true);
-                    }
-                    break;
+                    values.put("datas", BitmapUtils.uriToBase64(data.getData(),
+                            mContext.getContentResolver(), true));
+                    return values;
             }
         }
         return null;

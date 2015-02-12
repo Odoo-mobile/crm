@@ -278,4 +278,23 @@
         </ScrollView>
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/meetingDeleteLayout"
+        android:visibility="gone"
+        android:background="@color/android_blue_dark"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:gravity="center"
+            android:text="Delete"
+            android:textAllCaps="true"
+            android:layout_width="match_parent"
+            android:textColor="@android:color/white"
+            android:fontFamily="@string/font_normal"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/default_16dp" />
+    </LinearLayout>
 </LinearLayout>

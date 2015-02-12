@@ -47,7 +47,7 @@ public class CRMLeadSyncService extends OSyncService implements ISyncFinishListe
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("crm.lead"))
-            adapter.onSyncFinish(this);
+            adapter.onSyncFinish(this).syncDataLimit(50);
     }
 
     @Override

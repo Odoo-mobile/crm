@@ -51,7 +51,7 @@ public class PhoneCallSyncService extends OSyncService implements ISyncFinishLis
             ODomain domain = new ODomain();
             domain.add("user_id", "=", user.getUser_id());
             adapter.setDomain(domain).syncDataLimit(10);
-            adapter.onSyncFinish(this);
+            adapter.onSyncFinish(this).syncDataLimit(50);
         }
     }
 

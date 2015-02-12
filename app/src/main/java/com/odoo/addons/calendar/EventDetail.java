@@ -105,6 +105,8 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         if (extra != null) {
             row_id = getIntent().getIntExtra(OColumn.ROW_ID, -1);
             if (row_id != -1) {
+                findViewById(R.id.meetingDeleteLayout).setVisibility(View.VISIBLE);
+                findViewById(R.id.meetingDeleteLayout).setOnClickListener(this);
                 actionBar.setTitle(R.string.label_edit_meeting);
                 ODataRow record = calendarEvent.browse(row_id);
                 eventForm.initForm(record);
@@ -121,11 +123,14 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                         ODateUtils.DEFAULT_TIME_FORMAT));
                 colorSelected(CalendarUtils.getColorData(record.getInt("color_index")));
             } else {
-                ODataRow opp_data = null;
+                ODataRow opp_data = new ODataRow();
+                if (extra.containsKey(CalendarDashboard.KEY_DATE)) {
+                    event_date_start.setValue(extra.getString(CalendarDashboard.KEY_DATE));
+                    event_date_end.setValue(extra.getString(CalendarDashboard.KEY_DATE));
+                }
                 OField opp_field = (OField) findViewById(R.id.opportunity_id);
-                if (extra != null && extra.containsKey("opp_id")) {
+                if (extra.containsKey("opp_id")) {
                     opp_field.setVisibility(View.VISIBLE);
-                    opp_data = new ODataRow();
                     opp_data.put("opportunity_id", extra.getInt("opp_id"));
                 }
                 eventForm.initForm(opp_data);
@@ -170,6 +175,23 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                                 ReminderDialog.ReminderType.TimeBasedEvent);
                 dialog.setOnReminderValueSelectListener(this);
                 dialog.show();
+                break;
+            case R.id.meetingDeleteLayout:
+                OAlert.showConfirm(this, "Are you sure want to delete meeting ?",
+                        new OAlert.OnAlertConfirmListener() {
+                            @Override
+                            public void onConfirmChoiceSelect(OAlert.ConfirmType type) {
+                                switch (type) {
+                                    case POSITIVE:
+                                        calendarEvent.delete(row_id);
+                                        Toast.makeText(EventDetail.this, "Meeting deleted",
+                                                Toast.LENGTH_LONG).show();
+                                        finish();
+                                        break;
+                                    case NEGATIVE:
+                                }
+                            }
+                        });
                 break;
         }
     }

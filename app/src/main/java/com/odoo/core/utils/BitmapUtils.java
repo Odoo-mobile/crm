@@ -41,6 +41,8 @@ import java.io.InputStream;
 import odoo.controls.OControlHelper;
 
 public class BitmapUtils {
+    public static final int THUMBNAIL_SIZE = 600;
+
     /**
      * Read bytes.
      *
@@ -49,31 +51,49 @@ public class BitmapUtils {
      * @return the byte[]
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private static byte[] readBytes(Uri uri, ContentResolver resolver)
+    private static byte[] readBytes(Uri uri, ContentResolver resolver, boolean thumbnail)
             throws IOException {
         // this dynamically extends to take the bytes you read
         InputStream inputStream = resolver.openInputStream(uri);
         ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
 
-        // this is storage overwritten on each iteration with bytes
-        int bufferSize = 1024;
-        byte[] buffer = new byte[bufferSize];
+        if (!thumbnail) {
+            // this is storage overwritten on each iteration with bytes
+            int bufferSize = 1024;
+            byte[] buffer = new byte[bufferSize];
 
-        // we need to know how may bytes were read to write them to the
-        // byteBuffer
-        int len = 0;
-        while ((len = inputStream.read(buffer)) != -1) {
-            byteBuffer.write(buffer, 0, len);
+            // we need to know how may bytes were read to write them to the
+            // byteBuffer
+            int len = 0;
+            while ((len = inputStream.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+        } else {
+            Bitmap imageBitmap = BitmapFactory.decodeStream(inputStream);
+            int thumb_width = imageBitmap.getWidth() / 2;
+            int thumb_height = imageBitmap.getHeight() / 2;
+            if (thumb_width > THUMBNAIL_SIZE) {
+                thumb_width = THUMBNAIL_SIZE;
+            }
+            if (thumb_width == THUMBNAIL_SIZE) {
+                thumb_height = ((imageBitmap.getHeight() / 2) * THUMBNAIL_SIZE)
+                        / (imageBitmap.getWidth() / 2);
+            }
+            imageBitmap = Bitmap.createScaledBitmap(imageBitmap, thumb_width, thumb_height, false);
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteBuffer);
         }
-
         // and then we can return your byte array.
         return byteBuffer.toByteArray();
     }
 
     public static String uriToBase64(Uri uri, ContentResolver resolver) {
+        return uriToBase64(uri, resolver, false);
+    }
+
+    public static String uriToBase64(Uri uri, ContentResolver resolver, boolean thumbnail) {
         String encodedBase64 = "";
         try {
-            byte[] bytes = readBytes(uri, resolver);
+            byte[] bytes = readBytes(uri, resolver, thumbnail);
             encodedBase64 = Base64.encodeToString(bytes, 0);
         } catch (IOException e1) {
             e1.printStackTrace();
