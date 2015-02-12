@@ -22,7 +22,9 @@ package com.odoo.addons.crm.services;
 import android.content.Context;
 import android.content.SyncResult;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.odoo.addons.crm.CRM;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.core.orm.ODataRow;
@@ -31,6 +33,8 @@ import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
+
+import odoo.ODomain;
 
 public class CRMLeadSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = CRMLeadSyncService.class.getSimpleName();
@@ -46,8 +50,16 @@ public class CRMLeadSyncService extends OSyncService implements ISyncFinishListe
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
-        if (adapter.getModel().getModelName().equals("crm.lead"))
+        if (adapter.getModel().getModelName().equals("crm.lead")) {
+            ODomain domain = new ODomain();
+            if (extras.containsKey(CRM.KEY_IS_LEAD)) {
+                domain.add("type", "=",
+                        (extras.getBoolean(CRM.KEY_IS_LEAD)) ? "lead" : "opportunity");
+                adapter.setDomain(domain);
+                Log.d(TAG, "Setting lead filter type");
+            }
             adapter.onSyncFinish(this).syncDataLimit(50);
+        }
     }
 
     @Override

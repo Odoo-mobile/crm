@@ -78,6 +78,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     public static final String KEY_MENU = "key_menu_item";
     public static final int REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD = 223;
     public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 224;
+    public static final String KEY_IS_LEAD = "key_is_lead";
     private Type mType = Type.Leads;
     private View mView;
     private int mLocal_id = 0;
@@ -91,7 +92,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     private boolean filter_customer_data = false;
     private int customer_id = -1;
     private ODataRow convertRequestRecord = null;
-
+    private Bundle syncBundle = new Bundle();
     public enum Type {
         Leads, Opportunities
     }
@@ -234,6 +235,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         OControls.setText(view, R.id.create_date, date);
         // Controls for opportunity
         if (mType == Type.Opportunities) {
+            syncBundle.putBoolean(KEY_IS_LEAD, false);
             view.findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
             if (!row.getString("date_action").equals("false")) {
                 OControls.setVisible(view, R.id.date_action);
@@ -250,6 +252,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                 OControls.setGone(view, R.id.title_action);
             }
         } else {
+            syncBundle.putBoolean(KEY_IS_LEAD, true);
             view.findViewById(R.id.opportunity_controls).setVisibility(View.GONE);
         }
     }
@@ -284,7 +287,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     @Override
     public void onRefresh() {
         if (inNetwork()) {
-            parent().sync().requestSync(CRMLead.AUTHORITY);
+            parent().sync().requestSync(CRMLead.AUTHORITY, syncBundle);
             setSwipeRefreshing(true);
         } else {
             hideRefreshingProgress();

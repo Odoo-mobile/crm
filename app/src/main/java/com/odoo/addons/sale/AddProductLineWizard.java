@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OdooFields;
 import com.odoo.core.support.list.OListAdapter;
+import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.crm.R;
@@ -34,7 +36,7 @@ import odoo.controls.IOnQuickRecordCreateListener;
 
 public class AddProductLineWizard extends ActionBarActivity implements
         AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
-        OListAdapter.OnSearchChange, IOnQuickRecordCreateListener {
+        OListAdapter.OnSearchChange, IOnQuickRecordCreateListener, AdapterView.OnItemLongClickListener {
 
     private ProductProduct productProduct;
     private EditText edt_searchable_input;
@@ -46,6 +48,7 @@ public class AddProductLineWizard extends ActionBarActivity implements
     private LiveSearch mLiveDataLoader = null;
     private OColumn mCol = null;
     private HashMap<String, Float> lineValues = new HashMap<>();
+    private Boolean mLongClicked = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +63,7 @@ public class AddProductLineWizard extends ActionBarActivity implements
         if (extra != null) {
             mList = (ListView) findViewById(R.id.searchable_items);
             mList.setOnItemClickListener(this);
+            mList.setOnItemLongClickListener(this);
             for (String key : extra.keySet()) {
                 lineValues.put(key, extra.getFloat(key));
             }
@@ -138,11 +142,53 @@ public class AddProductLineWizard extends ActionBarActivity implements
     }
 
     @Override
-    public void onRecordCreated(ODataRow row) {
-        Float count = ((lineValues.containsKey(row.getString("id")))
+    public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+        ODataRow data = (ODataRow) objects.get(position);
+        mLongClicked = true;
+        int row_id = productProduct.selectRowId(data.getInt("id"));
+        if (row_id != -1) {
+            data.put(OColumn.ROW_ID, row_id);
+        }
+        if (!data.contains(OColumn.ROW_ID)) {
+            QuickCreateRecordProcess quickCreateRecordProcess = new QuickCreateRecordProcess(this);
+            quickCreateRecordProcess.execute(data);
+        } else {
+            onLongClicked(data);
+        }
+        return true;
+    }
+
+    private void onLongClicked(final ODataRow row) {
+        mLongClicked = false;
+        final Float count = ((lineValues.containsKey(row.getString("id")))
                 ? lineValues.get(row.getString("id")) : 0);
-        lineValues.put(row.getString("id"), ++count);
-        mAdapter.notifiyDataChange(objects);
+        OAlert.inputDialog(this, "Quantity", new OAlert.OnUserInputListener() {
+            @Override
+            public void onViewCreated(EditText inputView) {
+                inputView.setInputType(InputType.TYPE_CLASS_NUMBER
+                        | InputType.TYPE_NUMBER_FLAG_DECIMAL | InputType.TYPE_NUMBER_FLAG_SIGNED);
+                inputView.setText(count + "");
+            }
+
+            @Override
+            public void onUserInputted(Object value) {
+                float userData = Float.parseFloat(value.toString());
+                lineValues.put(row.getString("id"), userData);
+                mAdapter.notifiyDataChange(objects);
+            }
+        });
+    }
+
+    @Override
+    public void onRecordCreated(ODataRow row) {
+        if (!mLongClicked) {
+            Float count = ((lineValues.containsKey(row.getString("id")))
+                    ? lineValues.get(row.getString("id")) : 0);
+            lineValues.put(row.getString("id"), ++count);
+            mAdapter.notifiyDataChange(objects);
+        } else {
+            onLongClicked(row);
+        }
     }
 
     @Override

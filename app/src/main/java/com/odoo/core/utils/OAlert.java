@@ -22,6 +22,10 @@ package com.odoo.core.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.TextUtils;
+import android.util.TypedValue;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.odoo.crm.R;
 
@@ -89,7 +93,7 @@ public class OAlert {
         builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialog) {
-                if(listener!=null){
+                if (listener != null) {
                     listener.onConfirmChoiceSelect(ConfirmType.NEGATIVE);
                 }
             }
@@ -97,7 +101,50 @@ public class OAlert {
         builder.create().show();
     }
 
+    public static void inputDialog(Context context, String title, final OnUserInputListener listener) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        int margin = OResource.dimen(context, R.dimen.default_8dp);
+        params.setMargins(margin, margin, margin, margin);
+        LinearLayout linearLayout = new LinearLayout(context);
+        linearLayout.setLayoutParams(params);
+        linearLayout.setPadding(margin, margin, margin, margin);
+        final EditText edtInput = new EditText(context);
+        edtInput.setLayoutParams(params);
+        edtInput.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        if (listener != null) {
+            listener.onViewCreated(edtInput);
+        }
+        linearLayout.addView(edtInput);
+        builder.setView(linearLayout);
+        if (title != null)
+            builder.setTitle(title);
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (TextUtils.isEmpty(edtInput.getText())) {
+                    edtInput.setError("Field required");
+                    edtInput.requestFocus();
+                } else {
+                    if (listener != null) {
+                        listener.onUserInputted(edtInput.getText());
+                    }
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
+        builder.create().show();
+    }
+
     public static interface OnAlertConfirmListener {
         public void onConfirmChoiceSelect(ConfirmType type);
+    }
+
+    public static interface OnUserInputListener {
+        public void onViewCreated(EditText inputView);
+
+        public void onUserInputted(Object value);
     }
 }
