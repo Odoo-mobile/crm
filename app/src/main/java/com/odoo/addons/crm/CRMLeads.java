@@ -42,7 +42,6 @@ import android.widget.Toast;
 
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
-import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
@@ -68,18 +67,17 @@ import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindListener,
+public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewBindListener,
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
         IOnSearchViewChangeListener, View.OnClickListener, IOnItemClickListener,
         BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener,
         IOnBackPressListener, IOnActivityResultListener {
-    public static final String TAG = CRM.class.getSimpleName();
+    public static final String TAG = CRMLeads.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
     public static final int REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD = 223;
     public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 224;
     public static final String KEY_IS_LEAD = "key_is_lead";
-    private Type mType = Type.Leads;
     private View mView;
     private int mLocal_id = 0;
     private ListView mList;
@@ -93,6 +91,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     private int customer_id = -1;
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
+
     public enum Type {
         Leads, Opportunities
     }
@@ -111,7 +110,6 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         parent().setOnBackPressListener(this);
         parent().setOnActivityResultListener(this);
         Bundle extra = getArguments();
-        mType = Type.valueOf(extra.getString(KEY_MENU));
         if (extra != null && extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
             filter_customer_data = true;
             customer_id = extra.getInt(Customers.KEY_CUSTOMER_ID);
@@ -142,7 +140,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                 break;
             case R.id.fabButton:
                 Bundle type = new Bundle();
-                type.putString("type", mType.toString());
+                type.putString("type", Type.Leads.toString());
                 IntentUtils.startActivity(getActivity(), CRMDetail.class, type);
                 break;
         }
@@ -159,14 +157,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         String where = " type = ?";
         String[] whereArgs;
         List<String> args = new ArrayList<>();
-        switch (mType) {
-            case Leads:
-                args.add("lead");
-                break;
-            case Opportunities:
-                args.add("opportunity");
-                break;
-        }
+        args.add("lead");
         if (mFilter != null) {
             where += " and (name like ? or description like ? or display_name like ? " +
                     "or stage_name like ? or title_action like ?)";
@@ -195,7 +186,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setVisible(mView, R.id.swipe_container);
                     OControls.setGone(mView, R.id.customer_no_items);
-                    setHasSwipeRefreshView(mView, R.id.swipe_container, CRM.this);
+                    setHasSwipeRefreshView(mView, R.id.swipe_container, CRMLeads.this);
                 }
             }, 500);
         } else {
@@ -209,10 +200,10 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
                     OControls.setVisible(mView, R.id.customer_no_items);
-                    setHasSwipeRefreshView(mView, R.id.customer_no_items, CRM.this);
-                    OControls.setImage(mView, R.id.icon, (mType == Type.Leads) ? R.drawable.ic_action_leads
-                            : R.drawable.ic_action_opportunities);
-                    OControls.setText(mView, R.id.title, "No " + mType.toString() + " Found");
+                    setHasSwipeRefreshView(mView, R.id.customer_no_items, CRMLeads.this);
+                    OControls.setImage(mView, R.id.icon, R.drawable.ic_action_leads
+                    );
+                    OControls.setText(mView, R.id.title, "No Leads Found");
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);
@@ -233,28 +224,8 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         String date = ODateUtils.convertToDefault(row.getString("create_date"),
                 ODateUtils.DEFAULT_FORMAT, "MMMM, dd");
         OControls.setText(view, R.id.create_date, date);
-        // Controls for opportunity
-        if (mType == Type.Opportunities) {
-            syncBundle.putBoolean(KEY_IS_LEAD, false);
-            view.findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
-            if (!row.getString("date_action").equals("false")) {
-                OControls.setVisible(view, R.id.date_action);
-                String date_action = ODateUtils.convertToDefault(row.getString("date_action")
-                        , ODateUtils.DEFAULT_DATE_FORMAT, "MMMM, dd");
-                OControls.setText(view, R.id.date_action, date_action + " : ");
-            } else {
-                OControls.setGone(view, R.id.date_action);
-            }
-            if (!row.getString("title_action").equals("false")) {
-                OControls.setVisible(view, R.id.title_action);
-                OControls.setText(view, R.id.title_action, row.getString("title_action"));
-            } else {
-                OControls.setGone(view, R.id.title_action);
-            }
-        } else {
-            syncBundle.putBoolean(KEY_IS_LEAD, true);
-            view.findViewById(R.id.opportunity_controls).setVisibility(View.GONE);
-        }
+        syncBundle.putBoolean(KEY_IS_LEAD, true);
+        view.findViewById(R.id.opportunity_controls).setVisibility(View.GONE);
     }
 
     @Override
@@ -262,14 +233,15 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         List<ODrawerItem> menu = new ArrayList<>();
         menu.add(new ODrawerItem(TAG)
                 .setTitle(OResource.string(context, R.string.label_leads))
-                .setInstance(new CRM())
+                .setInstance(new CRMLeads())
                 .setIcon(R.drawable.ic_action_leads)
                 .setExtra(data(Type.Leads)));
         menu.add(new ODrawerItem(TAG)
                 .setTitle(OResource.string(context, R.string.label_opportunities))
-                .setInstance(new CRM())
+                .setInstance(new CRMOpportunitiesPager())
                 .setIcon(R.drawable.ic_action_opportunities)
                 .setExtra(data(Type.Opportunities)));
+
         return menu;
     }
 
@@ -333,7 +305,6 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
     }
 
     private void showSheet(Cursor data) {
-        ODataRow row = OCursorUtils.toDatarow(data);
         BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
         builder.listener(this);
         builder.setIconColor(_c(R.color.body_text_2));
@@ -342,10 +313,7 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
         builder.actionListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);
         builder.title(data.getString(data.getColumnIndex("name")));
-        if (row.getString("type").equals("lead"))
-            builder.menu(R.menu.menu_lead_list_sheet);
-        else
-            builder.menu(R.menu.menu_opp_list_sheet);
+        builder.menu(R.menu.menu_lead_list_sheet);
         mSheet = builder.create();
         mSheet.show();
     }
@@ -389,15 +357,6 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                     Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
                 }
                 break;
-            case R.id.menu_lead_convert_to_quotation:
-                if (inNetwork()) {
-                    Intent intent = new Intent(getActivity(), ConvertToQuotation.class);
-                    intent.putExtras(row.getPrimaryBundleData());
-                    parent().startActivityForResult(intent, REQUEST_CONVERT_TO_QUOTATION_WIZARD);
-                } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                }
-                break;
             case R.id.menu_lead_call_customer:
                 if (!row.getString("partner_id").equals("false")) {
                     String contact = partner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
@@ -422,17 +381,6 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
                     Toast.makeText(getActivity(), "No partner found !", Toast.LENGTH_LONG).show();
                 }
                 break;
-            case R.id.menu_lead_reschedule:
-                IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
-                break;
-            case R.id.menu_lead_won:
-                wonLost = "won";
-                if (inNetwork()) {
-                    crmLead.markWonLost(wonLost, row, markDoneListener);
-                } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                }
-                break;
             case R.id.menu_lead_lost:
                 wonLost = "lost";
                 if (inNetwork()) {
@@ -451,25 +399,9 @@ public class CRM extends BaseFragment implements OCursorListAdapter.OnViewBindLi
             List<Integer> ids = data.getIntegerArrayListExtra(ConvertToOpportunityWizard.KEY_LEADS_IDS);
             crmLead.convertToOpportunity(convertRequestRecord, ids, convertDoneListener);
         }
-        if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode == Activity.RESULT_OK) {
-            CRMLead crmLead = (CRMLead) db();
-            crmLead.createQuotation(convertRequestRecord, data.getStringExtra("partner_id"), data.getBooleanExtra("mark_won", false), createQuotationListener);
-        }
+
     }
 
-    CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
-        @Override
-        public void OnSuccess() {
-            Toast.makeText(getActivity(), OResource.string(getActivity(), R.string.label_quotation_created) + " " +
-                    convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
-            parent().sync().requestSync(SaleOrder.AUTHORITY);
-        }
-
-        @Override
-        public void OnCancelled() {
-
-        }
-    };
     CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {

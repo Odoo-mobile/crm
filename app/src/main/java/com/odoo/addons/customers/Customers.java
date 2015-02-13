@@ -38,7 +38,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.odoo.addons.crm.CRM;
+import com.odoo.addons.crm.CRMLeads;
+import com.odoo.addons.crm.CRMOpportunitiesPager;
 import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
@@ -70,13 +71,17 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public static final String KEY = Customers.class.getSimpleName();
     public static final String KEY_FILTER_REQUEST = "key_filter_request";
     public static final String KEY_CUSTOMER_ID = "key_customer_id";
-    public static final String KEY_FILTER_TYPE = CRM.KEY_MENU;
+    public static final String KEY_FILTER_TYPE = CRMLeads.KEY_MENU;
     private View mView;
     private String mCurFilter = null;
     private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
     private BottomSheet mSheet = null;
     private boolean syncRequested = false;
+
+    public enum Type {
+        Leads, Opportunities
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -263,10 +268,10 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
         switch (menu.getItemId()) {
             case R.id.menu_customer_opportunity:
-                requestLeads(CRM.Type.Opportunities, row.getInt(OColumn.ROW_ID), row.getString("name"));
+                requestOpportunity(row.getInt(OColumn.ROW_ID), row.getString("name"));
                 break;
             case R.id.menu_customer_leads:
-                requestLeads(CRM.Type.Leads, row.getInt(OColumn.ROW_ID), row.getString("name"));
+                requestLeads(Type.Leads, row.getInt(OColumn.ROW_ID), row.getString("name"));
                 break;
             case R.id.menu_customer_location:
                 String address = ((ResPartner) db()).getAddress(OCursorUtils.toDatarow((Cursor) extras));
@@ -297,13 +302,21 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         }
     }
 
-    private void requestLeads(CRM.Type type, int row_id, String name) {
+    private void requestOpportunity(int row_id, String name) {
+        Bundle extra = new Bundle();
+        extra.putBoolean(KEY_FILTER_REQUEST, true);
+        extra.putInt(KEY_CUSTOMER_ID, row_id);
+        extra.putString("name", name);
+        startFragment(new CRMOpportunitiesPager(), true, extra);
+    }
+
+    private void requestLeads(Type type, int row_id, String name) {
         Bundle extra = new Bundle();
         extra.putBoolean(KEY_FILTER_REQUEST, true);
         extra.putInt(KEY_CUSTOMER_ID, row_id);
         extra.putString(KEY_FILTER_TYPE, type.toString());
         extra.putString("name", name);
-        startFragment(new CRM(), true, extra);
+        startFragment(new CRMLeads(), true, extra);
     }
 
     @Override

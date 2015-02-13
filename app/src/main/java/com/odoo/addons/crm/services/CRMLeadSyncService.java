@@ -24,7 +24,7 @@ import android.content.SyncResult;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.odoo.addons.crm.CRM;
+import com.odoo.addons.crm.CRMLeads;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.core.orm.ODataRow;
@@ -52,9 +52,9 @@ public class CRMLeadSyncService extends OSyncService implements ISyncFinishListe
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("crm.lead")) {
             ODomain domain = new ODomain();
-            if (extras.containsKey(CRM.KEY_IS_LEAD)) {
+            if (extras.containsKey(CRMLeads.KEY_IS_LEAD)) {
                 domain.add("type", "=",
-                        (extras.getBoolean(CRM.KEY_IS_LEAD)) ? "lead" : "opportunity");
+                        (extras.getBoolean(CRMLeads.KEY_IS_LEAD)) ? "lead" : "opportunity");
                 adapter.setDomain(domain);
                 Log.d(TAG, "Setting lead filter type");
             }

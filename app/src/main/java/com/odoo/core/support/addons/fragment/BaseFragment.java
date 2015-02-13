@@ -61,8 +61,7 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mContext = getActivity();
-        if (savedInstanceState == null)
-            parent().setHasActionBarSpinner(false);
+        parent().setHasActionBarSpinner(false);
     }
 
     public void setTitle(String title) {
@@ -168,6 +167,19 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
             mSyncObserverHandle = null;
         }
         parent().unregisterReceiver(syncFinishReceiver);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        onNavSpinnerDestroy();
+    }
+
+    protected void onNavSpinnerDestroy() {
+        if (parent().getActionBarSpinner() != null) {
+            parent().getActionBarSpinner().setAdapter(null);
+            parent().setHasActionBarSpinner(false);
+        }
     }
 
     @Override
