@@ -20,7 +20,7 @@ android {
     }
 }
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:21.0.3'
     compile files('libs/odoo-v2.jar')
     compile files('libs/swipe_library.jar')
@@ -29,5 +29,7 @@ dependencies {
     compile project(':calendar-lib')
     compile project(':bottom-sheet-lib')
     compile project(':parallax-effect-lib')
+    compile project(':calendar-lib')
+    compile project(':intro-slider-lib')
     compile project(':snackbar-lib')
 }
