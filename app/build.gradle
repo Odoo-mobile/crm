@@ -29,5 +29,6 @@ dependencies {
     compile project(':calendar-lib')
     compile project(':bottom-sheet-lib')
     compile project(':parallax-effect-lib')
+    compile project(':calendar-lib')
     compile project(':snackbar-lib')
 }

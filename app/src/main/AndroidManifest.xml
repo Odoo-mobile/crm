@@ -62,20 +62,20 @@
         </service>
 
         <provider
-            android:multiprocess="true"
             android:name="com.odoo.core.orm.provider.BaseModelProvider"
-            android:authorities="com.odoo.core.crm.provider.content" />
+            android:authorities="com.odoo.core.crm.provider.content"
+            android:multiprocess="true" />
         <provider
-            android:multiprocess="true"
             android:name="com.odoo.base.addons.ir.providers.IrModelProvider"
-            android:authorities="com.odoo.core.crm.provider.content.sync.ir_model" />
+            android:authorities="com.odoo.core.crm.provider.content.sync.ir_model"
+            android:multiprocess="true" />
 
         <!-- Sync Provider & Service  // -->
         <provider
-            android:multiprocess="true"
             android:name="com.odoo.addons.customers.providers.CustomersSyncProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.res_partner"
-            android:label="@string/sync_label_customers" />
+            android:label="@string/sync_label_customers"
+            android:multiprocess="true" />
 
         <service
             android:name="com.odoo.addons.customers.services.CustomerSyncService"
@@ -91,10 +91,10 @@
         </service>
 
         <provider
-            android:multiprocess="true"
             android:name="com.odoo.addons.calendar.providers.CalendarSyncProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.calendar_event"
-            android:label="@string/sync_label_calendar" />
+            android:label="@string/sync_label_calendar"
+            android:multiprocess="true" />
 
         <service
             android:name="com.odoo.addons.calendar.services.CalendarSyncService"
@@ -110,10 +110,10 @@
         </service>
 
         <provider
-            android:multiprocess="true"
             android:name="com.odoo.addons.crm.providers.CRMLeadProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.crm_lead"
-            android:label="@string/sync_label_lead_opportunities" />
+            android:label="@string/sync_label_lead_opportunities"
+            android:multiprocess="true" />
 
         <service
             android:name="com.odoo.addons.crm.services.CRMLeadSyncService"
@@ -131,8 +131,8 @@
         <provider
             android:name="com.odoo.addons.sale.providers.SaleOrderProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.sale_order"
-            android:multiprocess="true"
-            android:label="@string/sync_label_quotation_sales_orders" />
+            android:label="@string/sync_label_quotation_sales_orders"
+            android:multiprocess="true" />
 
         <service
             android:name="com.odoo.addons.sale.services.SaleOrderSyncService"
@@ -150,8 +150,8 @@
         <provider
             android:name="com.odoo.addons.phonecall.providers.PhoneCallProvider"
             android:authorities="com.odoo.core.crm.provider.content.sync.crm_phonecall"
-            android:multiprocess="true"
-            android:label="@string/sync_label_phonecalls" />
+            android:label="@string/sync_label_phonecalls"
+            android:multiprocess="true" />
 
         <service
             android:name="com.odoo.addons.phonecall.services.PhoneCallSyncService"
@@ -178,12 +178,11 @@
         <activity
             android:name="com.odoo.addons.crm.ConvertToOpportunityWizard"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.odoo.addons.crm.ConvertToQuotation"
             android:theme="@style/Theme.AppCompat.Light.Dialog"
-            android:windowSoftInputMode="adjustPan"></activity>
-
+            android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.odoo.addons.phonecall.PhoneCallDetail"
             android:windowSoftInputMode="adjustPan" />
@@ -206,7 +205,11 @@
 
         <activity
             android:name="com.odoo.addons.sale.AddProductLineWizard"
-            android:windowSoftInputMode="adjustPan"></activity>
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name="com.odoo.core.account.AppIntro"
+            android:screenOrientation="portrait"
+            android:label="@string/title_activity_app_intro"></activity>
     </application>
 
 </manifest>

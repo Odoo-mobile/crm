@@ -62,16 +62,17 @@
     <string name="label_expected_revenue">Expected Revenue</string>
     <string name="label_at"> at </string>
     <string name="label_conversion_action"> Conversion Action </string>
-
     <string name="toast_information_saved">Information Saved</string>
     <string name="toast_phone_call_marked_done">Phone call held</string>
     <string name="toast_event_marked_done">Event marked done</string>
     <string name="toast_image_size_too_large">Image size is too large.</string>
     <string name="toast_marked"> marked</string>
+
     <string-array name="array_conversation_actions">
         <item>Convert to opportunity</item>
         <item>Merge with existing opportunities</item>
     </string-array>
+
     <string name="label_send_by_email">Send by email</string>
     <string name="label_confirm_sale">Confirm Sale</string>
     <string name="label_copy_quotation">Copy of quotation</string>
@@ -81,4 +82,8 @@
 
     <!-- Working day start time -->
     <string name="default_day_start_time">09:00:00</string>
+    <string name="title_activity_app_intro">AppIntro</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
 </resources>
