@@ -45,6 +45,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.odoo.core.account.AppIntro;
 import com.odoo.core.account.ManageAccounts;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.auth.OdooAccountManager;
@@ -58,6 +59,7 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OFragmentUtils;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.drawer.DrawerUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
@@ -78,6 +80,8 @@ public class OdooActivity extends ActionBarActivity {
     public static final String KEY_HAS_ACTIONBAR_SPINNER = "key_has_actionbar_spinner";
     public static final Integer REQUEST_ACCOUNT_CREATE = 1101;
     public static final Integer REQUEST_ACCOUNTS_MANAGE = 1102;
+    public static final String KEY_FRESH_LOGIN = "key_fresh_login";
+
 
     private DrawerLayout mDrawerLayout = null;
     private ActionBarDrawerToggle mDrawerToggle = null;
@@ -97,6 +101,11 @@ public class OdooActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         mSavedInstanceState = savedInstanceState;
         Log.i(TAG, "OdooActivity->onCreate");
+        OPreferenceManager preferenceManager = new OPreferenceManager(this);
+        if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
+            preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);
+            startActivity(new Intent(this, AppIntro.class));
+        }
         setContentView(R.layout.odoo_activity);
         OActionBarUtils.setActionBar(this, true);
         setupDrawer();

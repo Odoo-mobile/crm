@@ -1,1 +1,1 @@
-include ':app', ':calendar-lib', ':bottom-sheet-lib', ':snackbar-lib', ':parallax-effect-lib'
+include ':app', ':calendar-lib', ':bottom-sheet-lib', ':snackbar-lib', ':parallax-effect-lib', ':intro-slider-lib'
