@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.odoo.App;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.customers.Customers;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResUsers;
@@ -79,7 +80,7 @@ public class CRMDetail extends ActionBarActivity {
     private void init() {
         mForm = (OForm) findViewById(R.id.crmLeadForm);
         if (!extra.containsKey(OColumn.ROW_ID)) {
-            if (extra.getString("type").equals(CRM.Type.Opportunities.toString())) {
+            if (extra.getString("type").equals(Customers.Type.Opportunities.toString())) {
                 type = "opportunity";
                 findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
             }

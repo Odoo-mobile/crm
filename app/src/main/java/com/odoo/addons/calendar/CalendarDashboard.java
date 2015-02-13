@@ -208,7 +208,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         ODataRow row = (ODataRow) navSpinnerAdapter.getItem(position);
         mFilterType = FilterType.valueOf(row.getString("key"));
-        if (mFilterDate != null)
+        if (mFilterDate != null && getActivity() != null)
             getLoaderManager().restartLoader(0, null, this);
     }
 

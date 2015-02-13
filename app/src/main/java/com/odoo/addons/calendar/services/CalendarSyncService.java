@@ -25,7 +25,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
-import com.odoo.addons.crm.CRM;
+import com.odoo.addons.crm.CRMLeads;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.core.account.BaseSettings;
@@ -92,7 +92,7 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
         SyncUtils.get(getApplicationContext(), user).requestSync(CRMPhoneCalls.AUTHORITY);
         // Syncing only Opportunity from agenda
         Bundle syncData = new Bundle();
-        syncData.putBoolean(CRM.KEY_IS_LEAD, false);
+        syncData.putBoolean(CRMLeads.KEY_IS_LEAD, false);
         SyncUtils.get(getApplicationContext(), user).requestSync(CRMLead.AUTHORITY, syncData);
         return null;
     }
