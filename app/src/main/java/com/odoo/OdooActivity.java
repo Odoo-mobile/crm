@@ -537,21 +537,26 @@ public class OdooActivity extends ActionBarActivity {
 
     public void setHasActionBarSpinner(Boolean hasActionBarSpinner) {
         ActionBar actionBar = getSupportActionBar();
+        Spinner spinner = (Spinner) findViewById(R.id.spinner_nav);
         if (hasActionBarSpinner) {
-            findViewById(R.id.spinner_nav).setVisibility(View.VISIBLE);
+            if (spinner != null)
+                spinner.setVisibility(View.VISIBLE);
             actionBar.setDisplayShowTitleEnabled(false);
         } else {
-            findViewById(R.id.spinner_nav).setVisibility(View.GONE);
+            if (spinner != null)
+                spinner.setVisibility(View.GONE);
             actionBar.setDisplayShowTitleEnabled(true);
         }
         mHasActionBarSpinner = hasActionBarSpinner;
     }
 
     public Spinner getActionBarSpinner() {
+        Spinner spinner = null;
         if (mHasActionBarSpinner) {
-            return (Spinner) findViewById(R.id.spinner_nav);
+            spinner = (Spinner) findViewById(R.id.spinner_nav);
+            spinner.setAdapter(null);
         }
-        return null;
+        return spinner;
     }
 
 }

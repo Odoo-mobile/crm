@@ -17,5 +17,5 @@
     <item
         android:id="@+id/menu_lead_lost"
         android:icon="@drawable/ic_action_mark_lost"
-        android:title="@string/label_mark_as_won"></item>
+        android:title="@string/label_mark_as_lost"></item>
 </menu>
