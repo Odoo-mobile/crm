@@ -94,6 +94,7 @@
     <orderEntry type="library" exported="" name="play-services-6.5.87" level="project" />
     <orderEntry type="library" exported="" name="cardview-v7-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="calendar-lib-unspecified" level="project" />
+    <orderEntry type="module" module-name="intro-slider-lib" />
   </component>
 </module>
 

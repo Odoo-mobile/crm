@@ -3,8 +3,9 @@ package com.odoo.core.account;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 
+import com.odoo.config.IntroSliderItems;
 import com.odoo.crm.R;
-//import com.odoo.widgets.slider.SliderView;
+import com.odoo.widgets.slider.SliderView;
 
 public class AppIntro extends ActionBarActivity {
 

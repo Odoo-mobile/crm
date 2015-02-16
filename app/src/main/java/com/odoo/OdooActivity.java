@@ -104,7 +104,12 @@ public class OdooActivity extends ActionBarActivity {
         OPreferenceManager preferenceManager = new OPreferenceManager(this);
         if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
             preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);
-            startActivity(new Intent(this, AppIntro.class));
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    startActivity(new Intent(OdooActivity.this, AppIntro.class));
+                }
+            }, 1000);
         }
         setContentView(R.layout.odoo_activity);
         OActionBarUtils.setActionBar(this, true);
@@ -546,17 +551,19 @@ public class OdooActivity extends ActionBarActivity {
 
     public void setHasActionBarSpinner(Boolean hasActionBarSpinner) {
         ActionBar actionBar = getSupportActionBar();
-        Spinner spinner = (Spinner) findViewById(R.id.spinner_nav);
-        if (hasActionBarSpinner) {
-            if (spinner != null)
-                spinner.setVisibility(View.VISIBLE);
-            actionBar.setDisplayShowTitleEnabled(false);
-        } else {
-            if (spinner != null)
-                spinner.setVisibility(View.GONE);
-            actionBar.setDisplayShowTitleEnabled(true);
+        if (actionBar != null) {
+            Spinner spinner = (Spinner) findViewById(R.id.spinner_nav);
+            if (hasActionBarSpinner) {
+                if (spinner != null)
+                    spinner.setVisibility(View.VISIBLE);
+                actionBar.setDisplayShowTitleEnabled(false);
+            } else {
+                if (spinner != null)
+                    spinner.setVisibility(View.GONE);
+                actionBar.setDisplayShowTitleEnabled(true);
+            }
+            mHasActionBarSpinner = hasActionBarSpinner;
         }
-        mHasActionBarSpinner = hasActionBarSpinner;
     }
 
     public Spinner getActionBarSpinner() {

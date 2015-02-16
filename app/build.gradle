@@ -31,4 +31,5 @@ dependencies {
     compile project(':parallax-effect-lib')
     compile project(':calendar-lib')
     compile project(':snackbar-lib')
+    compile project(':intro-slider-lib')
 }
