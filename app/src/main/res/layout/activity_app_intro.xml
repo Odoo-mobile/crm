@@ -10,6 +10,6 @@
         android:layout_height="match_parent"
         android:id="@+id/sliderView">
 
-        </com.odoo.widgets.slider.SliderView>
+    </com.odoo.widgets.slider.SliderView>
 
 </LinearLayout>
