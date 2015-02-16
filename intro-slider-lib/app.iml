@@ -3,12 +3,9 @@
   <component name="FacetManager">
     <facet type="android-gradle" name="Android-Gradle">
       <configuration>
-        <option name="GRADLE_PROJECT_PATH" value=":intro-slider-lib" />
+        <option name="GRADLE_PROJECT_PATH" value=":app" />
       </configuration>
     </facet>
-<<<<<<< HEAD
-=======
-<<<<<<< HEAD
     <facet type="android" name="Android">
       <configuration>
         <option name="SELECTED_BUILD_VARIANT" value="debug" />
@@ -89,17 +86,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" exported="" name="support-annotations-21.0.3" level="project" />
     <orderEntry type="library" exported="" name="support-v4-21.0.3" level="project" />
-=======
->>>>>>> master-crm-studio-app-intro-dso
-  </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="true">
-    <exclude-output />
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
-<<<<<<< HEAD
-=======
->>>>>>> [IMP]
->>>>>>> master-crm-studio-app-intro-dso
   </component>
 </module>
 
