@@ -105,6 +105,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     }
 
     private void initSpinner() {
+        spinnerItems.clear();
         spinnerItems.addAll(crmStage.select(null, "type!=?", new String[]{"lead"}, "sequence"));
         mNavSpinnerAdapter = new OListAdapter(getActivity(), R.layout.base_simple_list_item_1, spinnerItems) {
             @Override
@@ -278,6 +279,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
 
     public void updatePager() {
         initCR();
+        initSpinner();
         mAdapter.notifyDataSetChanged();
     }
 
