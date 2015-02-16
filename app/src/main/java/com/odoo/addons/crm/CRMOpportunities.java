@@ -20,13 +20,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
@@ -40,6 +43,7 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
@@ -127,6 +131,32 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                 Bundle types = new Bundle();
                 types.putString("type", CRMLeads.Type.Opportunities.toString());
                 IntentUtils.startActivity(getActivity(), CRMDetail.class, types);
+                break;
+            case R.id.stage:
+                final ODataRow row = (ODataRow) v.getTag();
+                final List<String> stageNames = new ArrayList<>();
+                CRMCaseStage crmStage = new CRMCaseStage(getActivity(), null);
+                final List<ODataRow> stages = crmStage.select(null, "type != ?",
+                        new String[]{"lead"}, "sequence");
+                for (ODataRow stage : stages) {
+                    stageNames.add(stage.getString("name"));
+                }
+                OChoiceDialog.get(getActivity()).withOptions(stageNames)
+                        .show(new OChoiceDialog.OnChoiceSelectListener() {
+                            @Override
+                            public void choiceSelected(int position, String value) {
+                                OValues stageValue = new OValues();
+                                stageValue.put("stage_name", stages.get(position).
+                                        getString("name"));
+                                stageValue.put("stage_id", stages.get(position)
+                                        .getInt(OColumn.ROW_ID));
+                                new CRMLead(getActivity(), null).update(OColumn.ROW_ID + "=?",
+                                        new String[]{row.getString(OColumn.ROW_ID)}, stageValue);
+                                Toast.makeText(getActivity(), row.getString("name") +
+                                        " moved to stage " + stages.get(position).
+                                        getString("name"), Toast.LENGTH_SHORT).show();
+                            }
+                        });
                 break;
         }
     }
@@ -226,7 +256,11 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         } else {
             OControls.setGone(view, R.id.title_action);
         }
+        TextView tv = (TextView) view.findViewById(R.id.stage);
+        tv.setOnClickListener(this);
+        tv.setTag(row);
     }
+
 
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
@@ -280,6 +314,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
     }
+
 
     @Override
     public void onItemClick(View view, int position) {
@@ -416,6 +451,6 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
 
     @Override
     protected void onNavSpinnerDestroy() {
-        
+
     }
 }
