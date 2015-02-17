@@ -83,6 +83,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     private ODataRow currencyObj;
     private ResPartner partner = null;
     private String mSOType = "";
+    LinearLayout layoutAddItem = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         untaxedAmt.setText("0.00");
         taxesAmt.setText("0.00");
         total_amt.setText("0.00");
-        LinearLayout layoutAddItem = (LinearLayout) findViewById(R.id.layoutAddItem);
+        layoutAddItem = (LinearLayout) findViewById(R.id.layoutAddItem);
         layoutAddItem.setOnClickListener(this);
         if (extra == null) {
             mForm.initForm(null);
@@ -131,7 +132,10 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
             if (extra.getString("type").equals(Type.Quotation.toString())) {
                 actionBar.setTitle(R.string.label_quotation);
                 txvType.setText(R.string.label_quotation);
+                if (record.getString("state").equals("cancel"))
+                    layoutAddItem.setVisibility(View.GONE);
             } else {
+                layoutAddItem.setVisibility(View.GONE);
                 actionBar.setTitle(R.string.label_sale_orders);
                 txvType.setText(R.string.label_sale_orders);
                 mForm.setEditable(false);
@@ -183,7 +187,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         OField name = (OField) mForm.findViewById(R.id.fname);
         name.setEditable(false);
         if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {
-            menu.findItem(R.id.menu_sale_confirm_sale).setVisible(true);
+            // Operation on Sale Order
         } else {
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
@@ -193,7 +197,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
             mForm.setEditable(true);
         } else {
-            menu.findItem(R.id.menu_sale_cancel_order).setVisible(true);
+            menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(false);
         }
         if (extra == null) {
@@ -220,16 +224,6 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     } else {
                         Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
                     }
-                }
-                break;
-            case R.id.menu_sale_cancel_order:
-                if (record != null) {
-                    if (app.inNetwork()) {
-                        sale.cancelOrder(Sales.Type.valueOf(extra.getString("type")), record, cancelOrder);
-                    } else {
-                        Toast.makeText(this, R.string.toast_network_required, Toast.LENGTH_LONG).show();
-                    }
-                    finish();
                 }
                 break;
             case R.id.menu_sale_confirm_sale:

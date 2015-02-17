@@ -15,9 +15,6 @@
                 android:id="@+id/menu_sale_confirm_sale"
                 android:title="@string/label_sale_confirm_sale" />
             <item
-                android:id="@+id/menu_sale_cancel_order"
-                android:title="@string/label_sale_cancel_order" />
-            <item
                 android:id="@+id/menu_sale_new_copy_of_quotation"
                 android:title="@string/label_sale_new_copy_of_quotation" />
         </menu>
