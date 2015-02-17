@@ -272,15 +272,21 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onItemDoubleClick(View view, int position) {
+        onDoubleClick(position);
+    }
+
+    private void onDoubleClick(int position){
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         Bundle data = row.getPrimaryBundleData();
         data.putString("type", mType.toString());
         IntentUtils.startActivity(getActivity(), SalesDetail.class, data);
     }
-
     @Override
     public void onItemClick(View view, int position) {
-        showSheet((Cursor) mAdapter.getItem(position));
+        if (mType == Type.Quotation)
+            showSheet((Cursor) mAdapter.getItem(position));
+        else
+            onDoubleClick(position);
     }
 
     private void showSheet(Cursor data) {
@@ -292,15 +298,14 @@ public class Sales extends BaseFragment implements
         builder.actionListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);
         builder.title(data.getString(data.getColumnIndex("name")));
-        if (mType == Type.Quotation) {
-            if (data.getString(data.getColumnIndex("state")).equals("cancel"))
-                builder.menu(R.menu.menu_quotation_cancel_sheet);
-            else
-                builder.menu(R.menu.menu_quotation_sheet);
-        } else
-            builder.menu(R.menu.menu_so_sheet);
+
+        if (data.getString(data.getColumnIndex("state")).equals("cancel"))
+            builder.menu(R.menu.menu_quotation_cancel_sheet);
+        else
+            builder.menu(R.menu.menu_quotation_sheet);
         mSheet = builder.create();
         mSheet.show();
+
     }
 
     @Override

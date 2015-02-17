@@ -65,6 +65,7 @@ public class CRMDetail extends ActionBarActivity {
     private Menu menu;
     private String wonLost = "won";
     private String type = "lead";
+    private TextView currency_symbol;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +80,7 @@ public class CRMDetail extends ActionBarActivity {
 
     private void init() {
         mForm = (OForm) findViewById(R.id.crmLeadForm);
+        currency_symbol = (TextView) findViewById(R.id.currency_symbol);
         if (!extra.containsKey(OColumn.ROW_ID)) {
             if (extra.getString("type").equals(Customers.Type.Opportunities.toString())) {
                 type = "opportunity";
@@ -87,21 +89,25 @@ public class CRMDetail extends ActionBarActivity {
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_tag_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
+            ODataRow currency = ResCompany.getCurrency(this);
+            if (currency != null) {
+                currency_symbol.setText(currency.getString("symbol"));
+            }
         } else {
             initFormValues();
         }
         mForm.setEditable(true);
-        TextView currency_symbol = (TextView) findViewById(R.id.currency_symbol);
-        ODataRow currency = ResCompany.getCurrency(this);
-        if (currency != null) {
-            currency_symbol.setText(currency.getString("symbol"));
-        }
+
     }
 
     private void initFormValues() {
         record = crmLead.browse(extra.getInt(OColumn.ROW_ID));
         if (record == null) {
             finish();
+        }
+        ODataRow currency = record.getM2ORecord("company_currency").browse();
+        if (currency != null) {
+            currency_symbol.setText(currency.getString("symbol"));
         }
         if (!record.getString("type").equals("lead")) {
             actionBar.setTitle(R.string.label_opportunity);
@@ -155,6 +161,8 @@ public class CRMDetail extends ActionBarActivity {
                         crmLead.update(record.getInt(OColumn.ROW_ID), values);
                         row_id = record.getInt(OColumn.ROW_ID);
                     } else {
+                        values.put("company_id", ResCompany.myId(this));
+                        values.put("company_currency", ResCompany.myCurrency(this));
                         values.put("create_date", ODateUtils.getUTCDate());
                         values.put("user_id", ResUsers.myId(this));
                         CRMCaseStage stages = new CRMCaseStage(this, null);

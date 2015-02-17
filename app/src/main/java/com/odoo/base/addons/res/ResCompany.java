@@ -58,4 +58,17 @@ public class ResCompany extends OModel {
     public boolean allowDeleteRecordInLocal() {
         return false;
     }
+
+    public static int myId(Context context) {
+        ResCompany company = new ResCompany(context, null);
+        return company.selectRowId(Integer.parseInt(company.getUser().getCompany_id()));
+    }
+
+    public static int myCurrency(Context context) {
+        ResCompany company = new ResCompany(context, null);
+        ODataRow row = company.browse(company.selectRowId(Integer.parseInt(company.
+                getUser().getCompany_id())));
+        return row.getM2ORecord("currency_id").browse().getInt(OColumn.ROW_ID);
+
+    }
 }

@@ -111,13 +111,15 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     }
 
     private void initAdapter() {
-        mList = (ListView) mView.findViewById(R.id.listview);
-        mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.crm_item);
-        mAdapter.setOnViewBindListener(this);
-        mList.setAdapter(mAdapter);
-        setHasFloatingButton(mView, R.id.fabButton, mList, this);
-        mAdapter.handleItemClickListener(mList, this);
-        getLoaderManager().initLoader(0, null, this);
+        if(getActivity()!=null) {
+            mList = (ListView) mView.findViewById(R.id.listview);
+            mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.crm_item);
+            mAdapter.setOnViewBindListener(this);
+            mList.setAdapter(mAdapter);
+            setHasFloatingButton(mView, R.id.fabButton, mList, this);
+            mAdapter.handleItemClickListener(mList, this);
+            getLoaderManager().initLoader(0, null, this);
+        }
     }
 
     @Override
