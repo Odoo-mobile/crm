@@ -30,6 +30,15 @@
             android:padding="3dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
+
+        <ImageView
+            android:visibility="gone"
+            android:id="@+id/stage_move"
+            android:padding="3dp"
+            android:tint="@color/theme_secondary"
+            android:src="@drawable/ic_action_more"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 
     <TextView

@@ -124,9 +124,9 @@ public class CalendarEvent extends OModel {
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
-        domain.add("|");
-        domain.add("user_id", "=", getUser().getUser_id());
-        domain.add("partner_ids", "in", getUser().getPartner_id());
+//        domain.add("|");
+//        domain.add("user_id", "=", getUser().getUser_id());
+        domain.add("partner_ids.id", "=", getUser().getPartner_id());
         return domain;
     }
 

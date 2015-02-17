@@ -33,7 +33,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
 import com.odoo.core.account.BaseSettings;
-import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.crm.R;
 
@@ -55,12 +54,13 @@ public class ONotificationBuilder {
     private List<NotificationAction> mActions = new ArrayList<ONotificationBuilder.NotificationAction>();
     private int notification_id = 0;
     private Boolean withVibrate = true;
-    private OPreferenceManager mPref;
+    private Boolean withLargeIcon = true;
+    private Boolean withRingTone = true;
+    private int notification_color = R.color.theme_secondary;
 
     public ONotificationBuilder(Context context, int notification_id) {
         mContext = context;
         this.notification_id = notification_id;
-        mPref = new OPreferenceManager(context);
     }
 
     public ONotificationBuilder setTitle(String title) {
@@ -76,6 +76,24 @@ public class ONotificationBuilder {
     public ONotificationBuilder setIcon(int res_id) {
         icon = res_id;
         return this;
+    }
+
+    public ONotificationBuilder withLargeIcon(boolean largeIcon) {
+        withLargeIcon = largeIcon;
+        return this;
+    }
+
+    public boolean withLargeIcon() {
+        return withLargeIcon;
+    }
+
+    public ONotificationBuilder withRingTone(Boolean ringTone) {
+        withRingTone = ringTone;
+        return this;
+    }
+
+    public boolean withRingTone() {
+        return withRingTone;
     }
 
     public ONotificationBuilder setBigText(String bigText) {
@@ -103,23 +121,33 @@ public class ONotificationBuilder {
         return this;
     }
 
+    public ONotificationBuilder setColor(int res_id) {
+        notification_color = res_id;
+        return this;
+    }
+
     private void init() {
         mNotificationManager = (NotificationManager) mContext
                 .getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationBuilder = new NotificationCompat.Builder(mContext);
         mNotificationBuilder.setContentTitle(title);
         mNotificationBuilder.setContentText(text);
-        mNotificationBuilder.setContentInfo(text);
-        mNotificationBuilder.setSmallIcon(small_icon);
-        Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(), this.icon);
-        Bitmap newIcon = Bitmap.createBitmap(icon.getWidth(), icon.getHeight(), icon.getConfig());
-        Canvas canvas = new Canvas(newIcon);
-        canvas.drawColor(OResource.color(mContext, R.color.theme_primary));
-        canvas.drawBitmap(icon, 0, 0, null);
-        mNotificationBuilder.setLargeIcon(newIcon);
+        if (bigText == null)
+            mNotificationBuilder.setContentInfo(text);
+        if (withLargeIcon()) {
+            mNotificationBuilder.setSmallIcon(small_icon);
+            Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(), this.icon);
+            Bitmap newIcon = Bitmap.createBitmap(icon.getWidth(), icon.getHeight(), icon.getConfig());
+            Canvas canvas = new Canvas(newIcon);
+            canvas.drawColor(OResource.color(mContext, R.color.theme_primary));
+            canvas.drawBitmap(icon, 0, 0, null);
+            mNotificationBuilder.setLargeIcon(newIcon);
+        } else {
+            mNotificationBuilder.setSmallIcon(icon);
+        }
         mNotificationBuilder.setAutoCancel(mAutoCancel);
         mNotificationBuilder.setOngoing(mOnGoing);
-        mNotificationBuilder.setColor(OResource.color(mContext, R.color.theme_secondary));
+        mNotificationBuilder.setColor(OResource.color(mContext, notification_color));
         if (bigText != null) {
             NotificationCompat.BigTextStyle notiStyle = new NotificationCompat.BigTextStyle();
             notiStyle.setBigContentTitle(title);
@@ -149,7 +177,8 @@ public class ONotificationBuilder {
         if (withVibrate) {
             setVibrateForNotification();
         }
-        setSoundForNotification();
+        if (withRingTone())
+            setSoundForNotification();
         if (resultIntent != null) {
             _setResultIntent();
         }
@@ -179,6 +208,9 @@ public class ONotificationBuilder {
     }
 
     public void show() {
+        if (mNotificationBuilder == null) {
+            build();
+        }
         mNotificationManager.notify(notification_id, mNotificationBuilder.build());
     }
 

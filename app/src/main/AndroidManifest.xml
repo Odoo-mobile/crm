@@ -48,6 +48,10 @@
         <activity android:name="com.odoo.OdooActivity" />
         <activity android:name="odoo.controls.SearchableItemActivity" />
         <activity android:name="com.odoo.SettingsActivity" />
+        <activity
+            android:windowSoftInputMode="adjustPan"
+            android:name="com.odoo.core.account.OdooAccountQuickManage"
+            android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity android:name="com.odoo.core.account.About" />
         <activity android:name="com.odoo.core.account.Profile" />
 

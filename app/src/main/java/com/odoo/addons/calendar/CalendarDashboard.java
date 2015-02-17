@@ -696,7 +696,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 List<String> choices = new ArrayList<>();
                 choices.add("Schedule/Log calls");
                 choices.add("Schedule Meeting");
-                OChoiceDialog.get(getActivity()).withOptions(choices)
+                OChoiceDialog.get(getActivity()).withOptions(choices, -1)
                         .show(new OChoiceDialog.OnChoiceSelectListener() {
                             @Override
                             public void choiceSelected(int position, String value) {
@@ -722,7 +722,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 choices = new ArrayList<>();
                 choices.add("Re-Schedule call");
                 choices.add("Schedule other call");
-                OChoiceDialog.get(getActivity()).withOptions(choices)
+                OChoiceDialog.get(getActivity()).withOptions(choices, -1)
                         .show(new OChoiceDialog.OnChoiceSelectListener() {
                             @Override
                             public void choiceSelected(int position, String value) {

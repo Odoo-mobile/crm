@@ -29,6 +29,7 @@ import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.base.addons.ir.IrModel;
+import com.odoo.core.account.OdooAccountQuickManage;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
@@ -38,6 +39,8 @@ import com.odoo.core.support.OUser;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
+import com.odoo.core.utils.notification.ONotificationBuilder;
+import com.odoo.crm.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,10 +52,12 @@ import java.util.List;
 import odoo.ODomain;
 import odoo.Odoo;
 import odoo.OdooInstance;
+import odoo.OdooSessionExpiredException;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
-
+    public static final Integer REQUEST_SIGN_IN_ERROR = 11244;
+    public static final String KEY_AUTH_ERROR = "key_authentication_error";
     private Context mContext;
     private Class<? extends OModel> mModelClass;
     private OModel mModel;
@@ -131,7 +136,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         try {
             ODomain domain = new ODomain();
             domain.append(model.defaultDomain());
-            if(domain_filter!=null){
+            if (domain_filter != null) {
                 domain.append(domain_filter);
             }
 
@@ -190,13 +195,16 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (model.allowDeleteRecordInLocal()) {
                 removeNonExistRecordFromLocal(model);
             }
+
+            Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
+            if (createRelationRecords) {
+                IrModel irModel = new IrModel(mContext, user);
+                irModel.setLastSyncDateTimeToNow(model);
+            }
+        } catch (OdooSessionExpiredException odooSession) {
+            showSignInErrorNotification(user);
         } catch (Exception e) {
             e.printStackTrace();
-        }
-        Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
-        if (createRelationRecords) {
-            IrModel irModel = new IrModel(mContext, user);
-            irModel.setLastSyncDateTimeToNow(model);
         }
         // Performing next sync if any in service
         if (mSyncFinishListeners.containsKey(model.getModelName())) {
@@ -215,6 +223,42 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         model.close();
     }
 
+    private void showSignInErrorNotification(OUser user) {
+        ONotificationBuilder builder = new ONotificationBuilder(mContext,
+                REQUEST_SIGN_IN_ERROR);
+        builder.setTitle("Odoo authentication problem");
+        builder.setBigText("May be you have changed your account " +
+                "password or your account does not exists");
+        builder.setIcon(R.drawable.ic_action_alert_warning);
+        builder.setText(user.getAndroidName());
+        builder.allowVibrate(true);
+        builder.withRingTone(false);
+        builder.setOngoing(true);
+        builder.withLargeIcon(false);
+        builder.setColor(R.color.android_orange_dark);
+
+        Bundle extra = user.getAsBundle();
+        // Actions
+        ONotificationBuilder.NotificationAction actionReset = new ONotificationBuilder.NotificationAction(
+                R.drawable.ic_action_refresh,
+                "Reset",
+                110,
+                "reset_password",
+                OdooAccountQuickManage.class,
+                extra
+        );
+        ONotificationBuilder.NotificationAction deleteAccount = new ONotificationBuilder.NotificationAction(
+                R.drawable.ic_action_navigation_close,
+                "Remove",
+                111,
+                "remove_account",
+                OdooAccountQuickManage.class,
+                extra
+        );
+        builder.addAction(actionReset);
+        builder.addAction(deleteAccount);
+        builder.build().show();
+    }
 
     private void handleRelationRecords(OUser user,
                                        HashMap<String, OSyncDataUtils.SyncRelationRecords> relationRecords,

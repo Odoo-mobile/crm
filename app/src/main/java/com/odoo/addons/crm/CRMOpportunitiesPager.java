@@ -49,6 +49,7 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ import java.util.List;
 
 import odoo.controls.OControlHelper;
 
-public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnPageChangeListener, AdapterView.OnItemSelectedListener {
+public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnPageChangeListener, AdapterView.OnItemSelectedListener, IOnBackPressListener {
     public static final String TAG = CRMOpportunitiesPager.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
     private CRMLeads.Type mType = CRMLeads.Type.Opportunities;
@@ -89,6 +90,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mContext = getActivity();
+        parent().setOnBackPressListener(this);
         Bundle extra = getArguments();
         if (extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
             filterCustomerOpp = true;
@@ -105,6 +107,9 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     }
 
     private void initSpinner() {
+        if (getActivity() == null) {
+            return;
+        }
         spinnerItems.clear();
         spinnerItems.addAll(crmStage.select(null, "type!=?", new String[]{"lead"}, "sequence"));
         mNavSpinnerAdapter = new OListAdapter(getActivity(), R.layout.base_simple_list_item_1, spinnerItems) {
@@ -186,6 +191,12 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
 
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return ((IOnBackPressListener) mFragments.get("index_" + mNavSpinner.getSelectedItemPosition())
+        ).onBackPressed();
     }
 
     private class StagePagerAdapter extends FragmentStatePagerAdapter {

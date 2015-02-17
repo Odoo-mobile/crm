@@ -14,7 +14,6 @@
     <Spinner
         android:id="@+id/spinner_nav"
         android:visibility="gone"
-        android:popupBackground="@color/background_material_dark"
         android:layout_marginLeft="@dimen/default_16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

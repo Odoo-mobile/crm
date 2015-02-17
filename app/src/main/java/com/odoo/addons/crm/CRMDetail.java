@@ -38,6 +38,7 @@ import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.sync.SyncUtils;
@@ -66,6 +67,7 @@ public class CRMDetail extends ActionBarActivity {
     private String wonLost = "won";
     private String type = "lead";
     private TextView currency_symbol;
+    private int stage_id = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +87,9 @@ public class CRMDetail extends ActionBarActivity {
             if (extra.getString("type").equals(Customers.Type.Opportunities.toString())) {
                 type = "opportunity";
                 findViewById(R.id.opportunity_controls).setVisibility(View.VISIBLE);
+            }
+            if (extra.containsKey("stage_id")) {
+                stage_id = extra.getInt("stage_id");
             }
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_tag_new);
@@ -154,6 +159,9 @@ public class CRMDetail extends ActionBarActivity {
                 break;
             case R.id.menu_lead_save:
                 OValues values = mForm.getValues();
+                if (stage_id != OModel.INVALID_ROW_ID) {
+                    values.put("stage_id", stage_id);
+                }
                 if (values != null) {
                     values.put("type", type);
                     int row_id;
@@ -166,11 +174,17 @@ public class CRMDetail extends ActionBarActivity {
                         values.put("create_date", ODateUtils.getUTCDate());
                         values.put("user_id", ResUsers.myId(this));
                         CRMCaseStage stages = new CRMCaseStage(this, null);
-                        ODataRow row = stages.browse(new String[]{"name"}, "name = ?", new String[]{"New"});
+                        ODataRow row;
+                        if (!values.contains("stage_id")) {
+                            row = stages.browse(new String[]{"name"}, "name = ?", new String[]{"New"});
+                        } else {
+                            row = stages.browse(stage_id);
+                        }
                         if (row != null) {
                             values.put("stage_id", row.getInt(OColumn.ROW_ID));
                             values.put("stage_name", row.getString("name"));
                         }
+
                         values.put("display_name", values.getString("partner_name"));
                         values.put("assignee_name", crmLead.getUser().getName());
                         row_id = crmLead.insert(values);

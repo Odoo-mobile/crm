@@ -32,6 +32,8 @@ public class OChoiceDialog implements DialogInterface.OnClickListener {
     private AlertDialog.Builder mBuilder;
     private List<String> options = new ArrayList<>();
     private OnChoiceSelectListener mOnChoiceSelectListener;
+    private int defaultSelected = -1;
+    private String title = null;
 
     public OChoiceDialog(Context context) {
         mContext = context;
@@ -42,14 +44,23 @@ public class OChoiceDialog implements DialogInterface.OnClickListener {
         return new OChoiceDialog(context);
     }
 
-    public OChoiceDialog withOptions(List<String> options) {
+    public OChoiceDialog withTitle(String title) {
+        this.title = title;
+        return this;
+    }
+
+    public OChoiceDialog withOptions(List<String> options, int selected) {
         this.options = options;
+        defaultSelected = selected;
         return this;
     }
 
     public void show(OnChoiceSelectListener listener) {
         mOnChoiceSelectListener = listener;
-        mBuilder.setSingleChoiceItems(options.toArray(new String[options.size()]), -1, this);
+        if (title != null) {
+            mBuilder.setTitle(title);
+        }
+        mBuilder.setSingleChoiceItems(options.toArray(new String[options.size()]), defaultSelected, this);
         mBuilder.show();
     }
 

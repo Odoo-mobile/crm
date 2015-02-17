@@ -47,8 +47,8 @@
         android:layout_height="72dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
+        android:layout_marginBottom="@dimen/default_8dp"
+        android:layout_marginRight="@dimen/default_8dp"
         odoo:drawable="@drawable/ic_action_content_add"
         odoo:fabColor="@color/theme_primary" />
 </RelativeLayout>

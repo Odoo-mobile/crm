@@ -67,6 +67,12 @@ public class PhoneCalls extends BaseFragment implements
     private String mFilter = null;
     private boolean syncRequested = false;
 
+    public enum Type {
+        Logged, Scheduled
+    }
+
+    private Type mType = Type.Logged;
+
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
@@ -78,6 +84,7 @@ public class PhoneCalls extends BaseFragment implements
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
+        mType = Type.valueOf(getArguments().getString("type"));
         setHasSwipeRefreshView(mView, R.id.swipe_container, this);
         initAdapter();
     }
@@ -132,14 +139,24 @@ public class PhoneCalls extends BaseFragment implements
     }
 
     @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String where = null;
-        String[] whereArgs = null;
-        if (mFilter != null) {
-            where = " name like ? or lead_name like ? or customer_name like ?";
-            whereArgs = new String[]{"%" + mFilter + "%", "%" + mFilter + "%", "%" + mFilter + "%"};
+    public Loader<Cursor> onCreateLoader(int id, Bundle data) {
+        String where;
+        List<String> args = new ArrayList<>();
+        if (mType == Type.Logged) {
+            where = " state = ?";
+            args.add("done");
+        } else {
+            where = " state != ?";
+            args.add("done");
         }
-        return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, "date");
+        if (mFilter != null) {
+            where = " and name like ? or lead_name like ? or customer_name like ?";
+            args.add("%" + mFilter + "%");
+            args.add("%" + mFilter + "%");
+            args.add("%" + mFilter + "%");
+        }
+        return new CursorLoader(getActivity(), db().uri(), null, where,
+                (args.size() > 0) ? args.toArray(new String[args.size()]) : null, "date");
     }
 
     @Override
@@ -189,8 +206,20 @@ public class PhoneCalls extends BaseFragment implements
         menu.add(new ODrawerItem(TAG)
                 .setTitle(OResource.string(context, R.string.label_logged_calls))
                 .setIcon(R.drawable.ic_action_call_logs)
+                .setExtra(extra(Type.Logged))
+                .setInstance(new PhoneCalls()));
+        menu.add(new ODrawerItem(TAG)
+                .setTitle(OResource.string(context, R.string.label_scheduled_calls))
+                .setIcon(R.drawable.ic_action_schedule_call)
+                .setExtra(extra(Type.Scheduled))
                 .setInstance(new PhoneCalls()));
         return menu;
+    }
+
+    private Bundle extra(Type type) {
+        Bundle extra = new Bundle();
+        extra.putString("type", type.toString());
+        return extra;
     }
 
     @Override
