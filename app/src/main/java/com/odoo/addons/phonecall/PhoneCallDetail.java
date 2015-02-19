@@ -39,6 +39,7 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.core.utils.reminder.ReminderReceiver;
 import com.odoo.crm.R;
@@ -59,7 +60,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
     private ODataRow record;
     private CRMPhoneCalls crmPhoneCalls;
     private OField phoneCallDate, opportunity_id;
-    private String logType = "done";
+    private String logType = "done", type= null;
     private Boolean updateOpportunity = false;
     private CRMLead crmLead = null;
     private OForm opportunity_action_form;
@@ -141,6 +142,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                 data_record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
                 int opp_id = extra.getInt(KEY_OPPORTUNITY_ID);
                 data_record.put("opportunity_id", opp_id);
+                data_record.put("date", ODateUtils.getCurrentDateWithHour(1));
                 if (extra.containsKey(PhoneStateReceiver.KEY_DURATION_START)) {
                     long start_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_START));
                     long end_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_END));
@@ -200,10 +202,11 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     if (extra == null || extra.containsKey("opp_id")
                             || extra.containsKey(KEY_LOG_CALL_REQUEST) || extra.containsKey("call_id")) {
                         int row_id = crmPhoneCalls.insert(values);
-                        crmPhoneCalls.setReminder(row_id);
+                        Toast.makeText(this, type + " " + values.getString("name"), Toast.LENGTH_LONG).show();
                     } else {
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
                         crmPhoneCalls.setReminder(extra.getInt(OColumn.ROW_ID));
+                        Toast.makeText(this,"Updated " + type + " " + values.getString("name"), Toast.LENGTH_LONG).show();
                     }
                     finish();
                 }
@@ -230,9 +233,11 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                 Date now = new Date();
                 if (now.compareTo(selectedDate) >= 0) {
                     actionBar.setTitle(R.string.label_log_call);
+                    type = OResource.string(this, R.string.label_logged_call);
                     logType = "done";
                 } else {
                     logType = "open";
+                    type = OResource.string(this, R.string.label_scheduled_call);
                     actionBar.setTitle(R.string.label_schedule_call);
                 }
             }

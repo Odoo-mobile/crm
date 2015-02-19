@@ -21,9 +21,11 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.addons.calendar.EventDetail;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
+import com.odoo.addons.phonecall.PhoneCallDetail;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
@@ -223,7 +225,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, CRMOpportunities.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_opportunities);
-                    OControls.setText(mView, R.id.title, "No Opportunity Found");
+                    OControls.setText(mView, R.id.title, OResource.string(getActivity(),R.string.label_no_opportunity_found));
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);
@@ -353,7 +355,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
 
     @Override
     public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
-        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+        final ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
         mSheet.dismiss();
         convertRequestRecord = row;
         CRMLead crmLead = (CRMLead) db();
@@ -393,7 +395,29 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                 }
                 break;
             case R.id.menu_lead_reschedule:
-                IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
+                List<String> choices = new ArrayList<>();
+                choices.add(OResource.string(getActivity(),R.string.label_opt_schedule_log_call));
+                choices.add(OResource.string(getActivity(),R.string.label_opt_schedule_meeting));
+                OChoiceDialog.get(getActivity()).withOptions(choices, -1)
+                        .show(new OChoiceDialog.OnChoiceSelectListener() {
+                            @Override
+                            public void choiceSelected(int position, String value) {
+                                int opp_id = row.getInt(OColumn.ROW_ID);
+                                switch (position) {
+                                    case 0:
+                                        Bundle extra = new Bundle();
+                                        extra.putInt("opp_id", opp_id);
+                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
+                                        break;
+                                    case 1: // Schedule meeting
+                                        Bundle data = new Bundle();
+//                                        data.putString(KEY_DATE, mFilterDate);
+                                        data.putInt("opp_id", opp_id);
+                                        IntentUtils.startActivity(getActivity(), EventDetail.class, data);
+                                        break;
+                                }
+                            }
+                        });
                 break;
             case R.id.menu_lead_won:
                 wonLost = "won";

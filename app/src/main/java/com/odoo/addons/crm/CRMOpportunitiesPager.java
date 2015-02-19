@@ -49,6 +49,7 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.crm.R;
 
@@ -112,6 +113,10 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         }
         spinnerItems.clear();
         spinnerItems.addAll(crmStage.select(null, "type!=?", new String[]{"lead"}, "sequence"));
+        if (spinnerItems.isEmpty()) {
+            parent().setHasActionBarSpinner(false);
+            return;
+        }
         mNavSpinnerAdapter = new OListAdapter(getActivity(), R.layout.base_simple_list_item_1, spinnerItems) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -145,6 +150,14 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
                 crmStage.uri(), true, observer);
         initCR();
         mPager = (ViewPager) view.findViewById(R.id.pager);
+        if (spinnerItems.isEmpty()) {
+            mPager.setVisibility(View.GONE);
+            OControls.setVisible(view, R.id.dashboard_no_item_view);
+            OControls.setText(view, R.id.title, OResource.string(getActivity(), R.string.label_no_opportunity_found));
+            OControls.setText(view, R.id.subTitle, "");
+            OControls.setImage(view, R.id.icon, R.drawable.ic_action_opportunities);
+            return;
+        }
         mPager.setOnPageChangeListener(this);
         mTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_title_strip);
         mTabStrip.setTabIndicatorColor(Color.WHITE);

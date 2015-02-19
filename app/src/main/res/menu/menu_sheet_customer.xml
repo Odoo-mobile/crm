@@ -22,7 +22,7 @@
         android:title="@string/label_message" />
     <item
         android:id="@+id/menu_customer_schedule_call"
-        android:icon="@drawable/ic_action_call_logs"
+        android:icon="@drawable/ic_action_reschedule"
         android:title="@string/label_schedule_call" />
     <!--<item-->
     <!--android:id="@+id/menu_customer_meetings"-->

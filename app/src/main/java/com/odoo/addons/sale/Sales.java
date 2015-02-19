@@ -63,7 +63,7 @@ import java.util.List;
 
 public class Sales extends BaseFragment implements
         OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>,
-        SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener, View.OnClickListener,
+        SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener,
         ISyncStatusObserverListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener {
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
@@ -103,7 +103,7 @@ public class Sales extends BaseFragment implements
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
         mAdapter.handleItemClickListener(mList, this);
-        setHasFloatingButton(mView, R.id.fabButton, mList, this);
+        mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
         setHasSyncStatusObserver(TAG, this, db());
         setHasSwipeRefreshView(mView, R.id.swipe_container, this);
         getLoaderManager().initLoader(0, null, this);
@@ -256,14 +256,6 @@ public class Sales extends BaseFragment implements
         //Nothing to do
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fabButton:
-                IntentUtils.startActivity(getActivity(), SalesDetail.class, null);
-                break;
-        }
-    }
 
     @Override
     public void onStatusChange(Boolean refreshing) {
@@ -275,12 +267,13 @@ public class Sales extends BaseFragment implements
         onDoubleClick(position);
     }
 
-    private void onDoubleClick(int position){
+    private void onDoubleClick(int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         Bundle data = row.getPrimaryBundleData();
         data.putString("type", mType.toString());
         IntentUtils.startActivity(getActivity(), SalesDetail.class, data);
     }
+
     @Override
     public void onItemClick(View view, int position) {
         if (mType == Type.Quotation)

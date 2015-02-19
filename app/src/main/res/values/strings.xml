@@ -27,6 +27,8 @@
     <string name="label_phone_calls">Phone calls</string>
     <string name="label_logged_calls">Logged calls</string>
     <string name="label_scheduled_calls">Scheduled calls</string>
+    <string name="label_logged_call">Logged call</string>
+    <string name="label_scheduled_call">Scheduled call</string>
     <string name="label_log_call">Log Call</string>
     <string name="label_convert_to_opportunity">Convert to Opportunity</string>
     <string name="label_create_opportunity">Create Opportunity</string>
@@ -52,6 +54,7 @@
     <string name="label_no_customer_found">No Customers Found</string>
     <string name="label_no_location_found">No location found !</string>
     <string name="label_no_contact_found">No contact found !</string>
+    <string name="label_no_opportunity_found">No Opportunity Found !</string>
     <string name="label_no_email_found">No email found !</string>
     <string name="label_no_logged_calls_found">No Logged calls Found</string>
     <string name="label_event_marked">Event marked</string>
@@ -80,6 +83,8 @@
     <string name="label_no_order_line">You cannot confirm a sales order which has no line</string>
     <string name="label_quotation_confirm">Quotation confirmed !</string>
     <string name="label_new_copy_quotation">New Copy of Quotation</string>
+    <string name="label_opt_schedule_log_call">Schedule/Log Call</string>
+    <string name="label_opt_schedule_meeting">Meeting</string>
 
     <!-- Working day start time -->
     <string name="default_day_start_time">09:00:00</string>

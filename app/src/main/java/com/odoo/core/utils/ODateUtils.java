@@ -212,6 +212,14 @@ public class ODateUtils {
         return cal.getTime();
     }
 
+    public static String getCurrentDateWithHour(int addHour) {
+        Calendar cal = Calendar.getInstance();
+        int hour = cal.get(Calendar.HOUR);
+        cal.set(Calendar.HOUR, hour + addHour);
+        Date date = cal.getTime();
+        return ODateUtils.createDate(date, ODateUtils.DEFAULT_FORMAT, true);
+    }
+
     public static Date getDateMinuteBefore(Date originalDate, int minutes) {
         Calendar cal = new GregorianCalendar();
         cal.setTime(originalDate);
