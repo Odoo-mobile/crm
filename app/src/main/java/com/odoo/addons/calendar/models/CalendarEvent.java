@@ -103,7 +103,7 @@ public class CalendarEvent extends OModel {
 
 
     // PhoneCalls link
-    OColumn phonecall_id = new OColumn("Phonecalls", CRMPhoneCalls.class, OColumn.RelationType.ManyToOne);
+    OColumn phonecall_id = new OColumn("Phone calls", CRMPhoneCalls.class, OColumn.RelationType.ManyToOne);
     //Opportunities id
     OColumn opportunity_id = new OColumn("Opportunities", CRMLead.class, OColumn.RelationType.ManyToOne)
             .addDomain("type", "=", "opportunity");
@@ -124,8 +124,6 @@ public class CalendarEvent extends OModel {
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
-//        domain.add("|");
-//        domain.add("user_id", "=", getUser().getUser_id());
         domain.add("partner_ids.id", "=", getUser().getPartner_id());
         return domain;
     }

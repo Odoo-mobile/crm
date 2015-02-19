@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import odoo.OArguments;
+import odoo.Odoo;
 import odoo.controls.ExpandableListControl;
 import odoo.controls.OField;
 import odoo.controls.OForm;
@@ -465,6 +466,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     context.put("quantity", qty);
                     context.put("pricelist", pricelist);
                     String method = (stockInstalled) ? "product_id_change_with_wh" : "product_id_change";
+                    Odoo.DEBUG=true;
                     JSONObject response = ((JSONObject) helper.callMethod(method, arguments, context));
                     JSONObject res = response.getJSONObject("value");
                     if (response.has("warning") && !response.getString("warning").equals("false")) {

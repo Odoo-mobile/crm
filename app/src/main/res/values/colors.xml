@@ -50,4 +50,5 @@
     </array>
 
     <color name="icon_tint">#5e5e5e</color>
+    <color name="actionbar_spinner_text_color">#414141</color>
 </resources>

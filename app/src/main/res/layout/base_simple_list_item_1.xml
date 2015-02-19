@@ -8,7 +8,7 @@
     <TextView
         android:textStyle="bold"
         android:id="@android:id/text1"
-        android:textColor="@android:color/white"
+        android:textColor="@color/actionbar_spinner_text_color"
         android:layout_width="match_parent"
         android:textSize="@dimen/text_size_xmedium"
         android:layout_height="wrap_content" />

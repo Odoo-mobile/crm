@@ -25,9 +25,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import com.odoo.addons.calendar.models.CalendarEvent;
-import com.odoo.addons.crm.CRMLeads;
-import com.odoo.addons.crm.models.CRMLead;
-import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.core.account.BaseSettings;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
@@ -36,7 +33,6 @@ import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.reminder.ReminderUtils;
 
@@ -88,12 +84,6 @@ public class CalendarSyncService extends OSyncService implements ISyncFinishList
             }
         }
         Log.i(TAG, count + " reminder updated");
-        // Syncing phone calls and sales order
-        SyncUtils.get(getApplicationContext(), user).requestSync(CRMPhoneCalls.AUTHORITY);
-        // Syncing only Opportunity from agenda
-        Bundle syncData = new Bundle();
-        syncData.putBoolean(CRMLeads.KEY_IS_LEAD, false);
-        SyncUtils.get(getApplicationContext(), user).requestSync(CRMLead.AUTHORITY, syncData);
         return null;
     }
 }

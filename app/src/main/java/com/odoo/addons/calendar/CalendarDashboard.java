@@ -51,6 +51,7 @@ import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.CalendarUtils;
 import com.odoo.addons.calendar.utils.TodayIcon;
 import com.odoo.addons.crm.CRMDetail;
+import com.odoo.addons.crm.CRMLeads;
 import com.odoo.addons.crm.ConvertToQuotation;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.PhoneCallDetail;
@@ -70,6 +71,7 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.support.list.OListAdapter;
+import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
@@ -809,6 +811,12 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public void onRefresh() {
         if (inNetwork()) {
             parent().sync().requestSync(CalendarEvent.AUTHORITY);
+            // Syncing phone calls and sales order
+            SyncUtils.get(getActivity(), db().getUser()).requestSync(CRMPhoneCalls.AUTHORITY);
+            // Syncing only Opportunity from agenda
+            Bundle syncData = new Bundle();
+            syncData.putBoolean(CRMLeads.KEY_IS_LEAD, false);
+            SyncUtils.get(getActivity(), db().getUser()).requestSync(CRMLead.AUTHORITY, syncData);
             setSwipeRefreshing(true);
         } else {
             hideRefreshingProgress();

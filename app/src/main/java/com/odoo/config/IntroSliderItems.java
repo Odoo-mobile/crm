@@ -55,6 +55,9 @@ public class IntroSliderItems implements SliderPagerAdapter.SliderBuilderListene
         items.add(new SliderItem("Manageable lines", "Easily share your tasks and get invitations from others",
                 R.drawable.slide_6, this)
                 .putExtra("sub_title", "Easily manage order lines"));
+        items.add(new SliderItem("Works in offline", "Allow you to work offline",
+                R.drawable.no_network, this)
+                .putExtra("sub_title", "Offline support"));
         return items;
     }
 
