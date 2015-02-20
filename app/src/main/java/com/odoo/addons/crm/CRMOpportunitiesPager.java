@@ -79,6 +79,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     private Spinner mNavSpinner = null;
     private OListAdapter mNavSpinnerAdapter = null;
     private List<Object> spinnerItems = new ArrayList<>();
+    private int selectedPagerPosition = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -176,6 +177,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     @Override
     public void onPageSelected(int position) {
         mNavSpinner.setSelection(position);
+        selectedPagerPosition = position;
     }
 
     @Override
@@ -292,6 +294,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         initCR();
         initSpinner();
         mAdapter.notifyDataSetChanged();
+        mPager.setCurrentItem(selectedPagerPosition);
     }
 
 }

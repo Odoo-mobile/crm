@@ -59,7 +59,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import odoo.OArguments;
-import odoo.Odoo;
 import odoo.controls.ExpandableListControl;
 import odoo.controls.OField;
 import odoo.controls.OForm;
@@ -308,10 +307,10 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     Thread.sleep(500);
                     int new_id = sale.getServerDataHelper().createOnServer(data);
                     values.put("id", new_id);
-                    sale.insert(values);
                     ODataRow record = new ODataRow();
                     record.put("id", new_id);
                     sale.quickCreateRecord(record);
+                    sale.insert(values);
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override
@@ -448,11 +447,13 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     arguments.add(false); // UOM
                     arguments.add(qty); // Qty_UOS
                     arguments.add(false);// UOS
-                    arguments.add(product.getString("name"));
+                    arguments.add((product.getString("name").equals("false")) ? false
+                            : product.getString("name"));
                     arguments.add(customer.getInt("id")); // Partner id
                     arguments.add(false); // lang
                     arguments.add(true); // update_tax
-                    arguments.add(customer.getString("date_order")); // date order
+                    arguments.add((customer.getString("date_order").equals("false")) ? false
+                            : customer.getString("date_order")); // date order
                     arguments.add(false); // packaging
                     Object fiscal_position = (customer.getString("fiscal_position").equals("false"))
                             ? false : customer.getString("fiscal_position");
@@ -466,7 +467,6 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     context.put("quantity", qty);
                     context.put("pricelist", pricelist);
                     String method = (stockInstalled) ? "product_id_change_with_wh" : "product_id_change";
-                    Odoo.DEBUG=true;
                     JSONObject response = ((JSONObject) helper.callMethod(method, arguments, context));
                     JSONObject res = response.getJSONObject("value");
                     if (response.has("warning") && !response.getString("warning").equals("false")) {

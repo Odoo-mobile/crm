@@ -58,6 +58,7 @@ import java.util.Date;
 import java.util.List;
 
 import odoo.OArguments;
+import odoo.ODomain;
 
 public class CRMLead extends OModel {
     public static final String TAG = CRMLead.class.getSimpleName();
@@ -503,6 +504,16 @@ public class CRMLead extends OModel {
                 }
             }
         }.execute();
+    }
+
+
+    @Override
+    public ODomain defaultDomain() {
+        ODomain domain = new ODomain();
+        domain.add("|");
+        domain.add("user_id", "=", getUser().getUser_id());
+        domain.add("user_id", "=", false);
+        return domain;
     }
 
     public static interface OnOperationSuccessListener {

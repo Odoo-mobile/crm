@@ -32,7 +32,7 @@ import java.util.List;
 public class ODataRow implements Parcelable {
     public static final String TAG = ODataRow.class.getSimpleName();
 
-    HashMap<String, Object> _data = new HashMap<String, Object>();
+    HashMap<String, Object> _data = new HashMap<>();
 
     public void put(String key, Object value) {
         _data.put(key, value);
@@ -75,6 +75,12 @@ public class ODataRow implements Parcelable {
 
     public OO2MRecord getO2MRecord(String key) {
         return (OO2MRecord) _data.get(key);
+    }
+
+    public List<Object> values() {
+        List<Object> values = new ArrayList<>();
+        values.addAll(_data.values());
+        return values;
     }
 
     public List<String> keys() {
