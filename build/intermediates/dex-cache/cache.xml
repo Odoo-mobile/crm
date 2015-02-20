@@ -16,6 +16,7 @@
         <dex dex="/home/dso/odoo-mobile/master-crm-studio-imp-12215-dso/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-d6fb2ab3e0a2bc80bcf3e023f0ef982e3ae18e70.jar" />
     </item>
     <item
+<<<<<<< HEAD
         jar="/home/dso/odoo-mobile/master-crm-studio-imp-12215-dso/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -55,6 +56,8 @@
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/odoo-v2-85f9ee53571d608938a1474338b6f89cf888172b.jar" />
     </item>
     <item
+=======
+>>>>>>> [IMP]
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/bottom-sheet-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -79,6 +82,9 @@
     </item>
     <item
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> [IMP]
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/snackbar-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -123,10 +129,14 @@
         jumboMode="false"
         revision="21.1.2"
 <<<<<<< HEAD
+<<<<<<< HEAD
         sha1="0ed5ba70cce5b43d89ac74214dcd43ef1244d1c6">
 =======
         sha1="5a576da8aa9287b9f4e443583f7560b6c6a0677d">
 >>>>>>> [IMP] improvment task #12215
+=======
+        sha1="0ed5ba70cce5b43d89ac74214dcd43ef1244d1c6">
+>>>>>>> [IMP]
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-99f060204eb7292d1c95a89e00ffda90ba4aed86.jar" />
     </item>
     <item
@@ -137,6 +147,7 @@
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-3b09c4627695554122f7a540f6f744bbbf58126a.jar" />
     </item>
     <item
+<<<<<<< HEAD
 <<<<<<< HEAD
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/calendar-lib/unspecified/classes.jar"
         jumboMode="false"
@@ -196,6 +207,9 @@
     </item>
     <item
         jar="/home/dso/odoo-mobile/master-crm-studio-imp-12215-dso/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+=======
+        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/calendar-lib/unspecified/classes.jar"
+>>>>>>> [IMP]
         jumboMode="false"
         revision="21.1.2"
 <<<<<<< HEAD
