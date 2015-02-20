@@ -91,7 +91,7 @@ public class CustomersSyncProvider extends BaseModelProvider {
         try {
             OdooFields fields = new OdooFields(new String[]{"name", "image_small", "email"});
             ODomain domain = new ODomain();
-            domain.add("name", "=ilike", searchName);
+            domain.add("name", "=ilike", "%" + searchName);
             List<ODataRow> records = model.getServerDataHelper().searchRecords(fields, domain, 10);
             items.addAll(records);
         } catch (Exception e) {
