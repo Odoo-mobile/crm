@@ -57,6 +57,7 @@
     <string name="label_no_opportunity_found">No Opportunity Found !</string>
     <string name="label_no_email_found">No email found !</string>
     <string name="label_no_logged_calls_found">No Logged calls Found</string>
+    <string name="label_no_scheduled_calls_found">No Scheduled calls Found</string>
     <string name="label_event_marked">Event marked</string>
     <string name="label_new_meeting">New Meeting</string>
     <string name="label_edit_meeting">Edit Meeting</string>

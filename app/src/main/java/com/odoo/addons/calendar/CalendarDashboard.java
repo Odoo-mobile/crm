@@ -230,21 +230,34 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         for (SysCal.DateInfo date : week_dates) {
             String date_str = date.getDateString();
             int total = 0;
-            // Checking for events
-            total += event.countGroupBy("date_start", "date(date_start)"
-                    , "(date(date_start) <= ? and date(date_end) >= ? )", new String[]{date_str, date_str}).getInt("total");
+            switch (mFilterType) {
+                case All:
+                case Meetings:
+                    // Checking for events
+                    total += event.countGroupBy("date_start", "date(date_start)"
+                            , "(date(date_start) <= ? and date(date_end) >= ? )", new String[]{date_str, date_str}).getInt("total");
 
-            // Checking for phone calls
-            total += calls.countGroupBy("date", "date(date)",
-                    "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)",
-                    new String[]{date_str, date_str, "open", "pending"})
-                    .getInt("total");
+                    if (mFilterType != FilterType.All)
+                        break;
+                case PhoneCalls:
+                    // Checking for phone calls
+                    total += calls.countGroupBy("date", "date(date)",
+                            "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)",
+                            new String[]{date_str, date_str, "open", "pending"})
+                            .getInt("total");
 
-            // Leads
-            total += lead.countGroupBy("date_deadline", "date(date_deadline)",
-                    "(date(date_deadline) >= ? and date(date_deadline) <= ? or " +
-                            "date(date_action) >= ? and date(date_action) <= ?) and type = ?",
-                    new String[]{date_str, date_str, date_str, date_str, "opportunity"}).getInt("total");
+                    if (mFilterType != FilterType.All)
+                        break;
+                case Opportunities:
+                    // Leads
+                    total += lead.countGroupBy("date_deadline", "date(date_deadline)",
+                            "(date(date_deadline) >= ? and date(date_deadline) <= ? or " +
+                                    "date(date_action) >= ? and date(date_action) <= ?) and type = ?",
+                            new String[]{date_str, date_str, date_str, date_str, "opportunity"}).getInt("total");
+                    if (mFilterType != FilterType.All)
+                        break;
+            }
+
             items.add(new OdooCalendar.DateDataObject(date_str, (total > 0)));
         }
         return items;
@@ -377,13 +390,14 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         Cursor cr = (Cursor) extras;
         String type = cr.getString(cr.getColumnIndex("data_type"));
         String is_done = cr.getString(cr.getColumnIndex("is_done"));
-        if (is_done.equals("0"))
-            return;
-
-        MenuItem mark_done = null;
         if (type.equals("event")) {
-            mark_done = menu.findItem(R.id.menu_events_all_done);
-            mark_done.setVisible(false);
+            ODataRow row = OCursorUtils.toDatarow(cr);
+            if (row.getString("location").equals("false")) {
+                menu.findItem(R.id.menu_events_location).setVisible(false);
+            }
+            if (is_done.equals("1")) {
+                menu.findItem(R.id.menu_events_all_done).setVisible(false);
+            }
         }
     }
 

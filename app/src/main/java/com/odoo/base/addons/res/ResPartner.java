@@ -111,4 +111,8 @@ public class
             add += " - " + row.getString("zip") + " ";
         return add;
     }
+
+    public Uri liveSearchURI() {
+        return uri().buildUpon().appendPath("live_searchable_customer").build();
+    }
 }

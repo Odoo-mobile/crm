@@ -92,6 +92,7 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
 
+
     public enum Type {
         Leads, Opportunities
     }
@@ -318,6 +319,7 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
         mSheet.show();
     }
 
+
     @Override
     public void onSheetActionClick(BottomSheet sheet, Object extras) {
         mSheet.dismiss();
@@ -358,15 +360,21 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
                 }
                 break;
             case R.id.menu_lead_call_customer:
-                if (!row.getString("partner_id").equals("false")) {
-                    String contact = partner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
-                    if (!contact.equals("false")) {
-                        IntentUtils.requestCall(getActivity(), contact);
+                String contact = (row.getString("phone").equals("false")) ?
+                        (row.getString("mobile").equals("false")) ? "false" : row.getString("mobile") : row.getString("phone");
+                if (contact.equals("false")) {
+                    if (!row.getString("partner_id").equals("false")) {
+                        contact = partner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
+                        if (!contact.equals("false")) {
+                            IntentUtils.requestCall(getActivity(), contact);
+                        } else {
+                            Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).show();
                     }
                 } else {
-                    Toast.makeText(getActivity(), "No partner found !", Toast.LENGTH_LONG).show();
+                    IntentUtils.requestCall(getActivity(), contact);
                 }
                 break;
             case R.id.menu_lead_customer_location:

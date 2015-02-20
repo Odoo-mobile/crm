@@ -19,9 +19,11 @@
  */
 package com.odoo.addons.customers;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.LoaderManager;
@@ -66,7 +68,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener, View.OnClickListener,
         BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener,
-        IOnBackPressListener, IOnItemClickListener {
+        IOnBackPressListener, IOnItemClickListener, BottomSheetListeners.OnSheetMenuCreateListener {
 
     public static final String KEY = Customers.class.getSimpleName();
     public static final String KEY_FILTER_REQUEST = "key_filter_request";
@@ -132,7 +134,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         }
         String selection = (args.size() > 0) ? where : null;
         String[] selectionArgs = (args.size() > 0) ? args.toArray(new String[args.size()]) : null;
-        return new CursorLoader(getActivity(), db().uri(),
+        return new CursorLoader(getActivity(), ((ResPartner) db()).liveSearchURI(),
                 null, selection, selectionArgs, null);
     }
 
@@ -174,6 +176,25 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         mAdapter.changeCursor(null);
     }
 
+    @Override
+    public void onItemClick(View view, final int position) {
+        ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
+        if (row.getInt(OColumn.ROW_ID) == 0) {
+            CustomerQuickCreater customerQuickCreater =
+                    new CustomerQuickCreater(new OnLiveSearchRecordCreateListener() {
+                        @Override
+                        public void recordCreated(ODataRow row) {
+                            Cursor cr = getActivity().getContentResolver()
+                                    .query(db().uri(), null, "id = ?", new String[]{row.getString("id")}
+                                            , null);
+                            cr.moveToFirst();
+                            showSheet(cr);
+                        }
+                    });
+            customerQuickCreater.execute(row);
+        } else
+            showSheet((Cursor) mAdapter.getItem(position));
+    }
 
     private void showSheet(Cursor data) {
         if (mSheet != null) {
@@ -185,11 +206,28 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         builder.setTextColor(_c(R.color.body_text_2));
         builder.setData(data);
         builder.actionListener(this);
+        builder.setOnSheetMenuCreateListener(this);
         builder.setActionIcon(R.drawable.ic_action_edit);
         builder.title(data.getString(data.getColumnIndex("name")));
         builder.menu(R.menu.menu_sheet_customer);
         mSheet = builder.create();
         mSheet.show();
+    }
+
+    @Override
+    public void onSheetMenuCreate(Menu menu, Object o) {
+        ODataRow row = OCursorUtils.toDatarow((Cursor) o);
+        String address = ((ResPartner) db()).getAddress(row);
+        if (address.equals("false") || TextUtils.isEmpty(address)) {
+            menu.findItem(R.id.menu_customer_location).setVisible(false);
+        }
+        String contact = ResPartner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
+        if (contact.equals("false")) {
+            menu.findItem(R.id.menu_customer_call).setVisible(false);
+        }
+        if (row.getString("email").equals("false")) {
+            menu.findItem(R.id.menu_customer_send_message).setVisible(false);
+        }
     }
 
     @Override
@@ -263,7 +301,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     }
 
     @Override
-    public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
+    public void onItemClick(BottomSheet sheet, final MenuItem menu, final Object extras) {
         sheet.dismiss();
         ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
         switch (menu.getItemId()) {
@@ -300,6 +338,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
                 break;
         }
+
     }
 
     private void requestOpportunity(int row_id, String name) {
@@ -321,12 +360,18 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
 
     @Override
     public void onItemDoubleClick(View view, int position) {
-        loadActivity(OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position)));
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        showSheet((Cursor) mAdapter.getItem(position));
+        final ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
+        if (row.getInt(OColumn.ROW_ID) == 0) {
+            CustomerQuickCreater customerQuickCreater =
+                    new CustomerQuickCreater(new OnLiveSearchRecordCreateListener() {
+                        @Override
+                        public void recordCreated(ODataRow row) {
+                            loadActivity(row);
+                        }
+                    });
+            customerQuickCreater.execute(row);
+        } else
+            loadActivity(row);
     }
 
     @Override
@@ -353,5 +398,50 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         return true;
     }
 
+
+    private class CustomerQuickCreater extends AsyncTask<ODataRow, Void, ODataRow> {
+        private ProgressDialog progressDialog;
+        private OnLiveSearchRecordCreateListener mOnLiveSearchRecordCreateListener;
+
+        public CustomerQuickCreater(OnLiveSearchRecordCreateListener listener) {
+            mOnLiveSearchRecordCreateListener = listener;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = new ProgressDialog(getActivity());
+            progressDialog.setTitle(R.string.title_working);
+            progressDialog.setMessage(_s(R.string.title_please_wait));
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
+
+        @Override
+        protected ODataRow doInBackground(ODataRow... params) {
+            try {
+                Thread.sleep(500);
+                return db().quickCreateRecord(params[0]);
+            } catch (Exception e) {
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(ODataRow row) {
+            super.onPostExecute(row);
+            progressDialog.dismiss();
+            getLoaderManager().restartLoader(0, null, Customers.this);
+            if (mOnLiveSearchRecordCreateListener != null && row != null) {
+                mOnLiveSearchRecordCreateListener.recordCreated(row);
+            }
+        }
+    }
+
+
+    public interface OnLiveSearchRecordCreateListener {
+        public void recordCreated(ODataRow row);
+    }
 
 }

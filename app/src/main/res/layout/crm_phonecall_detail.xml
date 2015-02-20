@@ -142,6 +142,44 @@
                 style="@style/ViewSeparator"
                 android:layout_marginLeft="72dp" />
 
+            <LinearLayout
+                android:id="@+id/reminderForPhoneCall"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:gravity="center_vertical|top"
+                android:background="?android:attr/selectableItemBackground"
+                android:orientation="horizontal"
+                android:paddingBottom="8dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:paddingTop="8dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="top"
+                    android:layout_marginRight="3dp"
+                    android:paddingBottom="5dp"
+                    android:src="@drawable/ic_action_bell"
+                    android:tint="@color/body_text_3" />
+
+                <TextView
+                    android:id="@+id/reminderTypeName"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:fontFamily="@string/font_normal"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="16dp"
+                    android:text="@string/at_the_time_of_event"
+                    android:textSize="@dimen/text_size_xmedium" />
+            </LinearLayout>
+
+            <View
+                style="@style/ViewSeparator"
+                android:layout_marginLeft="72dp" />
+
             <odoo.controls.OField
                 android:layout_width="match_parent"
                 app:fieldName="categ_id"

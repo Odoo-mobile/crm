@@ -29,6 +29,7 @@ import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.base.addons.ir.IrModel;
+import com.odoo.base.addons.res.ResCompany;
 import com.odoo.core.account.OdooAccountQuickManage;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.ODataRow;
@@ -312,6 +313,14 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
                 }
                 app.setOdoo(odoo, user);
+
+                ResCompany company = new ResCompany(context, user);
+                if (company.count("id = ? ", new String[]{user.getCompany_id()}) <= 0) {
+                    ODataRow company_details = new ODataRow();
+                    company_details.put("id", user.getCompany_id());
+                    company.quickCreateRecord(company_details);
+                }
+
             }
             return odoo;
         } catch (Exception e) {
