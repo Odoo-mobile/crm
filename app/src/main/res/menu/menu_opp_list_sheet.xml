@@ -15,7 +15,7 @@
     <item
         android:id="@+id/menu_lead_reschedule"
         android:icon="@drawable/ic_action_reschedule"
-        android:title="@string/label_re_schedule"></item>
+        android:title="@string/label_schedule_call"></item>
     <item
         android:id="@+id/menu_lead_won"
         android:icon="@drawable/ic_action_mark_won"

@@ -113,13 +113,17 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                 allDay.setValue(record.getBoolean("allday"));
                 String dateFormat = (record.getBoolean("allday")) ? ODateUtils.DEFAULT_DATE_FORMAT :
                         ODateUtils.DEFAULT_FORMAT;
-                event_date_start.setValue(ODateUtils.parseDate(record.getString("date_start"), dateFormat,
+                event_date_start.setValue(ODateUtils.parseDate(record.getString("date_start"),
+                        dateFormat,
                         ODateUtils.DEFAULT_DATE_FORMAT));
-                event_date_end.setValue(ODateUtils.parseDate(record.getString("date_end"), dateFormat,
+                event_date_end.setValue(ODateUtils.parseDate(record.getString("date_end"),
+                        dateFormat,
                         ODateUtils.DEFAULT_DATE_FORMAT));
-                event_time_start.setValue(ODateUtils.parseDate(record.getString("date_start"), dateFormat,
+                event_time_start.setValue(ODateUtils.parseDate(record.getString("date_start"),
+                        dateFormat,
                         ODateUtils.DEFAULT_TIME_FORMAT));
-                event_time_end.setValue(ODateUtils.parseDate(record.getString("date_end"), dateFormat,
+                event_time_end.setValue(ODateUtils.parseDate(record.getString("date_end"),
+                        dateFormat,
                         ODateUtils.DEFAULT_TIME_FORMAT));
                 colorSelected(CalendarUtils.getColorData(record.getInt("color_index")));
             } else {
@@ -142,7 +146,8 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         String action = getIntent().getAction();
         if (action != null && (action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_DONE) ||
                 action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_RE_SCHEDULE))) {
-            ONotificationBuilder.cancelNotification(this, getIntent().getExtras().getInt(OColumn.ROW_ID));
+            ONotificationBuilder.cancelNotification(this, getIntent().getExtras().
+                    getInt(OColumn.ROW_ID));
             if (action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_DONE)) {
                 int row_id = getIntent().getExtras().getInt(OColumn.ROW_ID);
                 OValues values = new OValues();
@@ -273,8 +278,10 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
             }
         } else {
             //v7
-            String start_datetime = values.get("event_date_start") + " " + values.get("event_time_start");
-            String stop_datetime = values.get("event_date_end") + " " + values.get("event_time_end");
+            String start_datetime = values.get("event_date_start") + " " +
+                    values.get("event_time_start");
+            String stop_datetime = values.get("event_date_end") + " " +
+                    values.get("event_time_end");
             meeting.put("date", start_datetime);
             meeting.put("date_deadline", stop_datetime);
             meeting.put("date_start", meeting.get("date"));
@@ -288,7 +295,8 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         Date date_end = ODateUtils.createDateObject(meeting.getString("date_end"),
                 format, false);
         if (date_end.compareTo(date_start) < 0) {
-            OAlert.showWarning(this, OResource.string(this, R.string.error_end_date_small_than_start_date));
+            OAlert.showWarning(this, OResource.string(this,
+                    R.string.error_end_date_small_than_start_date));
         } else {
             Date now = new Date();
             Date reminderDate = null;
@@ -300,7 +308,8 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                 reminderDate = ReminderDialog.getReminderDateTime(meeting.getString("date_start"),
                         meeting.getBoolean("allday"), mReminder);
                 if (reminderDate != null) {
-                    meeting.put("reminder_datetime", ODateUtils.getDate(reminderDate, ODateUtils.DEFAULT_FORMAT));
+                    meeting.put("reminder_datetime", ODateUtils.getDate(reminderDate,
+                            ODateUtils.DEFAULT_FORMAT));
                 }
             }
             if (row_id != -1) {
@@ -330,7 +339,8 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
             findViewById(R.id.event_start_time).setVisibility(View.GONE);
             findViewById(R.id.event_end_time).setVisibility(View.GONE);
         } else {
-            OControls.setText(mView, R.id.reminderTypeName, OResource.string(this, R.string.at_the_time_of_event));
+            OControls.setText(mView, R.id.reminderTypeName, OResource.string(this,
+                    R.string.at_the_time_of_event));
             findViewById(R.id.event_start_time).setVisibility(View.VISIBLE);
             findViewById(R.id.event_end_time).setVisibility(View.VISIBLE);
         }

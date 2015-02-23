@@ -20,13 +20,18 @@
 package com.odoo.addons.phonecall;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.addons.calendar.utils.ReminderDialog;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.features.receivers.PhoneStateReceiver;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
@@ -39,8 +44,10 @@ import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.core.utils.reminder.ReminderReceiver;
+import com.odoo.core.utils.reminder.ReminderUtils;
 import com.odoo.crm.R;
 
 import java.util.Date;
@@ -48,7 +55,9 @@ import java.util.Date;
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFieldValueChangeListener {
+public class PhoneCallDetail extends ActionBarActivity implements OField.
+        IOnFieldValueChangeListener, ReminderDialog.OnReminderValueSelectListener,
+        View.OnClickListener {
     public static final String TAG = PhoneCallDetail.class.getSimpleName();
     public static final String KEY_LOG_CALL_REQUEST = "key_log_call_request";
     public static final String KEY_PHONE_NUMBER = "key_phone_number";
@@ -59,10 +68,14 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
     private ODataRow record;
     private CRMPhoneCalls crmPhoneCalls;
     private OField phoneCallDate, opportunity_id;
-    private String logType = "done";
+    private String logType = "done", type = null;
     private Boolean updateOpportunity = false;
     private CRMLead crmLead = null;
     private OForm opportunity_action_form;
+    private ReminderDialog.ReminderItem mReminder;
+    OValues values = null;
+    public static final String KEY_RESCHEDULE = "key_reschedule";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +97,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
         opportunity_id = (OField) findViewById(R.id.opportunity_id);
         opportunity_id.setOnValueChangeListener(this);
         phoneCallDate.setOnValueChangeListener(this);
+        findViewById(R.id.reminderForPhoneCall).setOnClickListener(this);
         mForm.setEditable(true);
         if (extra != null) {
             String action = getIntent().getAction();
@@ -93,8 +107,10 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     ODataRow opp_rec = new ODataRow();
                     opp_rec.put("opportunity_id", extra.getInt("opp_id"));
                     boolean partner_edit = true;
-                    if (!crmLead.browse(extra.getInt("opp_id")).getString("partner_id").equals("false")) {
-                        opp_rec.put("partner_id", crmLead.browse(extra.getInt("opp_id")).getInt("partner_id"));
+                    if (!crmLead.browse(extra.getInt("opp_id")).getString("partner_id").
+                            equals("false")) {
+                        opp_rec.put("partner_id", crmLead.browse(extra.getInt("opp_id")).
+                                getInt("partner_id"));
                         partner_edit = false;
                     }
                     mForm.initForm(opp_rec);
@@ -141,9 +157,12 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                 data_record.put("partner_phone", extra.getString(KEY_PHONE_NUMBER));
                 int opp_id = extra.getInt(KEY_OPPORTUNITY_ID);
                 data_record.put("opportunity_id", opp_id);
+                data_record.put("date", ODateUtils.getCurrentDateWithHour(1));
                 if (extra.containsKey(PhoneStateReceiver.KEY_DURATION_START)) {
-                    long start_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_START));
-                    long end_time = Long.parseLong(extra.getString(PhoneStateReceiver.KEY_DURATION_END));
+                    long start_time = Long.parseLong(extra.getString(
+                            PhoneStateReceiver.KEY_DURATION_START));
+                    long end_time = Long.parseLong(extra.getString(
+                            PhoneStateReceiver.KEY_DURATION_END));
                     long duration = (end_time - start_time);
                     data_record.put("duration", ODateUtils.durationToFloat(duration));
                 }
@@ -156,6 +175,29 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
             }
         } else {
             mForm.initForm(null);
+        }
+        String action = getIntent().getAction();
+        if (action != null && (action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_DONE) ||
+                action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_RE_SCHEDULE))) {
+            ONotificationBuilder.cancelNotification(this, getIntent().getExtras().
+                    getInt(OColumn.ROW_ID));
+            if (action.equals(ReminderReceiver.ACTION_EVENT_REMINDER_DONE)) {
+                int row_id = getIntent().getExtras().getInt(OColumn.ROW_ID);
+                OValues values = new OValues();
+                values.put("is_done", 1);
+                crmPhoneCalls.update(row_id, values);
+                Toast.makeText(this, R.string.toast_event_marked_done, Toast.LENGTH_LONG).show();
+                extra.remove(KEY_RESCHEDULE);
+            }
+        }
+
+        if (extra != null && extra.containsKey(KEY_RESCHEDULE)) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    onClick(findViewById(R.id.reminderForEvent));
+                }
+            }, 500);
         }
     }
 
@@ -172,7 +214,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                 finish();
                 break;
             case R.id.menu_phonecall_save:
-                OValues values = mForm.getValues();
+                values = mForm.getValues();
                 if (values != null) {
                     values.put("user_id", ResUsers.myId(this));
                     ResPartner partner = new ResPartner(this, null);
@@ -197,19 +239,52 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                         values.put("call_type", categ_id.getString("name"));
                     }
                     values.put("state", logType);
+                    if (type.equals(OResource.string(this, R.string.label_scheduled_call))) {
+                        setTimer();
+                    }
                     if (extra == null || extra.containsKey("opp_id")
-                            || extra.containsKey(KEY_LOG_CALL_REQUEST) || extra.containsKey("call_id")) {
+                            || extra.containsKey(KEY_LOG_CALL_REQUEST) ||
+                            extra.containsKey("call_id")) {
                         int row_id = crmPhoneCalls.insert(values);
-                        crmPhoneCalls.setReminder(row_id);
+                        Toast.makeText(this, type + " " + values.getString("name"),
+                                Toast.LENGTH_LONG).show();
                     } else {
                         crmPhoneCalls.update(extra.getInt(OColumn.ROW_ID), values);
                         crmPhoneCalls.setReminder(extra.getInt(OColumn.ROW_ID));
+                        Toast.makeText(this, "Updated " + type + " " + values.getString("name"),
+                                Toast.LENGTH_LONG).show();
                     }
                     finish();
                 }
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void setTimer() {
+        Date now = new Date();
+        String format = ODateUtils.DEFAULT_FORMAT;
+        Date date_start = ODateUtils.createDateObject(values.getString("date"),
+                format, false);
+        Date reminderDate = null;
+        int row_id = extra.getInt(OColumn.ROW_ID);
+        if (now.compareTo(date_start) < 0) {
+            values.put("has_reminder", "true");
+            reminderDate = ReminderDialog.getReminderDateTime(values.getString("date"),
+                    false, mReminder);
+            if (reminderDate != null) {
+                values.put("reminder_datetime", ODateUtils.getDate(reminderDate,
+                        ODateUtils.DEFAULT_FORMAT));
+            }
+        }
+        Bundle extra = new Bundle();
+        extra.putInt(OColumn.ROW_ID, row_id);
+        extra.putString(ReminderUtils.KEY_REMINDER_TYPE, "phonecall");
+        if (reminderDate != null) {
+            if (ReminderUtils.get(getApplicationContext()).resetReminder(reminderDate, extra)) {
+                Log.i(TAG, "Reminder added.");
+            }
+        }
     }
 
     @Override
@@ -226,16 +301,40 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.IOnFiel
                     (updateOpportunity) ? View.VISIBLE : View.GONE);
         } else {
             if (!value.toString().equals("now()")) {
-                Date selectedDate = ODateUtils.createDateObject(value.toString(), ODateUtils.DEFAULT_FORMAT, false);
+                Date selectedDate = ODateUtils.createDateObject(value.toString(),
+                        ODateUtils.DEFAULT_FORMAT, false);
                 Date now = new Date();
                 if (now.compareTo(selectedDate) >= 0) {
                     actionBar.setTitle(R.string.label_log_call);
+                    type = OResource.string(this, R.string.label_logged_call);
                     logType = "done";
+                    LinearLayout reminder = (LinearLayout) findViewById(R.id.reminderForPhoneCall);
+                    reminder.setVisibility(View.GONE);
                 } else {
                     logType = "open";
+                    type = OResource.string(this, R.string.label_scheduled_call);
                     actionBar.setTitle(R.string.label_schedule_call);
                 }
             }
         }
     }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.reminderForPhoneCall:
+                ReminderDialog dialog = new ReminderDialog(this, ReminderDialog.ReminderType.TimeBasedEvent);
+                dialog.setOnReminderValueSelectListener(this);
+                dialog.show();
+                break;
+        }
+
+    }
+
+    @Override
+    public void onReminderItemSelect(ReminderDialog.ReminderItem value) {
+        ((TextView) findViewById(R.id.reminderTypeName)).setText(value.getTitle());
+        mReminder = value;
+    }
+
 }

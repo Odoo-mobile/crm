@@ -710,8 +710,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 break;
             case R.id.menu_opp_reschedule:
                 List<String> choices = new ArrayList<>();
-                choices.add("Schedule/Log calls");
-                choices.add("Schedule Meeting");
+                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_log_call));
+                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_meeting));
                 OChoiceDialog.get(getActivity()).withOptions(choices, -1)
                         .show(new OChoiceDialog.OnChoiceSelectListener() {
                             @Override
