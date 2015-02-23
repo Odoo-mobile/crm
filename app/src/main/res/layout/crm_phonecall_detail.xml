@@ -129,19 +129,6 @@
 
             </odoo.controls.OField>
 
-            <odoo.controls.OField
-                android:layout_width="match_parent"
-                app:fieldName="duration"
-                app:fieldTextSize="@dimen/text_size_xmedium"
-                app:widgetType="Duration"
-                android:layout_height="wrap_content">
-
-            </odoo.controls.OField>
-
-            <View
-                style="@style/ViewSeparator"
-                android:layout_marginLeft="72dp" />
-
             <LinearLayout
                 android:id="@+id/reminderForPhoneCall"
                 android:layout_width="match_parent"
@@ -161,13 +148,14 @@
                     android:layout_marginRight="3dp"
                     android:paddingBottom="5dp"
                     android:src="@drawable/ic_action_bell"
-                    android:tint="@color/body_text_3" />
+                    android:tint="@color/body_text_2" />
 
                 <TextView
                     android:id="@+id/reminderTypeName"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
+                    android:textColor="@color/body_text_2"
                     android:background="@android:color/transparent"
                     android:fontFamily="@string/font_normal"
                     android:gravity="center_vertical"
@@ -175,6 +163,15 @@
                     android:text="@string/at_the_time_of_event"
                     android:textSize="@dimen/text_size_xmedium" />
             </LinearLayout>
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                app:fieldName="duration"
+                app:fieldTextSize="@dimen/text_size_xmedium"
+                app:widgetType="Duration"
+                android:layout_height="wrap_content">
+
+            </odoo.controls.OField>
 
             <View
                 style="@style/ViewSeparator"

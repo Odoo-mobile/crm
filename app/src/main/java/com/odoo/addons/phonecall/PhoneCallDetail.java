@@ -27,7 +27,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -239,13 +238,12 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.
                         values.put("call_type", categ_id.getString("name"));
                     }
                     values.put("state", logType);
-                    if (type.equals(OResource.string(this, R.string.label_scheduled_call))) {
-                        setTimer();
-                    }
                     if (extra == null || extra.containsKey("opp_id")
                             || extra.containsKey(KEY_LOG_CALL_REQUEST) ||
                             extra.containsKey("call_id")) {
                         int row_id = crmPhoneCalls.insert(values);
+                        extra = new Bundle();
+                        extra.putInt(OColumn.ROW_ID, row_id);
                         Toast.makeText(this, type + " " + values.getString("name"),
                                 Toast.LENGTH_LONG).show();
                     } else {
@@ -253,6 +251,9 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.
                         crmPhoneCalls.setReminder(extra.getInt(OColumn.ROW_ID));
                         Toast.makeText(this, "Updated " + type + " " + values.getString("name"),
                                 Toast.LENGTH_LONG).show();
+                    }
+                    if (type.equals(OResource.string(this, R.string.label_scheduled_call))) {
+                        setTimer();
                     }
                     finish();
                 }
@@ -308,9 +309,9 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.
                     actionBar.setTitle(R.string.label_log_call);
                     type = OResource.string(this, R.string.label_logged_call);
                     logType = "done";
-                    LinearLayout reminder = (LinearLayout) findViewById(R.id.reminderForPhoneCall);
-                    reminder.setVisibility(View.GONE);
+                    findViewById(R.id.reminderForPhoneCall).setVisibility(View.GONE);
                 } else {
+                    findViewById(R.id.reminderForPhoneCall).setVisibility(View.VISIBLE);
                     logType = "open";
                     type = OResource.string(this, R.string.label_scheduled_call);
                     actionBar.setTitle(R.string.label_schedule_call);

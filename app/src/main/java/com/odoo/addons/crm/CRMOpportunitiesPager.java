@@ -81,6 +81,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     private OListAdapter mNavSpinnerAdapter = null;
     private List<Object> spinnerItems = new ArrayList<>();
     private int selectedPagerPosition = 0;
+    private View mView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -91,6 +92,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mView = view;
         mContext = getActivity();
         parent().setOnBackPressListener(this);
         Bundle extra = getArguments();
@@ -104,8 +106,8 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         observer = new DataObserver(handler);
         parent().setHasActionBarSpinner(true);
         mNavSpinner = parent().getActionBarSpinner();
-        initSpinner();
         initPager(view);
+        initSpinner();
     }
 
     private void initSpinner() {
@@ -116,7 +118,16 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         spinnerItems.addAll(crmStage.select(null, "type!=?", new String[]{"lead"}, "sequence"));
         if (spinnerItems.isEmpty()) {
             parent().setHasActionBarSpinner(false);
+            mPager.setVisibility(View.GONE);
+            OControls.setVisible(mView, R.id.dashboard_no_item_view);
+            OControls.setText(mView, R.id.title, OResource.string(getActivity(),
+                    R.string.label_no_opportunity_found));
+            OControls.setText(mView, R.id.subTitle, "");
+            OControls.setImage(mView, R.id.icon, R.drawable.ic_action_opportunities);
             return;
+        } else {
+            mPager.setVisibility(View.VISIBLE);
+            OControls.setGone(mView, R.id.dashboard_no_item_view);
         }
         mNavSpinnerAdapter = new OListAdapter(getActivity(), R.layout.base_simple_list_item_1, spinnerItems) {
             @Override
@@ -151,21 +162,12 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
                 crmStage.uri(), true, observer);
         initCR();
         mPager = (ViewPager) view.findViewById(R.id.pager);
-        if (spinnerItems.isEmpty()) {
-            mPager.setVisibility(View.GONE);
-            OControls.setVisible(view, R.id.dashboard_no_item_view);
-            OControls.setText(view, R.id.title, OResource.string(getActivity(), R.string.label_no_opportunity_found));
-            OControls.setText(view, R.id.subTitle, "");
-            OControls.setImage(view, R.id.icon, R.drawable.ic_action_opportunities);
-            return;
-        }
         mPager.setOnPageChangeListener(this);
         mTabStrip = (PagerTabStrip) view.findViewById(R.id.pager_title_strip);
         mTabStrip.setTabIndicatorColor(Color.WHITE);
         mPager.setOffscreenPageLimit(2);
         mAdapter = new StagePagerAdapter(cursor, getChildFragmentManager());
         mPager.setAdapter(mAdapter);
-
         for (int i = 0; i < mTabStrip.getChildCount(); ++i) {
             View nextChild = mTabStrip.getChildAt(i);
             if (nextChild instanceof TextView) {
