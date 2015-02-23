@@ -22,13 +22,18 @@ package com.odoo.core.support;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.text.InputType;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.utils.BitmapUtils;
@@ -47,8 +52,10 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
     private ArrayAdapter<OUser> mAdapter;
     private AlertDialog dialog;
     private AlertDialog.Builder builder;
+    private AlertDialog.Builder builder_password;
     private OUser mUser;
     private IUserLoginSelectListener mIUserLoginSelectListener = null;
+    private boolean flag = false;
 
     public OdooUserLoginSelectorDialog(Context context) {
         mContext = context;
@@ -127,11 +134,47 @@ public class OdooUserLoginSelectorDialog implements AdapterView.OnItemClickListe
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        OUser user = mAdapter.getItem(position);
-        if (mIUserLoginSelectListener != null) {
-            mIUserLoginSelectListener.onUserSelected(user);
-        }
-        dialog.dismiss();
+        if (dialog != null)
+            dialog.dismiss();
+        dialog = null;
+        final OUser user = mAdapter.getItem(position);
+        AbsListView.LayoutParams params = new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT,
+                AbsListView.LayoutParams.WRAP_CONTENT);
+        LinearLayout linearLayout = new LinearLayout(mContext);
+        linearLayout.setLayoutParams(params);
+        linearLayout.setPadding(10, 10, 10, 10);
+        final EditText edt_password = new EditText(mContext);
+        edt_password.setLayoutParams(params);
+        edt_password.setHint(OResource.string(mContext, R.string.label_password));
+        edt_password.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        linearLayout.addView(edt_password);
+        builder_password = new AlertDialog.Builder(mContext);
+        builder_password.setTitle(R.string.label_enter_password);
+        builder_password.setView(linearLayout);
+        builder_password.setCancelable(false);
+        builder_password.setPositiveButton(OResource.string(mContext, R.string.label_login), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (!TextUtils.isEmpty(edt_password.getText())) {
+                    if (edt_password.getText().toString().equals(user.getPassword())) {
+                        if (mIUserLoginSelectListener != null) {
+                            mIUserLoginSelectListener.onUserSelected(user);
+                        }
+                    } else {
+                        Toast.makeText(mContext, OResource.string(mContext, R.string.toast_invalid_password), Toast.LENGTH_LONG).show();
+                        edt_password.setText("");
+                        edt_password.requestFocus();
+                    }
+                } else {
+                    edt_password.setError(OResource.string(mContext, R.string.error_provide_password));
+                    //show();
+                }
+                dialog.dismiss();
+            }
+        });
+        builder_password.setNegativeButton(OResource.string(mContext, R.string.label_cancel), null);
+        dialog = builder_password.create();
+        dialog.show();
     }
 
     public interface IUserLoginSelectListener {

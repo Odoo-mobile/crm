@@ -67,6 +67,8 @@
     <string name="label_expected_revenue">Expected Revenue</string>
     <string name="label_at"> at </string>
     <string name="label_conversion_action"> Conversion Action </string>
+    <string name="label_enter_password"> Enter your Password </string>
+    <string name="toast_invalid_password"> Invalid password.</string>
     <string name="toast_information_saved">Information Saved</string>
     <string name="toast_phone_call_marked_done">Phone call held</string>
     <string name="toast_event_marked_done">Event marked done</string>
