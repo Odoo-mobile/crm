@@ -41,7 +41,7 @@ import java.io.InputStream;
 import odoo.controls.OControlHelper;
 
 public class BitmapUtils {
-    public static final int THUMBNAIL_SIZE = 600;
+    public static final int THUMBNAIL_SIZE = 500;
 
     /**
      * Read bytes.

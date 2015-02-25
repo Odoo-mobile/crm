@@ -86,6 +86,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.
         actionBar.setTitle(R.string.label_log_call);
         extra = getIntent().getExtras();
         crmLead = new CRMLead(this, null);
+        mReminder = ReminderDialog.getDefault(this, false);
         init();
     }
 

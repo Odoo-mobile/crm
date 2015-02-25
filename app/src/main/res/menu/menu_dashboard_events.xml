@@ -12,6 +12,6 @@
     <item
         android:id="@+id/menu_events_all_done"
         android:icon="@drawable/ic_action_done_all"
-        android:title="@string/label_mark_as_won"></item>
+        android:title="@string/label_mark_done"></item>
 
 </menu>

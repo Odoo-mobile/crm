@@ -235,7 +235,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 case Meetings:
                     // Checking for events
                     total += event.countGroupBy("date_start", "date(date_start)"
-                            , "(date(date_start) <= ? and date(date_end) >= ? )", new String[]{date_str, date_str}).getInt("total");
+                            , "(date(date_start) <= ? and date(date_end) >= ? )",
+                            new String[]{date_str, date_str}).getInt("total");
 
                     if (mFilterType != FilterType.All)
                         break;
@@ -525,7 +526,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public Loader<Cursor> onCreateLoader(int id, Bundle data) {
         List<String> args = new ArrayList<>();
         String where = "";
-        String date_end = ODateUtils.getDateDayBeforeAfterUTC(mFilterDate + " 00:00:00", 1);
         args.add(mFilterDate);
         CalendarEvent event = (CalendarEvent) db();
         Uri uri = event.agendaUri();
@@ -534,7 +534,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 CRMPhoneCalls phoneCalls = new CRMPhoneCalls(getActivity(), db().getUser());
                 uri = phoneCalls.uri();
                 where = "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)";
-                args.add(date_end);
+                args.add(mFilterDate);
                 args.add("open");
                 args.add("pending");
                 if (mFilter != null) {
@@ -547,9 +547,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 uri = leads.uri();
                 where = "(date(date_deadline) >= ? and date(date_deadline) <= ? or " +
                         "date(date_action) >= ? and date(date_action) <= ?) and type = ?";
-                args.add(date_end);
                 args.add(mFilterDate);
-                args.add(date_end);
+                args.add(mFilterDate);
+                args.add(mFilterDate);
                 args.add("opportunity");
                 if (mFilter != null) {
                     where += " and (name like ? or description like ?)";

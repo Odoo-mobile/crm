@@ -29,7 +29,6 @@ import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.provider.BaseModelProvider;
-import com.odoo.core.utils.ODateUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,11 +61,10 @@ public class CalendarSyncProvider extends BaseModelProvider {
             return super.query(uri, base_projection, selection, selectionArgs, sortOrder);
         }
         String date_start = selectionArgs[0];
-        String date_end = ODateUtils.getDateDayBeforeAfterUTC(date_start + " 00:00:00", 1);
         String filter = null;
         if (selectionArgs.length > 1)
             filter = selectionArgs[1];
-        String where = "";
+        String where;
         List<String> args = new ArrayList<>();
         // Getting events
         MatrixCursor event_separator = new MatrixCursor(
