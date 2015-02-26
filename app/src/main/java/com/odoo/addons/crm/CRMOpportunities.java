@@ -57,7 +57,8 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
         IOnSearchViewChangeListener, View.OnClickListener, IOnItemClickListener,
-        BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener,
+        BottomSheetListeners.OnSheetItemClickListener,
+        BottomSheetListeners.OnSheetActionClickListener,
         IOnBackPressListener, IOnActivityResultListener {
     public static final String TAG = CRMOpportunities.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
@@ -110,7 +111,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     }
 
     private void initAdapter() {
-        if(getActivity()!=null) {
+        if (getActivity() != null) {
             mList = (ListView) mView.findViewById(R.id.listview);
             mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.crm_item);
             mAdapter.setOnViewBindListener(this);
@@ -225,7 +226,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, CRMOpportunities.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_opportunities);
-                    OControls.setText(mView, R.id.title, OResource.string(getActivity(),R.string.label_no_opportunity_found));
+                    OControls.setText(mView, R.id.title, OResource.string(getActivity(), R.string.label_no_opportunity_found));
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);
@@ -357,7 +358,6 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
         final ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
         mSheet.dismiss();
-        convertRequestRecord = row;
         CRMLead crmLead = (CRMLead) db();
         ResPartner partner = new ResPartner(getActivity(), null);
         switch (menu.getItemId()) {
@@ -367,7 +367,8 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                     intent.putExtras(row.getPrimaryBundleData());
                     parent().startActivityForResult(intent, REQUEST_CONVERT_TO_QUOTATION_WIZARD);
                 } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), R.string.toast_network_required,
+                            Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.menu_lead_call_customer:
@@ -376,7 +377,8 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                     if (!contact.equals("false")) {
                         IntentUtils.requestCall(getActivity(), contact);
                     } else {
-                        Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).
+                                show();
                     }
                 } else {
                     Toast.makeText(getActivity(), "No partner found !", Toast.LENGTH_LONG).show();
@@ -388,16 +390,17 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                     if (!address.equals("false") && !TextUtils.isEmpty(address)) {
                         IntentUtils.redirectToMap(getActivity(), address);
                     } else {
-                        Toast.makeText(getActivity(), "No location found !", Toast.LENGTH_LONG).show();
+                        Toast.makeText(getActivity(), _s(R.string.label_no_location_found), Toast.LENGTH_LONG).
+                                show();
                     }
                 } else {
-                    Toast.makeText(getActivity(), "No partner found !", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getActivity(), _s(R.string.label_no_contact_found), Toast.LENGTH_LONG).show();
                 }
                 break;
             case R.id.menu_lead_reschedule:
                 List<String> choices = new ArrayList<>();
-                choices.add(OResource.string(getActivity(),R.string.label_opt_schedule_log_call));
-                choices.add(OResource.string(getActivity(),R.string.label_opt_schedule_meeting));
+                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_log_call));
+                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_meeting));
                 OChoiceDialog.get(getActivity()).withOptions(choices, -1)
                         .show(new OChoiceDialog.OnChoiceSelectListener() {
                             @Override
@@ -407,13 +410,15 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                                     case 0:
                                         Bundle extra = new Bundle();
                                         extra.putInt("opp_id", opp_id);
-                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
+                                        IntentUtils.startActivity(getActivity(),
+                                                PhoneCallDetail.class, extra);
                                         break;
                                     case 1: // Schedule meeting
                                         Bundle data = new Bundle();
 //                                        data.putString(KEY_DATE, mFilterDate);
                                         data.putInt("opp_id", opp_id);
-                                        IntentUtils.startActivity(getActivity(), EventDetail.class, data);
+                                        IntentUtils.startActivity(getActivity(),
+                                                EventDetail.class, data);
                                         break;
                                 }
                             }
@@ -440,16 +445,21 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
 
     @Override
     public void onOdooActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode == Activity.RESULT_OK) {
+        if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode ==
+                Activity.RESULT_OK) {
             CRMLead crmLead = (CRMLead) db();
-            crmLead.createQuotation(convertRequestRecord, data.getStringExtra("partner_id"), data.getBooleanExtra("mark_won", false), createQuotationListener);
+            convertRequestRecord = crmLead.browse(data.getIntExtra(OColumn.ROW_ID, 0));
+            crmLead.createQuotation(convertRequestRecord, data.getStringExtra("partner_id"),
+                    data.getBooleanExtra("mark_won", false), createQuotationListener);
         }
     }
 
-    CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.OnOperationSuccessListener() {
+    CRMLead.OnOperationSuccessListener createQuotationListener = new CRMLead.
+            OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
-            Toast.makeText(getActivity(), OResource.string(getActivity(), R.string.label_quotation_created) + " " +
+            Toast.makeText(getActivity(), OResource.string(getActivity(),
+                    R.string.label_quotation_created) + " " +
                     convertRequestRecord.getString("name"), Toast.LENGTH_LONG).show();
             parent().sync().requestSync(SaleOrder.AUTHORITY);
         }
