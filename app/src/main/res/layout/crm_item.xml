@@ -36,7 +36,7 @@
             android:id="@+id/stage_move"
             android:padding="3dp"
             android:tint="@color/theme_secondary"
-            android:src="@drawable/ic_action_more"
+            android:src="@drawable/ic_action_move_to"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
     </LinearLayout>

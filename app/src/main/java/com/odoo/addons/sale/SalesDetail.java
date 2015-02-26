@@ -73,7 +73,6 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     private ODataRow record;
     private SaleOrder sale;
     private ActionBar actionBar;
-    private Menu menu;
     private ExpandableListControl mList;
     private ExpandableListControl.ExpandableListAdapter mAdapter;
     private List<Object> objects = new ArrayList<>();
@@ -83,7 +82,8 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     private ODataRow currencyObj;
     private ResPartner partner = null;
     private String mSOType = "";
-    LinearLayout layoutAddItem = null;
+    private LinearLayout layoutAddItem = null;
+    private Type mType;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -93,6 +93,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         actionBar = getSupportActionBar();
         sale = new SaleOrder(this, null);
         extra = getIntent().getExtras();
+        mType = Type.valueOf(extra.getString("type"));
         currencyObj = sale.currency();
         init();
         initAdapter();
@@ -125,11 +126,11 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
             if (record == null) {
                 finish();
             }
-            if (!record.getString("partner_id").equals("false")) {
+            if (!record.getString("partner_id").equals("false") && mType == Type.Quotation) {
                 OnCustomerChangeUpdate onCustomerChangeUpdate = new OnCustomerChangeUpdate();
                 onCustomerChangeUpdate.execute(record.getM2ORecord("partner_id").browse());
             }
-            if (extra.getString("type").equals(Type.Quotation.toString())) {
+            if (mType == Type.Quotation) {
                 actionBar.setTitle(R.string.label_quotation);
                 txvType.setText(R.string.label_quotation);
                 if (record.getString("state").equals("cancel"))
@@ -183,7 +184,6 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_sale_detail, menu);
-        this.menu = menu;
         OField name = (OField) mForm.findViewById(R.id.fname);
         name.setEditable(false);
         if (extra != null && !extra.getString("type").equals(Type.SaleOrder.toString())) {

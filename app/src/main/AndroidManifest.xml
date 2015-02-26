@@ -212,8 +212,7 @@
             android:windowSoftInputMode="adjustPan" />
         <activity
             android:name="com.odoo.core.account.AppIntro"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_app_intro"></activity>
+            android:screenOrientation="portrait"></activity>
     </application>
 
 </manifest>

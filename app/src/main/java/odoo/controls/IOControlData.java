@@ -26,7 +26,7 @@ import com.odoo.core.orm.fields.OColumn;
 public interface IOControlData {
     public static final String TAG = IOControlData.class.getSimpleName();
 
-    public void setValue(Object value);
+    public void setValue(Object value, boolean notifyUpdate);
 
     public Object getValue();
 

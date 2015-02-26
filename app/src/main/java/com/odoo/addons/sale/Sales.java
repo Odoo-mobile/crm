@@ -103,7 +103,8 @@ public class Sales extends BaseFragment implements
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
         mAdapter.handleItemClickListener(mList, this);
-        mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
+        if (mType == Type.SaleOrder)
+            mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
         setHasSyncStatusObserver(TAG, this, db());
         setHasSwipeRefreshView(mView, R.id.swipe_container, this);
         getLoaderManager().initLoader(0, null, this);

@@ -34,31 +34,40 @@
             android:title="Sync data limit" />
     </PreferenceCategory>
 
-
+    <PreferenceCategory
+        android:title="Notifications"
+        android:key="notification_settings">
+        <RingtonePreference
+            android:key="phonecall_notification_ringtone"
+            android:title="Notification ring tone"
+            android:ringtoneType="notification"
+            android:defaultValue="@string/notification_default_ring_tone"
+            android:summary="Set notification ring tone" />
+        <SwitchPreference
+            android:key="hands_up_notification"
+            android:title="Enable hands up notification"
+            android:summary="Allow application to show quick notification on screen"
+            android:summaryOff="Enable to allow application to show quick notification on screen"
+            android:defaultValue="false" />
+    </PreferenceCategory>
     <PreferenceCategory
         android:title="Lead/Opportunity"
         android:key="crm_lead_settings">
         <Preference
             android:key="lead_work_day_start_time"
             android:title="Day start time"
-            android:summary="Set your working day start time"></Preference>
+            android:summary="Set your working day start time" />
     </PreferenceCategory>
-    <PreferenceCategory
-        android:title="Phone calls"
-        android:key="crm_phonecalls_settings">
-        <SwitchPreference
-            android:key="phonecall_allow_caller_window"
-            android:title="Show caller window"
-            android:summary="Allow application to show caller window with customer opportunity"
-            android:summaryOff="Enable to show latest opportunity detail of caller customer"
-            android:defaultValue="true"></SwitchPreference>
-        <RingtonePreference
-            android:key="phonecall_notification_ringtone"
-            android:title="Notification ring tone"
-            android:ringtoneType="notification"
-            android:defaultValue="@string/notification_default_ring_tone"
-            android:summary="Set notification ring tone"></RingtonePreference>
-    </PreferenceCategory>
+    <!--<PreferenceCategory-->
+    <!--android:title="Phone calls"-->
+    <!--android:key="crm_phonecalls_settings">-->
+    <!--<SwitchPreference-->
+    <!--android:key="phonecall_allow_caller_window"-->
+    <!--android:title="Show caller window"-->
+    <!--android:summary="Allow application to show caller window with customer opportunity"-->
+    <!--android:summaryOff="Enable to show latest opportunity detail of caller customer"-->
+    <!--android:defaultValue="true" />-->
+    <!--</PreferenceCategory>-->
 
     <PreferenceCategory
         android:key="application_about"

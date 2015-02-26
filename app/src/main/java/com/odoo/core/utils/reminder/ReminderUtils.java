@@ -27,6 +27,7 @@ import android.os.Bundle;
 
 import com.odoo.core.orm.fields.OColumn;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class ReminderUtils {
@@ -43,12 +44,15 @@ public class ReminderUtils {
     }
 
     public boolean setReminder(Date date, Bundle extra) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.SECOND, 0);
         Intent myIntent = new Intent(mContext, ReminderReceiver.class);
         myIntent.putExtras(extra);
         int row_id = extra.getInt(OColumn.ROW_ID);
         AlarmManager alarmManager = (AlarmManager) mContext.getSystemService(Context.ALARM_SERVICE);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(mContext, row_id, myIntent, 0);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, date.getTime(), pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, cal.getTime().getTime(), pendingIntent);
         return true;
     }
 

@@ -100,7 +100,10 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         parent().setOnBackPressListener(this);
         mView = view;
         mPartnersList = (ListView) view.findViewById(R.id.listview);
+        mPartnersList.setFastScrollEnabled(true);
+        mPartnersList.setFastScrollAlwaysVisible(true);
         mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.customer_row_item);
+        mAdapter.setHasSectionIndexers(true, "name");
         mAdapter.setOnViewBindListener(this);
         mPartnersList.setAdapter(mAdapter);
         mAdapter.handleItemClickListener(mPartnersList, this);
@@ -135,7 +138,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         String selection = (args.size() > 0) ? where : null;
         String[] selectionArgs = (args.size() > 0) ? args.toArray(new String[args.size()]) : null;
         return new CursorLoader(getActivity(), ((ResPartner) db()).liveSearchURI(),
-                null, selection, selectionArgs, null);
+                null, selection, selectionArgs, "name");
     }
 
     @Override

@@ -275,12 +275,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
         initAdapter();
         mFilterDate = date.getDateString();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                getLoaderManager().restartLoader(0, null, CalendarDashboard.this);
-            }
-        }, 500);
+        if (getActivity() != null) {
+            getLoaderManager().restartLoader(0, null, CalendarDashboard.this);
+        }
         return calendarView;
     }
 

@@ -226,7 +226,8 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, CRMOpportunities.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_opportunities);
-                    OControls.setText(mView, R.id.title, OResource.string(getActivity(), R.string.label_no_opportunity_found));
+                    if (getActivity() != null)
+                        OControls.setText(mView, R.id.title, OResource.string(getActivity(), R.string.label_no_opportunity_found));
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);
@@ -372,16 +373,22 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                 }
                 break;
             case R.id.menu_lead_call_customer:
-                if (!row.getString("partner_id").equals("false")) {
-                    String contact = partner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
-                    if (!contact.equals("false")) {
-                        IntentUtils.requestCall(getActivity(), contact);
+                String contact = (row.getString("phone").equals("false")) ?
+                        (row.getString("mobile").equals("false")) ? "false" : row.getString("mobile") : row.getString("phone");
+                if (contact.equals("false")) {
+                    if (!row.getString("partner_id").equals("false")) {
+                        contact = partner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
+                        if (!contact.equals("false")) {
+                            IntentUtils.requestCall(getActivity(), contact);
+                        } else {
+                            Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).show();
+                        }
                     } else {
                         Toast.makeText(getActivity(), "No contact found !", Toast.LENGTH_LONG).
                                 show();
                     }
                 } else {
-                    Toast.makeText(getActivity(), "No partner found !", Toast.LENGTH_LONG).show();
+                    IntentUtils.requestCall(getActivity(), contact);
                 }
                 break;
             case R.id.menu_lead_customer_location:
@@ -494,5 +501,11 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     @Override
     protected void onNavSpinnerDestroy() {
 
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getLoaderManager().destroyLoader(0);
     }
 }

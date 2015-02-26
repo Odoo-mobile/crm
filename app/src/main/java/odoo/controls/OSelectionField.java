@@ -303,7 +303,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     }
 
     @Override
-    public void setValue(Object value) {
+    public void setValue(Object value, boolean notifyUpdate) {
         mValue = value;
         if (mValue == null || mValue.toString().equals("false")) {
             mValue = -1;
@@ -403,7 +403,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (!row.getString(mModel.getDefaultNameColumn()).equals("false"))
                 txvView.setText(row.getString(mModel.getDefaultNameColumn()));
         }
-        if (mValueUpdateListener != null && mValue != -1) {
+        if (mValueUpdateListener != null && mValue != -1 && notifyUpdate) {
             mValueUpdateListener.onValueUpdate(row);
         }
     }
@@ -516,7 +516,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         } else {
             mValue = items.get(position).get(OColumn.ROW_ID);
         }
-        setValue(mValue);
+        setValue(mValue, true);
     }
 
     @Override
@@ -552,14 +552,14 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position,
                             long id) {
-        setValue(position);
+        setValue(position, true);
     }
 
     BroadcastReceiver valueReceiver = new BroadcastReceiver() {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            setValue(intent.getIntExtra("selected_position", -1));
+            setValue(intent.getIntExtra("selected_position", -1), true);
             mContext.unregisterReceiver(valueReceiver);
         }
     };
@@ -616,7 +616,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         int index = mRadioGroup.indexOfChild(group.findViewById(checkedId));
         ODataRow row = items.get(index);
-        setValue(row.getInt(OColumn.ROW_ID));
+        setValue(row.getInt(OColumn.ROW_ID), true);
     }
 
     @Override

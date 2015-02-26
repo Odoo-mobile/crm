@@ -28,9 +28,11 @@ import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.odoo.core.account.BaseSettings;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.crm.R;
 
@@ -48,6 +50,7 @@ public class ReminderDialog implements AdapterView.OnItemClickListener {
     private OListAdapter mAdapter;
     private OnReminderValueSelectListener mOnReminderValueSelectListener = null;
     private List<Object> reminderTypes = new ArrayList<>();
+    private OPreferenceManager mPref;
 
     public enum ReminderType {
         FullDayEvent, TimeBasedEvent
@@ -55,19 +58,28 @@ public class ReminderDialog implements AdapterView.OnItemClickListener {
 
     public ReminderDialog(Context context, ReminderType type) {
         mContext = context;
+        reminderTypes.clear();
+        mPref = new OPreferenceManager(mContext);
         mType = type;
         List<ReminderItem> reminders = new ArrayList<>();
-        reminders.add(new ReminderItem(0, OResource.string(mContext, R.string.no_notification), "false"));
+        reminders.add(0, new ReminderItem(0, OResource.string(mContext, R.string.no_notification), "false"));
         switch (mType) {
             case FullDayEvent:
+                // At your working day start time
+                String workingStartTime = ODateUtils.parseDate(mPref.getString(BaseSettings.KEY_LEAD_WORK_DAY_START_TIME,
+                                OResource.string(mContext, R.string.default_day_start_time)), ODateUtils.DEFAULT_TIME_FORMAT,
+                        ODateUtils.DEFAULT_TIME_FORMAT);
+                reminders.add(1, new ReminderItem(1,
+                        OResource.string(mContext, R.string.on_your_working_day_start_time),
+                        workingStartTime));
                 // At 9 AM
-                reminders.add(new ReminderItem(1,
+                reminders.add(2, new ReminderItem(2,
                         String.format(OResource.string(mContext, R.string.on_the_day_at), "9 AM"), "9:00 AM"));
                 // before day at 11:30 PM
-                reminders.add(new ReminderItem(2,
+                reminders.add(3, new ReminderItem(3,
                         String.format(OResource.string(mContext, R.string.day_before_at), "11:30 PM"), "11:30 PM"));
                 // before day at 5:00 PM
-                reminders.add(new ReminderItem(3,
+                reminders.add(4, new ReminderItem(4,
                         String.format(OResource.string(mContext, R.string.day_before_at), "5 PM"), "5:00 PM"));
                 break;
             case TimeBasedEvent:
@@ -131,10 +143,13 @@ public class ReminderDialog implements AdapterView.OnItemClickListener {
             if (allDay) {
                 switch (item.getRequest_code()) {
                     case 1:
-                        return ODateUtils.setDateTime(eventDate, 9, 0, 0);
+                        return ODateUtils.createDateObject(eventDateTime + " " + item.getValue(),
+                                ODateUtils.DEFAULT_FORMAT, true);
                     case 2:
-                        return ODateUtils.setDateTime(dayBefore, 23, 30, 0);
+                        return ODateUtils.setDateTime(eventDate, 9, 0, 0);
                     case 3:
+                        return ODateUtils.setDateTime(dayBefore, 23, 30, 0);
+                    case 4:
                         return ODateUtils.setDateTime(dayBefore, 17, 0, 0);
                 }
             } else {

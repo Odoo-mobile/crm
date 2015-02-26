@@ -100,7 +100,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
                         mSwitch = new Switch(mContext);
                         mSwitch.setLayoutParams(params);
                         mSwitch.setOnCheckedChangeListener(this);
-                        setValue(getValue());
+                        setValue(getValue(), true);
                         if (mLabel != null)
                             mSwitch.setText(mLabel);
                         if (textSize > -1) {
@@ -147,7 +147,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
     }
 
     @Override
-    public void setValue(Object value) {
+    public void setValue(Object value, boolean notifyUpdate) {
         if (value == null)
             return;
         mValue = Boolean.parseBoolean(value.toString());
@@ -169,7 +169,8 @@ public class OBooleanField extends LinearLayout implements IOControlData,
             txvView.setText(getCheckBoxLabel());
         }
         if (mValueUpdateListener != null) {
-            mValueUpdateListener.onValueUpdate(value);
+            if (notifyUpdate)
+                mValueUpdateListener.onValueUpdate(value);
             if (!isEditable() && mValue == false) {
                 mValueUpdateListener.visibleControl(false);
             } else {
@@ -257,7 +258,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        setValue(isChecked);
+        setValue(isChecked, true);
     }
 
     @Override
@@ -273,7 +274,7 @@ public class OBooleanField extends LinearLayout implements IOControlData,
 
     @Override
     public void resetData() {
-        setValue(getValue());
+        setValue(getValue(), true);
     }
 
     public void setResource(float textSize, int appearance, int color) {

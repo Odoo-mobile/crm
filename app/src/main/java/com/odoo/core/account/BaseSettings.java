@@ -69,7 +69,8 @@ public class BaseSettings extends PreferenceFragment implements
         String defaultDayStartTime = OResource.string(getActivity(), R.string.default_day_start_time);
         String time = mPref.getString(KEY_LEAD_WORK_DAY_START_TIME, defaultDayStartTime);
         DateTimePicker.Builder builder = new DateTimePicker.Builder(getActivity());
-        builder.setTime(time);
+        builder.setTime(ODateUtils.convertToUTC(time, ODateUtils.DEFAULT_TIME_FORMAT,
+                ODateUtils.DEFAULT_TIME_FORMAT));
         builder.setType(DateTimePicker.Type.Time);
         builder.setCallBack(this);
         builder.build().show();
@@ -103,8 +104,7 @@ public class BaseSettings extends PreferenceFragment implements
     public static String getDayStartTime(Context context) {
         String defaultDayStartTime = OResource.string(context, R.string.default_day_start_time);
         OPreferenceManager mPref = new OPreferenceManager(context);
-        String time = mPref.getString(KEY_LEAD_WORK_DAY_START_TIME, defaultDayStartTime);
-        return ODateUtils.convertToUTC(time, ODateUtils.DEFAULT_TIME_FORMAT, ODateUtils.DEFAULT_TIME_FORMAT);
+        return mPref.getString(KEY_LEAD_WORK_DAY_START_TIME, defaultDayStartTime);
     }
 
 }

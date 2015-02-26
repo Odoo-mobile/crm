@@ -96,7 +96,7 @@ public class OBlobField extends LinearLayout implements IOControlData {
     }
 
     @Override
-    public void setValue(Object value) {
+    public void setValue(Object value, boolean notifyUpdate) {
         mValue = value;
         if (mValue != null && imgView != null) {
             if (!mValue.equals("false")) {

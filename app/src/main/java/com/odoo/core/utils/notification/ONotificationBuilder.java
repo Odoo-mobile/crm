@@ -33,6 +33,7 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
 import com.odoo.core.account.BaseSettings;
+import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.crm.R;
 
@@ -57,9 +58,11 @@ public class ONotificationBuilder {
     private Boolean withLargeIcon = true;
     private Boolean withRingTone = true;
     private int notification_color = R.color.theme_secondary;
+    private OPreferenceManager mPref;
 
     public ONotificationBuilder(Context context, int notification_id) {
         mContext = context;
+        mPref = new OPreferenceManager(mContext);
         this.notification_id = notification_id;
     }
 
@@ -204,7 +207,11 @@ public class ONotificationBuilder {
         mNotificationResultIntent = PendingIntent.getActivity(mContext, 0,
                 resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         mNotificationBuilder.setDefaults(Notification.DEFAULT_ALL);
-        mNotificationBuilder.setContentIntent(mNotificationResultIntent);
+        if (mPref.getBoolean("hands_up_notification", true)) {
+            mNotificationBuilder.setFullScreenIntent(mNotificationResultIntent, true);
+        } else {
+            mNotificationBuilder.setContentIntent(mNotificationResultIntent);
+        }
     }
 
     public void show() {

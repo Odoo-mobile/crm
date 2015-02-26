@@ -22,9 +22,9 @@ package com.odoo.addons.calendar;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -156,15 +156,6 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
                 Toast.makeText(this, R.string.toast_event_marked_done, Toast.LENGTH_LONG).show();
                 extra.remove(KEY_RESCHEDULE);
             }
-        }
-
-        if (extra != null && extra.containsKey(KEY_RESCHEDULE)) {
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    onClick(findViewById(R.id.reminderForEvent));
-                }
-            }, 500);
         }
     }
 
@@ -300,7 +291,13 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         } else {
             Date now = new Date();
             Date reminderDate = null;
-            if (now.compareTo(date_start) < 0) {
+            int diff = 99;
+            if (meeting.getBoolean("allday")) {
+                if (DateUtils.isToday(date_start.getTime())) {
+                    diff = 0;
+                }
+            }
+            if (diff == 0 || now.compareTo(date_start) <= 0) {
                 meeting.put("has_reminder", "true");
                 if (mReminder == null) {
                     mReminder = ReminderDialog.getDefault(this, meeting.getBoolean("allday"));
