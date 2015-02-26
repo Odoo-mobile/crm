@@ -73,6 +73,7 @@ public class ConvertToQuotation extends ActionBarActivity implements View.OnClic
                     boolean mark_won = convert_form.getValues().getBoolean("mark_won");
                     String partner_id = convert_form.getValues().getString("partner_id");
                     Intent data = new Intent();
+                    data.putExtra(OColumn.ROW_ID, extra.getInt(OColumn.ROW_ID));
                     data.putExtra("partner_id", partner_id);
                     data.putExtra("mark_won", mark_won);
                     setResult(RESULT_OK, data);
