@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="#0288D1"
+    android:layout_height="match_parent">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_gravity="top"
+            android:layout_height="wrap_content">
+
+            <odoo.controls.BezelImageView
+                android:id="@+id/customerImage"
+                android:layout_width="90dp"
+                android:layout_marginRight="@dimen/default_8dp"
+                android:scaleType="centerCrop"
+                android:layout_height="90dp" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:padding="@dimen/default_16dp"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:orientation="horizontal"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/partner_name"
+                        android:textAppearance="?android:textAppearanceMedium"
+                        android:textColor="#ffffff"
+                        android:fontFamily="@string/font_normal"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_marginRight="5dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <TextView
+                        android:id="@+id/company_name"
+                        android:textAppearance="?android:textAppearanceSmall"
+                        android:textColor="#ebebeb"
+                        android:textStyle="italic"
+                        android:fontFamily="@string/font_condensed"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/leadName"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#99ffffff"
+                    android:fontFamily="@string/font_normal"
+                    android:maxLines="2"
+                    android:ellipsize="middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/oppProbability"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:textColor="#bbffffff"
+                    android:layout_marginTop="5dp"
+                    android:fontFamily="@string/font_normal"
+                    android:singleLine="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <TextView
+                    android:id="@+id/partner_contact"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:textColor="#ffffff"
+                    android:fontFamily="@string/font_normal"
+                    android:singleLine="true"
+                    android:ellipsize="end"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+        <ImageView
+            android:src="@drawable/odoo_small"
+            android:tint="#ffffff"
+            android:layout_marginRight="@dimen/default_16dp"
+            android:layout_marginBottom="5dp"
+            android:layout_width="60dp"
+            android:layout_marginTop="@dimen/default_8dp"
+            android:layout_marginLeft="@dimen/default_16dp"
+            android:layout_gravity="bottom|left"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
+</LinearLayout>

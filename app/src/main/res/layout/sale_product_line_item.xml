@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:gravity="center_vertical"
+    android:paddingLeft="@dimen/default_16dp"
+    android:paddingTop="@dimen/default_16dp"
+    android:paddingBottom="@dimen/default_16dp"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/productQty"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:background="@drawable/circle_mask_secondary"
+        android:fontFamily="@string/font_condensed"
+        android:gravity="center"
+        android:text="52"
+        android:padding="5dp"
+        android:layout_marginRight="@dimen/default_16dp"
+        android:textColor="@android:color/white"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
+
+    <TextView
+        android:id="@+id/productName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:ellipsize="end"
+        android:fontFamily="@string/font_normal"
+        android:textColor="@color/body_text_2"
+        android:gravity="center_vertical"
+        android:hint="@string/label_search"
+        android:singleLine="true"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+    <ImageView
+        android:id="@+id/remove_qty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:background="?android:attr/selectableItemBackground"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:visibility="gone"
+        android:paddingTop="@dimen/default_8dp"
+        android:paddingBottom="@dimen/default_8dp"
+        android:src="@drawable/ic_action_content_remove_circle"
+        android:tint="@color/android_red_dark" />
+
+</LinearLayout>

@@ -26,7 +26,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.odoo.R;
 import com.odoo.SettingsActivity;
 import com.odoo.config.Addons;
 import com.odoo.core.account.Profile;
@@ -36,6 +35,7 @@ import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
+import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CRM</string>
+    <string name="label_today">Today</string>
+    <!-- Sync Labels// -->
+    <string name="sync_label_customers">Customers</string>
+    <string name="sync_label_calendar">Calendar</string>
+    <string name="sync_label_lead_opportunities">Leads/Opportunities</string>
+    <string name="sync_label_quotation_sales_orders">Quotations/Sales Orders</string>
+    <string name="sync_label_phonecalls">Logged Calls</string>
+    <string name="no_notification">No Notification</string>
+    <string name="at_the_time_of_event">At the time of event</string>
+    <string name="on_the_day_at">On the day at %s</string>
+    <string name="day_before_at">The day before at %s</string>
+    <string name="minutes_before">%s minutes before</string>
+    <string name="custom">Custom...</string>
+    <string name="error_end_date_small_than_start_date">End date cannot be set before start date.</string>
+    <string name="label_leads">Leads</string>
+    <string name="label_lead">Lead</string>
+    <string name="label_opp">Opportunity</string>
+    <string name="label_opportunities">Opportunities</string>
+    <string name="label_quotation">Quotations</string>
+    <string name="label_opportunity">Opportunity</string>
+    <string name="label_sale_orders">Sales Orders</string>
+    <string name="label_phone_calls">Phone calls</string>
+    <string name="label_logged_calls">Logged calls</string>
+    <string name="label_convert_to_opportunity">Convert to Opportunity</string>
+    <string name="label_create_opportunity">Create Opportunity</string>
+    <string name="label_convert_to_quotation">Create Quotation</string>
+    <string name="label_create_quotation">@string/label_convert_to_quotation</string>
+    <string name="label_mark_as_lost">Mark Lost</string>
+    <string name="label_mark_as_won">Mark Won</string>
+    <string name="label_location">Location</string>
+    <string name="label_call">Call</string>
+    <string name="label_message">Message</string>
+    <string name="label_schedule_call">Schedule Call</string>
+    <string name="label_meetings">Meeting</string>
+    <string name="label_sale_confirm_sale">Confirm Sale</string>
+    <string name="label_sale_create_invoice">Create Invoice</string>
+    <string name="label_sale_cancel_order">Cancel Order</string>
+    <string name="label_sale_new_copy_of_quotation">New Copy of Quotation</string>
+    <string name="label_mark_done">Mark Done</string>
+    <string name="label_tag_new">New</string>
+    <string name="label_quotation_created">Quotation Created for</string>
+    <string name="label_re_schedule">Re-Schedule</string>
+<<<<<<< HEAD
+=======
+    <string name="label_sync_warning">Need to sync before converting to Opportunity</string>
+
+    <string name="label_no_customer_found">No Customers Found</string>
+    <string name="label_no_location_found">No location found !</string>
+    <string name="label_no_contact_found">No contact found !</string>
+    <string name="label_no_email_found">No email found !</string>
+    <string name="label_no_logged_calls_found">No Logged calls Found</string>
+    <string name="label_event_marked">Event marked </string>
+    <string name="label_new_meeting">New Meeting</string>
+    <string name="label_edit_meeting">Edit Meeting</string>
+    <string name="label_missed_call_from_customer">Missed call from customer</string>
+
+    <string name="toast_information_saved">Information Saved</string>
+    <string name="toast_phone_call_marked_done">Phone call marked done</string>
+    <string name="toast_event_marked_done">Event marked done</string>
+    <string name="toast_image_size_too_large">Image size is too large.</string>
+    <string name="toast_marked"> marked</string>
+>>>>>>> master-crm-studio-dpr
+    <string-array name="array_conversation_actions">
+        <item>Convert to opportunity</item>
+        <item>Merge with existing opportunities</item>
+    </string-array>
+    <string name="label_send_by_email">Send by email</string>
+    <string name="label_confirm_sale">Confirm Sale</string>
+    <string name="label_copy_quotation">Copy of quotation</string>
+    <string name="label_no_order_line">You cannot confirm a sales order which has no line</string>
+    <string name="label_quotation_confirm">Quotation confirmed !</string>
+    <string name="label_new_copy_quotation">New Copy of Quotation</string>
+</resources>

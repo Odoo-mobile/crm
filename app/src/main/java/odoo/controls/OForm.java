@@ -42,7 +42,6 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -183,17 +182,16 @@ public class OForm extends LinearLayout {
         }
 
         // Adding chatter view if model requested
-        if (!mEditable) {
-            if (model != null && model.hasMailChatter()
-                    && mRecord != null && mRecord.getInt("id") != 0) {
-                if (chatterView == null) {
-                    chatterView = (MailChatterView) LayoutInflater.from(mContext)
-                            .inflate(R.layout.base_mail_chatter, this, false);
-                    chatterView.setModelName(model.getModelName());
-                    chatterView.setRecordServerId(mRecord.getInt("id"));
-                    chatterView.generateView();
-                    addView(chatterView);
-                }
+        if (model != null && model.hasMailChatter()
+                && mRecord != null && mRecord.contains("id")
+                && mRecord.getInt("id") != 0) {
+            if (chatterView == null) {
+                chatterView = (MailChatterView) LayoutInflater.from(mContext)
+                        .inflate(R.layout.base_mail_chatter, this, false);
+                chatterView.setModelName(model.getModelName());
+                chatterView.setRecordServerId(mRecord.getInt("id"));
+                chatterView.generateView();
+                addView(chatterView);
             }
         }
     }

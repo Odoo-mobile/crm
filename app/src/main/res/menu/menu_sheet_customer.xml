@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_customer_opportunity"
+        android:icon="@drawable/ic_action_opportunities"
+        android:title="@string/label_opportunities" />
+    <item
+        android:id="@+id/menu_customer_leads"
+        android:icon="@drawable/ic_action_leads"
+        android:title="@string/label_leads" />
+    <item
+        android:id="@+id/menu_customer_location"
+        android:icon="@drawable/ic_action_location"
+        android:title="@string/label_location" />
+    <item
+        android:id="@+id/menu_customer_call"
+        android:icon="@drawable/ic_action_phone"
+        android:title="@string/label_call" />
+    <item
+        android:id="@+id/menu_customer_send_message"
+        android:icon="@drawable/ic_action_message"
+        android:title="@string/label_message" />
+    <item
+        android:id="@+id/menu_customer_schedule_call"
+        android:icon="@drawable/ic_action_reschedule"
+        android:title="@string/label_schedule_call" />
+    <!--<item-->
+    <!--android:id="@+id/menu_customer_meetings"-->
+    <!--android:icon="@drawable/ic_action_calendar"-->
+    <!--android:title="@string/label_meetings" />-->
+</menu>

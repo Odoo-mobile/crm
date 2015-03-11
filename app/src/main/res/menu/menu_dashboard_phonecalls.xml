@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_phonecall_call"
+        android:icon="@drawable/ic_action_phone"
+        android:title="@string/label_call"></item>
+    <item
+        android:id="@+id/menu_phonecall_reschedule"
+        android:icon="@drawable/ic_action_reschedule"
+        android:title="@string/label_schedule_call"></item>
+    <item
+        android:id="@+id/menu_phonecall_all_done"
+        android:icon="@drawable/ic_action_done_all"
+        android:title="@string/label_call_held"></item>
+
+</menu>

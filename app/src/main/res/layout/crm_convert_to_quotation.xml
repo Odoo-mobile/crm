@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@android:color/white"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/title"
+        android:textColor="@color/body_text_1"
+        android:text="@string/label_convert_to_quotation"
+        android:layout_width="match_parent"
+        android:textAppearance="?android:textAppearanceMedium"
+        android:fontFamily="@string/font_normal"
+        android:padding="@dimen/default_16dp"
+        android:layout_height="wrap_content" />
+
+    <View style="@style/ViewSeparator" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:layout_height="0dp">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="@dimen/default_8dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <odoo.controls.OForm
+                android:id="@+id/convert_form"
+                android:layout_width="match_parent"
+                app:modelName="crm.lead"
+                android:orientation="vertical"
+                android:layout_height="wrap_content">
+
+                <odoo.controls.OField
+                    android:id="@+id/partner"
+                    app:fieldName="partner_id"
+                    app:showIcon="false"
+                    app:showLabel="false"
+                    app:widgetType="SearchableLive"
+                    app:fieldLabelColor="@color/body_text_3"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+
+                <odoo.controls.OField
+                    android:id="@+id/mark_won"
+                    app:fieldName="mark_won"
+                    app:showIcon="false"
+                    app:showLabel="false"
+                    app:controlLabel="Mark won"
+                    app:fieldType="Boolean"
+                    app:defaultValue="false"
+                    app:fieldLabelColor="@color/body_text_3"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+            </odoo.controls.OForm>
+        </LinearLayout>
+    </ScrollView>
+
+    <View style="@style/ViewSeparator" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:showDividers="middle"
+        android:divider="?android:attr/dividerHorizontal"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/create_quotation"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:fontFamily="@string/font_normal"
+            android:padding="@dimen/default_16dp"
+            android:text="@string/label_create_quotation"
+            android:textAllCaps="true"
+            android:textColor="@color/body_text_1"
+            android:textSize="@dimen/text_size_medium" />
+
+        <Button
+            android:id="@+id/cancel"
+            style="?android:attr/borderlessButtonStyle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:fontFamily="@string/font_normal"
+            android:layout_height="match_parent"
+            android:background="?android:selectableItemBackground"
+            android:gravity="center"
+            android:padding="@dimen/default_16dp"
+            android:text="@string/label_cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/body_text_2"
+            android:textSize="@dimen/text_size_medium" />
+    </LinearLayout>
+
+</LinearLayout>
