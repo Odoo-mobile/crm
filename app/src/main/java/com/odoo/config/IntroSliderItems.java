@@ -39,28 +39,25 @@ public class IntroSliderItems implements SliderPagerAdapter.SliderBuilderListene
 
     public List<SliderItem> getItems() {
         List<SliderItem> items = new ArrayList<>();
-        items.add(new SliderItem("Agenda", "Easily share your tasks and get invitations from others",
+        items.add(new SliderItem("Daily Planner", "Odoo CRM keeps you organized, focused and more productive",
                 R.drawable.slide_1, this)
-                .putExtra("sub_title", "Today Agenda"));
-        items.add(new SliderItem("Material Design", "Easily share your tasks and get invitations from others",
-                R.drawable.slide_2, this)
-                .putExtra("sub_title", "Simple, Flat, Easy"));
-        items.add(new SliderItem("Call Identity", "Easily share your tasks and get invitations from others",
+                .putExtra("sub_title", "Manage everything in one place"));
+        items.add(new SliderItem("Live caller ID", "Get information about customer and recent opportunity before you pickup the phone.",
                 R.drawable.slide_3, this)
-                .putExtra("sub_title", "Identify your customer"));
-        items.add(new SliderItem("Reminder Notification", "Easily share your tasks and get invitations from others",
+                .putExtra("sub_title", "See who's calling"));
+        items.add(new SliderItem("Reminders", "Use reminders to make sure no phone-calls, meetings or opportunities forgotten",
                 R.drawable.slide_4, this)
                 .putExtra("sub_title", "Reminder with quick actions"));
-        items.add(new SliderItem("Easy operations", "Easily share your tasks and get invitations from others",
+        items.add(new SliderItem("Easy actions", "Odoo CRM offers simple, quick and easy actions at your fingertips",
                 R.drawable.slide_5, this)
-                .putExtra("sub_title", "Quick operations"));
-        items.add(new SliderItem("Manageable lines", "Easily share your tasks and get invitations from others",
+                .putExtra("sub_title", "Getting things done quickly"));
+        items.add(new SliderItem("Manage quotations", "Create/Manage quotations and manage order lines easily",
                 R.drawable.slide_6, this)
                 .putExtra("sub_title", "Easily manage order lines"));
-        items.add(new SliderItem("Works in offline", "Allow you to work offline",
+        items.add(new SliderItem("", "All the data automatically synchronized with server when you re-connect to internet",
                 R.drawable.no_network, this)
-                .putExtra("sub_title", "Offline support"));
-        items.add(new SliderItem("Works with Saas", "Works with Odoo Saas cloud",
+                .putExtra("sub_title", "Works offline"));
+        items.add(new SliderItem("", "Works with Odoo Saas cloud",
                 R.drawable.saas_support, this)
                 .putExtra("sub_title", "Odoo Saas Support"));
         items.add(new SliderItem("Let's Start", "",

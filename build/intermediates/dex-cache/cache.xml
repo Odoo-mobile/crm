@@ -9,13 +9,6 @@
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-c615b16eec8f5b1c0464f8d60f22318f8b542403.jar" />
     </item>
     <item
-        jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/libs/odoo-v2.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="ac69c24051df207a3d00758875befeb85a14b155">
-        <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/odoo-v2-85f9ee53571d608938a1474338b6f89cf888172b.jar" />
-    </item>
-    <item
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/bottom-sheet-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
@@ -89,7 +82,7 @@
         jar="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/exploded-aar/master-crm-studio-dpr/intro-slider-lib/unspecified/classes.jar"
         jumboMode="false"
         revision="21.1.2"
-        sha1="94237ba25971c96a71dc7562e8db9f178b71e370">
+        sha1="7528a042933b9baf50ee606817b5185a973ad2e9">
         <dex dex="/home/dpr/odoo-mobile/odoo/studio-projects/master-crm-studio-dpr/app/build/intermediates/pre-dexed/debug/classes-99f060204eb7292d1c95a89e00ffda90ba4aed86.jar" />
     </item>
     <item
