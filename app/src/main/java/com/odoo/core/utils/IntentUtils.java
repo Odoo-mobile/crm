@@ -68,4 +68,10 @@ public class IntentUtils {
             context.startActivity(intent);
         }
     }
+
+    public static void startContactIntent(Context context, String number) {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("tel:" + number));
+        context.startActivity(intent);
+    }
 }

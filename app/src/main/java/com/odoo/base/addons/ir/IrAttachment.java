@@ -31,6 +31,7 @@ import com.odoo.core.support.OUser;
 
 public class IrAttachment extends OModel {
     public static final String TAG = IrAttachment.class.getSimpleName();
+
     OColumn name = new OColumn("Name", OVarchar.class);
     OColumn datas_fname = new OColumn("Data file name", OText.class);
     OColumn file_size = new OColumn("File Size", OInteger.class);
