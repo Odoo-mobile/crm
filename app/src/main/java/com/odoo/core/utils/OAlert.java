@@ -27,7 +27,7 @@ import android.util.TypedValue;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 
-import com.odoo.crm.R;
+import com.odoo.R;
 
 public class OAlert {
     public static final String TAG = OAlert.class.getSimpleName();

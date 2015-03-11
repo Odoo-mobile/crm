@@ -35,7 +35,7 @@ import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.notification.ONotificationBuilder;
-import com.odoo.crm.R;
+import com.odoo.R;
 
 public class OdooAccountQuickManage extends ActionBarActivity implements View.OnClickListener {
     public static final String TAG = OdooAccountQuickManage.class.getSimpleName();

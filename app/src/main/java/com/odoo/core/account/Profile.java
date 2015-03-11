@@ -27,12 +27,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.odoo.R;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
-import com.odoo.crm.R;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
 import odoo.controls.OForm;

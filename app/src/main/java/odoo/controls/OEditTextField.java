@@ -127,7 +127,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
     }
 
     @Override
-    public void setValue(Object value, boolean notifyUpdate) {
+    public void setValue(Object value) {
         if (value == null)
             return;
         if (value.toString().equals("false")) {
@@ -140,7 +140,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
         } else {
             txvText.setText(value.toString());
         }
-        if (mValueUpdateListener != null && notifyUpdate) {
+        if (mValueUpdateListener != null) {
             mValueUpdateListener.onValueUpdate(value);
         }
     }
@@ -218,7 +218,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
     @Override
     public void onFocusChange(View v, boolean hasFocus) {
         if (!hasFocus && edtText.getText().length() > 0) {
-            setValue(getValue(), true);
+            setValue(getValue());
         }
     }
 
@@ -235,7 +235,7 @@ public class OEditTextField extends LinearLayout implements IOControlData,
 
     @Override
     public void resetData() {
-        setValue(getValue(), true);
+        setValue(getValue());
     }
 
     public void setResource(float textSize, int appearance, int color) {

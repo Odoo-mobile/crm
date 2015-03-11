@@ -38,7 +38,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Interpolator;
 import android.widget.AbsListView;
 
-import com.odoo.crm.R;
+import com.odoo.R;
 
 public class FloatingActionButton extends View {
     public static final String TAG = FloatingActionButton.class.getSimpleName();

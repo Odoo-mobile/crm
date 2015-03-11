@@ -299,7 +299,7 @@ public class OCursorListAdapter extends CursorAdapter implements
 
     @Override
     public int getSectionForPosition(int position) {
-        return 0;
+        return azIndexers.get(sections[position]);
     }
 
 }

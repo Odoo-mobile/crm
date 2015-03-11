@@ -62,7 +62,7 @@ public class OSQLite extends SQLiteOpenHelper {
 
     private List<OModel> getModels() {
         List<OModel> models = new ArrayList<>();
-        models.addAll(BaseModels.baseModels(mContext));
+        models.addAll(BaseModels.baseModels(mContext, mUser));
         for (OAddon addon : mAddons.getAddons()) {
             IBaseFragment fragment = (IBaseFragment) addon.get();
             try {

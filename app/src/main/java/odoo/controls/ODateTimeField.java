@@ -124,14 +124,14 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
     }
 
     @Override
-    public void setValue(Object value, boolean notifyUpdate) {
+    public void setValue(Object value) {
         mValue = value;
         if (value == null || value.toString().equals("false")) {
             txvText.setText("No Value");
             return;
         }
         txvText.setText(getDate(mValue.toString(), mParsePattern));
-        if (mValueUpdateListener != null && notifyUpdate) {
+        if (mValueUpdateListener != null) {
             mValueUpdateListener.onValueUpdate(value);
         }
     }
@@ -240,7 +240,7 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
     public void onDatePick(String date) {
         mDate = date;
         if (mFieldType == FieldType.Date) {
-            setValue(mDate + " 00:00:00", true);
+            setValue(mDate + " 00:00:00");
         }
     }
 
@@ -257,7 +257,7 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
         }
         Date dt = ODateUtils.createDateObject(date, format, true);
         String utc_date = ODateUtils.getUTCDate(dt, format);
-        setValue(utc_date, true);
+        setValue(utc_date);
     }
 
     public void setParsePattern(String parsePattern) {
@@ -278,7 +278,7 @@ public class ODateTimeField extends LinearLayout implements IOControlData,
 
     @Override
     public void resetData() {
-        setValue(getValue(), true);
+        setValue(getValue());
     }
 
     public void setResource(float textSize, int appearance, int color) {

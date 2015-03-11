@@ -9,7 +9,7 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.widget.ScrollView;
 
-import com.odoo.crm.R;
+import com.odoo.R;
 
 public class ODrawerScrollView extends ScrollView {
     private Drawable mInsetForeground;

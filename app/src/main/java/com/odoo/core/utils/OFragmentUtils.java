@@ -27,7 +27,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 
-import com.odoo.crm.R;
+import com.odoo.R;
 
 public class OFragmentUtils {
     public static final String TAG = OFragmentUtils.class.getSimpleName();

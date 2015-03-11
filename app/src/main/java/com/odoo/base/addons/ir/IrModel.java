@@ -33,7 +33,7 @@ import com.odoo.core.utils.ODateUtils;
 
 public class IrModel extends OModel {
     public static final String TAG = IrModel.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.ir_model";
+    public static final String AUTHORITY = "com.odoo.crm.core.provider.content.sync.ir_model";
     OColumn name = new OColumn("Model Description", OVarchar.class).setSize(100);
     OColumn model = new OColumn("Model", OVarchar.class).setSize(100);
     OColumn state = new OColumn("State", OVarchar.class).setSize(64);

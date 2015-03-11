@@ -24,7 +24,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 
-import com.odoo.crm.R;
+import com.odoo.R;
 
 import java.util.Locale;
 

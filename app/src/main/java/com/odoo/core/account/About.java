@@ -28,7 +28,7 @@ import android.widget.TextView;
 
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
-import com.odoo.crm.R;
+import com.odoo.R;
 import com.odoo.datas.OConstants;
 
 public class About extends ActionBarActivity {

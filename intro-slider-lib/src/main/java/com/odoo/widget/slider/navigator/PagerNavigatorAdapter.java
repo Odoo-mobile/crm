@@ -60,8 +60,8 @@ public class PagerNavigatorAdapter {
 				shapeBg.setColor(mContext.getResources().getColor(
 						color.theme_primary_trans));
 			}
-			params.setMargins(getLeftRightMargin(), getTopBottomMargin(),
-					getLeftRightMargin(), getTopBottomMargin());
+			params.setMargins(getLeftRightMargine(), getTopBottomMargine(),
+					getLeftRightMargine(), getTopBottomMargine());
 			child.setLayoutParams(params);
 			child.setBackground(shapeBg);
 			child.invalidate();
@@ -77,13 +77,13 @@ public class PagerNavigatorAdapter {
 					R.dimen.dot_normal_height_width);
 	}
 
-	private int getTopBottomMargin() {
+	private int getTopBottomMargine() {
 		return (int) mContext.getResources().getDimension(
-				R.dimen.dot_top_bottom_margin);
+				R.dimen.dot_top_bottom_margine);
 	}
 
-	private int getLeftRightMargin() {
+	private int getLeftRightMargine() {
 		return (int) mContext.getResources().getDimension(
-				R.dimen.dot_left_right_margin);
+				R.dimen.dot_left_right_margine);
 	}
 }

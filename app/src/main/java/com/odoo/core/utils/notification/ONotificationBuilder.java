@@ -35,7 +35,7 @@ import android.support.v4.app.NotificationCompat.Builder;
 import com.odoo.core.account.BaseSettings;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
-import com.odoo.crm.R;
+import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;

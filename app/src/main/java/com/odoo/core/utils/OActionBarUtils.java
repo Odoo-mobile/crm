@@ -23,7 +23,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.odoo.crm.R;
+import com.odoo.R;
 
 public class OActionBarUtils {
 

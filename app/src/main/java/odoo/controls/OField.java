@@ -48,7 +48,7 @@ import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OTimestamp;
 import com.odoo.core.orm.fields.types.OVarchar;
-import com.odoo.crm.R;
+import com.odoo.R;
 
 public class OField extends LinearLayout implements IOControlData.ValueUpdateListener {
     public static final String TAG = OField.class.getSimpleName();
@@ -269,7 +269,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         mControlData.setValueUpdateListener(this);
         mControlData.setEditable(getEditable());
         mControlData.initControl();
-        mControlData.setValue(mValue, true);
+        mControlData.setValue(mValue);
         container.addView(controlView);
     }
 
@@ -363,17 +363,10 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
         return getFieldName();
     }
 
-    public void updateValue(Object value) {
-        mValue = value;
-        if (mValue != null && mControlData != null) {
-            mControlData.setValue(mValue, false);
-        }
-    }
-
     public void setValue(Object value) {
         mValue = value;
         if (mValue != null && mControlData != null) {
-            mControlData.setValue(mValue, true);
+            mControlData.setValue(mValue);
         }
     }
 
@@ -390,7 +383,7 @@ public class OField extends LinearLayout implements IOControlData.ValueUpdateLis
             mControlData.setEditable(editable);
             mControlData.initControl();
             if (value != null)
-                mControlData.setValue(value, true);
+                mControlData.setValue(value);
         }
     }
 

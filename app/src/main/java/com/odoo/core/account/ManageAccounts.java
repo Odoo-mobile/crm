@@ -37,7 +37,7 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
-import com.odoo.crm.R;
+import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
