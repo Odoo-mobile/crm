@@ -19,6 +19,7 @@
  */
 package com.odoo.core.account;
 
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.method.LinkMovementMethod;
@@ -26,9 +27,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.odoo.R;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
-import com.odoo.R;
 import com.odoo.datas.OConstants;
 
 public class About extends ActionBarActivity {
@@ -46,10 +47,12 @@ public class About extends ActionBarActivity {
         versionName = (TextView) findViewById(R.id.txvVersionName);
         try {
             // setting version name from manifest file
-            String version = getPackageManager().getPackageInfo(
-                    getPackageName(), 0).versionName;
+            PackageInfo packageInfo = getPackageManager().getPackageInfo(
+                    getPackageName(), 0);
+            String version = packageInfo.versionName;
+            String build = packageInfo.versionCode + "";
             versionName.setText(getResources()
-                    .getString(R.string.label_version) + " " + version);
+                    .getString(R.string.label_version) + " " + version + " (Build:" + build + ")");
 
             // setting link in textview
             aboutLine2 = (TextView) findViewById(R.id.line2);

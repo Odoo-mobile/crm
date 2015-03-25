@@ -118,7 +118,8 @@ public class BaseModelProvider extends ContentProvider {
         }
         Context ctx = getContext();
         assert ctx != null;
-        cr.setNotificationUri(ctx.getContentResolver(), uri);
+        if (cr != null)
+            cr.setNotificationUri(ctx.getContentResolver(), uri);
         return cr;
     }
 

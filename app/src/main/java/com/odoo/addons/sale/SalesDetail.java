@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.App;
+import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.addons.sale.models.SalesOrderLine;
@@ -49,7 +50,6 @@ import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
-import com.odoo.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -116,7 +116,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         total_amt.setText("0.00");
         layoutAddItem = (LinearLayout) findViewById(R.id.layoutAddItem);
         layoutAddItem.setOnClickListener(this);
-        if (extra == null) {
+        if (extra == null || !extra.containsKey(OColumn.ROW_ID)) {
             mForm.initForm(null);
             actionBar.setTitle(R.string.label_new);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_action_navigation_close);
@@ -154,15 +154,16 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     }
 
     private void initAdapter() {
-
         mList = (ExpandableListControl) findViewById(R.id.expListOrderLine);
         mList.setVisibility(View.VISIBLE);
-        if (extra != null) {
+        if (extra != null && record != null) {
             List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
             for (ODataRow line : lines) {
-                String product_id = line.getM2ORecord("product_id").browse().getString("id");
-                lineValues.put(product_id, line.getFloat("product_uom_qty"));
-                lineIds.put(product_id, line.getInt("id"));
+                int product_id = line.getInt("product_id");
+                if (product_id != 0) {
+                    lineValues.put(product_id + "", line.getFloat("product_uom_qty"));
+                    lineIds.put(product_id + "", line.getInt("id"));
+                }
             }
             objects.addAll(lines);
         }
@@ -192,7 +193,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
             menu.findItem(R.id.menu_sale_save).setVisible(false);
             menu.findItem(R.id.menu_sale_confirm_sale).setVisible(false);
         }
-        if (extra != null && record.getString("state").equals("cancel")) {
+        if (extra != null && record != null && record.getString("state").equals("cancel")) {
             menu.findItem(R.id.menu_sale_save).setVisible(true).setTitle("Copy Quotation");
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
             mForm.setEditable(true);
@@ -200,7 +201,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
             menu.findItem(R.id.menu_sale_new_copy_of_quotation).setVisible(false);
         }
-        if (extra == null) {
+        if (extra == null || !extra.containsKey(OColumn.ROW_ID)) {
             menu.findItem(R.id.menu_sale_save).setVisible(true);
             menu.findItem(R.id.menu_sale_detail_more).setVisible(false);
         }
@@ -310,7 +311,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     ODataRow record = new ODataRow();
                     record.put("id", new_id);
                     sale.quickCreateRecord(record);
-                    sale.insert(values);
+                    //sale.insert(values);
                 } else {
                     runOnUiThread(new Runnable() {
                         @Override

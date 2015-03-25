@@ -37,6 +37,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.base.addons.res.ResPartner;
 import com.odoo.core.orm.ODataRow;
@@ -55,7 +56,6 @@ import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import com.odoo.widgets.snackbar.SnackBar;
@@ -167,7 +167,7 @@ public class PhoneCalls extends BaseFragment implements
             args.add("done");
         }
         if (mFilter != null) {
-            where = " and name like ? or lead_name like ? or customer_name like ?";
+            where += " and name like ? or lead_name like ? or customer_name like ?";
             args.add("%" + mFilter + "%");
             args.add("%" + mFilter + "%");
             args.add("%" + mFilter + "%");
@@ -202,10 +202,13 @@ public class PhoneCalls extends BaseFragment implements
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, PhoneCalls.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
-                    if (mType == Type.Logged)
+                    if (mType == Type.Logged) {
                         OControls.setText(mView, R.id.title, _s(R.string.label_no_logged_calls_found));
-                    else
+                        OControls.setImage(mView, R.id.icon,R.drawable.ic_action_call_logs);
+                    } else {
                         OControls.setText(mView, R.id.title, _s(R.string.label_no_scheduled_calls_found));
+                        OControls.setImage(mView, R.id.icon,R.drawable.ic_action_schedule_call);
+                    }
                     OControls.setText(mView, R.id.subTitle, "");
                 }
             }, 500);

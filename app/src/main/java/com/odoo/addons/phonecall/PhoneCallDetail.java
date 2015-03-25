@@ -296,6 +296,8 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.
             updateOpportunity = false;
             if (!lead.getString("type").equals("lead")) {
                 updateOpportunity = true;
+                opportunity_action_form.loadChatter(false);
+                
                 opportunity_action_form.setEditable(true);
                 opportunity_action_form.initForm(lead);
             }

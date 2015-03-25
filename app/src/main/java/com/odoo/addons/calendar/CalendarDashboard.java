@@ -47,6 +47,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.calendar.models.CalendarEvent;
 import com.odoo.addons.calendar.utils.CalendarUtils;
 import com.odoo.addons.calendar.utils.TodayIcon;
@@ -81,7 +82,6 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import com.odoo.widgets.snackbar.SnackBar;
@@ -572,30 +572,31 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public void onLoadFinished(Loader<Cursor> loader, final Cursor cr) {
         mAdapter.changeCursor(cr);
-        new Handler().postDelayed(new Runnable() {
+        if (cr != null) {
+            new Handler().postDelayed(new Runnable() {
 
-            @Override
-            public void run() {
-                if (cr.getCount() > 0) {
-                    OControls.setGone(calendarView, R.id.dashboard_progress);
-                    OControls.setVisible(calendarView, R.id.items_container);
-                    OControls.setGone(calendarView, R.id.dashboard_no_items);
-                    setHasSwipeRefreshView(calendarView, R.id.swipe_container,
-                            CalendarDashboard.this);
-                } else {
-                    setHasSwipeRefreshView(calendarView,
-                            R.id.dashboard_no_items, CalendarDashboard.this);
-                    if (db().isEmptyTable() && !syncRequested) {
-                        syncRequested = true;
-                        parent().sync().requestSync(
-                                CalendarEvent.AUTHORITY);
-                        setSwipeRefreshing(true);
+                @Override
+                public void run() {
+                    if (cr.getCount() > 0) {
+                        OControls.setGone(calendarView, R.id.dashboard_progress);
+                        OControls.setVisible(calendarView, R.id.items_container);
+                        OControls.setGone(calendarView, R.id.dashboard_no_items);
+                        setHasSwipeRefreshView(calendarView, R.id.swipe_container,
+                                CalendarDashboard.this);
+                    } else {
+                        setHasSwipeRefreshView(calendarView,
+                                R.id.dashboard_no_items, CalendarDashboard.this);
+                        OControls.setGone(calendarView, R.id.dashboard_progress);
+                        OControls.setVisible(calendarView, R.id.dashboard_no_items);
                     }
-                    OControls.setGone(calendarView, R.id.dashboard_progress);
-                    OControls.setVisible(calendarView, R.id.dashboard_no_items);
                 }
-            }
-        }, 300);
+            }, 300);
+        }
+        if (db().isEmptyTable() && !syncRequested) {
+            syncRequested = true;
+            parent().sync().requestSync(CalendarEvent.AUTHORITY);
+            setSwipeRefreshing(true);
+        }
     }
 
     @Override
@@ -606,7 +607,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     @Override
     public List<ODrawerItem> drawerMenus(Context context) {
         List<ODrawerItem> menu = new ArrayList<>();
-        menu.add(new ODrawerItem(KEY).setTitle("Agenda")
+        menu.add(new ODrawerItem(KEY).setTitle("Calendar")
                 .setInstance(new CalendarDashboard())
                 .setIcon(R.drawable.ic_action_dashboard));
         return menu;

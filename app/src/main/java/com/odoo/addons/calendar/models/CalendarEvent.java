@@ -111,9 +111,9 @@ public class CalendarEvent extends OModel {
     public CalendarEvent(Context context, OUser user) {
         super(context, "calendar.event", user);
         mContext = context;
-        if (getOdooVersion() != null) {
-            int version = getOdooVersion().getVersion_number();
-            if (version == 7) {
+        if (getUser() != null && getUser().getVersion_number() != null) {
+            int version = getUser().getVersion_number();
+            if (version <= 7) {
                 setModelName("crm.meeting");
             }
         }
@@ -125,7 +125,13 @@ public class CalendarEvent extends OModel {
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
-        domain.add("partner_ids.id", "=", getUser().getPartner_id());
+        if (getOdooVersion().getVersion_number() <= 7) {
+            domain.add("|");
+            domain.add("user_id", "=", getUser().getUser_id());
+            domain.add("partner_ids.id", "=", getUser().getPartner_id());
+        } else {
+            domain.add("partner_ids.id", "=", getUser().getPartner_id());
+        }
         return domain;
     }
 

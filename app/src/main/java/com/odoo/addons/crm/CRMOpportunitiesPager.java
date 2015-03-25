@@ -40,6 +40,7 @@ import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
@@ -51,7 +52,6 @@ import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -212,8 +212,11 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
 
     @Override
     public boolean onBackPressed() {
-        return ((IOnBackPressListener) mFragments.get("index_" + mNavSpinner.getSelectedItemPosition())
-        ).onBackPressed();
+        if (mFragments.size() > 0) {
+            return ((IOnBackPressListener) mFragments.get("index_" + mNavSpinner.getSelectedItemPosition())
+            ).onBackPressed();
+        }
+        return true;
     }
 
     private class StagePagerAdapter extends FragmentStatePagerAdapter {

@@ -25,6 +25,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.odoo.App;
+import com.odoo.R;
 import com.odoo.addons.sale.Sales;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCurrency;
@@ -43,7 +44,6 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -98,7 +98,7 @@ public class SaleOrder extends OModel {
         super(context, "sale.order", user);
         mContext = context;
         setHasMailChatter(true);
-        if (getOdooVersion().getVersion_number() == 7) {
+        if (getUser().getVersion_number() == 7) {
             date_order.setType(ODate.class);
         }
 

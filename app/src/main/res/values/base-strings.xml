@@ -132,5 +132,7 @@
     <string name="about_Company_line4">For more information visit <a href="https://www.odoo.com/">Odoo.com</a>.</string>
     <string name="app_version_name">Version</string>
     <string name="notification_default_ring_tone">content://settings/system/notification_sound</string>
-    <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.co.in/">Terms of Service</a> and <a href="http://www.odoo.co.in/">Privacy Policy</a></string>
+    <string name="disclaimer_content">By continuing, you agree to the <a href="http://www.odoo.com/">Terms of Service</a> and <a href="http://www.odoo.com/">Privacy Policy</a></string>
 </resources>
+
+    

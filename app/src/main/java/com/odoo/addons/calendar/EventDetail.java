@@ -102,6 +102,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
         findViewById(R.id.reminderForEvent).setOnClickListener(this);
         Bundle extra = getIntent().getExtras();
         eventForm = (OForm) mView;
+        eventForm.setModel(calendarEvent.getModelName());
         if (extra != null) {
             row_id = getIntent().getIntExtra(OColumn.ROW_ID, -1);
             if (row_id != -1) {

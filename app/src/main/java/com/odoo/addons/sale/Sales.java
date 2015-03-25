@@ -38,6 +38,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.addons.fragment.BaseFragment;
@@ -53,7 +54,6 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
@@ -64,7 +64,7 @@ import java.util.List;
 public class Sales extends BaseFragment implements
         OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener,
-        ISyncStatusObserverListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener {
+        ISyncStatusObserverListener, IOnItemClickListener, BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener, IOnBackPressListener, View.OnClickListener {
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
 
@@ -103,6 +103,7 @@ public class Sales extends BaseFragment implements
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
         mAdapter.handleItemClickListener(mList, this);
+        setHasFloatingButton(mView, R.id.fabButton, mList, this);
         if (mType == Type.SaleOrder)
             mView.findViewById(R.id.fabButton).setVisibility(View.GONE);
         setHasSyncStatusObserver(TAG, this, db());
@@ -113,8 +114,10 @@ public class Sales extends BaseFragment implements
     @Override
     public void onViewBind(View view, Cursor cursor, ODataRow row) {
         OControls.setText(view, R.id.name, row.getString("name"));
+        String format = (db().getUser().getVersion_number() <= 7)
+                ? ODateUtils.DEFAULT_DATE_FORMAT : ODateUtils.DEFAULT_FORMAT;
         String date = ODateUtils.convertToDefault(row.getString("date_order"),
-                ODateUtils.DEFAULT_FORMAT, "MMMM, dd");
+                format, "MMMM, dd");
         OControls.setText(view, R.id.date_order, date);
         OControls.setText(view, R.id.state, row.getString("state_title"));
         if (row.getString("partner_name").equals("false")) {
@@ -383,5 +386,16 @@ public class Sales extends BaseFragment implements
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fabButton:
+                Bundle bundle = new Bundle();
+                bundle.putString("type", Type.Quotation.toString());
+                IntentUtils.startActivity(getActivity(), SalesDetail.class, bundle);
+                break;
+        }
     }
 }

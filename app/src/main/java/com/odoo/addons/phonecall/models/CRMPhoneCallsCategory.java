@@ -56,11 +56,13 @@ public class CRMPhoneCallsCategory extends OModel {
     public static int getId(Context context, Type type) {
         int id = 0;
         CRMPhoneCallsCategory category = new CRMPhoneCallsCategory(context, null);
-        ODataRow row = category.browse(new String[]{}, "name = ?", new String[]{
-                (type == Type.Inbound) ? "Inbound" : "Outbound"
-        });
-        if (row != null) {
-            id = row.getInt(OColumn.ROW_ID);
+        if (category.count(null, null) > 0) {
+            ODataRow row = category.browse(new String[]{}, "name = ?", new String[]{
+                    (type == Type.Inbound) ? "Inbound" : "Outbound"
+            });
+            if (row != null) {
+                id = row.getInt(OColumn.ROW_ID);
+            }
         }
         return id;
     }
