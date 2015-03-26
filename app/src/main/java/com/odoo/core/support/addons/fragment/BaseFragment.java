@@ -37,11 +37,11 @@ import android.widget.ListView;
 
 import com.odoo.App;
 import com.odoo.OdooActivity;
+import com.odoo.R;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.service.receivers.ISyncFinishReceiver;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import odoo.controls.fab.FloatingActionButton;
 
@@ -166,7 +166,11 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
             ContentResolver.removeStatusChangeListener(mSyncObserverHandle);
             mSyncObserverHandle = null;
         }
-        parent().unregisterReceiver(syncFinishReceiver);
+        try {
+            parent().unregisterReceiver(syncFinishReceiver);
+        } catch (Exception e) {
+            // Skipping issue related to unregister receiver
+        }
     }
 
     @Override
@@ -185,6 +189,8 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     @Override
     public void onResume() {
         super.onResume();
+        if (OUser.current(getActivity()) == null)
+            return;
         if (mSyncStatusObserverListener != null) {
             mSyncStatusObserver.onStatusChanged(0);
             int mask = ContentResolver.SYNC_OBSERVER_TYPE_PENDING
