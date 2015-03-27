@@ -174,7 +174,7 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
         }
         whereArgs = args.toArray(new String[args.size()]);
 
-        return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, "date_action DESC");
+        return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, "create_date DESC");
     }
 
     @Override

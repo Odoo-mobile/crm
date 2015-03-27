@@ -574,7 +574,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         mAdapter.changeCursor(cr);
         if (cr != null) {
             new Handler().postDelayed(new Runnable() {
-
                 @Override
                 public void run() {
                     if (cr.getCount() > 0) {

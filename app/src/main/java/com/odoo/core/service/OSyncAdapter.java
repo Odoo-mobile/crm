@@ -42,7 +42,6 @@ import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.notification.ONotificationBuilder;
-import com.odoo.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
