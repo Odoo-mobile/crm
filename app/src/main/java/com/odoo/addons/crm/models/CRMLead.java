@@ -97,6 +97,7 @@ public class CRMLead extends OModel {
     OColumn date_closed = new OColumn("Closed", ODateTime.class);
     OColumn stage_id = new OColumn("Stage", CRMCaseStage.class,
             OColumn.RelationType.ManyToOne);
+
     OColumn user_id = new OColumn("Salesperson", ResUsers.class,
             OColumn.RelationType.ManyToOne);
     OColumn referred = new OColumn("Referred By", OVarchar.class);
@@ -106,7 +107,7 @@ public class CRMLead extends OModel {
             OColumn.RelationType.ManyToOne);
     OColumn company_currency = new OColumn("Company Currency",
             ResCurrency.class, OColumn.RelationType.ManyToOne);
-
+    OColumn section_id = new OColumn("Sales Team", CrmCaseSection.class, OColumn.RelationType.ManyToOne);
     /**
      * Only used for type opportunity
      */

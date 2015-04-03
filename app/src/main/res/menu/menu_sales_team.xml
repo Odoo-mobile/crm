@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_use_lead"
+        android:icon="@drawable/ic_action_leads"
+        android:title="@string/label_leads"></item>
+    <item
+        android:id="@+id/menu_use_opportunity"
+        android:icon="@drawable/ic_action_opportunities"
+        android:title="@string/label_opportunities"></item>
+    <item
+        android:id="@+id/menu_use_quotation"
+        android:icon="@drawable/ic_action_quotation"
+        android:title="@string/label_quotation"></item>
+
+</menu>

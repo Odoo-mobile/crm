@@ -39,6 +39,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.odoo.R;
+import com.odoo.addons.crm.SalesTeam;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.addons.fragment.BaseFragment;
@@ -68,6 +69,8 @@ public class Sales extends BaseFragment implements
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
 
+    private boolean filter_team_data = false;
+    private int section_id = -1;
     private View mView;
     private ListView mList;
     private OCursorListAdapter mAdapter;
@@ -94,6 +97,16 @@ public class Sales extends BaseFragment implements
         super.onViewCreated(view, savedInstanceState);
         parent().setOnBackPressListener(this);
         mView = view;
+        Bundle extra = getArguments();
+        if (extra != null && extra.containsKey(SalesTeam.KEY_FILTER_REQUEST)) {
+            if (extra.containsKey(SalesTeam.KEY_SECTION_ID)) {
+                filter_team_data = true;
+                section_id = extra.getInt(SalesTeam.KEY_SECTION_ID);
+            }
+            mView.findViewById(R.id.filterContainer).setVisibility(View.VISIBLE);
+            OControls.setText(mView, R.id.filter_name, extra.getString("name"));
+            mView.findViewById(R.id.cancel_filter).setOnClickListener(this);
+        }
         initAdapter();
     }
 
@@ -159,6 +172,10 @@ public class Sales extends BaseFragment implements
             case Quotation:
                 where = " (state = ? or state = ?)";
                 args.addAll(Arrays.asList(new String[]{"draft", "cancel"}));
+                if (filter_team_data) {
+                    where += " and section_id = ?";
+                    args.add(section_id + "");
+                }
                 break;
             case SaleOrder:
                 where = "(state = ? or state = ? or state = ?)";
@@ -391,6 +408,9 @@ public class Sales extends BaseFragment implements
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.cancel_filter:
+                getActivity().getSupportFragmentManager().popBackStack();
+                break;
             case R.id.fabButton:
                 Bundle bundle = new Bundle();
                 bundle.putString("type", Type.Quotation.toString());

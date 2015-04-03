@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
 import com.odoo.base.addons.res.ResPartner;
@@ -60,7 +61,6 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
@@ -88,7 +88,8 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     private boolean syncRequested = false;
     // Customer's data filter
     private boolean filter_customer_data = false;
-    private int customer_id = -1;
+    private boolean filter_team_data = false;
+    private int customer_id = -1, section_id = -1;
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
 
@@ -112,10 +113,15 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
         parent().setOnActivityResultListener(this);
         Bundle extra = getArguments();
         if (extra != null && extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
-            filter_customer_data = true;
-            customer_id = extra.getInt(Customers.KEY_CUSTOMER_ID);
-            mView.findViewById(R.id.customer_filterContainer).setVisibility(View.VISIBLE);
-            OControls.setText(mView, R.id.customer_name, extra.getString("name"));
+            if (extra.containsKey(Customers.KEY_CUSTOMER_ID)) {
+                filter_customer_data = true;
+                customer_id = extra.getInt(Customers.KEY_CUSTOMER_ID);
+            } else if (extra.containsKey(SalesTeam.KEY_SECTION_ID)) {
+                filter_team_data = true;
+                section_id = extra.getInt(SalesTeam.KEY_SECTION_ID);
+            }
+            mView.findViewById(R.id.filterContainer).setVisibility(View.VISIBLE);
+            OControls.setText(mView, R.id.filter_name, extra.getString("name"));
             mView.findViewById(R.id.cancel_filter).setOnClickListener(this);
         }
         setHasSyncStatusObserver(TAG, this, db());
@@ -172,6 +178,10 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
             where += " and partner_id = ?";
             args.add(customer_id + "");
         }
+        if (filter_team_data) {
+            where += " and section_id = ?";
+            args.add(section_id + "");
+        }
         whereArgs = args.toArray(new String[args.size()]);
 
         return new CursorLoader(getActivity(), db().uri(), null, where, whereArgs, "create_date DESC");
@@ -202,8 +212,7 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
                     OControls.setGone(mView, R.id.swipe_container);
                     OControls.setVisible(mView, R.id.customer_no_items);
                     setHasSwipeRefreshView(mView, R.id.customer_no_items, CRMLeads.this);
-                    OControls.setImage(mView, R.id.icon, R.drawable.ic_action_leads
-                    );
+                    OControls.setImage(mView, R.id.icon, R.drawable.ic_action_leads);
                     OControls.setText(mView, R.id.title, "No Leads Found");
                     OControls.setText(mView, R.id.subTitle, "");
                 }

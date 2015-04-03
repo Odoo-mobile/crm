@@ -7,7 +7,7 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:id="@+id/customer_filterContainer"
+        android:id="@+id/filterContainer"
         android:background="@android:color/white"
         android:layout_width="match_parent"
         android:visibility="gone"
@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content" />
 
             <TextView
-                android:id="@+id/customer_name"
+                android:id="@+id/filter_name"
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
                 android:paddingLeft="@dimen/default_16dp"

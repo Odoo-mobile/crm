@@ -21,6 +21,7 @@ package com.odoo.base.addons;
 
 import android.content.Context;
 
+import com.odoo.addons.crm.models.SaleConfigSettings;
 import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.mail.MailMessage;
@@ -46,6 +47,7 @@ public class BaseModels {
         models.add(new ResCompany(context, user));
         models.add(new IrAttachment(context, user));
         models.add(new MailMessage(context, user));
+        models.add(new SaleConfigSettings(context, user));
         return models;
     }
 }

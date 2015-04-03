@@ -27,6 +27,7 @@ import android.util.Log;
 import com.odoo.addons.crm.CRMLeads;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.crm.models.SaleConfigSettings;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.service.ISyncFinishListener;
@@ -35,6 +36,7 @@ import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
 import odoo.ODomain;
+import odoo.Odoo;
 
 public class CRMLeadSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = CRMLeadSyncService.class.getSimpleName();
@@ -50,6 +52,7 @@ public class CRMLeadSyncService extends OSyncService implements ISyncFinishListe
 
     @Override
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
+        Odoo.DEBUG = true;
         if (adapter.getModel().getModelName().equals("crm.lead")) {
             ODomain domain = new ODomain();
             if (extras.containsKey(CRMLeads.KEY_IS_LEAD)) {
@@ -60,7 +63,18 @@ public class CRMLeadSyncService extends OSyncService implements ISyncFinishListe
             }
             adapter.onSyncFinish(this).syncDataLimit(50);
         }
+        CRMCaseStage stage = new CRMCaseStage(getApplicationContext(), user);
+        if (adapter.getModel().getModelName().equals(stage.getModelName())) {
+            adapter.onSyncFinish(syncFinishListener);
+        }
     }
+
+    ISyncFinishListener syncFinishListener = new ISyncFinishListener() {
+        @Override
+        public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {
+            return new OSyncAdapter(getApplicationContext(), SaleConfigSettings.class, CRMLeadSyncService.this, true);
+        }
+    };
 
     @Override
     public OSyncAdapter performNextSync(OUser user, SyncResult syncResult) {

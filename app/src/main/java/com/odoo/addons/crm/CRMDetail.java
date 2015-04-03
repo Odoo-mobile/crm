@@ -31,8 +31,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.App;
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
+import com.odoo.addons.crm.models.SaleConfigSettings;
 import com.odoo.addons.customers.Customers;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResCompany;
@@ -47,7 +49,6 @@ import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -111,9 +112,10 @@ public class CRMDetail extends ActionBarActivity {
             finish();
         }
         ODataRow currency = record.getM2ORecord("company_currency").browse();
-        if (currency != null) {
+        if (currency != null)
             currency_symbol.setText(currency.getString("symbol"));
-        }
+        if (!SaleConfigSettings.showSaleTeams(this))
+            mForm.findViewById(R.id.sales_team).setVisibility(View.GONE);
         if (!record.getString("type").equals("lead")) {
             actionBar.setTitle(R.string.label_opportunity);
             type = "opportunity";
@@ -269,7 +271,6 @@ public class CRMDetail extends ActionBarActivity {
                     sync.requestSync(SaleOrder.AUTHORITY);
                 }
 
-
                 @Override
                 public void OnCancelled() {
 
@@ -295,7 +296,6 @@ public class CRMDetail extends ActionBarActivity {
             Intent intent = new Intent(CRMDetail.this, CRMDetail.class);
             intent.putExtra(OColumn.ROW_ID, record.getInt(OColumn.ROW_ID));
             startActivity(intent);
-
             finish();
         }
 

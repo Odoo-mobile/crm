@@ -21,6 +21,7 @@ package com.odoo.config;
 
 import com.odoo.addons.calendar.CalendarDashboard;
 import com.odoo.addons.crm.CRMLeads;
+import com.odoo.addons.crm.SalesTeam;
 import com.odoo.addons.customers.Customers;
 import com.odoo.addons.phonecall.PhoneCalls;
 import com.odoo.addons.sale.Sales;
@@ -36,8 +37,9 @@ public class Addons extends AddonsHelper {
      * OAddon partners = new OAddon(Partners.class).setDefault();
      */
     OAddon a_agenda = new OAddon(CalendarDashboard.class).setDefault();
-    OAddon b_partners = new OAddon(Customers.class);
-    OAddon c_crm_leads = new OAddon(CRMLeads.class);
+    OAddon b_sales_team =new OAddon(SalesTeam.class);
+    OAddon c_partners = new OAddon(Customers.class);
+    OAddon d_crm_leads = new OAddon(CRMLeads.class);
     OAddon e_sale = new OAddon(Sales.class);
     OAddon f_phone_calls = new OAddon(PhoneCalls.class);
 }

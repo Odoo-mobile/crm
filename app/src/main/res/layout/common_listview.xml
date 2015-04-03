@@ -5,12 +5,12 @@
     android:layout_height="match_parent">
 
     <include
-        layout="@layout/customer_filter_container"
-        android:id="@+id/customer_data_filter_container" />
+        layout="@layout/filter_container"
+        android:id="@+id/data_filter_container" />
 
     <LinearLayout
         android:id="@+id/data_list_container"
-        android:layout_below="@+id/customer_data_filter_container"
+        android:layout_below="@+id/data_filter_container"
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">

@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 
 import com.odoo.App;
 import com.odoo.R;
+import com.odoo.addons.crm.models.CrmCaseSection;
 import com.odoo.addons.sale.Sales;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCurrency;
@@ -88,7 +89,7 @@ public class SaleOrder extends OModel {
     @Odoo.Functional(method = "countOrderLines", store = true, depends = {"order_line"})
     OColumn order_line_count = new OColumn("Total Lines", OVarchar.class)
             .setLocalColumn();
-
+    OColumn section_id = new OColumn("Sales Team", CrmCaseSection.class, OColumn.RelationType.ManyToOne);
     OColumn partner_invoice_id = new OColumn("partner_invoice_id", OVarchar.class).setLocalColumn();
     OColumn partner_shipping_id = new OColumn("partner_shipping_id", OVarchar.class).setLocalColumn();
     OColumn pricelist_id = new OColumn("pricelist_id", OVarchar.class).setLocalColumn();

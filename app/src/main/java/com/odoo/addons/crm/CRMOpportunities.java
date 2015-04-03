@@ -53,7 +53,8 @@ import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CRMOpportunities extends BaseFragment implements OCursorListAdapter.OnViewBindListener,
+public class
+        CRMOpportunities extends BaseFragment implements OCursorListAdapter.OnViewBindListener,
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
         IOnSearchViewChangeListener, View.OnClickListener, IOnItemClickListener,
@@ -75,8 +76,8 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     private int stage_id = -1;
     private boolean syncRequested = false;
     // Customer's data filter
-    private boolean filter_customer_data = false;
-    private int customer_id = -1;
+    private boolean filter_customer_data = false, filter_team_data = false;
+    private int customer_id = -1, section_id = -1;
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
 
@@ -97,13 +98,19 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         if (extra != null) {
             if (extra.containsKey(CRMOpportunitiesPager.KEY_STAGE_ID)) {
                 stage_id = extra.getInt(CRMOpportunitiesPager.KEY_STAGE_ID);
-            }
-            if (extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
-                filter_customer_data = true;
-                customer_id = extra.getInt(Customers.KEY_CUSTOMER_ID);
-                mView.findViewById(R.id.customer_filterContainer).setVisibility(View.VISIBLE);
-                OControls.setText(mView, R.id.customer_name, extra.getString("name"));
-                mView.findViewById(R.id.cancel_filter).setOnClickListener(this);
+            } else {
+                if (extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
+                    if (extra.containsKey(Customers.KEY_CUSTOMER_ID)) {
+                        filter_customer_data = true;
+                        customer_id = extra.getInt(Customers.KEY_CUSTOMER_ID);
+                    } else if (extra.containsKey(SalesTeam.KEY_SECTION_ID)) {
+                        filter_team_data = true;
+                        section_id = extra.getInt(SalesTeam.KEY_SECTION_ID);
+                    }
+                    mView.findViewById(R.id.filterContainer).setVisibility(View.VISIBLE);
+                    OControls.setText(mView, R.id.filter_name, extra.getString("name"));
+                                                           mView.findViewById(R.id.cancel_filter).setOnClickListener(this);
+                }
             }
         }
         setHasSyncStatusObserver(TAG, this, db());
@@ -194,6 +201,10 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         if (filter_customer_data) {
             where += " and partner_id = ?";
             args.add(customer_id + "");
+        }
+        if (filter_team_data) {
+            where += " and section_id = ?";
+            args.add(section_id + "");
         }
         whereArgs = args.toArray(new String[args.size()]);
 

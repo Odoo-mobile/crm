@@ -42,7 +42,17 @@
             </odoo.controls.OField>
 
             <View style="@style/ViewSeparator" />
+            <odoo.controls.OField
+                android:id="@+id/sales_team"
+                app:iconResource="@drawable/ic_action_user"
+                android:layout_width="match_parent"
+                app:fieldName="section_id"
+                app:fieldTextAppearance="?android:textAppearanceMedium"
+                app:fieldTextSize="@dimen/text_size_xmedium"
+                android:layout_height="wrap_content">
 
+            </odoo.controls.OField>
+            <View style="@style/ViewSeparator" />
             <LinearLayout
                 android:id="@+id/opportunity_controls"
                 android:layout_width="match_parent"
