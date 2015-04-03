@@ -26,6 +26,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.TextUtils;
 
+import com.odoo.R;
 import com.odoo.base.addons.res.ResCompany;
 import com.odoo.base.addons.res.ResCountry;
 import com.odoo.base.addons.res.ResCurrency;
@@ -49,7 +50,6 @@ import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.reminder.ReminderUtils;
-import com.odoo.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -144,6 +144,10 @@ public class CRMLead extends OModel {
         super(context, "crm.lead", user);
         mContext = context;
         setHasMailChatter(true);
+        String serie = getOdooVersion().getServer_serie();
+        if (serie.equals("8.saas~6")) {
+            categ_ids.setName("tag_ids");
+        }
     }
 
     @Override

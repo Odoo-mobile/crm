@@ -33,12 +33,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.PagerTabStrip;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.odoo.R;
 import com.odoo.addons.crm.models.CRMCaseStage;
@@ -59,7 +61,7 @@ import java.util.List;
 
 import odoo.controls.OControlHelper;
 
-public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnPageChangeListener, AdapterView.OnItemSelectedListener, IOnBackPressListener {
+public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnPageChangeListener, AdapterView.OnItemSelectedListener, IOnBackPressListener, SwipeRefreshLayout.OnRefreshListener {
     public static final String TAG = CRMOpportunitiesPager.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
     private CRMLeads.Type mType = CRMLeads.Type.Opportunities;
@@ -119,6 +121,8 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         if (spinnerItems.isEmpty()) {
             parent().setHasActionBarSpinner(false);
             mPager.setVisibility(View.GONE);
+            setHasSwipeRefreshView(mView, R.id.no_items_found, this);
+            OControls.setVisible(mView, R.id.no_items_found);
             OControls.setVisible(mView, R.id.dashboard_no_item_view);
             OControls.setText(mView, R.id.title, OResource.string(getActivity(),
                     R.string.label_no_opportunity_found));
@@ -127,6 +131,7 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
             return;
         } else {
             mPager.setVisibility(View.VISIBLE);
+            OControls.setGone(mView, R.id.no_items_found);
             OControls.setGone(mView, R.id.dashboard_no_item_view);
         }
         mNavSpinnerAdapter = new OListAdapter(getActivity(), R.layout.base_simple_list_item_1, spinnerItems) {
@@ -217,6 +222,20 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
             ).onBackPressed();
         }
         return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        if (inNetwork()) {
+            Bundle syncBundle = new Bundle();
+            syncBundle.putBoolean(CRMOpportunities.KEY_IS_LEAD, false);
+            parent().sync().requestSync(CRMLead.AUTHORITY, syncBundle);
+            setSwipeRefreshing(true);
+        } else {
+            hideRefreshingProgress();
+            Toast.makeText(getActivity(), _s(R.string.toast_network_required), Toast.LENGTH_LONG)
+                    .show();
+        }
     }
 
     private class StagePagerAdapter extends FragmentStatePagerAdapter {

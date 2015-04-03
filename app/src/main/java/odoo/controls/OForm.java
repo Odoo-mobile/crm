@@ -42,6 +42,7 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OResource;
+import com.odoo.core.utils.logger.OLog;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -146,6 +147,7 @@ public class OForm extends LinearLayout {
 
     private void initForm() {
         findAllFields(this);
+        OLog.log("Trying to get model " + mModel);
         model = OModel.get(mContext, mModel, null);
         if (model != null) {
             setOrientation(VERTICAL);

@@ -24,7 +24,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.odoo.addons.crm.models.CRMCaseCateg;
+import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.base.addons.BaseModels;
+import com.odoo.base.addons.mail.MailMessage;
+import com.odoo.base.addons.mail.MailMessageSubType;
 import com.odoo.config.Addons;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
@@ -38,7 +42,7 @@ import java.util.List;
 public class OSQLite extends SQLiteOpenHelper {
     public static final String TAG = OSQLite.class.getSimpleName();
     public static final String KEY_MODEL_CLASS_REGISTER = "key_model_class_register";
-    public static final int DATABASE_VERSION = 1;
+    public static final int DATABASE_VERSION = 2;
     private Context mContext;
     private OUser mUser = null;
     private Addons mAddons;
@@ -134,16 +138,46 @@ public class OSQLite extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         Log.i(TAG, "upgrading database.");
-        OSQLHelper sqlHelper = new OSQLHelper(mContext);
-        for (OModel model : getModels()) {
-            sqlHelper.createDropStatements(model);
-        }
-        for (String key : sqlHelper.getStatements().keySet()) {
-            String query = sqlHelper.getStatements().get(key);
+        // Updates in mail messages. added subtype_id
+        MailMessageSubType subType = new MailMessageSubType(mContext, mUser);
+        MailMessage mailMessage = new MailMessage(mContext, mUser);
+
+        OSQLHelper osqlHelper;
+        // Dropping mail message
+        db.execSQL("DROP TABLE IF EXISTS mail_message ");
+        // re-creating mail message and sub type
+        osqlHelper = new OSQLHelper(mContext);
+        osqlHelper.createStatements(subType);
+        osqlHelper.createStatements(mailMessage);
+        for (String key : osqlHelper.getStatements().keySet()) {
+            String query = osqlHelper.getStatements().get(key);
             db.execSQL(query);
-            Log.i(TAG, "Table dropped " + key);
         }
-        onCreate(db);
+        registerModelsClassPath();
+        registerModels(osqlHelper.getModels());
+
+        // Updating crm case stage model name for saas-6
+        if (mUser.getVersion_serie().equals("8.saas~6")) {
+            osqlHelper = new OSQLHelper(mContext);
+            CRMCaseCateg caseCateg = new CRMCaseCateg(mContext, mUser);
+            CRMCaseStage caseStage = new CRMCaseStage(mContext, mUser);
+            osqlHelper.createStatements(caseCateg);
+            osqlHelper.createStatements(caseStage);
+            registerModels(osqlHelper.getModels());
+            db.execSQL("ALTER TABLE crm_case_stage RENAME TO crm_stage");
+            db.execSQL("ALTER TABLE crm_case_categ RENAME TO crm_lead_tag");
+        }
+
+//            OSQLHelper sqlHelper = new OSQLHelper(mContext);
+//            for (OModel model : getModels()) {
+//                sqlHelper.createDropStatements(model);
+//            }
+//            for (String key : sqlHelper.getStatements().keySet()) {
+//                String query = sqlHelper.getStatements().get(key);
+//                db.execSQL(query);
+//                Log.i(TAG, "Table dropped " + key);
+//            }
+//            onCreate(db);
     }
 
     public void dropDatabase() {

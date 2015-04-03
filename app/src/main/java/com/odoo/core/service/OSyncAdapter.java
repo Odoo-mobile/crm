@@ -206,7 +206,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         } catch (OdooSessionExpiredException odooSession) {
             app.setOdoo(null, user);
-            showSignInErrorNotification(user);
+//            showSignInErrorNotification(user);
         } catch (Exception e) {
             e.printStackTrace();
         }

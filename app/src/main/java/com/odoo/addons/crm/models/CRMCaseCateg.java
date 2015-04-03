@@ -34,7 +34,8 @@ public class CRMCaseCateg extends OModel {
         super(context, "crm.case.categ", user);
         if (getOdooVersion() != null) {
             int version = getOdooVersion().getVersion_number();
-            if (version >= 9) {
+            String serie = getOdooVersion().getServer_serie();
+            if (version >= 9 || serie.equals("8.saas~6")) {
                 setModelName("crm.lead.tag");
             }
         }

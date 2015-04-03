@@ -42,7 +42,8 @@ public class CRMCaseStage extends OModel {
         super(context, "crm.case.stage", user);
         if (getOdooVersion() != null) {
             int version = getOdooVersion().getVersion_number();
-            if (version >= 9) {
+            String serieVersion = getOdooVersion().getServer_serie();
+            if (serieVersion.equals("8.saas~6") || version >= 9) {
                 setModelName("crm.stage");
             }
         }
