@@ -81,6 +81,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     private TextView txvType, currency1, currency2, currency3, untaxedAmt, taxesAmt, total_amt;
     private ODataRow currencyObj;
     private ResPartner partner = null;
+    private ProductProduct products = null;
     private String mSOType = "";
     private LinearLayout layoutAddItem = null;
     private Type mType;
@@ -95,9 +96,10 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         extra = getIntent().getExtras();
         mType = Type.valueOf(extra.getString("type"));
         currencyObj = sale.currency();
+        partner = new ResPartner(this, null);
+        products = new ProductProduct(this, null);
         init();
         initAdapter();
-        partner = new ResPartner(this, null);
     }
 
     private void init() {
@@ -159,7 +161,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
         if (extra != null && record != null) {
             List<ODataRow> lines = record.getO2MRecord("order_line").browseEach();
             for (ODataRow line : lines) {
-                int product_id = line.getInt("product_id");
+                int product_id = products.selectServerId(line.getInt("product_id"));
                 if (product_id != 0) {
                     lineValues.put(product_id + "", line.getFloat("product_uom_qty"));
                     lineIds.put(product_id + "", line.getInt("id"));
@@ -460,14 +462,17 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                             ? false : customer.getString("fiscal_position");
                     arguments.add(fiscal_position);// fiscal position
                     arguments.add(false); // flag
-                    if (stockInstalled) {
+                    int version = saleLine.getOdooVersion().getVersion_number();
+                    if (stockInstalled && version > 7) {
                         arguments.add(false);
                     }
                     JSONObject context = new JSONObject();
                     context.put("partner_id", customer.getInt("id"));
                     context.put("quantity", qty);
                     context.put("pricelist", pricelist);
-                    String method = (stockInstalled) ? "product_id_change_with_wh" : "product_id_change";
+
+                    // Fixed for Odoo 7.0 no product_id_change_with_wh available for v7
+                    String method = (stockInstalled && version > 7) ? "product_id_change_with_wh" : "product_id_change";
                     JSONObject response = ((JSONObject) helper.callMethod(method, arguments, context));
                     JSONObject res = response.getJSONObject("value");
                     if (response.has("warning") && !response.getString("warning").equals("false")) {

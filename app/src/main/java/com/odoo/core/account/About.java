@@ -19,7 +19,6 @@
  */
 package com.odoo.core.account;
 
-import android.content.pm.PackageInfo;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -33,9 +32,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.R;
+import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OActionBarUtils;
-import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.datas.OConstants;
 
@@ -56,7 +55,7 @@ public class About extends ActionBarActivity implements View.OnClickListener {
         findViewById(R.id.abtus_header).setOnClickListener(this);
         TextView versionName, aboutLine2, aboutLine3, aboutLine4;
         versionName = (TextView) findViewById(R.id.txvVersionName);
-        handler = getWindow().getDecorView().getHandler();
+        handler = new Handler();
         try {
             PackageManager packageManager = getPackageManager();
             // setting version name from manifest file

@@ -39,6 +39,8 @@ import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
+import org.json.JSONArray;
+
 import odoo.ODomain;
 
 public class CalendarEvent extends OModel {
@@ -128,10 +130,11 @@ public class CalendarEvent extends OModel {
         if (getOdooVersion().getVersion_number() <= 7) {
             domain.add("|");
             domain.add("user_id", "=", getUser().getUser_id());
-            domain.add("partner_ids.id", "=", getUser().getPartner_id());
+            domain.add("partner_ids", "in", new JSONArray().put(getUser().getPartner_id()));
         } else {
-            domain.add("partner_ids.id", "=", getUser().getPartner_id());
+            domain.add("partner_ids", "in", new JSONArray().put(getUser().getPartner_id()));
         }
+        domain.add("recurrency", "=", false);
         return domain;
     }
 

@@ -16,6 +16,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
+import com.odoo.R;
 import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.ServerDataHelper;
@@ -25,7 +26,6 @@ import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
