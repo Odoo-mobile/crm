@@ -1,0 +1,302 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:paddingTop="@dimen/statusBarHeight"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/theme_primary"
+        android:minHeight="?attr/actionBarSize"
+        app:titleMarginStart="@dimen/default_16dp"
+        android:paddingRight="@dimen/default_16dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        app:theme="@style/ToolBarTheme" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="#ffffff"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <odoo.controls.OForm
+                app:controlIconTint="@color/body_text_3"
+                android:id="@+id/eventForm"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                app:editableMode="true"
+                app:modelName="calendar.event"
+                android:layout_height="wrap_content">
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    app:fieldName="name"
+                    app:showIcon="false"
+                    app:showLabel="false"
+                    app:fieldTextAppearance="?android:textAppearanceLarge"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+
+                <View style="@style/ViewSeparator" />
+
+                <odoo.controls.OField
+                    android:id="@+id/fieldAllDay"
+                    android:layout_width="match_parent"
+                    app:fieldName="allday"
+                    app:widgetType="Switch"
+                    app:showLabel="false"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    app:fieldTextColor="@color/body_text_2"
+                    app:iconTint="@color/body_text_3"
+                    app:iconResource="@drawable/ic_action_time_clock"
+                    android:layout_height="wrap_content">
+
+                </odoo.controls.OField>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="72dp"
+                    android:paddingRight="@dimen/default_16dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:orientation="horizontal">
+
+                        <odoo.controls.OField
+                            android:id="@+id/event_date_start"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            app:fieldName="event_date_start"
+                            app:defaultValue="now()"
+                            app:parsePattern="EEEE, MMM dd, yyyy"
+                            app:fieldType="Date"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
+                            app:withOutSidePadding="false"
+                            app:showLabel="false"
+                            app:fieldTextColor="@color/body_text_2"
+                            app:showIcon="false"
+                            android:layout_height="match_parent"></odoo.controls.OField>
+
+                        <odoo.controls.OField
+                            android:id="@+id/event_start_time"
+                            android:layout_width="wrap_content"
+                            app:fieldName="event_time_start"
+                            app:defaultValue="now()"
+                            app:parsePattern="hh:mm a"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
+                            app:fieldTextColor="@color/body_text_2"
+                            app:fieldType="Time"
+                            app:withOutSidePadding="false"
+                            app:showLabel="false"
+                            app:showIcon="false"
+                            android:layout_height="match_parent"></odoo.controls.OField>
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:orientation="horizontal">
+
+                        <odoo.controls.OField
+                            android:id="@+id/event_date_end"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            app:fieldName="event_date_end"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
+                            app:defaultValue="now()"
+                            app:fieldTextColor="@color/body_text_2"
+                            app:parsePattern="EEEE, MMM dd, yyyy"
+                            app:fieldType="Date"
+                            app:withOutSidePadding="false"
+                            app:showLabel="false"
+                            app:showIcon="false"
+                            android:layout_height="match_parent"></odoo.controls.OField>
+
+                        <odoo.controls.OField
+                            android:id="@+id/event_end_time"
+                            android:layout_width="wrap_content"
+                            app:fieldName="event_time_end"
+                            app:defaultValue="now()"
+                            app:parsePattern="hh:mm a"
+                            app:fieldTextSize="@dimen/text_size_xmedium"
+                            app:fieldTextColor="@color/body_text_2"
+                            app:fieldType="Time"
+                            app:withOutSidePadding="false"
+                            app:showLabel="false"
+                            app:showIcon="false"
+                            android:layout_height="match_parent"></odoo.controls.OField>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    app:iconTint="@color/body_text_3"
+                    app:fieldName="class"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    app:showLabel="false"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    app:iconResource="@drawable/ic_action_lock"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <odoo.controls.OField
+                    android:id="@+id/opportunity_id"
+                    android:layout_width="match_parent"
+                    app:fieldName="opportunity_id"
+                    app:widgetType="Searchable"
+                    android:visibility="gone"
+                    app:iconResource="@drawable/ic_action_opportunities"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    android:layout_height="wrap_content" />
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    app:fieldName="location"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    app:showLabel="false"
+                    app:iconTint="@color/body_text_3"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    app:iconResource="@drawable/ic_action_location"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <LinearLayout
+                    android:id="@+id/reminderForEvent"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:gravity="center_vertical|top"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:orientation="horizontal"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="8dp">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top"
+                        android:layout_marginRight="3dp"
+                        android:paddingBottom="5dp"
+                        android:src="@drawable/ic_action_bell"
+                        android:tint="@color/body_text_3" />
+
+                    <TextView
+                        android:id="@+id/reminderTypeName"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:background="@android:color/transparent"
+                        android:fontFamily="@string/font_normal"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="16dp"
+                        android:text="@string/at_the_time_of_event"
+                        android:textSize="@dimen/text_size_xmedium" />
+                </LinearLayout>
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <LinearLayout
+                    android:id="@+id/event_color"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:clickable="true"
+                    android:gravity="center_vertical|top"
+                    android:orientation="horizontal"
+                    android:paddingBottom="8dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:paddingTop="8dp">
+
+                    <ImageView
+                        android:id="@+id/event_color_view"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_gravity="top"
+                        android:layout_marginRight="3dp"
+                        android:paddingBottom="5dp"
+                        android:src="@drawable/ic_action_dot"
+                        android:tint="@color/theme_primary" />
+
+                    <TextView
+                        android:id="@+id/event_color_label"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:fontFamily="@string/font_normal"
+                        android:gravity="center_vertical"
+                        android:paddingLeft="16dp"
+                        android:text="Default Color"
+                        android:textSize="@dimen/text_size_xmedium" />
+                </LinearLayout>
+
+                <View
+                    style="@style/ViewSeparator"
+                    android:layout_marginLeft="72dp" />
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    app:fieldName="description"
+                    app:showLabel="false"
+                    app:iconTint="@color/body_text_3"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    app:fieldTextAppearance="?android:textAppearanceMedium"
+                    app:iconResource="@drawable/ic_action_notes_content"
+                    android:layout_height="wrap_content"></odoo.controls.OField>
+            </odoo.controls.OForm>
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/meetingDeleteLayout"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <View style="@style/ViewSeparator" />
+
+        <TextView
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:text="Delete"
+            android:textAllCaps="true"
+            android:layout_width="match_parent"
+            android:textColor="@color/body_text_2"
+            android:fontFamily="@string/font_normal"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/default_16dp" />
+    </LinearLayout>
+</LinearLayout>

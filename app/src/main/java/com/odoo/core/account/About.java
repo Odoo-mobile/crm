@@ -55,7 +55,7 @@ public class About extends ActionBarActivity implements View.OnClickListener {
         findViewById(R.id.abtus_header).setOnClickListener(this);
         TextView versionName, aboutLine2, aboutLine3, aboutLine4;
         versionName = (TextView) findViewById(R.id.txvVersionName);
-        handler = getWindow().getDecorView().getHandler();
+        handler = new Handler();
         try {
             PackageManager packageManager = getPackageManager();
             // setting version name from manifest file

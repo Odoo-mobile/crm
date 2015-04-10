@@ -260,8 +260,9 @@ public class OUser {
         setPassword(accMgr.getUserData(account, "password"));
         setCompany_id(accMgr.getUserData(account, "company_id"));
         setAllowSelfSignedSSL(Boolean.parseBoolean(accMgr.getUserData(account, "allow_self_signed_ssl")));
-        setVersion_number(Integer.parseInt(accMgr.getUserData(account,
-                "odoo_version_number")));
+        String odoo_version_number = accMgr.getUserData(account, "odoo_version_number");
+        if (odoo_version_number != null && !odoo_version_number.contains("null"))
+            setVersion_number(Integer.parseInt(odoo_version_number));
         setVersion_serie(accMgr.getUserData(account, "odoo_version_serie"));
         // If oAuth login
         setOAuthLogin(Boolean.parseBoolean(accMgr.getUserData(account,

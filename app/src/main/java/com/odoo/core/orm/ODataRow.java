@@ -50,6 +50,9 @@ public class ODataRow implements Parcelable {
     }
 
     public Float getFloat(String key) {
+        if (_data.get(key).toString().equals("false")) {
+            _data.put(key, 0);
+        }
         return Float.parseFloat(_data.get(key).toString());
     }
 
@@ -110,6 +113,10 @@ public class ODataRow implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
 
+    }
+
+    public void remove(String key) {
+        _data.remove(key);
     }
 
     public class IdName {

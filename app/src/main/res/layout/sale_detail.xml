@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/theme_primary"
+        android:minHeight="?attr/actionBarSize"
+        app:titleMarginStart="@dimen/default_16dp"
+        android:paddingTop="@dimen/statusBarHeight"
+        android:paddingRight="@dimen/default_8dp"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+        app:theme="@style/ToolBarTheme" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <odoo.controls.OForm
+            android:id="@+id/saleForm"
+            android:orientation="vertical"
+            app:controlIconTint="@color/body_text_3"
+            app:modelName="sale.order"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/txvType"
+                    android:layout_width="wrap_content"
+                    android:gravity="right"
+                    android:padding="@dimen/default_16dp"
+                    android:textAppearance="?android:textAppearanceLarge"
+                    android:layout_height="match_parent" />
+
+                <odoo.controls.OField
+                    android:layout_width="match_parent"
+                    android:id="@+id/fname"
+                    app:defaultValue="/"
+                    app:fieldName="name"
+                    app:showLabel="false"
+                    app:showIcon="false"
+                    app:fieldTextAppearance="?android:textAppearanceLarge"
+                    app:fieldTextSize="@dimen/text_size_xmedium"
+                    android:layout_height="wrap_content" />
+            </LinearLayout>
+
+            <View style="@style/ViewSeparator" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                app:fieldName="partner_id"
+                app:showLabel="true"
+                app:iconResource="@drawable/ic_action_user"
+                app:widgetType="SearchableLive"
+                app:fieldTextAppearance="?android:textAppearanceMedium"
+                android:layout_height="wrap_content" />
+
+            <View style="@style/ViewSeparator" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:showDividers="middle"
+                android:divider="?android:attr/dividerHorizontal"
+                android:layout_height="wrap_content">
+
+                <odoo.controls.OField
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    app:fieldName="date_order"
+                    app:defaultValue="now()"
+                    app:showLabel="true"
+                    app:iconResource="@drawable/ic_action_time_clock"
+                    app:parsePattern="MMM dd yyyy, hh:MM a"
+                    app:fieldTextSize="@dimen/text_size_medium"
+                    app:fieldTextAppearance="?android:textAppearanceSmall"
+                    android:layout_height="wrap_content" />
+
+            </LinearLayout>
+
+            <View style="@style/ViewSeparator" />
+
+            <odoo.controls.OField
+                android:layout_width="match_parent"
+                app:fieldName="payment_term"
+                app:showLabel="true"
+                app:fieldTextSize="@dimen/text_size_xmedium"
+                app:fieldTextAppearance="?android:textAppearanceMedium"
+                app:showIcon="false"
+                android:layout_height="wrap_content" />
+
+
+            <View style="@style/ViewSeparator" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:paddingLeft="@dimen/default_16dp"
+                android:paddingRight="@dimen/default_16dp"
+                android:id="@+id/layoutAddItem"
+                android:paddingTop="@dimen/default_8dp"
+                android:paddingBottom="@dimen/default_8dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:layout_height="match_parent">
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:src="@drawable/ic_action_edit"
+                    android:padding="2dp"
+                    android:tint="@color/android_orange_dark"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:text="Manage order lines"
+                    android:textAllCaps="true"
+                    android:textColor="@color/android_orange_dark"
+                    android:textStyle="bold"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <odoo.controls.ExpandableListControl
+                android:id="@+id/expListOrderLine"
+                android:layout_width="match_parent"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="@dimen/default_8dp"
+                android:layout_marginBottom="@dimen/default_8dp"
+                android:layout_height="wrap_content">
+
+            </odoo.controls.ExpandableListControl>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:padding="@dimen/default_8dp"
+                    android:text="Untaxed Amount:"
+                    android:gravity="center_vertical|right"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/untaxedTotal"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical|right"
+                    android:minWidth="80dp"
+                    android:fontFamily="@string/font_normal"
+                    android:textColor="@color/body_text_1"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/currency1"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:paddingRight="@dimen/default_16dp"
+                    android:paddingLeft="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:padding="@dimen/default_8dp"
+                    android:text="Taxes :"
+                    android:gravity="center_vertical|right"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/taxesTotal"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical|right"
+                    android:fontFamily="@string/font_normal"
+                    android:minWidth="80dp"
+                    android:textColor="@color/body_text_1"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/currency2"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:paddingRight="@dimen/default_16dp"
+                    android:paddingLeft="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textAppearance="?android:textAppearanceSmall"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:padding="@dimen/default_8dp"
+                    android:textStyle="bold"
+                    android:text="Total:"
+                    android:gravity="center_vertical|right"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/fTotal"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical|right"
+                    android:fontFamily="@string/font_normal"
+                    android:minWidth="80dp"
+                    android:textStyle="bold"
+                    android:textColor="@color/body_text_1"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:layout_height="match_parent" />
+
+                <TextView
+                    android:id="@+id/currency3"
+                    android:paddingBottom="@dimen/default_8dp"
+                    android:paddingTop="@dimen/default_8dp"
+                    android:paddingRight="@dimen/default_16dp"
+                    android:paddingLeft="@dimen/default_8dp"
+                    android:layout_width="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textStyle="bold"
+                    android:textAppearance="?android:textAppearanceMedium"
+                    android:layout_height="match_parent" />
+
+            </LinearLayout>
+        </odoo.controls.OForm>
+    </ScrollView>
+</LinearLayout>

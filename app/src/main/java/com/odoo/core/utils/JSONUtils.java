@@ -82,6 +82,12 @@ public class JSONUtils {
         try {
             values = new JSONObject();
             for (OColumn col : model.getColumns(false)) {
+                if (col.getName().equals("id") && row.getInt("id") == 0) {
+                    /* FIXME: 7.0 not supporting
+                    Response from server : column "id" specified more than once
+                     */
+                    continue;
+                }
                 if (col.getRelationType() == null) {
                     if (!col.getName().equals("create_date") || !col.getName().equals("write_date")) {
                         Object val = row.get(col.getName());

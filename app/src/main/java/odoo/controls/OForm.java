@@ -42,7 +42,7 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
+import com.odoo.core.utils.logger.OLog;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -61,6 +61,7 @@ public class OForm extends LinearLayout {
     private OValues extraValues = new OValues();
     private MailChatterView chatterView = null;
     private Boolean loadChatter = true;
+
     public OForm(Context context) {
         super(context);
         init(context, null, 0, 0);
@@ -146,47 +147,49 @@ public class OForm extends LinearLayout {
 
     private void initForm() {
         findAllFields(this);
+        OLog.log("Trying to get model " + mModel);
         model = OModel.get(mContext, mModel, null);
-        setOrientation(VERTICAL);
-        for (String key : mFormFieldControls.keySet()) {
-            View v = mFormFieldControls.get(key);
-            if (v instanceof OField) {
-                OField c = (OField) v;
-                c.setEditable(mEditable);
-                c.useTemplate(autoUIGenerate);
-                c.setModel(model);
-                OColumn column = model.getColumn(c.getFieldName());
-                if (column != null) {
-                    c.setColumn(column);
-                    // Setting OnChange Event
-                    if (column.hasOnChange()) {
-                        setOnChangeForControl(column, c);
-                    }
+        if (model != null) {
+            setOrientation(VERTICAL);
+            for (String key : mFormFieldControls.keySet()) {
+                View v = mFormFieldControls.get(key);
+                if (v instanceof OField) {
+                    OField c = (OField) v;
+                    c.setEditable(mEditable);
+                    c.useTemplate(autoUIGenerate);
+                    c.setModel(model);
+                    OColumn column = model.getColumn(c.getFieldName());
+                    if (column != null) {
+                        c.setColumn(column);
+                        // Setting OnChange Event
+                        if (column.hasOnChange()) {
+                            setOnChangeForControl(column, c);
+                        }
 
-                    // Setting domain Filter for column
-                    if (column.hasDomainFilterColumn()) {
-                        setOnDomainFilterCallBack(column, c);
+                        // Setting domain Filter for column
+                        if (column.hasDomainFilterColumn()) {
+                            setOnDomainFilterCallBack(column, c);
+                        }
                     }
-                }
-                c.initControl();
-                Object val = c.getValue();
-                if (mRecord != null) {
-                    if (mRecord.contains(c.getFieldName()))
-                        val = mRecord.get(c.getFieldName());
-                }
-                if (val != null)
-                    c.setValue(val);
-                if (icon_tint_color != -1) {
-                    c.setIconTintColor(icon_tint_color);
+                    c.initControl();
+                    Object val = c.getValue();
+                    if (mRecord != null) {
+                        if (mRecord.contains(c.getFieldName()))
+                            val = mRecord.get(c.getFieldName());
+                    }
+                    if (val != null)
+                        c.setValue(val);
+                    if (icon_tint_color != -1) {
+                        c.setIconTintColor(icon_tint_color);
+                    }
                 }
             }
-        }
 
-        // Adding chatter view if model requested
-        if(loadChatter) {
-            if (!mEditable) {
+            // Adding chatter view if model requested
+            if (loadChatter) {
                 if (model != null && model.hasMailChatter()
-                        && mRecord != null && mRecord.getInt("id") != 0) {
+                        && mRecord != null && mRecord.contains("id")
+                        && mRecord.getInt("id") != 0) {
                     if (chatterView == null) {
                         chatterView = (MailChatterView) LayoutInflater.from(mContext)
                                 .inflate(R.layout.base_mail_chatter, this, false);
@@ -199,8 +202,12 @@ public class OForm extends LinearLayout {
             }
         }
     }
-    
-    public void loadChatter(boolean loadChatter){
+
+    public void loadChatter(boolean loadChatter) {
+        this.loadChatter = loadChatter;
+    }
+
+    public void loadChatter(Boolean loadChatter) {
         this.loadChatter = loadChatter;
     }
 

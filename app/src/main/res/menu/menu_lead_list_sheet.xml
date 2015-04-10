@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_lead_convert_to_opportunity"
+        android:icon="@drawable/ic_action_opportunities"
+        android:title="@string/label_convert_to_opportunity"></item>
+    <item
+        android:id="@+id/menu_lead_call_customer"
+        android:icon="@drawable/ic_action_phone"
+        android:title="@string/label_call"></item>
+    <item
+        android:id="@+id/menu_lead_customer_location"
+        android:icon="@drawable/ic_action_location"
+        android:title="@string/label_location"></item>
+
+    <item
+        android:id="@+id/menu_lead_lost"
+        android:icon="@drawable/ic_action_mark_lost"
+        android:title="@string/label_mark_as_lost"></item>
+</menu>

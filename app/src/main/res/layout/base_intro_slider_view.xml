@@ -43,4 +43,18 @@
         android:textSize="@dimen/text_size_large"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:visibility="gone"
+        android:layout_marginTop="@dimen/default_16dp"
+        android:id="@+id/btnSliderFinish"
+        android:textColor="#ffffff"
+        android:textAllCaps="true"
+        android:textStyle="bold"
+        android:paddingLeft="@dimen/default_16dp"
+        android:paddingRight="@dimen/default_16dp"
+        android:background="@color/theme_primary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>

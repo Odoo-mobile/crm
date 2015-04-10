@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingRight="@dimen/default_16dp"
+    android:paddingLeft="@dimen/default_16dp"
+    android:paddingTop="@dimen/default_8dp"
+    android:paddingBottom="@dimen/default_8dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/name"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:layout_width="0dp"
+            android:textColor="@color/body_text_1"
+            android:layout_weight="1"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:paddingRight="5dp"
+            android:layout_height="wrap_content" />
+
+        <ImageView
+            android:id="@+id/remove_lead"
+            android:padding="5dp"
+            android:src="@drawable/ic_action_navigation_close"
+            android:layout_width="wrap_content"
+            android:tint="@color/android_red_dark"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/type"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:layout_width="wrap_content"
+            android:singleLine="true"
+            android:textColor="@color/body_text_2"
+            android:paddingRight="5dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/stage"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:layout_width="wrap_content"
+            android:textColor="@color/android_violet_dark"
+            android:paddingRight="5dp"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/create_date"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:layout_width="wrap_content"
+            android:textColor="@color/body_text_2"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+</LinearLayout>

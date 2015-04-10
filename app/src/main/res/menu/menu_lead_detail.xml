@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/menu_lead_save"
+        android:title="@string/label_save"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_lead_detail_more"
+        android:icon="@drawable/ic_action_more"
+        app:showAsAction="always"
+        android:title="@string/label_more">
+        <menu>
+            <item
+                android:id="@+id/menu_lead_convert_to_opportunity"
+                android:title="@string/label_convert_to_opportunity" />
+            <item
+                android:id="@+id/menu_mark_lost"
+                android:title="@string/label_mark_as_lost" />
+            <item
+                android:id="@+id/menu_mark_won"
+                android:title="@string/label_mark_as_won" />
+            <item
+                android:id="@+id/menu_lead_convert_to_quotation"
+                android:title="@string/label_convert_to_quotation" />
+        </menu>
+    </item>
+</menu>

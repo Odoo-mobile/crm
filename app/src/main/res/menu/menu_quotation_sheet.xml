@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--<item-->
+        <!--android:id="@+id/menu_so_send_by_email"-->
+        <!--android:icon="@drawable/ic_action_message"-->
+        <!--android:title="@string/label_send_by_email"></item>-->
+    <item
+        android:id="@+id/menu_so_confirm_sale"
+        android:icon="@drawable/ic_action_sale_order"
+        android:title="@string/label_confirm_sale"></item>
+    <item
+        android:id="@+id/menu_quotation_cancel"
+        android:icon="@drawable/ic_action_navigation_close"
+        android:title="@string/label_cancel"></item>
+</menu>

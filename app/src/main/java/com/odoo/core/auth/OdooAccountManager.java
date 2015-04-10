@@ -77,7 +77,8 @@ public class OdooAccountManager {
     public static boolean createAccount(Context context, OUser user) {
         AccountManager accountManager = AccountManager.get(context);
         Account account = new Account(user.getAndroidName(), KEY_ACCOUNT_TYPE);
-        return accountManager.addAccountExplicitly(account, String.valueOf(user.getPassword()), user.getAsBundle());
+        return accountManager.addAccountExplicitly(account, String.valueOf(user.getPassword()), 
+                user.getAsBundle());
     }
 
     /**

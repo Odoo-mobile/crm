@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_sale_save"
+        android:title="@string/label_save"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/menu_sale_detail_more"
+        android:icon="@drawable/ic_action_more"
+        app:showAsAction="always"
+        android:title="@string/label_more">
+        <menu>
+            <item
+                android:id="@+id/menu_sale_confirm_sale"
+                android:title="@string/label_sale_confirm_sale" />
+            <item
+                android:id="@+id/menu_sale_new_copy_of_quotation"
+                android:title="@string/label_sale_new_copy_of_quotation" />
+        </menu>
+    </item>
+</menu>
