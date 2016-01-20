@@ -1,5 +1,5 @@
-Odoo Mobile Framework v2.0
-==========================
+Odoo CRM v1.0
+=============
 
 <b>Android Studio Project</b>
 
@@ -7,12 +7,22 @@ Odoo Mobile Framework v2.0
 <img alt="Odoo Instace" src="https://dharmangsoni.odoo.com/website/image?max_height=768&field=datas&model=ir.attachment&id=42&max_width=250" style="height:50px; width:auto" />
 </a>
 
-Odoo is a powerful open source framework. With help of this framework we can rapidly develop almost any application.
+Odoo CRM allows you to manage Scheduled Calls, Meetings and TODO's Opportunities, You can convert opportunity to quotation, and send by email.
 
-World is contracting with the growth of mobile phone technology. As the number of users is increasing day by day, facilities are also increasing. Now a days mobiles are not used just for making calls but they have innumerable uses and can be used as a Camera , Music player, Tablet PC, T.V. , Web browser etc. And with the new technologies, new software and operating systems are required.
+Major Features:
+---------------
 
-One of the most widely used mobile OS these days is ANDROID. Android is a software bunch comprising not only operating system but also middleware and key applications.
+★ Works Offline
 
-Odoo Mobile framework is an open source mobile application development framework with Odoo integration. With the help of mobile framework we can rapidly develop almost all Odoo supported application as faster as we can develop in Odoo Framework.
+★ Works for SaaS and Self Hosted Instances
 
-This framework contains its own ORM to handle mobile’s local database. So you do not have to worry about data comming from Odoo Server. It has pre-developed services and providers to make your application data synchronized with Odoo.
+★ Manage your day in one screen - Agenda
+
+★ Phone call support for Incoming and Outgoing calls
+
+★ Full access to chatter on leads, opportunity, quotes and other documents
+
+Odoo Supported Versions:
+------------------------
+ - Odoo 7.0
+ - Odoo 8.0
