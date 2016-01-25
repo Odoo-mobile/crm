@@ -51,7 +51,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.List;
 
-import odoo.OArguments;
+import odoo.helper.OArguments;
 
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();

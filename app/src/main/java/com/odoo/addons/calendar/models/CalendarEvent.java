@@ -41,7 +41,7 @@ import com.odoo.core.support.OUser;
 
 import org.json.JSONArray;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
 
 public class CalendarEvent extends OModel {
     public static final String TAG = CalendarEvent.class.getSimpleName();

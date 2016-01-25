@@ -33,7 +33,7 @@ import com.odoo.core.support.OdooFields;
 
 import java.util.List;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
 
 public class CustomerFinder {
     public static final String TAG = CustomerFinder.class.getSimpleName();

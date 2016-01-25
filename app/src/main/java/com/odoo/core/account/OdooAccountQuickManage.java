@@ -28,6 +28,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,25 +36,27 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.odoo.App;
 import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.service.OSyncAdapter;
-import com.odoo.core.support.OUser;
-import com.odoo.core.support.OdooLoginHelper;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 
-public class OdooAccountQuickManage extends ActionBarActivity implements View.OnClickListener {
+import odoo.Odoo;
+import odoo.helper.OUser;
+
+public class OdooAccountQuickManage extends AppCompatActivity implements View.OnClickListener {
     public static final String TAG = OdooAccountQuickManage.class.getSimpleName();
     private OUser user = null;
     private ImageView userAvatar;
     private TextView txvName;
-    private OdooLoginHelper loginHelper;
     private LoginProcess loginProcess = null;
     private EditText edtPassword;
     private String action;
+    private App mApp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +65,7 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         getSupportActionBar().hide();
         action = getIntent().getAction();
+        mApp = (App) getApplicationContext();
         // Removing notification
         ONotificationBuilder.cancelNotification(this, OSyncAdapter.REQUEST_SIGN_IN_ERROR);
         user = OdooAccountManager.getDetails(this, getIntent().getStringExtra("android_name"));
@@ -147,8 +151,7 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
         }
         user.setPassword(edtPassword.getText().toString());
         loginProcess = new LoginProcess();
-        loginHelper = new OdooLoginHelper(getApplicationContext());
-        loginProcess.execute(user.getDBName(), user.getHost());
+        loginProcess.execute(user.getDatabase(), user.getHost());
     }
 
     private class LoginProcess extends AsyncTask<String, Void, OUser> {
@@ -168,13 +171,12 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
 
         @Override
         protected OUser doInBackground(String... params) {
-
-            try {
-                return loginHelper.login(user.getUsername(), user.getPassword(), user.getDatabase(), params[1], user.isAllowSelfSignedSSL());
-            } catch (Exception e) {
-                e.printStackTrace();
+            Odoo odoo = mApp.getOdoo(user);
+            if (odoo == null) {
+                odoo = OSyncAdapter.createOdooInstance(OdooAccountQuickManage.this,
+                        (com.odoo.core.support.OUser) user);
             }
-            return null;
+            return odoo.authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
         }
 
         @Override
@@ -182,7 +184,9 @@ public class OdooAccountQuickManage extends ActionBarActivity implements View.On
             super.onPostExecute(oUser);
             progressDialog.dismiss();
             if (oUser != null) {
-                OdooAccountManager.updateUserData(OdooAccountQuickManage.this, user);
+                OdooAccountManager.updateUserData(OdooAccountQuickManage.this,
+                        (com.odoo.core.support.OUser) user);
+                mApp.setOdoo(null, user);
                 finish();
                 Intent intent = new Intent(OdooAccountQuickManage.this, OdooActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

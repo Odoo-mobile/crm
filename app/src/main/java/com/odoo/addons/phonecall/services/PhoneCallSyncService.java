@@ -33,7 +33,7 @@ import com.odoo.core.support.OUser;
 
 import java.util.List;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
 
 public class PhoneCallSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = PhoneCallSyncService.class.getSimpleName();

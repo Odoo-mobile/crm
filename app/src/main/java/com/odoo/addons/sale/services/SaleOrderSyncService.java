@@ -34,7 +34,8 @@ import com.odoo.core.support.OUser;
 import java.util.ArrayList;
 import java.util.List;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
+
 
 public class SaleOrderSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = SaleOrderSyncService.class.getSimpleName();
@@ -59,7 +60,7 @@ public class SaleOrderSyncService extends OSyncService implements ISyncFinishLis
             }
             if (!firstSync)
                 adapter.onSyncFinish(this);
-            domain.add("user_id", "=", user.getUser_id());
+            domain.add("user_id", "=", user.getUserId());
             adapter.setDomain(domain).syncDataLimit(50);
         }
         if (adapter.getModel().getModelName().equals("account.payment.term")) {

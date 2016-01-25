@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
 
 public class CustomersSyncProvider extends BaseModelProvider {
     public static final String TAG = CustomersSyncProvider.class.getSimpleName();

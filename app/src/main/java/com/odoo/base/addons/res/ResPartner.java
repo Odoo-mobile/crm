@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 30/12/14 4:00 PM
  */
 package com.odoo.base.addons.res;
@@ -22,7 +22,7 @@ package com.odoo.base.addons.res;
 import android.content.Context;
 import android.net.Uri;
 
-import com.odoo.addons.sale.models.AccountPaymentTerm;
+import com.odoo.App;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -33,12 +33,14 @@ import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
+import com.odoo.addons.sale.models.AccountPaymentTerm;
 
-import org.json.JSONArray;
+import java.util.ArrayList;
+import java.util.List;
 
-public class
-        ResPartner extends OModel {
-    public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.res_partner";
+public class ResPartner extends OModel {
+    public static final String AUTHORITY = App.APPLICATION_ID +
+            ".core.provider.content.sync.res_partner";
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
     OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
     OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
@@ -80,8 +82,8 @@ public class
     public String storeCompanyName(OValues value) {
         try {
             if (!value.getString("parent_id").equals("false")) {
-                JSONArray parent_id = new JSONArray(value.getString("parent_id"));
-                return parent_id.getString(1);
+                List<Object> parent_id = (ArrayList<Object>) value.get("parent_id");
+                return parent_id.get(1) + "";
             }
         } catch (Exception e) {
             e.printStackTrace();

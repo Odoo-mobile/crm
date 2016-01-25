@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
 import odoo.controls.IOnQuickRecordCreateListener;
 
 public class AddProductLineWizard extends ActionBarActivity implements

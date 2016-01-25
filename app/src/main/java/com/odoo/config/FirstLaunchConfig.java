@@ -15,27 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
  *
- * Created on 19/12/14 2:36 PM
+ * Created on 28/4/15 4:32 PM
  */
-package com.odoo.core.utils;
+package com.odoo.config;
 
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.Toolbar;
+import android.content.Context;
 
-import com.odoo.R;
+import com.odoo.core.support.OUser;
 
-public class OActionBarUtils {
+public class FirstLaunchConfig {
 
-    public static void setActionBar(ActionBarActivity activity, Boolean withHomeButtonEnabled) {
-        Toolbar toolbar = (Toolbar) activity.findViewById(R.id.toolbar);
-        if (toolbar != null) {
-            activity.setSupportActionBar(toolbar);
-            ActionBar actionBar = activity.getSupportActionBar();
-            if (withHomeButtonEnabled) {
-                actionBar.setHomeButtonEnabled(true);
-                actionBar.setDisplayHomeAsUpEnabled(true);
-            }
-        }
+    public static void onFirstLaunch(Context context, OUser user) {
+
     }
+
 }

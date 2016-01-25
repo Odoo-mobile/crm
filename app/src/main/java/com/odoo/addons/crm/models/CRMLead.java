@@ -57,8 +57,9 @@ import org.json.JSONObject;
 import java.util.Date;
 import java.util.List;
 
-import odoo.OArguments;
-import odoo.ODomain;
+
+import odoo.helper.OArguments;
+import odoo.helper.ODomain;
 
 public class CRMLead extends OModel {
     public static final String TAG = CRMLead.class.getSimpleName();
@@ -85,7 +86,7 @@ public class CRMLead extends OModel {
     @Odoo.api.v8
     OColumn categ_ids = new OColumn("Tags", CRMCaseCateg.class,
             OColumn.RelationType.ManyToMany);
-    @Odoo.api.v9alpha
+    @Odoo.api.v9
     OColumn tag_ids = new OColumn("Tags", CRMCaseCateg.class,
             OColumn.RelationType.ManyToMany);
     OColumn contact_name = new OColumn("Contact Name", OVarchar.class);
@@ -144,7 +145,7 @@ public class CRMLead extends OModel {
         super(context, "crm.lead", user);
         mContext = context;
         setHasMailChatter(true);
-        String serie = getOdooVersion().getServer_serie();
+        String serie = getOdooVersion().getServerSerie();
         if (serie.equals("8.saas~6")) {
             categ_ids.setName("tag_ids");
         }

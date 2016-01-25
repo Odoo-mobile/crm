@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 8/1/15 5:47 PM
  */
 package com.odoo.addons.customers;
@@ -26,7 +26,6 @@ import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -43,23 +42,21 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.service.OSyncAdapter;
-import com.odoo.core.support.OdooFields;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
 import com.odoo.R;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
-import org.json.JSONObject;
-
-import odoo.ODomain;
-import odoo.Odoo;
 import odoo.controls.OField;
 import odoo.controls.OForm;
+import odoo.helper.OdooFields;
+import odoo.helper.utils.gson.OdooResult;
 
-public class CustomerDetails extends ActionBarActivity implements View.OnClickListener, OField.IOnFieldValueChangeListener {
+public class CustomerDetails extends OdooCompatActivity
+        implements View.OnClickListener, OField.IOnFieldValueChangeListener {
     public static final String TAG = CustomerDetails.class.getSimpleName();
     private final String KEY_MODE = "key_edit_mode";
     private final String KEY_NEW_IMAGE = "key_new_image";
@@ -81,10 +78,11 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.customer_detail);
-        OActionBarUtils.setActionBar(this, false);
+        OAppBarUtils.setAppBar(this, false);
         fileManager = new OFileManager(this);
         actionBar = getSupportActionBar();
-        actionBar.setTitle("");
+        if (actionBar != null)
+            actionBar.setTitle("");
         if (savedInstanceState != null) {
             mEditMode = savedInstanceState.getBoolean(KEY_MODE);
             newImage = savedInstanceState.getString(KEY_NEW_IMAGE);
@@ -296,19 +294,11 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
             String image = null;
             try {
                 Thread.sleep(300);
-                Odoo odoo = app.getOdoo(resPartner.getUser());
-                if (odoo == null) {
-                    odoo = OSyncAdapter.createOdooInstance(CustomerDetails.this, resPartner.getUser());
-                }
-                ODomain domain = new ODomain();
-                domain.add("id", "=", params[0]);
-                JSONObject result = odoo.search_read(resPartner.getModelName(),
-                        new OdooFields(new String[]{"image_medium"}).get(),
-                        domain.get());
-                JSONObject records = result.getJSONArray("records")
-                        .getJSONObject(0);
-                if (!records.getString("image_medium").equals("false")) {
-                    image = records.getString("image_medium");
+                OdooFields fields = new OdooFields();
+                fields.addAll(new String[]{"image_medium"});
+                OdooResult record = resPartner.getServerDataHelper().read(null, params[0]);
+                if (record != null && !record.getString("image_medium").equals("false")) {
+                    image = record.getString("image_medium");
                 }
             } catch (Exception e) {
                 e.printStackTrace();

@@ -47,6 +47,12 @@
     <string name="label_reply">Reply</string>
     <string name="label_close">Close</string>
     <string name="label_send">Send</string>
+
+    <!-- package warning -->
+    <string name="changes_required">Changes required in \n<b>app/build.gradle</b> for</string>
+    <string name="label_app_name">Application Name</string>
+    <string name="label_package_name">Application Id</string>
+    <string name="label_dialog_disappear">Panel will disappear when configuration changed.</string>
     <!-- Drawer -->
     <string name="label_drawer_account_add_account">Add Account</string>
     <string name="label_drawer_account_manage_accounts">Manage Accounts</string>
@@ -84,6 +90,7 @@
     <string name="label_export_db">Export Database</string>
     <string name="label_our_apps">Our apps</string>
     <string name="label_attach_a_file"> + Attach a file</string>
+    <string name="label_be_patient_we_are_configuring_account_update">Be patient, We are configuring your account updates</string>
     <!-- Toasts -->
     <string name="developer_2_tap">Need 2 tap for developer mode</string>
     <string name="developer_5_tap">Developer mode activated</string>
@@ -95,6 +102,7 @@
     <string name="toast_account_removed">Account Removed Successfully</string>
     <string name="toast_no_activity_found_to_handle_file">No activity found to handle file</string>
     <string name="toast_updating_password">Updating password</string>
+    <string name="toast_something_gone_wrong">Something gone wrong</string>
     <!-- Setting pref strings -->
     <string-array name="syncInterval">
         <item name="5">Every 5 minutes</item>
@@ -116,11 +124,15 @@
         <item name="30">1 month old</item>
         <item name="60">2 months old</item>
         <item name="90">3 months old</item>
+        <item name="180">6 months old</item>
+        <item name="360">12 months old</item>
     </string-array>
     <string-array name="syncDataLimitValues">
         <item name="30">30</item>
         <item name="60">60</item>
         <item name="90">90</item>
+        <item name="180">180</item>
+        <item name="360">360</item>
     </string-array>
     <string name="general_settings">General Settings</string>
     <string name="application_settings_summary">Sync settings, Interval settings, sync data limit, and more</string>

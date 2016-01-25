@@ -3,32 +3,57 @@ apply plugin: 'com.android.application'
 android {
     signingConfigs {
     }
-    compileSdkVersion 22
-    buildToolsVersion "21.1.2"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
     defaultConfig {
+        manifestPlaceholders = [applicationName: "CRM"]
         applicationId "com.odoo.crm"
         minSdkVersion 14
-        targetSdkVersion 22
+        targetSdkVersion 23
         versionCode 7
         versionName "1.0.7"
     }
     buildTypes {
         release {
             minifyEnabled false
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
-    compile files('libs/swipe_library.jar')
-    compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.android.support:cardview-v7:22.0.0'
-    compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:cardview-v7:23.1.1'
+    compile 'com.google.android.gms:play-services:8.3.0'
+    compile 'com.android.support:design:23.1.1'
     compile project(':intro-slider-lib')
+    compile project(':odoo-rpc-v3')
     compile project(':parallax-effect-lib')
-    compile project(':odoo-rpc-v2')
+    compile project(':odoo-rpc-v3')
     compile project(':calendar-lib')
     compile project(':bottom-sheet-lib')
     compile project(':snackbar-lib')
+}
+
+/**
+ * Application Package checker.
+ * Required to change application Id 'com.odoo.crm' and application name 'CRM'
+ */
+task compilePreCheck(dependsOn: build) {
+    if (project.getProperty("checkForPackageName") == "true") {
+        def testId = project.getProperty("appId")
+        def testName = project.getProperty("appName")
+        def packageWarning = "Application name and Application id must be different than '$testId' and '$testName'.\n\n " +
+                "Please change your Application Id and Application name in app/build.gradle\n" +
+                "Thank You.\n Odoo Mobile Team"
+        def applicationId = android.defaultConfig.getProperty("applicationId")
+        def applicationName = android.defaultConfig.manifestPlaceholders.get("applicationName")
+        println "Odoo Mobile : Pre checking package and application name"
+        print "Current Application Id   : $applicationId"
+        print "Current Application Name : $applicationName"
+        if (applicationId == testId || applicationName == testName) {
+            throw new StopExecutionException(packageWarning)
+        }
+    }
 }

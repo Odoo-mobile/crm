@@ -24,27 +24,28 @@ import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.odoo.OdooActivity;
+import com.odoo.R;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.ExpandableListControl;
 
-public class ManageAccounts extends ActionBarActivity implements View.OnClickListener, ExpandableListControl.ExpandableListAdapterGetViewListener {
+public class ManageAccounts extends AppCompatActivity implements View.OnClickListener,
+        ExpandableListControl.ExpandableListAdapterGetViewListener {
 
     private List<Object> accounts = new ArrayList<>();
     private ExpandableListControl mList = null;
@@ -55,7 +56,7 @@ public class ManageAccounts extends ActionBarActivity implements View.OnClickLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.base_manage_accounts);
         setTitle(R.string.label_accounts);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this, true);
         setResult(RESULT_CANCELED);
         accounts.clear();
         accounts.addAll(OdooAccountManager.getAllAccounts(this));
@@ -66,14 +67,14 @@ public class ManageAccounts extends ActionBarActivity implements View.OnClickLis
 
     private void generateView(View view, OUser user) {
         OControls.setText(view, R.id.accountName, user.getName());
-        OControls.setText(view, R.id.accountURL, (user.isOAauthLogin()) ? user.getInstanceUrl() : user.getHost());
+        OControls.setText(view, R.id.accountURL, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
         OControls.setImage(view, R.id.profile_image, R.drawable.avatar);
         if (!user.getAvatar().equals("false")) {
             Bitmap bmp = BitmapUtils.getBitmapImage(this, user.getAvatar());
             if (bmp != null)
                 OControls.setImage(view, R.id.profile_image, bmp);
         }
-        if (user.isIsactive()) {
+        if (user.isActive()) {
             OControls.setVisible(view, R.id.btnLogout);
             OControls.setGone(view, R.id.btnLogin);
         } else {

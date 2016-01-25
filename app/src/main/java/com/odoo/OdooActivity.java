@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 18/12/14 5:25 PM
  */
 package com.odoo;
@@ -31,12 +31,12 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,21 +44,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.odoo.core.account.AppIntro;
 import com.odoo.core.account.ManageAccounts;
 import com.odoo.core.account.OdooLogin;
 import com.odoo.core.account.OdooUserAskPassword;
+import com.odoo.core.account.OdooUserObjectUpdater;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.support.OUser;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
 import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.BitmapUtils;
-import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OFragmentUtils;
 import com.odoo.core.utils.OPreferenceManager;
@@ -70,7 +73,7 @@ import com.odoo.R;
 
 import java.util.List;
 
-public class OdooActivity extends ActionBarActivity {
+public class OdooActivity extends OdooCompatActivity {
 
     public static final String TAG = OdooActivity.class.getSimpleName();
     public static final Integer DRAWER_ITEM_LAUNCH_DELAY = 300;
@@ -93,15 +96,20 @@ public class OdooActivity extends ActionBarActivity {
     private LinearLayout mDrawerItemContainer = null;
     private Boolean mAccountBoxExpanded = false;
     private Bundle mSavedInstanceState = null;
-    private Spinner spinner_nav = null;
     private Integer mDrawerSelectedIndex = -1;
     private Boolean mHasActionBarSpinner = false;
+    private App app;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.i(TAG, "OdooActivity->onCreate");
         mSavedInstanceState = savedInstanceState;
+        app = (App) getApplicationContext();
+        startApp(savedInstanceState);
+    }
+
+    private void startApp(Bundle savedInstanceState) {
         OPreferenceManager preferenceManager = new OPreferenceManager(this);
         if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
             preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);
@@ -113,8 +121,33 @@ public class OdooActivity extends ActionBarActivity {
             }, 1000);
         }
         setContentView(R.layout.odoo_activity);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this, true);
         setupDrawer();
+        // Validating user object
+        validateUserObject();
+    }
+
+    private void validateUserObject() {
+        if (OdooAccountManager.anyActiveUser(this)) {
+            OUser user = OUser.current(this);
+            if (!OdooAccountManager.isValidUserObj(this, user)
+                    && app.inNetwork()) {
+                OdooUserObjectUpdater.showUpdater(this, new OdooUserObjectUpdater.OnUpdateFinish() {
+                    @Override
+                    public void userObjectUpdateFinished() {
+                        startActivity(new Intent(OdooActivity.this, OdooLogin.class));
+                        finish();
+                    }
+
+                    @Override
+                    public void userObjectUpdateFail() {
+                        Toast.makeText(OdooActivity.this, OResource.string(OdooActivity.this,
+                                R.string.toast_something_gone_wrong), Toast.LENGTH_LONG).show();
+                        finish();
+                    }
+                });
+            }
+        }
     }
 
     // Creating drawer
@@ -148,7 +181,7 @@ public class OdooActivity extends ActionBarActivity {
                 invalidateOptionsMenu();
             }
         };
-        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, Gravity.START);
+        mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mDrawerToggle.syncState();
 
         setupAccountBox();
@@ -192,7 +225,7 @@ public class OdooActivity extends ActionBarActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                mDrawerLayout.closeDrawer(Gravity.START);
+                mDrawerLayout.closeDrawer(GravityCompat.START);
             }
         }, DRAWER_ITEM_LAUNCH_DELAY);
 
@@ -255,7 +288,7 @@ public class OdooActivity extends ActionBarActivity {
         TextView url = (TextView) chosenAccountView.findViewById(R.id.profile_url_text);
 
         name.setText(currentUser.getName());
-        url.setText((currentUser.isOAauthLogin()) ? currentUser.getInstanceUrl() : currentUser.getHost());
+        url.setText((currentUser.isOAuthLogin()) ? currentUser.getInstanceURL() : currentUser.getHost());
 
         if (!currentUser.getAvatar().equals("false")) {
             Bitmap bitmap = BitmapUtils.getBitmapImage(this, currentUser.getAvatar());
@@ -358,7 +391,7 @@ public class OdooActivity extends ActionBarActivity {
                         avatar.setImageBitmap(img);
                 }
                 OControls.setText(view, R.id.profile_name_text, user.getName());
-                OControls.setText(view, R.id.profile_url_text, (user.isOAauthLogin()) ? user.getInstanceUrl() : user.getHost());
+                OControls.setText(view, R.id.profile_url_text, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
                 // Setting login event for other account
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -376,7 +409,7 @@ public class OdooActivity extends ActionBarActivity {
 
                                                 mAccountBoxExpanded = false;
                                                 accountBoxToggle();
-                                                mDrawerLayout.closeDrawer(Gravity.START);
+                                                mDrawerLayout.closeDrawer(GravityCompat.START);
                                                 // Restarting activity
                                                 restartActivity();
                                             }
@@ -489,7 +522,7 @@ public class OdooActivity extends ActionBarActivity {
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_ACCOUNT_CREATE) {
                 if (mDrawerLayout != null) {
-                    mDrawerLayout.closeDrawer(Gravity.START);
+                    mDrawerLayout.closeDrawer(GravityCompat.START);
                     accountBoxToggle();
                 }
                 OdooAccountManager.login(this, data.getStringExtra(KEY_NEW_USER_NAME));

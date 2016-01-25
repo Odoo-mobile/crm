@@ -46,7 +46,7 @@ import org.json.JSONArray;
 
 import java.util.Date;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
 
 public class CRMPhoneCalls extends OModel {
     public static final String TAG = CRMPhoneCalls.class.getSimpleName();

@@ -27,7 +27,7 @@ import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
-import odoo.ODomain;
+import odoo.helper.ODomain;
 
 public class CustomerSyncService extends OSyncService {
     public static final String TAG = CustomerSyncService.class.getSimpleName();
