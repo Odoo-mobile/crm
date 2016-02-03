@@ -51,6 +51,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import odoo.Odoo;
+import odoo.handler.OdooVersionException;
 import odoo.helper.ODomain;
 import odoo.helper.ORecordValues;
 import odoo.helper.OdooFields;
@@ -182,10 +183,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (response.containsKey("error")) {
                 app.setOdoo(null, user);
                 OPreferenceManager pref = new OPreferenceManager(mContext);
-//                OdooResult record = (OdooResult) response.get("error");
-//                if (pref.getBoolean(About.DEVELOPER_MODE, false)) {
-//                    // TODO: Show developer error if enabled
-//                }
+                if (pref.getBoolean(About.DEVELOPER_MODE, false)) {
+                    OdooResult error = response.getMap("error");
+                    OLog.log("ERROR ERROR :(" + error);
+                }
                 return;
             }
 
@@ -316,27 +317,31 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static Odoo createOdooInstance(final Context context, final OUser user) {
         final App app = (App) context.getApplicationContext();
         Odoo odoo = app.getOdoo(user);
-        if (odoo == null) {
-            odoo = Odoo.createInstance(context,
-                    (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
-            odoo.helper.OUser mUser =
-                    odoo.authenticate(user.getUsername(), user.getPassword(), (user.isOAuthLogin()) ?
-                            user.getInstanceDatabase() : user.getDatabase());
-            app.setOdoo(odoo, user);
-            if (mUser != null) {
-                ResCompany company = new ResCompany(context, user);
-                if (company.count("id = ? ", new String[]{user.getCompanyId() + ""}) <= 0) {
-                    ODataRow company_details = new ODataRow();
-                    company_details.put("id", user.getCompanyId());
-                    company.quickCreateRecord(company_details);
-                }
-            } else {
-                // FIXME: Need to check again. Not working properly
-                //showSignInErrorNotification(context, user);
+        try {
+            if (odoo == null) {
+                odoo = Odoo.createQuickInstance(context, (user.isOAuthLogin())
+                        ? user.getInstanceURL() : user.getHost());
+                odoo.helper.OUser mUser =
+                        odoo.authenticate(user.getUsername(), user.getPassword(), (user.isOAuthLogin()) ?
+                                user.getInstanceDatabase() : user.getDatabase());
+                app.setOdoo(odoo, user);
+                if (mUser != null) {
+                    ResCompany company = new ResCompany(context, user);
+                    if (company.count("id = ? ", new String[]{user.getCompanyId() + ""}) <= 0) {
+                        ODataRow company_details = new ODataRow();
+                        company_details.put("id", user.getCompanyId());
+                        company.quickCreateRecord(company_details);
+                    }
+                } else {
+                    // FIXME: Need to check again. Not working properly
+                    //showSignInErrorNotification(context, user);
 //                Toast.makeText(context, OResource.string(context, R.string.toast_something_gone_wrong),
 //                        Toast.LENGTH_LONG).show();
-                Log.e(TAG, OResource.string(context, R.string.toast_something_gone_wrong));
+                    Log.e(TAG, OResource.string(context, R.string.toast_something_gone_wrong));
+                }
             }
+        } catch (OdooVersionException e) {
+            e.printStackTrace();
         }
         return odoo;
     }
