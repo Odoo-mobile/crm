@@ -42,8 +42,8 @@ import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.sync.SyncUtils;
-import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
@@ -73,7 +73,7 @@ public class CRMDetail extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crm_detail);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this,true);
         actionBar = getSupportActionBar();
         crmLead = new CRMLead(this, null);
         extra = getIntent().getExtras();

@@ -49,7 +49,7 @@ public class PhoneCallSyncService extends OSyncService implements ISyncFinishLis
     public void performDataSync(OSyncAdapter adapter, Bundle extras, OUser user) {
         if (adapter.getModel().getModelName().equals("crm.phonecall")) {
             ODomain domain = new ODomain();
-            domain.add("user_id", "=", user.getUser_id());
+            domain.add("user_id", "=", user.getUserId());
             adapter.setDomain(domain).syncDataLimit(10);
             adapter.onSyncFinish(this).syncDataLimit(50);
         }

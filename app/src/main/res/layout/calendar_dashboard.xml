@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:odoo="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,14 +9,14 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"></com.odoo.libs.calendar.view.OdooCalendar>
 
-    <odoo.controls.fab.FloatingActionButton
-        android:id="@+id/fabButton"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="16dp"
-        android:layout_marginRight="16dp"
-        odoo:drawable="@drawable/ic_action_content_add"
-        odoo:fabColor="@color/theme_primary" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:layout_margin="@dimen/default_16dp"
+        android:src="@drawable/ic_action_content_add"
+        app:borderWidth="0dp"
+        app:layout_behavior="odoo.controls.fab.FABScrollBehaviour" />
 </FrameLayout>

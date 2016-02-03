@@ -52,18 +52,18 @@ public class CalendarEvent extends OModel {
     @Odoo.api.v7
     OColumn date = new OColumn("Start Date", ODateTime.class);
     @Odoo.api.v8
-    @Odoo.api.v9alpha
+    @Odoo.api.v9
     OColumn start_date = new OColumn("Start Date", ODate.class);
     @Odoo.api.v8
-    @Odoo.api.v9alpha
+    @Odoo.api.v9
     OColumn start_datetime = new OColumn("Start Date", ODateTime.class);
     @Odoo.api.v7
     OColumn date_deadline = new OColumn("Dead Line", ODateTime.class);
     @Odoo.api.v8
-    @Odoo.api.v9alpha
+    @Odoo.api.v9
     OColumn stop_date = new OColumn("Stop Date", ODate.class);
     @Odoo.api.v8
-    @Odoo.api.v9alpha
+    @Odoo.api.v9
     OColumn stop_datetime = new OColumn("Stop Date", ODateTime.class);
     OColumn duration = new OColumn("Duration", OVarchar.class).setSize(32);
     OColumn allday = new OColumn("All Day", OBoolean.class);
@@ -113,8 +113,8 @@ public class CalendarEvent extends OModel {
     public CalendarEvent(Context context, OUser user) {
         super(context, "calendar.event", user);
         mContext = context;
-        if (getUser() != null && getUser().getVersion_number() != null) {
-            int version = getUser().getVersion_number();
+        if (getUser() != null && getUser().getOdooVersion() != null) {
+            int version = getUser().getOdooVersion().getVersionNumber();
             if (version <= 7) {
                 setModelName("crm.meeting");
             }
@@ -127,12 +127,12 @@ public class CalendarEvent extends OModel {
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
-        if (getOdooVersion().getVersion_number() <= 7) {
+        if (getOdooVersion().getVersionNumber() <= 7) {
             domain.add("|");
-            domain.add("user_id", "=", getUser().getUser_id());
-            domain.add("partner_ids", "in", new JSONArray().put(getUser().getPartner_id()));
+            domain.add("user_id", "=", getUser().getUserId());
+            domain.add("partner_ids", "in", new JSONArray().put(getUser().getPartnerId()));
         } else {
-            domain.add("partner_ids", "in", new JSONArray().put(getUser().getPartner_id()));
+            domain.add("partner_ids", "in", new JSONArray().put(getUser().getPartnerId()));
         }
         domain.add("recurrency", "=", false);
         return domain;

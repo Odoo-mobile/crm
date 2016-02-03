@@ -43,6 +43,7 @@ import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OdooRecordUtils;
+import com.odoo.core.utils.logger.OLog;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 
 import java.util.ArrayList;
@@ -55,6 +56,8 @@ import odoo.helper.ORecordValues;
 import odoo.helper.OdooFields;
 import odoo.helper.utils.gson.OdooRecord;
 import odoo.helper.utils.gson.OdooResult;
+import odoo.listeners.IOdooLoginCallback;
+import odoo.listeners.OdooError;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
@@ -179,10 +182,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (response.containsKey("error")) {
                 app.setOdoo(null, user);
                 OPreferenceManager pref = new OPreferenceManager(mContext);
-                OdooResult record = (OdooResult) response.get("error");
-                if (pref.getBoolean(About.DEVELOPER_MODE, false)) {
-                    // TODO: Show developer error if enabled
-                }
+//                OdooResult record = (OdooResult) response.get("error");
+//                if (pref.getBoolean(About.DEVELOPER_MODE, false)) {
+//                    // TODO: Show developer error if enabled
+//                }
                 return;
             }
 

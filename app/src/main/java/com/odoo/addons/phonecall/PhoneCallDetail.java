@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 13/1/15 4:55 PM
  */
 package com.odoo.addons.phonecall;
@@ -41,7 +41,7 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.utils.IntentUtils;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
@@ -81,7 +81,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crm_phonecall_detail);
         crmPhoneCalls = new CRMPhoneCalls(this, null);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this, true);
         actionBar = getSupportActionBar();
         actionBar.setTitle(R.string.label_log_call);
         extra = getIntent().getExtras();
@@ -297,7 +297,7 @@ public class PhoneCallDetail extends ActionBarActivity implements OField.
             if (!lead.getString("type").equals("lead")) {
                 updateOpportunity = true;
                 opportunity_action_form.loadChatter(false);
-                
+
                 opportunity_action_form.setEditable(true);
                 opportunity_action_form.initForm(lead);
             }

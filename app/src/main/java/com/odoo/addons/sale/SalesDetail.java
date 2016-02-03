@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 13/1/15 5:09 PM
  */
 package com.odoo.addons.sale;
@@ -44,9 +44,10 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.JSONUtils;
-import com.odoo.core.utils.OActionBarUtils;
 import com.odoo.core.utils.OAlert;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
@@ -62,10 +63,11 @@ import odoo.helper.OArguments;
 import odoo.controls.ExpandableListControl;
 import odoo.controls.OField;
 import odoo.controls.OForm;
+import odoo.helper.ORecordValues;
 
 import static com.odoo.addons.sale.Sales.Type;
 
-public class SalesDetail extends ActionBarActivity implements View.OnClickListener {
+public class SalesDetail extends OdooCompatActivity implements View.OnClickListener {
     public static final String TAG = SalesDetail.class.getSimpleName();
     public static final int REQUEST_ADD_ITEMS = 323;
     private Bundle extra;
@@ -90,7 +92,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.sale_detail);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this, true);
         actionBar = getSupportActionBar();
         sale = new SaleOrder(this, null);
         extra = getIntent().getExtras();
@@ -293,7 +295,7 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                     }
                 }
                 Thread.sleep(500);
-                JSONObject data = new JSONObject();
+                ORecordValues data = new ORecordValues();
                 data.put("name", values.getString("name"));
                 data.put("partner_id", partner.selectServerId(values.getInt("partner_id")));
                 data.put("date_order", values.getString("date_order"));
@@ -430,12 +432,19 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
 
         @Override
         protected List<ODataRow> doInBackground(HashMap<String, Float>... params) {
+            final OValues[] formValues = new OValues[1];
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    formValues[0] = mForm.getValues();
+                }
+            });
             List<ODataRow> items = new ArrayList<>();
             try {
                 ProductProduct productProduct = new ProductProduct(SalesDetail.this, sale.getUser());
                 SalesOrderLine saleLine = new SalesOrderLine(SalesDetail.this, sale.getUser());
                 ResPartner partner = new ResPartner(SalesDetail.this, sale.getUser());
-                ODataRow customer = partner.browse(mForm.getValues().getInt("partner_id"));
+                ODataRow customer = partner.browse(formValues[0].getInt("partner_id"));
                 ServerDataHelper helper = saleLine.getServerDataHelper();
                 boolean stockInstalled = saleLine.isInstalledOnServer("stock");
                 for (String key : params[0].keySet()) {
@@ -462,11 +471,11 @@ public class SalesDetail extends ActionBarActivity implements View.OnClickListen
                             ? false : customer.getString("fiscal_position");
                     arguments.add(fiscal_position);// fiscal position
                     arguments.add(false); // flag
-                    int version = saleLine.getOdooVersion().getVersion_number();
+                    int version = saleLine.getOdooVersion().getVersionNumber();
                     if (stockInstalled && version > 7) {
                         arguments.add(false);
                     }
-                    JSONObject context = new JSONObject();
+                    HashMap<String, Object> context = new HashMap<>();
                     context.put("partner_id", customer.getInt("id"));
                     context.put("quantity", qty);
                     context.put("pricelist", pricelist);

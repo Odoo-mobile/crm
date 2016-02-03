@@ -39,8 +39,9 @@ import com.odoo.addons.calendar.utils.ReminderDialog;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.core.utils.OActionBarUtils;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.OAlert;
+import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
@@ -54,7 +55,7 @@ import java.util.Date;
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class EventDetail extends ActionBarActivity implements View.OnClickListener,
+public class EventDetail extends OdooCompatActivity implements View.OnClickListener,
         EventColorDialog.OnColorSelectListener, OField.IOnFieldValueChangeListener, ReminderDialog.OnReminderValueSelectListener {
     public static final String TAG = EventDetail.class.getSimpleName();
     private ActionBar actionBar;
@@ -76,7 +77,7 @@ public class EventDetail extends ActionBarActivity implements View.OnClickListen
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.calendar_event_detail_form);
-        OActionBarUtils.setActionBar(this, true);
+        OAppBarUtils.setAppBar(this,true);
         calendarEvent = new CalendarEvent(this, null);
         actionBar = getSupportActionBar();
         actionBar.setHomeAsUpIndicator(R.drawable.ic_action_mark_undone);

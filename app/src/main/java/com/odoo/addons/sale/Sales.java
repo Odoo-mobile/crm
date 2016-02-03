@@ -114,7 +114,7 @@ public class Sales extends BaseFragment implements
     @Override
     public void onViewBind(View view, Cursor cursor, ODataRow row) {
         OControls.setText(view, R.id.name, row.getString("name"));
-        String format = (db().getUser().getVersion_number() <= 7)
+        String format = (db().getUser().getOdooVersion().getVersionNumber() <= 7)
                 ? ODateUtils.DEFAULT_DATE_FORMAT : ODateUtils.DEFAULT_FORMAT;
         String date = ODateUtils.convertToDefault(row.getString("date_order"),
                 format, "MMMM, dd");

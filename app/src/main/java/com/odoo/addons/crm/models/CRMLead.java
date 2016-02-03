@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 13/1/15 10:07 AM
  */
 package com.odoo.addons.crm.models;
@@ -55,11 +55,14 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
 import odoo.helper.OArguments;
 import odoo.helper.ODomain;
+import odoo.helper.ORecordValues;
+import odoo.helper.utils.gson.OdooResult;
 
 public class CRMLead extends OModel {
     public static final String TAG = CRMLead.class.getSimpleName();
@@ -290,7 +293,7 @@ public class CRMLead extends OModel {
                 try {
                     odoo.Odoo odoo = getServerDataHelper().getOdoo();
                     // Creating wizard record
-                    JSONObject values = new JSONObject();
+                    ORecordValues values = new ORecordValues();
                     values.put("name", (other_lead_ids.size() > 0) ? "merge" : "convert");
                     Object partner_id = false;
                     ODataRow partner = null;
@@ -302,21 +305,21 @@ public class CRMLead extends OModel {
                     values.put("action", (partner == null) ? "create" : "exist");
                     values.put("partner_id", partner_id);
 
-                    JSONObject context = new JSONObject();
+                    HashMap<String, Object> context = new HashMap<String, Object>();
                     context.put("stage_type", "lead");
                     context.put("active_id", lead.getInt("id"));
                     other_lead_ids.add(lead.getInt("id"));
-                    context.put("active_ids", JSONUtils.<Integer>toArray(other_lead_ids));
+                    context.put("active_ids", JSONUtils.toArray(other_lead_ids));
                     context.put("active_model", "crm.lead");
-                    odoo.updateContext(context);
-                    JSONObject result = odoo.createNew("crm.lead2opportunity.partner", values);
+                    odoo.withContext(context);
+                    OdooResult result = odoo.createRecord("crm.lead2opportunity.partner", values);
                     int lead_to_opp_partner_id = result.getInt("result");
 
                     // Converting lead to opportunity
                     OArguments arg = new OArguments();
                     arg.add(lead_to_opp_partner_id);
                     arg.add(context);
-                    odoo.call_kw("crm.lead2opportunity.partner", "action_apply", arg.get());
+                    odoo.callMethod("crm.lead2opportunity.partner", "action_apply", arg, null);
                     OValues val = new OValues();
                     val.put("type", "opportunity");
                     for (int id : other_lead_ids) {
@@ -351,7 +354,7 @@ public class CRMLead extends OModel {
     private void _markWonLost(String type, ODataRow record) {
         OArguments oArguments = new OArguments();
         oArguments.add(new JSONArray().put(record.getInt("id")));
-        getServerDataHelper().callMethod("case_mark_" + type, oArguments, new JSONObject());
+        getServerDataHelper().callMethod("case_mark_" + type, oArguments, new HashMap<String, Object>());
         CRMCaseStage stage = new CRMCaseStage(mContext, getUser());
         String key = (type.equals("won")) ? "Won" : (record.getString("type").equals("lead")) ? "Dead" : "Lost";
         ODataRow row = stage.browse(null, "name = ?", new String[]{key});
@@ -462,25 +465,25 @@ public class CRMLead extends OModel {
                 try {
                     odoo.Odoo odoo = getServerDataHelper().getOdoo();
                     // Creating wizard record
-                    JSONObject values = new JSONObject();
+                    ORecordValues values = new ORecordValues();
                     ResPartner resPartner = new ResPartner(mContext, getUser());
                     ODataRow partner = resPartner.browse(new String[]{}, Integer.parseInt(partnerId));
                     values.put("partner_id", partner.getInt("id"));
                     values.put("close", close);
-                    JSONObject context = new JSONObject();
+                    HashMap<String, Object> context = new HashMap<String, Object>();
                     context.put("stage_type", lead.getString("type"));
                     context.put("active_id", lead.getInt("id"));
                     context.put("active_ids", new JSONArray().put(lead.getInt("id")));
                     context.put("active_model", "crm.lead");
-                    odoo.updateContext(context);
-                    JSONObject result = odoo.createNew("crm.make.sale", values);
+                    odoo.withContext(context);
+                    OdooResult result = odoo.createRecord("crm.make.sale", values);
                     int quotation_wizard_id = result.getInt("result");
 
                     // Creating quotation
                     OArguments arg = new OArguments();
                     arg.add(quotation_wizard_id);
                     arg.add(context);
-                    odoo.call_kw("crm.make.sale", "makeOrder", arg.get());
+                    odoo.callMethod("crm.make.sale", "makeOrder", arg, null);
                     Thread.sleep(500);
                     // if close = true
                     if (close)
@@ -517,14 +520,14 @@ public class CRMLead extends OModel {
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
         domain.add("|");
-        domain.add("user_id", "=", getUser().getUser_id());
+        domain.add("user_id", "=", getUser().getUserId());
         domain.add("user_id", "=", false);
         return domain;
     }
 
-    public static interface OnOperationSuccessListener {
-        public void OnSuccess();
+    public interface OnOperationSuccessListener {
+        void OnSuccess();
 
-        public void OnCancelled();
+        void OnCancelled();
     }
 }

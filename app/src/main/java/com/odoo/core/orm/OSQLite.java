@@ -159,7 +159,7 @@ public class OSQLite extends SQLiteOpenHelper {
         registerModels(osqlHelper.getModels());
 
         // Updating crm case stage model name for saas-6
-        if (mUser.getVersion_serie().equals("8.saas~6")) {
+        if (mUser.getOdooVersion().getServerSerie().equals("8.saas~6")) {
             osqlHelper = new OSQLHelper(mContext);
             CRMCaseCateg caseCateg = new CRMCaseCateg(mContext, mUser);
             CRMCaseStage caseStage = new CRMCaseStage(mContext, mUser);

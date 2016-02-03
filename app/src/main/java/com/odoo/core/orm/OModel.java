@@ -1060,19 +1060,16 @@ public class OModel implements ISyncServiceListener {
         }
     }
 
-    public void isInstalledOnServer(final String module_name, IModuleInstallListener callback) {
+    public boolean isInstalledOnServer(final String module_name) {
         App app = (App) mContext.getApplicationContext();
-        app.getOdoo(getUser()).installedOnServer(module_name, new IModuleInstallListener() {
-            @Override
-            public void installedOnServer(boolean isInstalled) {
-                IrModel model = new IrModel(mContext, getUser());
-                OValues values = new OValues();
-                values.put("id", 0);
-                values.put("name", module_name);
-                values.put("state", "installed");
-                model.insertOrUpdate("name = ?", new String[]{module_name}, values);
-            }
-        });
+        boolean isInstalled = app.getOdoo(getUser()).installedOnServer(module_name);
+        IrModel model = new IrModel(mContext, getUser());
+        OValues values = new OValues();
+        values.put("id", 0);
+        values.put("name", module_name);
+        values.put("state", isInstalled);
+        model.insertOrUpdate("name = ?", new String[]{module_name}, values);
+        return isInstalled;
     }
 
     public String getDatabaseLocalPath() {

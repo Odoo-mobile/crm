@@ -109,7 +109,7 @@ public class CRMPhoneCalls extends OModel {
     @Override
     public ODomain defaultDomain() {
         ODomain domain = new ODomain();
-        domain.add("user_id", "=", getUser().getUser_id());
+        domain.add("user_id", "=", getUser().getUserId());
         return domain;
     }
 
