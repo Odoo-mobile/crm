@@ -41,11 +41,11 @@ public class App extends Application {
 
     @Override
     public void onCreate() {
-        super.onCreate();
         App.APPLICATION_ID= getPackageName();
         App.APPLICATION_NAME = getPackageManager().getApplicationLabel(getApplicationInfo()).toString();
         Odoo.REQUEST_TIMEOUT_MS = OConstants.RPC_REQUEST_TIME_OUT;
         Odoo.DEFAULT_MAX_RETRIES = OConstants.RPC_REQUEST_RETRIES;
+        super.onCreate();
     }
 
     public Odoo getOdoo(OUser user) {

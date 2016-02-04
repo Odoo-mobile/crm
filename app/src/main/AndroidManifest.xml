@@ -44,7 +44,9 @@
             </intent-filter>
         </activity>
         <activity android:name="com.odoo.core.account.ManageAccounts" />
-        <activity android:name="com.odoo.OdooActivity" android:label="${applicationName}" />
+        <activity
+            android:name="com.odoo.OdooActivity"
+            android:label="${applicationName}" />
         <activity android:name="odoo.controls.SearchableItemActivity" />
         <activity android:name="com.odoo.SettingsActivity" />
         <activity
@@ -57,9 +59,9 @@
             android:name=".base.addons.mail.widget.MailChatterCompose"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
         <activity
-            android:windowSoftInputMode="adjustPan"
             android:name="com.odoo.core.account.OdooAccountQuickManage"
-            android:theme="@style/Theme.AppCompat.Light.Dialog" />
+            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:windowSoftInputMode="adjustPan" />
         <activity android:name="com.odoo.core.account.About" />
         <activity android:name="com.odoo.core.account.Profile" />
 
@@ -71,7 +73,7 @@
                 <action android:name="odoo.Odoo.ACTION_ODOO_UPDATES" />
             </intent-filter>
         </receiver>
-        
+
         <receiver android:name=".server.notifications.OdooServerNotificationReceiver">
             <intent-filter>
                 <action android:name="${applicationId}.odoo.mobile.SERVER_NOTIFICATION" />
@@ -100,7 +102,7 @@
         <!-- Sync Provider & Service  // -->
         <provider
             android:name="com.odoo.addons.customers.providers.CustomersSyncProvider"
-            android:authorities="${applicationId}.core.provider.content.sync.res_partner"
+            android:authorities="${applicationId}.provider.content.sync.res_partner"
             android:label="@string/sync_label_customers"
             android:multiprocess="true" />
 
@@ -119,7 +121,7 @@
 
         <provider
             android:name="com.odoo.addons.calendar.providers.CalendarSyncProvider"
-            android:authorities="com.odoo.core.crm.provider.content.sync.calendar_event"
+            android:authorities="${applicationId}.provider.content.sync.calendar_event"
             android:label="@string/sync_label_calendar"
             android:multiprocess="true" />
 
@@ -138,7 +140,7 @@
 
         <provider
             android:name="com.odoo.addons.crm.providers.CRMLeadProvider"
-            android:authorities="com.odoo.core.crm.provider.content.sync.crm_lead"
+            android:authorities="${applicationId}.provider.content.sync.crm_lead"
             android:label="@string/sync_label_lead_opportunities"
             android:multiprocess="true" />
 
@@ -157,7 +159,7 @@
 
         <provider
             android:name="com.odoo.addons.sale.providers.SaleOrderProvider"
-            android:authorities="com.odoo.core.crm.provider.content.sync.sale_order"
+            android:authorities="${applicationId}.provider.content.sync.sale_order"
             android:label="@string/sync_label_quotation_sales_orders"
             android:multiprocess="true" />
 
@@ -176,7 +178,7 @@
 
         <provider
             android:name="com.odoo.addons.phonecall.providers.PhoneCallProvider"
-            android:authorities="com.odoo.core.crm.provider.content.sync.crm_phonecall"
+            android:authorities="${applicationId}.provider.content.sync.crm_phonecall"
             android:label="@string/sync_label_phonecalls"
             android:multiprocess="true" />
 

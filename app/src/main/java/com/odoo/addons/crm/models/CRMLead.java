@@ -52,12 +52,10 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.reminder.ReminderUtils;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-
 
 import odoo.helper.OArguments;
 import odoo.helper.ODomain;

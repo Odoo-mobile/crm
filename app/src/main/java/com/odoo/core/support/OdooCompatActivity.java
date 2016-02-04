@@ -1,6 +1,10 @@
 package com.odoo.core.support;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+
+import com.odoo.App;
 
 /**
  * Odoo, Open Source Management Solution
@@ -24,6 +28,12 @@ import android.support.v7.app.AppCompatActivity;
 public abstract class OdooCompatActivity extends AppCompatActivity {
     public static final String TAG = OdooCompatActivity.class.getSimpleName();
     private DevicePermissionResultListener mDevicePermissionResultListener = null;
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        App.APPLICATION_ID = getApplicationContext().getPackageName();
+    }
 
     // API23+ Permission model helper methods
     public void setOnDevicePermissionResultListener(DevicePermissionResultListener callback) {

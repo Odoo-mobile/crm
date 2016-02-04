@@ -22,7 +22,7 @@ package com.odoo.base.addons.res;
 import android.content.Context;
 import android.net.Uri;
 
-import com.odoo.App;
+import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -33,14 +33,12 @@ import com.odoo.core.orm.fields.types.OBoolean;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
-import com.odoo.addons.sale.models.AccountPaymentTerm;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ResPartner extends OModel {
-    public static final String AUTHORITY = App.APPLICATION_ID +
-            ".core.provider.content.sync.res_partner";
+    public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.res_partner";
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
     OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
     OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);

@@ -60,8 +60,6 @@ import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
-import com.odoo.libs.calendar.SysCal;
-import com.odoo.libs.calendar.view.OdooCalendar;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -82,6 +80,8 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
+import com.odoo.libs.calendar.SysCal;
+import com.odoo.libs.calendar.view.OdooCalendar;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 import com.odoo.widgets.snackbar.SnackBar;
@@ -310,6 +310,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onItemClick(View view, int position) {
+
         Cursor cr = (Cursor) mAdapter.getItem(position);
         String data_type = cr.getString(cr.getColumnIndex("data_type"));
         if (data_type.equals("event")) {
@@ -321,6 +322,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         if (data_type.equals("opportunity")) {
             showSheet(SheetType.Opportunity, cr);
         }
+
     }
 
     private void showSheet(SheetType type, Cursor data) {

@@ -58,7 +58,7 @@ public class ConvertToOpportunityWizard extends ActionBarActivity implements Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crm_convert_to_opportunity);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        getSupportActionBar().hide();
+//FIXME: null null null        getSupportActionBar().hide();
         setResult(RESULT_CANCELED);
         extra = getIntent().getExtras();
         convert_form = (OForm) findViewById(R.id.convert_form);

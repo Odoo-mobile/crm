@@ -46,7 +46,7 @@ public class ConvertToQuotation extends ActionBarActivity implements View.OnClic
         setContentView(R.layout.crm_convert_to_quotation);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        getSupportActionBar().hide();
+// FIXME: null null null        getSupportActionBar().hide();
         setResult(RESULT_CANCELED);
         extra = getIntent().getExtras();
         crmLead = new CRMLead(this, null);
