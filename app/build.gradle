@@ -33,7 +33,6 @@ dependencies {
     compile project(':odoo-rpc-v3')
     compile project(':calendar-lib')
     compile project(':bottom-sheet-lib')
-    compile project(':snackbar-lib')
 }
 
 /**

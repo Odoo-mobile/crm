@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 13/1/15 11:19 AM
  */
 package com.odoo.addons.phonecall;
@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -58,9 +59,6 @@ import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
-import com.odoo.widgets.snackbar.SnackBar;
-import com.odoo.widgets.snackbar.SnackbarBuilder;
-import com.odoo.widgets.snackbar.listeners.EventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +70,7 @@ public class PhoneCalls extends BaseFragment implements
         View.OnClickListener, ISyncStatusObserverListener,
         BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.
         OnSheetActionClickListener,
-        BottomSheetListeners.OnSheetMenuCreateListener, IOnItemClickListener, IOnBackPressListener, EventListener {
+        BottomSheetListeners.OnSheetMenuCreateListener, IOnItemClickListener, IOnBackPressListener {
     public static final String TAG = PhoneCalls.class.getSimpleName();
 
     private View mView;
@@ -204,10 +202,10 @@ public class PhoneCalls extends BaseFragment implements
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
                     if (mType == Type.Logged) {
                         OControls.setText(mView, R.id.title, _s(R.string.label_no_logged_calls_found));
-                        OControls.setImage(mView, R.id.icon,R.drawable.ic_action_call_logs);
+                        OControls.setImage(mView, R.id.icon, R.drawable.ic_action_call_logs);
                     } else {
                         OControls.setText(mView, R.id.title, _s(R.string.label_no_scheduled_calls_found));
-                        OControls.setImage(mView, R.id.icon,R.drawable.ic_action_schedule_call);
+                        OControls.setImage(mView, R.id.icon, R.drawable.ic_action_schedule_call);
                     }
                     OControls.setText(mView, R.id.subTitle, "");
                 }
@@ -400,9 +398,9 @@ public class PhoneCalls extends BaseFragment implements
                 values.put("state", "done");
                 phone_call.update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
-                SnackBar.get(getActivity()).text(_s(R.string.toast_phone_call_marked_done))
-                        .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
-                        .withEventListener(this).show();
+                Snackbar.make(getActivity().findViewById(android.R.id.content),
+                        _s(R.string.toast_phone_call_marked_done),
+                        Snackbar.LENGTH_LONG).setCallback(snackBarCallbacks).show();
                 break;
 
 
@@ -419,15 +417,20 @@ public class PhoneCalls extends BaseFragment implements
         }, 100);
     }
 
-    @Override
-    public void onShow(int i) {
-        hideFab();
-    }
 
-    @Override
-    public void onDismiss(int i) {
-        showFab();
-    }
+    Snackbar.Callback snackBarCallbacks = new Snackbar.Callback() {
+        @Override
+        public void onDismissed(Snackbar snackbar, int event) {
+            super.onDismissed(snackbar, event);
+            showFab();
+        }
+
+        @Override
+        public void onShown(Snackbar snackbar) {
+            super.onShown(snackbar);
+            hideFab();
+        }
+    };
 
     @Override
     public void onSheetActionClick(BottomSheet sheet, final Object extras) {

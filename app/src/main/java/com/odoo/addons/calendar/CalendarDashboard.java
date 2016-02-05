@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 9/1/15 10:34 AM
  */
 package com.odoo.addons.calendar;
@@ -29,6 +29,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -84,9 +85,6 @@ import com.odoo.libs.calendar.SysCal;
 import com.odoo.libs.calendar.view.OdooCalendar;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
-import com.odoo.widgets.snackbar.SnackBar;
-import com.odoo.widgets.snackbar.SnackbarBuilder;
-import com.odoo.widgets.snackbar.listeners.EventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -97,7 +95,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         OdooCalendar.OdooCalendarDateSelectListener, LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, BottomSheetListeners.OnSheetActionClickListener,
-        BottomSheetListeners.OnSheetMenuCreateListener, EventListener,
+        BottomSheetListeners.OnSheetMenuCreateListener,
         IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener,
         AdapterView.OnItemSelectedListener, IOnActivityResultListener, OCursorListAdapter.BeforeBindUpdateData {
     public static final String TAG = CalendarDashboard.class.getSimpleName();
@@ -763,16 +761,16 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 values.put("state", "done");
                 phone_call.update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
-                SnackBar.get(getActivity()).text(_s(R.string.toast_phone_call_marked_done) + " " + done_label)
-                        .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
-                        .withEventListener(this).show();
+                Snackbar.make(getActivity().findViewById(android.R.id.content),
+                        _s(R.string.toast_phone_call_marked_done) + " " + done_label, Snackbar.LENGTH_LONG)
+                        .setCallback(snackBarCallbacks).show();
                 break;
             case R.id.menu_events_all_done:
                 db().update(row_id, values);
                 getLoaderManager().restartLoader(0, null, this);
-                SnackBar.get(getActivity()).text(_s(R.string.label_event_marked) + " " + done_label)
-                        .duration(SnackbarBuilder.SnackbarDuration.LENGTH_LONG)
-                        .withEventListener(this).show();
+                Snackbar.make(getActivity().findViewById(android.R.id.content),
+                        _s(R.string.label_event_marked) + " " + done_label, Snackbar.LENGTH_LONG)
+                        .setCallback(snackBarCallbacks).show();
                 break;
             case R.id.menu_lead_convert_to_quotation:
                 if (inNetwork()) {
@@ -844,15 +842,19 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         setSwipeRefreshing(refreshing);
     }
 
-    @Override
-    public void onShow(int height) {
-        hideFab();
-    }
+    Snackbar.Callback snackBarCallbacks = new Snackbar.Callback() {
+        @Override
+        public void onDismissed(Snackbar snackbar, int event) {
+            super.onDismissed(snackbar, event);
+            showFab();
+        }
 
-    @Override
-    public void onDismiss(int height) {
-        showFab();
-    }
+        @Override
+        public void onShown(Snackbar snackbar) {
+            super.onShown(snackbar);
+            hideFab();
+        }
+    };
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
