@@ -64,7 +64,7 @@ import odoo.helper.utils.gson.OdooResult;
 
 public class CRMLead extends OModel {
     public static final String TAG = CRMLead.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.crm_lead";
+    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.crm_lead";
     public static final String KEY_LEAD = "lead";
     public static final String KEY_OPPORTUNITY = "opportunity";
     private Context mContext;

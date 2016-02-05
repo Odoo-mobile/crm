@@ -396,6 +396,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             if (is_done.equals("1")) {
                 menu.findItem(R.id.menu_events_all_done).setVisible(false);
             }
+            if (is_done.equals("1")) {
+                menu.findItem(R.id.menu_events_all_done).setTitle(R.string.label_mark_undone);
+            }
         }
     }
 

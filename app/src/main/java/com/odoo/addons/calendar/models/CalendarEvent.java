@@ -45,7 +45,7 @@ import odoo.helper.ODomain;
 
 public class CalendarEvent extends OModel {
     public static final String TAG = CalendarEvent.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.calendar_event";
+    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.calendar_event";
     private Context mContext;
 
     OColumn name = new OColumn("Meeting Name", OVarchar.class).setSize(64).setRequired();

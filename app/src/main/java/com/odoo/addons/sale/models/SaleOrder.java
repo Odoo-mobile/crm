@@ -55,7 +55,7 @@ import odoo.helper.OArguments;
 
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.sale_order";
+    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.sale_order";
     private Context mContext;
     OColumn name = new OColumn("name", OVarchar.class);
     OColumn date_order = new OColumn("Date", ODateTime.class);

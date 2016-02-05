@@ -50,7 +50,7 @@ import odoo.helper.ODomain;
 
 public class CRMPhoneCalls extends OModel {
     public static final String TAG = CRMPhoneCalls.class.getSimpleName();
-    public static final String AUTHORITY = "com.odoo.core.crm.provider.content.sync.crm_phonecall";
+    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.crm_phonecall";
     private Context mContext;
     OColumn user_id = new OColumn("Responsible", ResUsers.class,
             OColumn.RelationType.ManyToOne).setRequired();

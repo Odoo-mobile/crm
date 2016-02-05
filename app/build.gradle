@@ -7,7 +7,7 @@ android {
     buildToolsVersion "23.0.2"
     defaultConfig {
         manifestPlaceholders = [applicationName: "CRM"]
-        applicationId "com.odoo.core.crm"
+        applicationId "com.odoo.crm"
         minSdkVersion 14
         targetSdkVersion 23
         versionCode 7
