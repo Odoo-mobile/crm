@@ -118,7 +118,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private OListAdapter navSpinnerAdapter;
     private FilterType mFilterType = FilterType.All;
 
-
     private enum SheetType {
         Event, PhoneCall, Opportunity
     }
@@ -658,6 +657,10 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
                 break;
             case R.id.menu_events_reschedule:
+                if (cr.getString(cr.getColumnIndex("is_done")).equals("1")) {
+                    values.put("is_done", 0);
+                    db().update(row_id, values);
+                }
                 IntentUtils.startActivity(getActivity(), EventDetail.class, data);
                 break;
             // Opportunity menus
