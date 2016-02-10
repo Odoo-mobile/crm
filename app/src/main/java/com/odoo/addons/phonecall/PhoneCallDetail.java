@@ -22,7 +22,6 @@ package com.odoo.addons.phonecall;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -30,6 +29,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.calendar.utils.ReminderDialog;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.phonecall.features.receivers.PhoneStateReceiver;
@@ -40,6 +40,7 @@ import com.odoo.base.addons.res.ResUsers;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.ODateUtils;
@@ -47,14 +48,13 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.notification.ONotificationBuilder;
 import com.odoo.core.utils.reminder.ReminderReceiver;
 import com.odoo.core.utils.reminder.ReminderUtils;
-import com.odoo.R;
 
 import java.util.Date;
 
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class PhoneCallDetail extends ActionBarActivity implements OField.
+public class PhoneCallDetail extends OdooCompatActivity implements OField.
         IOnFieldValueChangeListener, ReminderDialog.OnReminderValueSelectListener,
         View.OnClickListener {
     public static final String TAG = PhoneCallDetail.class.getSimpleName();

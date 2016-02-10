@@ -1,40 +1,40 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 27/1/15 3:07 PM
  */
 package com.odoo.addons.crm;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.controls.ExpandableHeightGridView;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ import java.util.List;
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
-public class ConvertToOpportunityWizard extends ActionBarActivity implements View.OnClickListener, OField.IOnFieldValueChangeListener {
+public class ConvertToOpportunityWizard extends OdooCompatActivity implements View.OnClickListener, OField.IOnFieldValueChangeListener {
     public static final String TAG = ConvertToOpportunityWizard.class.getSimpleName();
     public static final String KEY_LEADS_IDS = "key_leads_ids";
     private Bundle extra;
@@ -58,7 +58,9 @@ public class ConvertToOpportunityWizard extends ActionBarActivity implements Vie
         super.onCreate(savedInstanceState);
         setContentView(R.layout.crm_convert_to_opportunity);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-//FIXME: null null null        getSupportActionBar().hide();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
         setResult(RESULT_CANCELED);
         extra = getIntent().getExtras();
         convert_form = (OForm) findViewById(R.id.convert_form);

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
@@ -21,6 +20,7 @@ import com.odoo.addons.sale.models.ProductProduct;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.OdooFields;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OAlert;
@@ -31,10 +31,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import odoo.helper.ODomain;
 import odoo.controls.IOnQuickRecordCreateListener;
+import odoo.helper.ODomain;
 
-public class AddProductLineWizard extends ActionBarActivity implements
+public class AddProductLineWizard extends OdooCompatActivity implements
         AdapterView.OnItemClickListener, TextWatcher, View.OnClickListener,
         OListAdapter.OnSearchChange, IOnQuickRecordCreateListener, AdapterView.OnItemLongClickListener {
 

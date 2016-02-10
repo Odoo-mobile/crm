@@ -1,40 +1,40 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 28/1/15 10:57 AM
  */
 package com.odoo.addons.crm;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.R;
+import com.odoo.core.support.OdooCompatActivity;
 
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
 
-public class ConvertToQuotation extends ActionBarActivity implements View.OnClickListener {
+public class ConvertToQuotation extends OdooCompatActivity implements View.OnClickListener {
     public static final String TAG = ConvertToQuotation.class.getSimpleName();
     private Bundle extra;
     private OForm convert_form;
@@ -46,7 +46,9 @@ public class ConvertToQuotation extends ActionBarActivity implements View.OnClic
         setContentView(R.layout.crm_convert_to_quotation);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-// FIXME: null null null        getSupportActionBar().hide();
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
         setResult(RESULT_CANCELED);
         extra = getIntent().getExtras();
         crmLead = new CRMLead(this, null);

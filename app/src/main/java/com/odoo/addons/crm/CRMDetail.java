@@ -23,7 +23,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -31,6 +30,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.App;
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
@@ -41,20 +41,20 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.sync.SyncUtils;
 import com.odoo.core.utils.OAlert;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
-import com.odoo.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import odoo.controls.OForm;
 
-public class CRMDetail extends ActionBarActivity {
+public class CRMDetail extends OdooCompatActivity {
     public static final String TAG = CRMDetail.class.getSimpleName();
     public static final int REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD = 1223;
     public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 1224;
