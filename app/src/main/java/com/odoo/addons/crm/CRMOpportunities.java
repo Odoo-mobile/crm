@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.calendar.EventDetail;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
@@ -46,7 +47,6 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
@@ -433,6 +433,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                 break;
             case R.id.menu_lead_won:
                 wonLost = "won";
+                convertRequestRecord = row;
                 if (inNetwork()) {
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
@@ -441,6 +442,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                 break;
             case R.id.menu_lead_lost:
                 wonLost = "lost";
+                convertRequestRecord = row;
                 if (inNetwork()) {
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
@@ -455,7 +457,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         if (requestCode == REQUEST_CONVERT_TO_QUOTATION_WIZARD && resultCode ==
                 Activity.RESULT_OK) {
             CRMLead crmLead = (CRMLead) db();
-            convertRequestRecord = crmLead.browse(data.getIntExtra(OColumn.ROW_ID, 0));
+            convertRequestRecord = crmLead.browse(data.getIntExtra(OColumn.ROW_ID,0));
             crmLead.createQuotation(convertRequestRecord, data.getStringExtra("partner_id"),
                     data.getBooleanExtra("mark_won", false), createQuotationListener);
         }
