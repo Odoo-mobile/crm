@@ -23,6 +23,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import com.odoo.R;
 
 public class IntentUtils {
 
@@ -44,10 +47,15 @@ public class IntentUtils {
     }
 
     public static void redirectToMap(Context context, String location) {
-        if (!location.equals("false") && !location.equals("")) {
-            String map = "geo:0,0?q=" + location;
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
-            context.startActivity(intent);
+        try {
+            if (!location.equals("false") && !location.equals("")) {
+                String map = "geo:0,0?q=" + location;
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
+                context.startActivity(intent);
+            }
+        }catch(Exception e){
+            Toast.makeText(context, R.string.toast_no_map,Toast.LENGTH_LONG).show();
+            return;
         }
     }
 
