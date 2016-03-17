@@ -19,22 +19,22 @@
  */
 package com.odoo.addons.crm;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
-import com.odoo.R;
 
 import odoo.controls.OField;
 import odoo.controls.OForm;
 
 
-public class ConvertToQuotation extends ActionBarActivity implements View.OnClickListener {
+public class ConvertToQuotation extends Activity implements View.OnClickListener {
     public static final String TAG = ConvertToQuotation.class.getSimpleName();
     private Bundle extra;
     private OForm convert_form;
@@ -46,7 +46,7 @@ public class ConvertToQuotation extends ActionBarActivity implements View.OnClic
         setContentView(R.layout.crm_convert_to_quotation);
         getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
-        getSupportActionBar().hide();
+//        getSupportActionBar().hide();
         setResult(RESULT_CANCELED);
         extra = getIntent().getExtras();
         crmLead = new CRMLead(this, null);
