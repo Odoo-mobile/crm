@@ -251,6 +251,7 @@ public class CustomerDetails extends ActionBarActivity implements View.OnClickLi
                 break;
             case R.id.menu_customer_cancel:
                 if (record == null) {
+                    mForm.initForm(record);
                     finish();
                     return true;
                 }

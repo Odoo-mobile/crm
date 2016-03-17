@@ -20,6 +20,7 @@
 package com.odoo.core.support;
 
 import android.content.Context;
+import android.util.Log;
 
 import com.odoo.App;
 import com.odoo.datas.OConstants;

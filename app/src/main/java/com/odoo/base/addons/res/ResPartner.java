@@ -21,6 +21,7 @@ package com.odoo.base.addons.res;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.core.orm.ODataRow;

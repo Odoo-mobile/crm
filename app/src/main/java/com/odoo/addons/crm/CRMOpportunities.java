@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.calendar.EventDetail;
 import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
@@ -46,7 +47,6 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 import com.odoo.widgets.bottomsheet.BottomSheet;
 import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
@@ -328,7 +328,6 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
     }
 
-
     @Override
     public void onItemClick(View view, int position) {
         showSheet((Cursor) mAdapter.getItem(position));
@@ -434,6 +433,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
             case R.id.menu_lead_won:
                 wonLost = "won";
                 if (inNetwork()) {
+                    convertRequestRecord = row;
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
                     Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();
@@ -442,6 +442,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
             case R.id.menu_lead_lost:
                 wonLost = "lost";
                 if (inNetwork()) {
+                    convertRequestRecord = row;
                     crmLead.markWonLost(wonLost, row, markDoneListener);
                 } else {
                     Toast.makeText(getActivity(), R.string.toast_network_required, Toast.LENGTH_LONG).show();

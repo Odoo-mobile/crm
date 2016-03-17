@@ -23,6 +23,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.widget.Toast;
+
+import com.odoo.R;
 
 public class IntentUtils {
 
@@ -47,7 +50,11 @@ public class IntentUtils {
         if (!location.equals("false") && !location.equals("")) {
             String map = "geo:0,0?q=" + location;
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
-            context.startActivity(intent);
+            if(intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+            }else{
+                Toast.makeText(context,R.string.toast_no_map,Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -57,7 +64,11 @@ public class IntentUtils {
             intent.setType("text/plain");
             intent.setData(Uri.parse("mailto:" + email));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+            if(intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+            }else{
+                Toast.makeText(context,R.string.toast_no_email,Toast.LENGTH_LONG).show();
+            }
         }
     }
 
