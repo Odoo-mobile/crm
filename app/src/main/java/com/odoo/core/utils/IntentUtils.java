@@ -47,15 +47,14 @@ public class IntentUtils {
     }
 
     public static void redirectToMap(Context context, String location) {
-        try {
-            if (!location.equals("false") && !location.equals("")) {
-                String map = "geo:0,0?q=" + location;
-                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
+        if (!location.equals("false") && !location.equals("")) {
+            String map = "geo:0,0?q=" + location;
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(map));
+            if(intent.resolveActivity(context.getPackageManager()) != null) {
                 context.startActivity(intent);
+            }else{
+                Toast.makeText(context,R.string.toast_no_map,Toast.LENGTH_LONG).show();
             }
-        }catch(Exception e){
-            Toast.makeText(context, R.string.toast_no_map,Toast.LENGTH_LONG).show();
-            return;
         }
     }
 
@@ -65,7 +64,11 @@ public class IntentUtils {
             intent.setType("text/plain");
             intent.setData(Uri.parse("mailto:" + email));
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            context.startActivity(intent);
+            if(intent.resolveActivity(context.getPackageManager()) != null) {
+                context.startActivity(intent);
+            }else{
+                Toast.makeText(context,R.string.toast_no_email,Toast.LENGTH_LONG).show();
+            }
         }
     }
 
