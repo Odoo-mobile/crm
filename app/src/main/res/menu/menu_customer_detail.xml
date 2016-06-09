@@ -17,8 +17,8 @@
     <item
         android:id="@+id/menu_customer_detail_more"
         android:icon="@drawable/ic_action_more"
-        app:showAsAction="always"
-        android:title="@string/label_more">
+        android:title="@string/label_more"
+        app:showAsAction="always">
         <menu>
             <item
                 android:id="@+id/menu_customer_share"

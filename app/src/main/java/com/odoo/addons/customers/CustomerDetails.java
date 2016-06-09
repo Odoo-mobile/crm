@@ -35,6 +35,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.App;
+import com.odoo.R;
 import com.odoo.addons.customers.utils.ShareUtil;
 import com.odoo.base.addons.ir.feature.OFileManager;
 import com.odoo.base.addons.res.ResPartner;
@@ -47,7 +48,6 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OAppBarUtils;
 import com.odoo.core.utils.OStringColorUtil;
-import com.odoo.R;
 import com.odoo.widgets.parallax.ParallaxScrollView;
 
 import odoo.controls.OField;
@@ -111,9 +111,9 @@ public class CustomerDetails extends OdooCompatActivity
             color = OStringColorUtil.getStringColor(this, record.getString("name"));
         }
         if (edit) {
-            if (extras != null)
+            if (extras != null) {
                 actionBar.setTitle(R.string.label_edit);
-            else
+            } else
                 actionBar.setTitle(R.string.label_new);
             actionBar.setBackgroundDrawable(new ColorDrawable(color));
             mForm = (OForm) findViewById(R.id.customerFormEdit);
