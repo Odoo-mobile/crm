@@ -1,2 +1,2 @@
-configurations.create("default")
+configurations.maybeCreate("default")
 artifacts.add("default", file('bottom-sheet-lib.aar'))
