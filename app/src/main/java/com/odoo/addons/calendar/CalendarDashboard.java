@@ -78,31 +78,28 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.controls.OBottomSheet;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
-import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.libs.calendar.SysCal;
 import com.odoo.libs.calendar.view.OdooCalendar;
-import com.odoo.widgets.bottomsheet.BottomSheet;
-import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class CalendarDashboard extends BaseFragment implements View.OnClickListener,
-        BottomSheetListeners.OnSheetItemClickListener, IOnBackPressListener,
         OdooCalendar.OdooCalendarDateSelectListener, LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, SwipeRefreshLayout.OnRefreshListener,
-        ISyncStatusObserverListener, BottomSheetListeners.OnSheetActionClickListener,
-        BottomSheetListeners.OnSheetMenuCreateListener,
-        IOnSearchViewChangeListener, IOnItemClickListener, OCursorListAdapter.OnViewCreateListener,
-        AdapterView.OnItemSelectedListener, IOnActivityResultListener, OCursorListAdapter.BeforeBindUpdateData {
+        ISyncStatusObserverListener, IOnSearchViewChangeListener, IOnItemClickListener,
+        OCursorListAdapter.OnViewCreateListener, AdapterView.OnItemSelectedListener,
+        IOnActivityResultListener, OCursorListAdapter.BeforeBindUpdateData,
+        OBottomSheet.OSheetItemClickListener, OBottomSheet.OSheetActionClickListener,
+        OBottomSheet.OSheetMenuCreateListener {
     public static final String TAG = CalendarDashboard.class.getSimpleName();
     public static final String KEY = "key_calendar_dashboard";
     public static final String KEY_DATE = "key_date";
     public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 229;
-    private BottomSheet mSheet = null;
     private OdooCalendar odooCalendar;
     private View calendarView = null;
     private ListView dashboardListView;
@@ -148,7 +145,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         super.onViewCreated(view, savedInstanceState);
         mView = view;
         setHasFloatingButton(view, R.id.fabButton, null, this);
-        parent().setOnBackPressListener(this);
         parent().setHasActionBarSpinner(true);
         parent().setOnActivityResultListener(this);
         navSpinner = parent().getActionBarSpinner();
@@ -156,6 +152,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         odooCalendar = (OdooCalendar) view.findViewById(R.id.dashboard_calendar);
         crmLead = new CRMLead(getActivity(), null);
         odooCalendar.setOdooCalendarDateSelectListener(this);
+
     }
 
     private void initActionSpinner() {
@@ -200,7 +197,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override
@@ -290,7 +286,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         setHasSyncStatusObserver(KEY, this, db());
     }
 
-
     @Override
     public void onItemDoubleClick(View view, int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
@@ -307,7 +302,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onItemClick(View view, int position) {
-
         Cursor cr = (Cursor) mAdapter.getItem(position);
         String data_type = cr.getString(cr.getColumnIndex("data_type"));
         if (data_type.equals("event")) {
@@ -319,46 +313,47 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         if (data_type.equals("opportunity")) {
             showSheet(SheetType.Opportunity, cr);
         }
-
     }
 
     private void showSheet(SheetType type, Cursor data) {
-        if (mSheet != null) {
-            mSheet.dismiss();
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
+        if (bottomSheet != null) {
+            bottomSheet.dismiss();
         }
-        BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
-        builder.listener(this);
-        builder.setIconColor(_c(R.color.body_text_2));
-        builder.setTextColor(_c(R.color.body_text_1));
-        builder.setData(data);
-        builder.actionListener(this);
-        builder.setActionIcon(R.drawable.ic_action_edit);
-        builder.title(data.getString(data.getColumnIndex("name")));
-        builder.setOnSheetMenuCreateListener(this);
+
+        bottomSheet.setSheetTitle(data.getString(data.getColumnIndex("name")));
+        bottomSheet.setData(data);
+        bottomSheet.setActionIcon(R.drawable.ic_action_edit, this);
+        bottomSheet.setSheetMenuCreateListener(this);
+        bottomSheet.setSheetItemClickListener(this);
         switch (type) {
             case Event:
-                builder.setOnSheetMenuCreateListener(this);
-                builder.menu(R.menu.menu_dashboard_events);
+                bottomSheet.setSheetActionsMenu(R.menu.menu_dashboard_events);
                 break;
             case PhoneCall:
-                builder.menu(R.menu.menu_dashboard_phonecalls);
+                bottomSheet.setSheetActionsMenu(R.menu.menu_dashboard_phonecalls);
                 break;
             case Opportunity:
-                builder.menu(R.menu.menu_dashboard_opportunity);
+                bottomSheet.setSheetActionsMenu(R.menu.menu_dashboard_opportunity);
                 break;
         }
-        mSheet = builder.create();
-        mSheet.show();
+        bottomSheet.show();
     }
 
     @Override
-    public void onSheetActionClick(BottomSheet sheet, final Object extras) {
+    public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
+        sheet.dismiss();
+        actionEvent(item, (Cursor) data);
+    }
+
+    @Override
+    public void onSheetActionClick(OBottomSheet sheet, final Object data) {
         sheet.dismiss();
         new Handler().postDelayed(new Runnable() {
 
             @Override
             public void run() {
-                Cursor cr = (Cursor) extras;
+                Cursor cr = (Cursor) data;
                 String data_type = cr.getString(cr.getColumnIndex("data_type"));
                 int record_id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
                 if (data_type.equals("phone_call")) {
@@ -379,12 +374,11 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 }
             }
         }, 250);
-
     }
 
     @Override
-    public void onSheetMenuCreate(Menu menu, Object extras) {
-        Cursor cr = (Cursor) extras;
+    public void onSheetMenuCreate(Menu menu, Object data) {
+        Cursor cr = (Cursor) data;
         String type = cr.getString(cr.getColumnIndex("data_type"));
         String is_done = cr.getString(cr.getColumnIndex("is_done"));
         if (type.equals("event")) {
@@ -398,6 +392,162 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
             if (is_done.equals("1")) {
                 menu.findItem(R.id.menu_events_all_done).setTitle(R.string.label_mark_undone);
             }
+        }
+    }
+
+    private void actionEvent(MenuItem menu, Cursor cr) {
+        String is_done = cr.getString(cr.getColumnIndex("is_done"));
+        final OValues values = new OValues();
+        values.put("_is_dirty", "false"); // to ignore update on server
+        final int row_id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
+        values.put("is_done", (is_done.equals("0")) ? 1 : 0);
+        String done_label = (is_done.equals("0")) ? "done" : "undone";
+        final ODataRow row = OCursorUtils.toDatarow(cr);
+        convertRequestRecord = row;
+        Bundle data = row.getPrimaryBundleData();
+        switch (menu.getItemId()) {
+            // Event menus
+            case R.id.menu_events_location:
+                String location = cr.getString(cr.getColumnIndex("location"));
+                if (location.equals("false")) {
+                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    IntentUtils.redirectToMap(getActivity(), location);
+                }
+                break;
+            case R.id.menu_events_reschedule:
+                if (cr.getString(cr.getColumnIndex("is_done")).equals("1")) {
+                    values.put("is_done", 0);
+                    db().update(row_id, values);
+                }
+                IntentUtils.startActivity(getActivity(), EventDetail.class, data);
+                break;
+            // Opportunity menus
+            case R.id.menu_opp_customer_location:
+                String address = cr.getString(cr.getColumnIndex("street")) + " ";
+                address += cr.getString(cr.getColumnIndex("street2")) + " ";
+                address += cr.getString(cr.getColumnIndex("city")) + " ";
+                address += cr.getString(cr.getColumnIndex("zip"));
+                address = address.replaceAll("false", "");
+                if (TextUtils.isEmpty(address.trim())) {
+                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found),
+                            Toast.LENGTH_LONG).show();
+                } else {
+                    IntentUtils.redirectToMap(getActivity(), address);
+                }
+                break;
+            case R.id.menu_opp_call_customer:
+            case R.id.menu_phonecall_call:
+                int partner_id = cr.getInt(cr.getColumnIndex("partner_id"));
+                if (partner_id != 0) {
+                    String contact = ResPartner.getContact(getActivity(), partner_id);
+                    if (contact != null && !contact.equals("false")) {
+                        IntentUtils.requestCall(getActivity(), contact);
+                    } else {
+                        Toast.makeText(getActivity(), _s(R.string.label_no_contact_found),
+                                Toast.LENGTH_LONG).show();
+                    }
+                } else {
+                    Toast.makeText(getActivity(), _s(R.string.label_no_contact_found),
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.menu_opp_lost:
+                if (inNetwork()) {
+                    wonLost = "lost";
+                    crmLead.markWonLost(wonLost, row, markDoneListener);
+                } else {
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required),
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.menu_opp_won:
+                if (inNetwork()) {
+                    wonLost = "won";
+                    crmLead.markWonLost(wonLost, row, markDoneListener);
+                } else {
+                    Toast.makeText(getActivity(), _s(R.string.toast_network_required),
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
+            case R.id.menu_opp_reschedule:
+                List<String> choices = new ArrayList<>();
+                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_log_call));
+                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_meeting));
+                OChoiceDialog.get(getActivity()).withOptions(choices, -1)
+                        .show(new OChoiceDialog.OnChoiceSelectListener() {
+                            @Override
+                            public void choiceSelected(int position, String value) {
+                                int opp_id = row.getInt(OColumn.ROW_ID);
+                                switch (position) {
+                                    case 0:
+                                        Bundle extra = new Bundle();
+                                        extra.putInt("opp_id", opp_id);
+                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
+                                        break;
+                                    case 1: // Schedule meeting
+                                        Bundle data = new Bundle();
+                                        data.putString(KEY_DATE, mFilterDate);
+                                        data.putInt("opp_id", opp_id);
+                                        IntentUtils.startActivity(getActivity(), EventDetail.class, data);
+                                        break;
+                                }
+                            }
+                        });
+                break;
+
+            case R.id.menu_phonecall_reschedule:
+                choices = new ArrayList<>();
+                choices.add("Re-Schedule call");
+                choices.add("Schedule other call");
+                OChoiceDialog.get(getActivity()).withOptions(choices, -1)
+                        .show(new OChoiceDialog.OnChoiceSelectListener() {
+                            @Override
+                            public void choiceSelected(int position, String value) {
+                                switch (position) {
+                                    case 0: // Re-Schedule
+                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
+                                                row.getPrimaryBundleData());
+
+                                        break;
+                                    case 1: // Schedule other call
+                                        Bundle extra = row.getPrimaryBundleData();
+                                        extra.putInt("call_id", row.getInt(OColumn.ROW_ID));
+                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
+                                                extra);
+                                        break;
+                                }
+                            }
+                        });
+                break;
+            // All done menu
+            case R.id.menu_phonecall_all_done:
+                final CRMPhoneCalls phone_call = new CRMPhoneCalls(getActivity(), null);
+                values.put("state", "done");
+                phone_call.update(row_id, values);
+                getLoaderManager().restartLoader(0, null, this);
+                Snackbar.make(getActivity().findViewById(android.R.id.content),
+                        _s(R.string.toast_phone_call_marked_done) + " " + done_label, Snackbar.LENGTH_LONG)
+                        .setCallback(snackBarCallbacks).show();
+                break;
+            case R.id.menu_events_all_done:
+                db().update(row_id, values);
+                getLoaderManager().restartLoader(0, null, this);
+                Snackbar.make(getActivity().findViewById(android.R.id.content),
+                        _s(R.string.label_event_marked) + " " + done_label, Snackbar.LENGTH_LONG)
+                        .setCallback(snackBarCallbacks).show();
+                break;
+            case R.id.menu_lead_convert_to_quotation:
+                if (inNetwork()) {
+                    Intent intent = new Intent(getActivity(), ConvertToQuotation.class);
+                    intent.putExtras(row.getPrimaryBundleData());
+                    parent().startActivityForResult(intent, REQUEST_CONVERT_TO_QUOTATION_WIZARD);
+                } else {
+                    Toast.makeText(getActivity(), R.string.toast_network_required,
+                            Toast.LENGTH_LONG).show();
+                }
+                break;
         }
     }
 
@@ -629,168 +779,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
-        dismissSheet(sheet);
-        actionEvent(menu, (Cursor) extras);
-    }
-
-    private void actionEvent(MenuItem menu, Cursor cr) {
-        String is_done = cr.getString(cr.getColumnIndex("is_done"));
-        final OValues values = new OValues();
-        values.put("_is_dirty", "false"); // to ignore update on server
-        final int row_id = cr.getInt(cr.getColumnIndex(OColumn.ROW_ID));
-        values.put("is_done", (is_done.equals("0")) ? 1 : 0);
-        String done_label = (is_done.equals("0")) ? "done" : "undone";
-        final ODataRow row = OCursorUtils.toDatarow(cr);
-        convertRequestRecord = row;
-        Bundle data = row.getPrimaryBundleData();
-        switch (menu.getItemId()) {
-            // Event menus
-            case R.id.menu_events_location:
-                String location = cr.getString(cr.getColumnIndex("location"));
-                if (location.equals("false")) {
-                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found),
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    IntentUtils.redirectToMap(getActivity(), location);
-                }
-                break;
-            case R.id.menu_events_reschedule:
-                if (cr.getString(cr.getColumnIndex("is_done")).equals("1")) {
-                    values.put("is_done", 0);
-                    db().update(row_id, values);
-                }
-                IntentUtils.startActivity(getActivity(), EventDetail.class, data);
-                break;
-            // Opportunity menus
-            case R.id.menu_opp_customer_location:
-                String address = cr.getString(cr.getColumnIndex("street")) + " ";
-                address += cr.getString(cr.getColumnIndex("street2")) + " ";
-                address += cr.getString(cr.getColumnIndex("city")) + " ";
-                address += cr.getString(cr.getColumnIndex("zip"));
-                address = address.replaceAll("false", "");
-                if (TextUtils.isEmpty(address.trim())) {
-                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found),
-                            Toast.LENGTH_LONG).show();
-                } else {
-                    IntentUtils.redirectToMap(getActivity(), address);
-                }
-                break;
-            case R.id.menu_opp_call_customer:
-            case R.id.menu_phonecall_call:
-                int partner_id = cr.getInt(cr.getColumnIndex("partner_id"));
-                if (partner_id != 0) {
-                    String contact = ResPartner.getContact(getActivity(), partner_id);
-                    if (contact != null && !contact.equals("false")) {
-                        IntentUtils.requestCall(getActivity(), contact);
-                    } else {
-                        Toast.makeText(getActivity(), _s(R.string.label_no_contact_found),
-                                Toast.LENGTH_LONG).show();
-                    }
-                } else {
-                    Toast.makeText(getActivity(), _s(R.string.label_no_contact_found),
-                            Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.menu_opp_lost:
-                if (inNetwork()) {
-                    wonLost = "lost";
-                    crmLead.markWonLost(wonLost, row, markDoneListener);
-                } else {
-                    Toast.makeText(getActivity(), _s(R.string.toast_network_required),
-                            Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.menu_opp_won:
-                if (inNetwork()) {
-                    wonLost = "won";
-                    crmLead.markWonLost(wonLost, row, markDoneListener);
-                } else {
-                    Toast.makeText(getActivity(), _s(R.string.toast_network_required),
-                            Toast.LENGTH_LONG).show();
-                }
-                break;
-            case R.id.menu_opp_reschedule:
-                List<String> choices = new ArrayList<>();
-                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_log_call));
-                choices.add(OResource.string(getActivity(), R.string.label_opt_schedule_meeting));
-                OChoiceDialog.get(getActivity()).withOptions(choices, -1)
-                        .show(new OChoiceDialog.OnChoiceSelectListener() {
-                            @Override
-                            public void choiceSelected(int position, String value) {
-                                int opp_id = row.getInt(OColumn.ROW_ID);
-                                switch (position) {
-                                    case 0:
-                                        Bundle extra = new Bundle();
-                                        extra.putInt("opp_id", opp_id);
-                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
-                                        break;
-                                    case 1: // Schedule meeting
-                                        Bundle data = new Bundle();
-                                        data.putString(KEY_DATE, mFilterDate);
-                                        data.putInt("opp_id", opp_id);
-                                        IntentUtils.startActivity(getActivity(), EventDetail.class, data);
-                                        break;
-                                }
-                            }
-                        });
-                break;
-
-            case R.id.menu_phonecall_reschedule:
-                choices = new ArrayList<>();
-                choices.add("Re-Schedule call");
-                choices.add("Schedule other call");
-                OChoiceDialog.get(getActivity()).withOptions(choices, -1)
-                        .show(new OChoiceDialog.OnChoiceSelectListener() {
-                            @Override
-                            public void choiceSelected(int position, String value) {
-                                switch (position) {
-                                    case 0: // Re-Schedule
-                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
-                                                row.getPrimaryBundleData());
-
-                                        break;
-                                    case 1: // Schedule other call
-                                        Bundle extra = row.getPrimaryBundleData();
-                                        extra.putInt("call_id", row.getInt(OColumn.ROW_ID));
-                                        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class,
-                                                extra);
-                                        break;
-                                }
-                            }
-                        });
-                break;
-            // All done menu
-            case R.id.menu_phonecall_all_done:
-                final CRMPhoneCalls phone_call = new CRMPhoneCalls(getActivity(), null);
-                values.put("state", "done");
-                phone_call.update(row_id, values);
-                getLoaderManager().restartLoader(0, null, this);
-                Snackbar.make(getActivity().findViewById(android.R.id.content),
-                        _s(R.string.toast_phone_call_marked_done) + " " + done_label, Snackbar.LENGTH_LONG)
-                        .setCallback(snackBarCallbacks).show();
-                break;
-            case R.id.menu_events_all_done:
-                db().update(row_id, values);
-                getLoaderManager().restartLoader(0, null, this);
-                Snackbar.make(getActivity().findViewById(android.R.id.content),
-                        _s(R.string.label_event_marked) + " " + done_label, Snackbar.LENGTH_LONG)
-                        .setCallback(snackBarCallbacks).show();
-                break;
-            case R.id.menu_lead_convert_to_quotation:
-                if (inNetwork()) {
-                    Intent intent = new Intent(getActivity(), ConvertToQuotation.class);
-                    intent.putExtras(row.getPrimaryBundleData());
-                    parent().startActivityForResult(intent, REQUEST_CONVERT_TO_QUOTATION_WIZARD);
-                } else {
-                    Toast.makeText(getActivity(), R.string.toast_network_required,
-                            Toast.LENGTH_LONG).show();
-                }
-                break;
-        }
-    }
-
     CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
         @Override
         public void OnSuccess() {
@@ -803,26 +791,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
         }
     };
-
-    private void dismissSheet(final BottomSheet sheet) {
-        new Handler().postDelayed(new Runnable() {
-
-            @Override
-            public void run() {
-                sheet.dismiss();
-            }
-        }, 100);
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        if (mSheet != null && mSheet.isShowing()) {
-            mSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
-
 
     @Override
     public void onRefresh() {

@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 13/1/15 10:24 AM
  */
 package com.odoo.addons.crm;
@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.odoo.R;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.addons.customers.Customers;
 import com.odoo.base.addons.res.ResPartner;
@@ -58,11 +59,8 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
+import com.odoo.core.utils.controls.OBottomSheet;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
-import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
-import com.odoo.widgets.bottomsheet.BottomSheet;
-import com.odoo.widgets.bottomsheet.BottomSheetListeners;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,8 +69,8 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
         IOnSearchViewChangeListener, View.OnClickListener, IOnItemClickListener,
-        BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener,
-        IOnBackPressListener, IOnActivityResultListener {
+        IOnActivityResultListener, OBottomSheet.OSheetActionClickListener,
+        OBottomSheet.OSheetItemClickListener {
     public static final String TAG = CRMLeads.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
     public static final int REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD = 223;
@@ -82,7 +80,6 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     private int mLocal_id = 0;
     private ListView mList;
     private OCursorListAdapter mAdapter;
-    private BottomSheet mSheet = null;
     private String mFilter = null;
     private String wonLost = "won";
     private boolean syncRequested = false;
@@ -91,7 +88,6 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     private int customer_id = -1;
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
-
 
     public enum Type {
         Leads, Opportunities
@@ -108,7 +104,6 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
-        parent().setOnBackPressListener(this);
         parent().setOnActivityResultListener(this);
         Bundle extra = getArguments();
         if (extra != null && extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
@@ -306,36 +301,32 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     }
 
     private void showSheet(Cursor data) {
-        BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
-        builder.listener(this);
-        builder.setIconColor(_c(R.color.body_text_2));
-        builder.setTextColor(_c(R.color.body_text_2));
-        builder.setData(data);
-        builder.actionListener(this);
-        builder.setActionIcon(R.drawable.ic_action_edit);
-        builder.title(data.getString(data.getColumnIndex("name")));
-        builder.menu(R.menu.menu_lead_list_sheet);
-        mSheet = builder.create();
-        mSheet.show();
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
+
+        bottomSheet.setData(data);
+        bottomSheet.setSheetActionsMenu(R.menu.menu_lead_list_sheet);
+        bottomSheet.setSheetTitle(data.getString(data.getColumnIndex("name")));
+        bottomSheet.setActionIcon(R.drawable.ic_action_edit, this);
+        bottomSheet.setSheetItemClickListener(this);
+        bottomSheet.show();
     }
 
-
     @Override
-    public void onSheetActionClick(BottomSheet sheet, Object extras) {
-        mSheet.dismiss();
-        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+    public void onSheetActionClick(OBottomSheet sheet, Object data) {
+        sheet.dismiss();
+        ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
     }
 
     @Override
-    public void onItemClick(BottomSheet sheet, MenuItem menu, Object extras) {
-        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
+    public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
+        ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         mLocal_id = row.getInt(OColumn.ROW_ID);
-        mSheet.dismiss();
+        sheet.dismiss();
         convertRequestRecord = row;
         CRMLead crmLead = (CRMLead) db();
         ResPartner partner = new ResPartner(getActivity(), null);
-        switch (menu.getItemId()) {
+        switch (item.getItemId()) {
             case R.id.menu_lead_convert_to_opportunity:
                 if (inNetwork()) {
                     if (row.getInt("id") == 0) {
@@ -343,10 +334,10 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
                     } else {
                         int count = crmLead.count("id != ? and partner_id = ? and " + OColumn.ROW_ID + " != ?"
                                 , new String[]{
-                                "0",
-                                row.getInt("partner_id") + "",
-                                row.getString(OColumn.ROW_ID)
-                        });
+                                        "0",
+                                        row.getInt("partner_id") + "",
+                                        row.getString(OColumn.ROW_ID)
+                                });
                         if (count > 0) {
                             Intent intent = new Intent(getActivity(), ConvertToOpportunityWizard.class);
                             intent.putExtras(row.getPrimaryBundleData());
@@ -407,7 +398,6 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
             List<Integer> ids = data.getIntegerArrayListExtra(ConvertToOpportunityWizard.KEY_LEADS_IDS);
             crmLead.convertToOpportunity(convertRequestRecord, ids, convertDoneListener);
         }
-
     }
 
     CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
@@ -436,14 +426,4 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
 
         }
     };
-
-    @Override
-    public boolean onBackPressed() {
-        if (mSheet != null && mSheet.isShowing()) {
-            mSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
-
 }

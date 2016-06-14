@@ -57,9 +57,7 @@ import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OCursorUtils;
-import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.widgets.bottomsheet.BottomSheet;
-import com.odoo.widgets.bottomsheet.BottomSheetListeners;
+import com.odoo.core.utils.controls.OBottomSheet;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,8 +65,8 @@ import java.util.List;
 public class Customers extends BaseFragment implements ISyncStatusObserverListener,
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         OCursorListAdapter.OnViewBindListener, IOnSearchViewChangeListener, View.OnClickListener,
-        BottomSheetListeners.OnSheetItemClickListener, BottomSheetListeners.OnSheetActionClickListener,
-        IOnBackPressListener, IOnItemClickListener, BottomSheetListeners.OnSheetMenuCreateListener {
+        IOnItemClickListener, OBottomSheet.OSheetActionClickListener,
+        OBottomSheet.OSheetMenuCreateListener, OBottomSheet.OSheetItemClickListener {
 
     public static final String KEY = Customers.class.getSimpleName();
     public static final String KEY_FILTER_REQUEST = "key_filter_request";
@@ -78,7 +76,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private String mCurFilter = null;
     private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
-    private BottomSheet mSheet = null;
     private boolean syncRequested = false;
 
     public enum Type {
@@ -97,7 +94,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setHasSwipeRefreshView(view, R.id.swipe_container, this);
-        parent().setOnBackPressListener(this);
         mView = view;
         mPartnersList = (ListView) view.findViewById(R.id.listview);
         mPartnersList.setFastScrollEnabled(true);
@@ -183,8 +179,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public void onItemClick(View view, final int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         if (row.getInt(OColumn.ROW_ID) == 0) {
-            CustomerQuickCreater customerQuickCreater =
-                    new CustomerQuickCreater(new OnLiveSearchRecordCreateListener() {
+            CustomerQuickCreator customerQuickCreater =
+                    new CustomerQuickCreator(new OnLiveSearchRecordCreateListener() {
                         @Override
                         public void recordCreated(ODataRow row) {
                             Cursor cr = getActivity().getContentResolver()
@@ -200,21 +196,18 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     }
 
     private void showSheet(Cursor data) {
-        if (mSheet != null) {
-            mSheet.dismiss();
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
+        String title = data.getString(data.getColumnIndex("name"));
+        if (bottomSheet.isShowing()) {
+            bottomSheet.dismiss();
         }
-        BottomSheet.Builder builder = new BottomSheet.Builder(getActivity());
-        builder.listener(this);
-        builder.setIconColor(_c(R.color.body_text_2));
-        builder.setTextColor(_c(R.color.body_text_2));
-        builder.setData(data);
-        builder.actionListener(this);
-        builder.setOnSheetMenuCreateListener(this);
-        builder.setActionIcon(R.drawable.ic_action_edit);
-        builder.title(data.getString(data.getColumnIndex("name")));
-        builder.menu(R.menu.menu_sheet_customer);
-        mSheet = builder.create();
-        mSheet.show();
+        bottomSheet.setSheetActionsMenu(R.menu.menu_sheet_customer);
+        bottomSheet.setSheetTitle(title);
+        bottomSheet.setData(data);
+        bottomSheet.setActionIcon(R.drawable.ic_action_edit, this);
+        bottomSheet.setSheetMenuCreateListener(this);
+        bottomSheet.setSheetItemClickListener(this);
+        bottomSheet.show();
     }
 
     @Override
@@ -230,6 +223,54 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         }
         if (row.getString("email").equals("false")) {
             menu.findItem(R.id.menu_customer_send_message).setVisible(false);
+        }
+    }
+
+    @Override
+    public void onSheetActionClick(OBottomSheet sheet, Object data) {
+        sheet.dismiss();
+        if (data instanceof Cursor) {
+            loadActivity(OCursorUtils.toDatarow((Cursor) data));
+        }
+    }
+
+    @Override
+    public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
+        sheet.dismiss();
+        ODataRow row = OCursorUtils.toDatarow((Cursor) data);
+        switch (item.getItemId()) {
+            case R.id.menu_customer_opportunity:
+                requestOpportunity(row.getInt(OColumn.ROW_ID), row.getString("name"));
+                break;
+            case R.id.menu_customer_leads:
+                requestLeads(Type.Leads, row.getInt(OColumn.ROW_ID), row.getString("name"));
+                break;
+            case R.id.menu_customer_location:
+                String address = ((ResPartner) db()).getAddress(row);
+                if (!address.equals("false") && !TextUtils.isEmpty(address))
+                    IntentUtils.redirectToMap(getActivity(), address);
+                else
+                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found), Toast.LENGTH_LONG).show();
+                break;
+            case R.id.menu_customer_call:
+                String contact = ResPartner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
+                if (!contact.equals("false"))
+                    IntentUtils.requestCall(getActivity(), contact);
+                else
+                    Toast.makeText(getActivity(), _s(R.string.label_no_contact_found), Toast.LENGTH_LONG).show();
+                break;
+            case R.id.menu_customer_send_message:
+                if (!row.getString("email").equals("false"))
+                    IntentUtils.requestMessage(getActivity(), row.getString("email"));
+                else
+                    Toast.makeText(getActivity(), _s(R.string.label_no_email_found), Toast.LENGTH_LONG).show();
+                break;
+            case R.id.menu_customer_schedule_call:
+                Bundle extra = row.getPrimaryBundleData();
+                extra.putInt(PhoneCallDetail.KEY_OPPORTUNITY_ID, -1);
+                extra.putBoolean(PhoneCallDetail.KEY_LOG_CALL_REQUEST, true);
+                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
+                break;
         }
     }
 
@@ -303,47 +344,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         }
     }
 
-    @Override
-    public void onItemClick(BottomSheet sheet, final MenuItem menu, final Object extras) {
-        sheet.dismiss();
-        ODataRow row = OCursorUtils.toDatarow((Cursor) extras);
-        switch (menu.getItemId()) {
-            case R.id.menu_customer_opportunity:
-                requestOpportunity(row.getInt(OColumn.ROW_ID), row.getString("name"));
-                break;
-            case R.id.menu_customer_leads:
-                requestLeads(Type.Leads, row.getInt(OColumn.ROW_ID), row.getString("name"));
-                break;
-            case R.id.menu_customer_location:
-                String address = ((ResPartner) db()).getAddress(OCursorUtils.toDatarow((Cursor) extras));
-                if (!address.equals("false") && !TextUtils.isEmpty(address))
-                    IntentUtils.redirectToMap(getActivity(), address);
-                else
-                    Toast.makeText(getActivity(), _s(R.string.label_no_location_found), Toast.LENGTH_LONG).show();
-                break;
-            case R.id.menu_customer_call:
-                String contact = ResPartner.getContact(getActivity(), row.getInt(OColumn.ROW_ID));
-                if (!contact.equals("false"))
-                    IntentUtils.requestCall(getActivity(), contact);
-                else
-                    Toast.makeText(getActivity(), _s(R.string.label_no_contact_found), Toast.LENGTH_LONG).show();
-                break;
-            case R.id.menu_customer_send_message:
-                if (!row.getString("email").equals("false"))
-                    IntentUtils.requestMessage(getActivity(), row.getString("email"));
-                else
-                    Toast.makeText(getActivity(), _s(R.string.label_no_email_found), Toast.LENGTH_LONG).show();
-                break;
-            case R.id.menu_customer_schedule_call:
-                Bundle extra = row.getPrimaryBundleData();
-                extra.putInt(PhoneCallDetail.KEY_OPPORTUNITY_ID, -1);
-                extra.putBoolean(PhoneCallDetail.KEY_LOG_CALL_REQUEST, true);
-                IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, extra);
-                break;
-        }
-
-    }
-
     private void requestOpportunity(int row_id, String name) {
         Bundle extra = new Bundle();
         extra.putBoolean(KEY_FILTER_REQUEST, true);
@@ -365,8 +365,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     public void onItemDoubleClick(View view, int position) {
         final ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
         if (row.getInt(OColumn.ROW_ID) == 0) {
-            CustomerQuickCreater customerQuickCreater =
-                    new CustomerQuickCreater(new OnLiveSearchRecordCreateListener() {
+            CustomerQuickCreator customerQuickCreater =
+                    new CustomerQuickCreator(new OnLiveSearchRecordCreateListener() {
                         @Override
                         public void recordCreated(ODataRow row) {
                             loadActivity(row);
@@ -377,12 +377,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
             loadActivity(row);
     }
 
-    @Override
-    public void onSheetActionClick(BottomSheet sheet, Object extras) {
-        if (extras instanceof Cursor) {
-            loadActivity(OCursorUtils.toDatarow((Cursor) extras));
-        }
-    }
 
     private void loadActivity(ODataRow row) {
         Bundle data = null;
@@ -392,21 +386,11 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         IntentUtils.startActivity(getActivity(), CustomerDetails.class, data);
     }
 
-    @Override
-    public boolean onBackPressed() {
-        if (mSheet != null && mSheet.isShowing()) {
-            mSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
-
-
-    private class CustomerQuickCreater extends AsyncTask<ODataRow, Void, ODataRow> {
+    private class CustomerQuickCreator extends AsyncTask<ODataRow, Void, ODataRow> {
         private ProgressDialog progressDialog;
         private OnLiveSearchRecordCreateListener mOnLiveSearchRecordCreateListener;
 
-        public CustomerQuickCreater(OnLiveSearchRecordCreateListener listener) {
+        public CustomerQuickCreator(OnLiveSearchRecordCreateListener listener) {
             mOnLiveSearchRecordCreateListener = listener;
         }
 
