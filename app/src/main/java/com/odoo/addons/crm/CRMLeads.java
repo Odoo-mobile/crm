@@ -61,7 +61,6 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.controls.OBottomSheet;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
-import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +69,7 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
         IOnSearchViewChangeListener, View.OnClickListener, IOnItemClickListener,
-        IOnBackPressListener, IOnActivityResultListener, OBottomSheet.OSheetActionClickListener,
+        IOnActivityResultListener, OBottomSheet.OSheetActionClickListener,
         OBottomSheet.OSheetItemClickListener {
     public static final String TAG = CRMLeads.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
@@ -89,7 +88,6 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     private int customer_id = -1;
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
-    private OBottomSheet bottomSheet;
 
     public enum Type {
         Leads, Opportunities
@@ -106,7 +104,6 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         mView = view;
-        parent().setOnBackPressListener(this);
         parent().setOnActivityResultListener(this);
         Bundle extra = getArguments();
         if (extra != null && extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
@@ -304,7 +301,8 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
     }
 
     private void showSheet(Cursor data) {
-        bottomSheet = new OBottomSheet(getActivity());
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
+
         bottomSheet.setData(data);
         bottomSheet.setSheetActionsMenu(R.menu.menu_lead_list_sheet);
         bottomSheet.setSheetTitle(data.getString(data.getColumnIndex("name")));
@@ -315,17 +313,16 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
 
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
-        bottomSheet.dismiss();
+        sheet.dismiss();
         ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
     }
 
     @Override
     public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
-
         ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         mLocal_id = row.getInt(OColumn.ROW_ID);
-        bottomSheet.dismiss();
+        sheet.dismiss();
         convertRequestRecord = row;
         CRMLead crmLead = (CRMLead) db();
         ResPartner partner = new ResPartner(getActivity(), null);
@@ -429,13 +426,4 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
 
         }
     };
-
-    @Override
-    public boolean onBackPressed() {
-        if (bottomSheet != null && bottomSheet.isShowing()) {
-            bottomSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
 }

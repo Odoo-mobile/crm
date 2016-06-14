@@ -47,7 +47,6 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.controls.OBottomSheet;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
-import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +55,8 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         LoaderManager.LoaderCallbacks<Cursor>, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, OCursorListAdapter.BeforeBindUpdateData,
         IOnSearchViewChangeListener, View.OnClickListener, IOnItemClickListener,
-        IOnBackPressListener, IOnActivityResultListener, OBottomSheet.OSheetActionClickListener, OBottomSheet.OSheetItemClickListener {
+        IOnActivityResultListener, OBottomSheet.OSheetActionClickListener,
+        OBottomSheet.OSheetItemClickListener {
     public static final String TAG = CRMOpportunities.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
     public static final int REQUEST_CONVERT_TO_OPPORTUNITY_WIZARD = 223;
@@ -75,7 +75,6 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     private int customer_id = -1;
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
-    private OBottomSheet bottomSheet;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -264,9 +263,6 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         } else {
             OControls.setGone(view, R.id.title_action);
         }
-//        TextView tv = (TextView) view.findViewById(R.id.stage);
-//        tv.setOnClickListener(this);
-//        tv.setTag(row);
         view.findViewById(R.id.stage_move).setTag(row);
         view.findViewById(R.id.stage_move).setOnClickListener(this);
     }
@@ -331,7 +327,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     }
 
     private void showSheet(Cursor data) {
-        bottomSheet = new OBottomSheet(getActivity());
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
         bottomSheet.setData(data);
         bottomSheet.setSheetActionsMenu(R.menu.menu_opp_list_sheet);
         bottomSheet.setSheetTitle(data.getString(data.getColumnIndex("name")));
@@ -342,7 +338,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
 
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
-        bottomSheet.dismiss();
+        sheet.dismiss();
         ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         IntentUtils.startActivity(getActivity(), CRMDetail.class, row.getPrimaryBundleData());
     }
@@ -351,7 +347,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
 
         final ODataRow row = OCursorUtils.toDatarow((Cursor) data);
-        bottomSheet.dismiss();
+        sheet.dismiss();
         CRMLead crmLead = (CRMLead) db();
         ResPartner partner = new ResPartner(getActivity(), null);
         switch (item.getItemId()) {
@@ -468,7 +464,6 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
 
         @Override
         public void OnCancelled() {
-
         }
     };
     CRMLead.OnOperationSuccessListener markDoneListener = new CRMLead.OnOperationSuccessListener() {
@@ -480,22 +475,11 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
 
         @Override
         public void OnCancelled() {
-
         }
     };
 
     @Override
-    public boolean onBackPressed() {
-        if (bottomSheet != null && bottomSheet.isShowing()) {
-            bottomSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
-
-    @Override
     protected void onNavSpinnerDestroy() {
-
     }
 
     @Override

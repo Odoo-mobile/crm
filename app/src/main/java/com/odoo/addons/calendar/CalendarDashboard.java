@@ -81,7 +81,6 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.controls.OBottomSheet;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
-import com.odoo.core.utils.sys.IOnBackPressListener;
 import com.odoo.libs.calendar.SysCal;
 import com.odoo.libs.calendar.view.OdooCalendar;
 
@@ -89,7 +88,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CalendarDashboard extends BaseFragment implements View.OnClickListener, IOnBackPressListener,
+public class CalendarDashboard extends BaseFragment implements View.OnClickListener,
         OdooCalendar.OdooCalendarDateSelectListener, LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, IOnSearchViewChangeListener, IOnItemClickListener,
@@ -115,7 +114,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private Spinner navSpinner;
     private OListAdapter navSpinnerAdapter;
     private FilterType mFilterType = FilterType.All;
-    private OBottomSheet bottomSheet;
 
     private enum SheetType {
         Event, PhoneCall, Opportunity
@@ -147,7 +145,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         super.onViewCreated(view, savedInstanceState);
         mView = view;
         setHasFloatingButton(view, R.id.fabButton, null, this);
-        parent().setOnBackPressListener(this);
         parent().setHasActionBarSpinner(true);
         parent().setOnActivityResultListener(this);
         navSpinner = parent().getActionBarSpinner();
@@ -200,7 +197,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override
@@ -290,7 +286,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         setHasSyncStatusObserver(KEY, this, db());
     }
 
-
     @Override
     public void onItemDoubleClick(View view, int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
@@ -307,7 +302,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onItemClick(View view, int position) {
-
         Cursor cr = (Cursor) mAdapter.getItem(position);
         String data_type = cr.getString(cr.getColumnIndex("data_type"));
         if (data_type.equals("event")) {
@@ -319,39 +313,13 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         if (data_type.equals("opportunity")) {
             showSheet(SheetType.Opportunity, cr);
         }
-
     }
 
-
     private void showSheet(SheetType type, Cursor data) {
-
-        bottomSheet = new OBottomSheet(getActivity());
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
         if (bottomSheet != null) {
             bottomSheet.dismiss();
         }
-
-        /*builder.listener(this);
-        builder.setIconColor(_c(R.color.body_text_2));
-        builder.setTextColor(_c(R.color.body_text_1));
-        builder.setData(data);
-        builder.actionListener(this);
-        builder.setActionIcon(R.drawable.ic_action_edit);
-        builder.title(data.getString(data.getColumnIndex("name")));
-        builder.setOnSheetMenuCreateListener(this);
-        switch (type) {
-            case Event:
-                builder.setOnSheetMenuCreateListener(this);
-                builder.menu(R.menu.menu_dashboard_events);
-                break;
-            case PhoneCall:
-                builder.menu(R.menu.menu_dashboard_phonecalls);
-                break;
-            case Opportunity:
-                builder.menu(R.menu.menu_dashboard_opportunity);
-                break;
-        }
-        mSheet = builder.create();
-        mSheet.show();*/
 
         bottomSheet.setSheetTitle(data.getString(data.getColumnIndex("name")));
         bottomSheet.setData(data);
@@ -374,7 +342,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
     @Override
     public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
-        bottomSheet.dismiss();
+        sheet.dismiss();
         actionEvent(item, (Cursor) data);
     }
 
@@ -582,7 +550,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
                 break;
         }
     }
-
 
     @Override
     public View onViewCreated(Context context, ViewGroup view, Cursor cr, int position) {
@@ -824,15 +791,6 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
 
         }
     };
-
-    @Override
-    public boolean onBackPressed() {
-        if (bottomSheet != null && bottomSheet.isShowing()) {
-            bottomSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public void onRefresh() {

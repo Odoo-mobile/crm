@@ -57,7 +57,6 @@ import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.OBottomSheet;
 import com.odoo.core.utils.dialog.OChoiceDialog;
-import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +65,7 @@ import java.util.List;
 public class PhoneCalls extends BaseFragment implements
         OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener,
-        View.OnClickListener, ISyncStatusObserverListener, IOnItemClickListener, IOnBackPressListener,
+        View.OnClickListener, ISyncStatusObserverListener, IOnItemClickListener,
         OBottomSheet.OSheetActionClickListener, OBottomSheet.OSheetMenuCreateListener,
         OBottomSheet.OSheetItemClickListener {
     public static final String TAG = PhoneCalls.class.getSimpleName();
@@ -76,7 +75,6 @@ public class PhoneCalls extends BaseFragment implements
     private OCursorListAdapter mAdapter;
     private String mFilter = null;
     private boolean syncRequested = false;
-    private OBottomSheet bottomSheet;
 
     public enum Type {
         Logged, Scheduled
@@ -105,7 +103,6 @@ public class PhoneCalls extends BaseFragment implements
         mAdapter = new OCursorListAdapter(getActivity(), null, R.layout.phonecall_item);
         mAdapter.setOnViewBindListener(this);
         mList.setAdapter(mAdapter);
-        parent().setOnBackPressListener(this);
         setHasFloatingButton(mView, R.id.fabButton, mList, this);
         setHasSyncStatusObserver(TAG, this, db());
         mAdapter.handleItemClickListener(mList, this);
@@ -293,13 +290,6 @@ public class PhoneCalls extends BaseFragment implements
         getLoaderManager().restartLoader(0, null, this);
     }
 
-//    @Override
-//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
-//        IntentUtils.startActivity(getActivity(), PhoneCallDetail.class, row.getPrimaryBundleData());
-//    }
-
-
     @Override
     public void onItemDoubleClick(View view, int position) {
         ODataRow row = OCursorUtils.toDatarow((Cursor) mAdapter.getItem(position));
@@ -313,10 +303,11 @@ public class PhoneCalls extends BaseFragment implements
     }
 
     private void showSheet(Cursor data) {
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
+
         if (bottomSheet != null) {
             bottomSheet.dismiss();
         }
-        bottomSheet = new OBottomSheet(getActivity());
         bottomSheet.setSheetActionsMenu(R.menu.menu_dashboard_phonecalls);
         bottomSheet.setSheetTitle(data.getString(data.getColumnIndex("name")));
         bottomSheet.setData(data);
@@ -351,7 +342,7 @@ public class PhoneCalls extends BaseFragment implements
 
     @Override
     public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
-        bottomSheet.dismiss();
+        sheet.dismiss();
         actionEvent(item, (Cursor) data);
     }
 
@@ -417,8 +408,6 @@ public class PhoneCalls extends BaseFragment implements
                         _s(R.string.toast_phone_call_marked_done),
                         Snackbar.LENGTH_LONG).setCallback(snackBarCallbacks).show();
                 break;
-
-
         }
     }
 
@@ -435,13 +424,4 @@ public class PhoneCalls extends BaseFragment implements
             hideFab();
         }
     };
-
-    @Override
-    public boolean onBackPressed() {
-        if (bottomSheet != null && bottomSheet.isShowing()) {
-            bottomSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
 }

@@ -53,7 +53,6 @@ import com.odoo.core.utils.OCursorUtils;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.controls.OBottomSheet;
-import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -62,7 +61,7 @@ import java.util.List;
 public class Sales extends BaseFragment implements
         OCursorListAdapter.OnViewBindListener, LoaderManager.LoaderCallbacks<Cursor>,
         SwipeRefreshLayout.OnRefreshListener, IOnSearchViewChangeListener,
-        ISyncStatusObserverListener, IOnItemClickListener, IOnBackPressListener, View.OnClickListener,
+        ISyncStatusObserverListener, IOnItemClickListener, View.OnClickListener,
         OBottomSheet.OSheetActionClickListener, OBottomSheet.OSheetItemClickListener {
     public static final String TAG = Sales.class.getSimpleName();
     public static final String KEY_MENU = "key_sales_menu";
@@ -73,7 +72,6 @@ public class Sales extends BaseFragment implements
     private String mFilter = null;
     private Type mType = Type.Quotation;
     private Boolean mSyncRequested = false;
-    private OBottomSheet bottomSheet;
 
     public enum Type {
         Quotation,
@@ -91,7 +89,6 @@ public class Sales extends BaseFragment implements
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        parent().setOnBackPressListener(this);
         mView = view;
         initAdapter();
     }
@@ -285,7 +282,7 @@ public class Sales extends BaseFragment implements
     }
 
     private void showSheet(Cursor data) {
-        bottomSheet = new OBottomSheet(getActivity());
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
         bottomSheet.setData(data);
         bottomSheet.setSheetTitle(data.getString(data.getColumnIndex("name")));
         bottomSheet.setActionIcon(R.drawable.ic_action_edit, this);
@@ -300,12 +297,9 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onSheetItemClick(OBottomSheet sheet, MenuItem item, Object data) {
-
-        bottomSheet.dismiss();
+        sheet.dismiss();
         ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         switch (item.getItemId()) {
-//            case R.id.menu_so_send_by_email:
-//                break;
             case R.id.menu_quotation_cancel:
                 ((SaleOrder) db()).cancelOrder(mType, row, cancelOrder);
                 break;
@@ -332,7 +326,7 @@ public class Sales extends BaseFragment implements
 
     @Override
     public void onSheetActionClick(OBottomSheet sheet, Object data) {
-        bottomSheet.dismiss();
+        sheet.dismiss();
         ODataRow row = OCursorUtils.toDatarow((Cursor) data);
         Bundle extras = row.getPrimaryBundleData();
         extras.putString("type", mType.toString());
@@ -347,7 +341,6 @@ public class Sales extends BaseFragment implements
 
         @Override
         public void OnCancelled() {
-
         }
     };
     SaleOrder.OnOperationSuccessListener confirmSale = new SaleOrder.OnOperationSuccessListener() {
@@ -358,7 +351,6 @@ public class Sales extends BaseFragment implements
 
         @Override
         public void OnCancelled() {
-
         }
     };
     SaleOrder.OnOperationSuccessListener newCopyQuotation = new SaleOrder.OnOperationSuccessListener() {
@@ -369,18 +361,8 @@ public class Sales extends BaseFragment implements
 
         @Override
         public void OnCancelled() {
-
         }
     };
-
-    @Override
-    public boolean onBackPressed() {
-        if (bottomSheet != null && bottomSheet.isShowing()) {
-            bottomSheet.dismiss();
-            return false;
-        }
-        return true;
-    }
 
     @Override
     public void onClick(View v) {

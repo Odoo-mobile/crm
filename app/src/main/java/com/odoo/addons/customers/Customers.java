@@ -76,7 +76,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private String mCurFilter = null;
     private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
-    private OBottomSheet bottomSheet;
     private boolean syncRequested = false;
 
     public enum Type {
@@ -197,10 +196,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     }
 
     private void showSheet(Cursor data) {
+        OBottomSheet bottomSheet = new OBottomSheet(getActivity());
         String title = data.getString(data.getColumnIndex("name"));
-        if (bottomSheet == null) {
-            bottomSheet = new OBottomSheet(getActivity());
-        }
         if (bottomSheet.isShowing()) {
             bottomSheet.dismiss();
         }
