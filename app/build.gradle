@@ -27,8 +27,6 @@ dependencies {
     compile 'com.android.support:design:23.4.0'
     compile project(':intro-slider-lib')
     compile project(':odoo-rpc-v3')
-    compile project(':parallax-effect-lib')
-    compile project(':odoo-rpc-v3')
     compile project(':calendar-lib')
 }
 

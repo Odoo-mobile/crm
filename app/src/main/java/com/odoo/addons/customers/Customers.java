@@ -288,13 +288,11 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         return items;
     }
 
-
     @Override
     public void onStatusChange(Boolean refreshing) {
         // Sync Status
         getLoaderManager().restartLoader(0, null, this);
     }
-
 
     @Override
     public void onRefresh() {
