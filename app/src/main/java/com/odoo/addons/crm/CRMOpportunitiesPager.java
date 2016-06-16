@@ -191,7 +191,6 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
 
     @Override
     public void onPageScrolled(int i, float v, int i2) {
-
     }
 
     @Override
@@ -202,7 +201,6 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
 
     @Override
     public void onPageScrollStateChanged(int i) {
-
     }
 
     @Override
@@ -212,7 +210,6 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-
     }
 
     @Override
@@ -294,7 +291,6 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         public int getCount() {
             return cursor.getCount();
         }
-
     }
 
     @Override
@@ -333,5 +329,4 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         mAdapter.notifyDataSetChanged();
         mPager.setCurrentItem(selectedPagerPosition);
     }
-
 }

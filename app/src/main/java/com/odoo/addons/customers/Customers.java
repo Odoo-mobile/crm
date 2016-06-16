@@ -375,7 +375,6 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
             loadActivity(row);
     }
 
-
     private void loadActivity(ODataRow row) {
         Bundle data = null;
         if (row != null) {
@@ -424,9 +423,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         }
     }
 
-
     public interface OnLiveSearchRecordCreateListener {
         public void recordCreated(ODataRow row);
     }
-
 }

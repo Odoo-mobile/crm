@@ -199,6 +199,8 @@ public class CustomerDetails extends OdooCompatActivity
         } else {
             userImage.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
             userImage.setColorFilter(Color.WHITE);
+            int color = OStringColorUtil.getStringColor(this, record.getString("name"));
+            userImage.setBackgroundColor(color);
         }
     }
 
