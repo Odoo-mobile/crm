@@ -1,5 +1,5 @@
-Odoo CRM v1.0
-=============
+Odoo CRM v1.1.0 (alpha)
+=======================
 
 <b>Android Studio Project</b>
 
