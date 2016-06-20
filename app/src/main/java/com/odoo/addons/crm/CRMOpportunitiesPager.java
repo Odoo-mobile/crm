@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p/>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p/>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p/>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p/>
  * Created on 13/2/15 11:56 AM
  */
 package com.odoo.addons.crm;
@@ -53,7 +53,6 @@ import com.odoo.core.support.drawer.ODrawerItem;
 import com.odoo.core.support.list.OListAdapter;
 import com.odoo.core.utils.OControls;
 import com.odoo.core.utils.OResource;
-import com.odoo.core.utils.sys.IOnBackPressListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -61,7 +60,8 @@ import java.util.List;
 
 import odoo.controls.OControlHelper;
 
-public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnPageChangeListener, AdapterView.OnItemSelectedListener, IOnBackPressListener, SwipeRefreshLayout.OnRefreshListener {
+public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnPageChangeListener,
+        AdapterView.OnItemSelectedListener, SwipeRefreshLayout.OnRefreshListener {
     public static final String TAG = CRMOpportunitiesPager.class.getSimpleName();
     public static final String KEY_MENU = "key_menu_item";
     private CRMLeads.Type mType = CRMLeads.Type.Opportunities;
@@ -96,7 +96,6 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
         super.onViewCreated(view, savedInstanceState);
         mView = view;
         mContext = getActivity();
-        parent().setOnBackPressListener(this);
         Bundle extra = getArguments();
         if (extra.containsKey(Customers.KEY_FILTER_REQUEST)) {
             filterCustomerOpp = true;
@@ -210,15 +209,6 @@ public class CRMOpportunitiesPager extends BaseFragment implements ViewPager.OnP
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
-    }
-
-    @Override
-    public boolean onBackPressed() {
-        if (mFragments.size() > 0) {
-            return ((IOnBackPressListener) mFragments.get("index_" + mNavSpinner.getSelectedItemPosition())
-            ).onBackPressed();
-        }
-        return true;
     }
 
     @Override
