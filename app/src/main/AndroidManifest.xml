@@ -38,13 +38,8 @@
         <activity
             android:name=".core.account.OdooLogin"
             android:label="${applicationName}"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+            android:screenOrientation="portrait" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity android:name=".addons.customers.CustomerDetails" />
         <activity android:name=".core.account.ManageAccounts" />
         <activity
@@ -54,7 +49,13 @@
         <activity android:name=".SettingsActivity" />
         <activity
             android:name=".core.account.AppIntro"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".base.addons.mail.widget.MailDetailDialog"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
