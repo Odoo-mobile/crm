@@ -81,6 +81,7 @@ public class CustomerDetails extends OdooCompatActivity
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         userImage = (ImageView) findViewById(R.id.user_image);
+        findViewById(R.id.captureImage).setOnClickListener(this);
 
         fileManager = new OFileManager(this);
         if (toolbar != null)
@@ -180,7 +181,6 @@ public class CustomerDetails extends OdooCompatActivity
         findViewById(R.id.email).setOnClickListener(this);
         findViewById(R.id.phone_number).setOnClickListener(this);
         findViewById(R.id.mobile_number).setOnClickListener(this);
-        findViewById(R.id.captureImage).setOnClickListener(this);
     }
 
     private void setCustomerImage() {
