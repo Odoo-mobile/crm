@@ -17,7 +17,6 @@ import com.odoo.widgets.slider.SliderView;
 
 public class AppIntro extends AppCompatActivity implements
         OdooUserLoginSelectorDialog.IUserLoginSelectListener {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

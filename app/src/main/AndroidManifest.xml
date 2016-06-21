@@ -239,6 +239,7 @@
         <activity
             android:name=".addons.sale.AddProductLineWizard"
             android:windowSoftInputMode="adjustPan" />
+        <activity android:name=".SetupActivity"></activity>
     </application>
 
 </manifest>

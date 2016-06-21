@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/theme_primary"
+    android:gravity="center"
+    android:orientation="vertical"
+    tools:context="com.odoo.SetupActivity">
+
+    <odoo.controls.BezelImageView
+        android:id="@+id/user_avatar"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_marginBottom="@dimen/default_24dp"
+        android:src="@drawable/avatar"
+        app:maskDrawable="@drawable/circle_mask_secondary" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_8dp"
+        android:text="Almost There..."
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        android:textColor="#fff" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/default_8dp"
+        android:indeterminate="true"
+        android:paddingBottom="@dimen/default_8dp"
+        android:paddingEnd="@dimen/default_48dp"
+        android:paddingLeft="@dimen/default_48dp"
+        android:paddingRight="@dimen/default_48dp"
+        android:paddingStart="@dimen/default_48dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Your Account is Setting Up"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textColor="#fff" />
+</LinearLayout>
