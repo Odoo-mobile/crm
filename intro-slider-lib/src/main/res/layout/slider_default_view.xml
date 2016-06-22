@@ -24,21 +24,6 @@
         android:textColor="#fff"
         android:textStyle="bold" />
 
-    <Button
-        android:id="@+id/btnStart"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/footer_dot"
-        android:layout_centerInParent="true"
-        android:layout_marginBottom="8dp"
-        android:background="@color/theme_primary"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:text="@string/login"
-        android:textAllCaps="true"
-        android:textColor="#fff"
-        android:textStyle="bold" />
-
     <LinearLayout
         android:id="@+id/footer_dot"
         android:layout_width="match_parent"
