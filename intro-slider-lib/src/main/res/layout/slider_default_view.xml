@@ -5,18 +5,20 @@
     <com.odoo.widgets.slider.SliderHelper
         android:id="@+id/default_view_helper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp" />
 
-    <Button
+    <TextView
         android:id="@+id/btnStart"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/footer_dot"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="8dp"
         android:background="@color/theme_primary"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
+        android:paddingTop="8dp"
         android:text="@string/login"
         android:textAllCaps="true"
         android:textColor="#fff"
