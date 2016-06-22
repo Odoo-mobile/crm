@@ -102,4 +102,6 @@
     <string name="alert_permission_help">Some of permission required to start application. Please grant permission from application settings.</string>
     <string name="confirm_are_you_sure_want_to_delete">Are you sure want to delete ?</string>
     <string name="toast_record_deleted">Record deleted</string>
+    <string name="almost_there">Almost there...</string>
+    <string name="your_account_is_setting_up">Your account is setting up</string>
 </resources>
