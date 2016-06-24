@@ -111,6 +111,7 @@ public class OValues implements Serializable {
         ContentValues values = new ContentValues();
         for (String key : _values.keySet()) {
             Object val = _values.get(key);
+            if (val == null) val = "false";
             if (val instanceof ArrayList || val instanceof List) {
                 // Contains all the ids list so replacing with all ids.
                 List<Integer> ids = (List<Integer>) val;

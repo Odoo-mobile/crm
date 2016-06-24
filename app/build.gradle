@@ -11,6 +11,7 @@ android {
         versionCode 7
         versionName "1.1.0alpha"
         multiDexEnabled true
+    }
     dexOptions {
         javaMaxHeapSize "2g"
     }
