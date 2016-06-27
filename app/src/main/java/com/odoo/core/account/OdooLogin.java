@@ -21,11 +21,8 @@ import com.odoo.App;
 import com.odoo.BuildConfig;
 import com.odoo.OdooActivity;
 import com.odoo.R;
-import com.odoo.SetupActivity;
-import com.odoo.base.addons.res.ResCompany;
-import com.odoo.config.FirstLaunchConfig;
+import com.odoo.core.account.setup.SetupActivity;
 import com.odoo.core.auth.OdooAccountManager;
-import com.odoo.core.orm.ODataRow;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooInstancesSelectorDialog;
 import com.odoo.core.utils.IntentUtils;
@@ -405,17 +402,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
             if (OdooAccountManager.createAccount(OdooLogin.this, mUser)) {
                 mUser = OdooAccountManager.getDetails(OdooLogin.this, mUser.getAndroidName());
                 OdooAccountManager.login(OdooLogin.this, mUser.getAndroidName());
-                FirstLaunchConfig.onFirstLaunch(OdooLogin.this, mUser);
-                try {
-                    // Syncing company details
-                    ODataRow company_details = new ODataRow();
-                    company_details.put("id", mUser.getCompanyId());
-                    ResCompany company = new ResCompany(OdooLogin.this, mUser);
-                    company.quickCreateRecord(company_details);
-                    Thread.sleep(500);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
                 return true;
             }
             return false;

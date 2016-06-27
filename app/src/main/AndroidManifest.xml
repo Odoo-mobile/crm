@@ -36,6 +36,23 @@
         android:largeHeap="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".core.account.AppIntro"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".core.account.setup.SetupActivity"
+            android:screenOrientation="portrait" />
+
+        <service
+            android:name=".core.account.setup.SetupIntentService"
+            android:exported="false" />
+
+        <activity
             android:name=".core.account.OdooLogin"
             android:label="${applicationName}"
             android:screenOrientation="portrait" />
@@ -46,15 +63,6 @@
             android:label="${applicationName}" />
         <activity android:name="odoo.controls.SearchableItemActivity" />
         <activity android:name=".SettingsActivity" />
-        <activity
-            android:name=".core.account.AppIntro"
-            android:screenOrientation="portrait">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".base.addons.mail.widget.MailDetailDialog"
             android:theme="@style/Theme.AppCompat.Light.Dialog" />
@@ -231,7 +239,6 @@
         <activity
             android:name=".addons.sale.AddProductLineWizard"
             android:windowSoftInputMode="adjustPan" />
-        <activity android:name=".SetupActivity"></activity>
     </application>
 
 </manifest>

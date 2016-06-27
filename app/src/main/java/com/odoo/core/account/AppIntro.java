@@ -7,8 +7,8 @@ import android.view.View;
 
 import com.odoo.OdooActivity;
 import com.odoo.R;
-import com.odoo.SetupActivity;
 import com.odoo.config.IntroSliderItems;
+import com.odoo.core.account.setup.SetupActivity;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooUserLoginSelectorDialog;
@@ -17,7 +17,6 @@ import com.odoo.widgets.slider.SliderView;
 
 public class AppIntro extends AppCompatActivity implements
         OdooUserLoginSelectorDialog.IUserLoginSelectListener {
-    public static final String KEY_FRESH_LOGIN = "key_fresh_login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +50,7 @@ public class AppIntro extends AppCompatActivity implements
 
     private boolean startSetupActivity() {
         OPreferenceManager preferenceManager = new OPreferenceManager(this);
-        if (!preferenceManager.getBoolean(KEY_FRESH_LOGIN, false)) {
-            preferenceManager.setBoolean(KEY_FRESH_LOGIN, true);
+        if (!preferenceManager.getBoolean(SetupActivity.KEY_APP_DATA_SETUP, false)) {
             startActivity(new Intent(this, SetupActivity.class));
             finish();
             return true;

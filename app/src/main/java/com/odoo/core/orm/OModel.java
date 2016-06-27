@@ -28,7 +28,6 @@ import android.net.Uri;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.odoo.App;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.orm.annotation.Odoo;
@@ -69,18 +68,17 @@ import java.util.Locale;
 
 import odoo.helper.ODomain;
 import odoo.helper.OdooVersion;
-import odoo.listeners.IModuleInstallListener;
 
 
 public class OModel implements ISyncServiceListener {
 
     public static final String TAG = OModel.class.getSimpleName();
-    public String BASE_AUTHORITY = App.APPLICATION_ID + ".core.provider.content";
     public static final int INVALID_ROW_ID = -1;
     public static OSQLite sqLite = null;
     private Context mContext;
     private OUser mUser;
     private String model_name = null;
+    private String base_authority;
     private List<OColumn> mColumns = new ArrayList<>();
     private List<OColumn> mRelationColumns = new ArrayList<>();
     private List<OColumn> mFunctionalColumns = new ArrayList<>();
@@ -486,19 +484,26 @@ public class OModel implements ISyncServiceListener {
         return model;
     }
 
+    public String getBaseAuthority() {
+        if (base_authority != null) {
+            return base_authority;
+        }
+        return mContext.getApplicationContext().getPackageName() + ".core.provider.content";
+    }
+
     public String authority() {
-        return BASE_AUTHORITY;
+        return getBaseAuthority();
     }
 
     public Uri buildURI(String authority) {
-        BASE_AUTHORITY = authority;
+        base_authority = authority;
         String path = getModelName().toLowerCase(Locale.getDefault());
-        return BaseModelProvider.buildURI(BASE_AUTHORITY, path, mUser.getAndroidName());
+        return BaseModelProvider.buildURI(authority, path, mUser.getAndroidName());
     }
 
     public Uri uri() {
         String path = getModelName().toLowerCase(Locale.getDefault());
-        return BaseModelProvider.buildURI(BASE_AUTHORITY, path, mUser.getAndroidName());
+        return BaseModelProvider.buildURI(getBaseAuthority(), path, mUser.getAndroidName());
     }
 
     public ODomain defaultDomain() {
@@ -1137,16 +1142,20 @@ public class OModel implements ISyncServiceListener {
         }
     }
 
+    /**
+     * FixME: Replace it with module install check.
+     */
     public boolean isInstalledOnServer(final String module_name) {
-        App app = (App) mContext.getApplicationContext();
-        boolean isInstalled = app.getOdoo(getUser()).installedOnServer(module_name);
-        IrModel model = new IrModel(mContext, getUser());
-        OValues values = new OValues();
-        values.put("id", 0);
-        values.put("name", module_name);
-        values.put("state", isInstalled);
-        model.insertOrUpdate("name = ?", new String[]{module_name}, values);
-        return isInstalled;
+//        App app = (App) mContext.getApplicationContext();
+//        boolean isInstalled = app.getOdoo(getUser()).installedOnServer(module_name);
+//        IrModel model = new IrModel(mContext, getUser());
+//        OValues values = new OValues();
+//        values.put("id", 0);
+//        values.put("name", module_name);
+//        values.put("state", isInstalled);
+//        model.insertOrUpdate("name = ?", new String[]{module_name}, values);
+//        return isInstalled;
+        return true;
     }
 
     public String getDatabaseLocalPath() {
