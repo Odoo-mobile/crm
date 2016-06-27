@@ -108,12 +108,13 @@ public class OSyncDataUtils {
                     String write_date = write_dates.get(key);
                     ODataRow record = mModel.browse(new String[]{"_write_date"}, "id = ?",
                             new String[]{server_id + ""});
-                    if (record != null) {
+                    if (record != null && !write_date.equals("false")) {
                         Date write_date_obj = ODateUtils.createDateObject(write_date,
                                 ODateUtils.DEFAULT_FORMAT, false);
                         Date _write_date_obj = ODateUtils.createDateObject(record.getString("_write_date"),
                                 ODateUtils.DEFAULT_FORMAT, false);
-                        if (_write_date_obj.compareTo(write_date_obj) > 0) {
+                        if (write_date_obj != null && _write_date_obj != null
+                                && _write_date_obj.compareTo(write_date_obj) > 0) {
                             // Local record is latest
                             updateToServerIds.add(server_id);
                         } else {

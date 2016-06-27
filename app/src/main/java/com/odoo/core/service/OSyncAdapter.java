@@ -55,8 +55,6 @@ import odoo.helper.ORecordValues;
 import odoo.helper.OdooFields;
 import odoo.helper.utils.gson.OdooRecord;
 import odoo.helper.utils.gson.OdooResult;
-import odoo.listeners.IOdooLoginCallback;
-import odoo.listeners.OdooError;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
@@ -70,6 +68,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     private Class<? extends OModel> mModelClass;
     private Integer mSyncDataLimit = 0;
     private Boolean checkForWriteCreateDate = true;
+    private Boolean modelLogOnly = false;
     private HashMap<String, ODomain> mDomain = new HashMap<>();
     private HashMap<String, ISyncFinishListener> mSyncFinishListeners = new HashMap<>();
 
@@ -108,6 +107,11 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         return this;
     }
 
+    public OSyncAdapter setModelLogOnly(boolean modelLogOnly) {
+        this.modelLogOnly = modelLogOnly;
+        return this;
+    }
+
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority,
                               ContentProviderClient provider, SyncResult syncResult) {
@@ -120,10 +124,14 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             mOdoo = createOdooInstance(mContext, mUser);
             if (mOdoo != null) {
                 dataUtils = new OSyncDataUtils(mContext, mOdoo);
-                Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
-                Log.i(TAG, "Model       : " + mModel.getModelName());
-                Log.i(TAG, "Database    : " + mModel.getDatabaseName());
-                Log.i(TAG, "Odoo Version: " + mUser.getOdooVersion().getServerSerie());
+                if (!modelLogOnly) {
+                    Log.i(TAG, "User        : " + mModel.getUser().getAndroidName());
+                    Log.i(TAG, "Model       : " + mModel.getModelName());
+                    Log.i(TAG, "Database    : " + mModel.getDatabaseName());
+                    Log.i(TAG, "Odoo Version: " + mUser.getOdooVersion().getServerSerie());
+                } else {
+                    Log.v(TAG, "Model       : " + mModel.getModelName());
+                }
                 // Calling service callback
                 if (mService != null)
                     mService.performDataSync(this, extras, mUser);
@@ -142,7 +150,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void syncData(OModel model, OUser user, ODomain domain_filter,
                           SyncResult result, Boolean checkForDataLimit, Boolean createRelationRecords) {
-        Log.v(TAG, "Sync for (" + model.getModelName() + ") Started at " + ODateUtils.getDate());
+        if (!modelLogOnly)
+            Log.v(TAG, "Sync for (" + model.getModelName() + ") Started at " + ODateUtils.getDate());
         model.onSyncStarted();
         try {
             ODomain domain = new ODomain();
@@ -196,7 +205,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
 
-            Log.v(TAG, "Processing " + response.getRecords().size() + " records");
+            if (!modelLogOnly)
+                Log.v(TAG, "Processing " + response.getRecords().size() + " records");
             dataUtils.handleResult(model, user, result, response, createRelationRecords);
             // Updating records on server if local are latest updated.
             // if model allowed update record to server
@@ -222,7 +232,8 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 removeNonExistRecordFromLocal(model);
             }
 
-            Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
+            if (!modelLogOnly)
+                Log.v(TAG, "Sync for (" + model.getModelName() + ") finished at " + ODateUtils.getDate());
             if (createRelationRecords) {
                 IrModel irModel = new IrModel(mContext, user);
                 irModel.setLastSyncDateTimeToNow(model);

@@ -21,11 +21,13 @@ package com.odoo.base.addons.mail;
 
 import android.content.Context;
 
+import com.odoo.core.account.setup.utils.OdooSetup;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 
+@OdooSetup.Model
 public class MailMessageSubType extends OModel {
     public static final String TAG = MailMessageSubType.class.getSimpleName();
 

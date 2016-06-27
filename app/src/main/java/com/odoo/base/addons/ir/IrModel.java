@@ -20,10 +20,11 @@
 package com.odoo.base.addons.ir;
 
 import android.content.Context;
-import android.net.Uri;
 import android.util.Log;
 
-import com.odoo.App;
+import com.odoo.core.account.setup.utils.OdooSetup;
+import com.odoo.core.account.setup.utils.Priority;
+import com.odoo.core.account.setup.utils.SetupUtils;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -32,15 +33,17 @@ import com.odoo.core.orm.fields.types.OVarchar;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import odoo.helper.ODomain;
+
+@OdooSetup.Model(Priority.HIGH)
 public class IrModel extends OModel {
     public static final String TAG = IrModel.class.getSimpleName();
-    public static String AUTHORITY = App.APPLICATION_ID + ".core.provider.content.sync.ir_model";
     OColumn name = new OColumn("Model Description", OVarchar.class).setSize(100);
     OColumn model = new OColumn("Model", OVarchar.class).setSize(100);
-    OColumn state = new OColumn("State", OVarchar.class).setSize(64);
 
     OColumn last_synced = new OColumn("Last Synced on ", ODateTime.class)
             .setLocalColumn();
@@ -50,17 +53,27 @@ public class IrModel extends OModel {
     }
 
     @Override
-    public Uri uri() {
-        return buildURI(AUTHORITY);
-    }
-
-    @Override
     public boolean checkForCreateDate() {
         return false;
     }
 
     @Override
     public boolean checkForWriteDate() {
+        return false;
+    }
+
+    @Override
+    public boolean allowCreateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowUpdateRecordOnServer() {
+        return false;
+    }
+
+    @Override
+    public boolean allowDeleteRecordOnServer() {
         return false;
     }
 
@@ -80,4 +93,13 @@ public class IrModel extends OModel {
         values.put("last_synced", ODateUtils.getDate(last_sync, ODateUtils.DEFAULT_FORMAT));
         insertOrUpdate("model = ?", new String[]{model.getModelName()}, values);
     }
+
+    @Override
+    public ODomain defaultDomain() {
+        SetupUtils utils = new SetupUtils(getContext(), getUser());
+        ODomain domain = super.defaultDomain();
+        domain.add("model", "in", new ArrayList<>(utils.getModels().keySet()));
+        return domain;
+    }
+
 }

@@ -25,9 +25,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.addons.crm.models.CRMCaseCateg;
 import com.odoo.addons.crm.models.CRMCaseStage;
-import com.odoo.App;
 import com.odoo.base.addons.BaseModels;
 import com.odoo.base.addons.mail.MailMessage;
 import com.odoo.base.addons.mail.MailMessageSubType;
