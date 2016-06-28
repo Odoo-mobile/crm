@@ -68,6 +68,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     private Class<? extends OModel> mModelClass;
     private Integer mSyncDataLimit = 0;
     private Boolean checkForWriteCreateDate = true;
+    private Boolean checkForCreateDate = true;
     private Boolean modelLogOnly = false;
     private HashMap<String, ODomain> mDomain = new HashMap<>();
     private HashMap<String, ISyncFinishListener> mSyncFinishListeners = new HashMap<>();
@@ -101,6 +102,12 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         checkForWriteCreateDate = check;
         return this;
     }
+
+    public OSyncAdapter checkForCreateDate(Boolean check) {
+        checkForCreateDate = check;
+        return this;
+    }
+
 
     public OSyncAdapter syncDataLimit(Integer dataLimit) {
         mSyncDataLimit = dataLimit;
@@ -163,7 +170,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (checkForWriteCreateDate) {
                 List<Integer> serverIds = model.getServerIds();
                 // Model Create date domain filters
-                if (model.checkForCreateDate() && checkForDataLimit) {
+                if (checkForCreateDate && model.checkForCreateDate() && checkForDataLimit) {
                     if (serverIds.size() > 0) {
                         if (model.checkForWriteDate()
                                 && !model.isEmptyTable()) {

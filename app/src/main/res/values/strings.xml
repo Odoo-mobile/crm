@@ -104,4 +104,9 @@
     <string name="toast_record_deleted">Record deleted</string>
     <string name="almost_there">Almost there...</string>
     <string name="your_account_is_setting_up">Your account is setting up</string>
+    <string name="title_oops">Oops !</string>
+    <string name="message_some_module_dependency_failed">Features related to <b>%s</b> are not going to work in application. Please install <b>%s</b> module on server.</string>
+    <string name="label_continue">Continue</string>
+    <string name="title_no_modules">No modules</string>
+    <string name="message_modules_not_installed">For running this application, %s modules required to be installed on server. Please contact your administrator.</string>
 </resources>

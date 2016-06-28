@@ -4,16 +4,20 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SyncResult;
+import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.odoo.base.addons.ir.IrModule;
 import com.odoo.core.account.setup.utils.Priority;
 import com.odoo.core.account.setup.utils.SetupUtils;
+import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
 
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -28,9 +32,13 @@ import odoo.Odoo;
  */
 public class SetupIntentService extends IntentService {
 
-    public static final String ACTION_PROGRESS_UPDATE = "progress_update";
-    public static final String EXTRA_PROGRESS = "extra_progress_value";
     public static final String TAG = SetupIntentService.class.getCanonicalName();
+    public static final String ACTION_SETUP_RESPONSE = "setup_response";
+    public static final String EXTRA_PROGRESS = "extra_progress_value";
+    public static final String EXTRA_ERROR = "extra_error_response";
+    public static final String KEY_DEPENDENCY_ERROR = "module_dependency_error";
+    public static final String KEY_MODULES = "modules";
+    public static final String KEY_SKIP_MODULE_CHECK = "skip_module_check";
     private Odoo odoo;
     private SetupUtils setupUtils;
     private OUser user;
@@ -43,6 +51,8 @@ public class SetupIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
+        Bundle extra = intent.getExtras();
+
         user = OUser.current(getApplicationContext()); // FIXME: can be also request form sync
         Log.d(TAG, "Setup Started for User : " + user.getAndroidName());
         setupUtils = new SetupUtils(getApplicationContext(), user);
@@ -56,6 +66,10 @@ public class SetupIntentService extends IntentService {
         // Syncing high priority models first (The Base data)
         Log.v(TAG, "Processing HIGH priority models");
         syncModels(setupModels.get(Priority.HIGH));
+
+        if (!extra.containsKey(KEY_SKIP_MODULE_CHECK) && !checkModuleDependency()) {
+            return;
+        }
 
         // Syncing user groups and model access rights (Access rights and res groups data)
         Log.v(TAG, "Processing access rights models");
@@ -91,17 +105,43 @@ public class SetupIntentService extends IntentService {
         OSyncAdapter syncAdapter = new OSyncAdapter(getApplicationContext(), model.getClass(), null, true);
         syncAdapter.setModelLogOnly(true);
         syncAdapter.setModel(model);
-        syncAdapter.checkForWriteCreateDate(false);
+        syncAdapter.checkForCreateDate(false);
         syncAdapter.onPerformSync(user.getAccount(), null, model.authority(), null, result);
         return result;
     }
 
 
     private void pushProgress() {
-        Intent data = new Intent(ACTION_PROGRESS_UPDATE);
+        Intent data = new Intent(ACTION_SETUP_RESPONSE);
         data.putExtra(EXTRA_PROGRESS, (totalFinishedTasks * 100) / totalTasks);
         LocalBroadcastManager.getInstance(getApplicationContext())
                 .sendBroadcast(data);
+    }
+
+    private void pushError(Bundle extra) {
+        Intent data = new Intent(ACTION_SETUP_RESPONSE);
+        data.putExtras(extra);
+        LocalBroadcastManager.getInstance(getApplicationContext())
+                .sendBroadcast(data);
+    }
+
+    private boolean checkModuleDependency() {
+        IrModule module = new IrModule(getApplicationContext(), user);
+        List<String> modulesNotInstalled = new ArrayList<>();
+        for (ODataRow row : module.select()) {
+            if (!row.getString("state").equals("installed")) {
+                Log.e(TAG, "Dependency module not installed on server : " + row.getString("shortdesc"));
+                modulesNotInstalled.add(row.getString("shortdesc"));
+            }
+        }
+        if (!modulesNotInstalled.isEmpty()) {
+            Bundle data = new Bundle();
+            data.putString(EXTRA_ERROR, KEY_DEPENDENCY_ERROR);
+            data.putStringArray(KEY_MODULES, modulesNotInstalled.toArray(new String[modulesNotInstalled.size()]));
+            pushError(data);
+            return false;
+        }
+        return true;
     }
 
 }
