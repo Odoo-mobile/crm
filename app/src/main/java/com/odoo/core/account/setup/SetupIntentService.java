@@ -39,6 +39,7 @@ public class SetupIntentService extends IntentService {
     public static final String KEY_DEPENDENCY_ERROR = "module_dependency_error";
     public static final String KEY_MODULES = "modules";
     public static final String KEY_SKIP_MODULE_CHECK = "skip_module_check";
+    public static final String KEY_SETUP_FINISHED = "setup_finished";
     private Odoo odoo;
     private SetupUtils setupUtils;
     private OUser user;
@@ -83,6 +84,9 @@ public class SetupIntentService extends IntentService {
         syncModels(setupModels.get(Priority.DEFAULT));
 
         Log.v(TAG, "All set. Setup service finished.");
+        Bundle data = new Bundle();
+        data.putBoolean(KEY_SETUP_FINISHED, true);
+        pushUpdate(data);
     }
 
     private void syncModels(List<Class<? extends OModel>> models) {
@@ -97,7 +101,9 @@ public class SetupIntentService extends IntentService {
             }
         }
         totalFinishedTasks++;
-        pushProgress();
+        Bundle extra = new Bundle();
+        extra.putInt(EXTRA_PROGRESS, (totalFinishedTasks * 100) / totalTasks);
+        pushUpdate(extra);
     }
 
     private SyncResult syncData(OModel model) {
@@ -111,11 +117,12 @@ public class SetupIntentService extends IntentService {
     }
 
 
-    private void pushProgress() {
-        Intent data = new Intent(ACTION_SETUP_RESPONSE);
-        data.putExtra(EXTRA_PROGRESS, (totalFinishedTasks * 100) / totalTasks);
+    private void pushUpdate(Bundle extra) {
+        extra = extra != null ? extra : Bundle.EMPTY;
+        Intent intent = new Intent(ACTION_SETUP_RESPONSE);
+        intent.putExtras(extra);
         LocalBroadcastManager.getInstance(getApplicationContext())
-                .sendBroadcast(data);
+                .sendBroadcast(intent);
     }
 
     private void pushError(Bundle extra) {
