@@ -25,6 +25,7 @@
     <color name="android_blue_dark">#0099CC</color>
     <color name="android_violet">#AA66CC</color>
     <color name="android_violet_dark">#9933CC</color>
+    <color name="android_violet_dark_tran">#bb9933CC</color>
     <color name="android_green">#99CC00</color>
     <color name="android_green_dark">#669900</color>
     <color name="android_orange">#FFBB33</color>
