@@ -68,6 +68,8 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.support.hintcase.HintCaseItem;
+import com.odoo.core.support.hintcase.HintCaseUtils;
 import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.support.list.OListAdapter;
@@ -115,6 +117,8 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     private OListAdapter navSpinnerAdapter;
     private FilterType mFilterType = FilterType.All;
 
+    private HintCaseUtils hintCaseUtils;
+
     private enum SheetType {
         Event, PhoneCall, Opportunity
     }
@@ -153,6 +157,25 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         crmLead = new CRMLead(getActivity(), null);
         odooCalendar.setOdooCalendarDateSelectListener(this);
 
+        // Adding hints for fragment
+        hintCaseUtils = HintCaseUtils.init(getActivity());
+        hintCaseUtils.addHint(
+                new HintCaseItem()
+                        .setTitle("New!")
+                        .setContent("Create new event on single tap.")
+                        .setViewId(R.id.fabButton)
+                        .withCircleShape());
+        hintCaseUtils.addHint(
+                new HintCaseItem()
+                        .setTitle("Today Menu")
+                        .setContent("Quick redirect calendar to today")
+                        .setViewId(R.id.menu_dashboard_goto_today));
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        hintCaseUtils.show();
     }
 
     private void initActionSpinner() {
