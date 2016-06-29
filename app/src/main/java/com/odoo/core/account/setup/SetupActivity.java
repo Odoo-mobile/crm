@@ -16,6 +16,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.config.BaseConfig;
 import com.odoo.core.support.OUser;
@@ -77,6 +78,8 @@ public class SetupActivity extends AppCompatActivity {
     private void setupFinished() {
         OPreferenceManager preferenceManager = new OPreferenceManager(this);
         preferenceManager.setBoolean(KEY_APP_DATA_SETUP, true);
+        startActivity(new Intent(this, OdooActivity.class));
+        finish();
     }
 
     private BroadcastReceiver setupResponseReceiver = new BroadcastReceiver() {
@@ -90,7 +93,8 @@ public class SetupActivity extends AppCompatActivity {
                     String[] modules = extra.getStringArray(SetupIntentService.KEY_MODULES);
                     showNoModulesInstallDialog(modules);
                 }
-
+            } else if (extra.containsKey(SetupIntentService.KEY_SETUP_FINISHED)) {
+                setupFinished();
             } else {
                 int progress = intent.getExtras().getInt(SetupIntentService.EXTRA_PROGRESS);
                 progressBar.setProgress(progress);

@@ -1,7 +1,6 @@
 package com.odoo.base.addons.ir;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.odoo.base.addons.res.ResGroups;
 import com.odoo.core.account.setup.utils.OdooSetup;
@@ -60,7 +59,6 @@ public class IrModelData extends OModel {
         domain.add("model", "in", models);
         domain.add("res_id", "in", serverIds);
 
-        Log.v(">>", domain.get() + " <<<");
         return domain;
     }
 
