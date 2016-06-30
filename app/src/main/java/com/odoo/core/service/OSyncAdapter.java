@@ -194,6 +194,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                     }
                 }
             }
+
             // Getting data
             OdooResult response = mOdoo.searchRead(model.getModelName(), getFields(model)
                     , domain, 0, mSyncDataLimit, "create_date DESC");

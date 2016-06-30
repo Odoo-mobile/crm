@@ -9,6 +9,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.odoo.base.addons.ir.IrModule;
+import com.odoo.config.BaseConfig;
 import com.odoo.core.account.setup.utils.Priority;
 import com.odoo.core.account.setup.utils.SetupUtils;
 import com.odoo.core.orm.ODataRow;
@@ -40,6 +41,7 @@ public class SetupIntentService extends IntentService {
     public static final String KEY_MODULES = "modules";
     public static final String KEY_SKIP_MODULE_CHECK = "skip_module_check";
     public static final String KEY_SETUP_FINISHED = "setup_finished";
+    public static final String KEY_NO_APP_ACCESS = "no_application_access";
     private Odoo odoo;
     private SetupUtils setupUtils;
     private OUser user;
@@ -68,6 +70,7 @@ public class SetupIntentService extends IntentService {
         Log.v(TAG, "Processing HIGH priority models");
         syncModels(setupModels.get(Priority.HIGH));
 
+        // Check for module dependency
         if (!extra.containsKey(KEY_SKIP_MODULE_CHECK) && !checkModuleDependency()) {
             return;
         }
@@ -79,6 +82,12 @@ public class SetupIntentService extends IntentService {
         // Syncing xml id data for models
         syncModels(setupModels.get(Priority.LOW));
 
+        // Check for user access to each modules.
+        // Returns, if user have no any access to use sale/crm app
+        if (!checkUserAccessGroup()) {
+            Log.e(TAG, "User has no access to application.");
+            return;
+        }
         // Master records for each model references
         Log.v(TAG, "Processing master record models for each model");
         syncModels(setupModels.get(Priority.DEFAULT));
@@ -132,16 +141,25 @@ public class SetupIntentService extends IntentService {
                 .sendBroadcast(data);
     }
 
-    private boolean checkModuleDependency() {
+    private List<String> geModulesName(boolean checkForNotInstalled) {
         IrModule module = new IrModule(getApplicationContext(), user);
-        List<String> modulesNotInstalled = new ArrayList<>();
+        List<String> modules = new ArrayList<>();
         for (ODataRow row : module.select()) {
-            if (!row.getString("state").equals("installed")) {
-                Log.e(TAG, "Dependency module not installed on server : " + row.getString("shortdesc"));
-                modulesNotInstalled.add(row.getString("shortdesc"));
+            if (checkForNotInstalled) {
+                if (!row.getString("state").equals("installed")) {
+                    modules.add(row.getString("shortdesc"));
+                }
+            } else {
+                modules.add(row.getString("shortdesc"));
             }
         }
+        return modules;
+    }
+
+    private boolean checkModuleDependency() {
+        List<String> modulesNotInstalled = geModulesName(true);
         if (!modulesNotInstalled.isEmpty()) {
+            Log.e(TAG, "Dependency modules are not installed on server : " + modulesNotInstalled);
             Bundle data = new Bundle();
             data.putString(EXTRA_ERROR, KEY_DEPENDENCY_ERROR);
             data.putStringArray(KEY_MODULES, modulesNotInstalled.toArray(new String[modulesNotInstalled.size()]));
@@ -149,6 +167,21 @@ public class SetupIntentService extends IntentService {
             return false;
         }
         return true;
+    }
+
+    private boolean checkUserAccessGroup() {
+        for (String group : BaseConfig.USER_GROUPS) {
+            if (user.hasGroup(group)) {
+                return true;
+            }
+        }
+        // No access to app
+        List<String> modules = geModulesName(false);
+        Bundle data = new Bundle();
+        data.putString(EXTRA_ERROR, KEY_NO_APP_ACCESS);
+        data.putStringArray(KEY_MODULES, modules.toArray(new String[modules.size()]));
+        pushError(data);
+        return false;
     }
 
 }

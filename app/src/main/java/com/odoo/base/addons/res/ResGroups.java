@@ -18,11 +18,6 @@ public class ResGroups extends OModel {
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100);
     OColumn category_id = new OColumn("Application", IrModuleCategory.class, OColumn.RelationType.ManyToOne);
 
-    OColumn users = new OColumn("Users", ResUsers.class, OColumn.RelationType.ManyToMany)
-            .setRelTableName("res_groups_user_rel")
-            .setRelBaseColumn("gid")
-            .setRelRelationColumn("uid");
-
     public ResGroups(Context context, OUser user) {
         super(context, "res.groups", user);
     }
