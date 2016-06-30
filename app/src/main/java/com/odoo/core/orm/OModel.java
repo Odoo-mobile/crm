@@ -626,16 +626,18 @@ public class OModel implements ISyncServiceListener {
         List<ODataRow> records = model.select(null, "model = ?", new String[]{getModelName()});
         if (records.size() > 0) {
             String date = records.get(0).getString("last_synced");
-            Date write_date = ODateUtils.createDateObject(date, ODateUtils.DEFAULT_FORMAT, true);
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(write_date);
+            if (!date.equals("false")) {
+                Date write_date = ODateUtils.createDateObject(date, ODateUtils.DEFAULT_FORMAT, true);
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(write_date);
             /*
                 Fixed for Postgres SQL
                 It stores milliseconds so comparing date wrong. 
              */
-            cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) + 2);
-            write_date = cal.getTime();
-            return ODateUtils.getDate(write_date, ODateUtils.DEFAULT_FORMAT);
+                cal.set(Calendar.SECOND, cal.get(Calendar.SECOND) + 2);
+                write_date = cal.getTime();
+                return ODateUtils.getDate(write_date, ODateUtils.DEFAULT_FORMAT);
+            }
         }
         return null;
     }
@@ -892,6 +894,10 @@ public class OModel implements ISyncServiceListener {
         return count > 0;
     }
 
+    public Cursor execute(String query, String[] args) {
+        SQLiteDatabase db = getReadableDatabase();
+        return db.rawQuery(query, args);
+    }
 
     public List<ODataRow> query(String query) {
         return query(query, null);
@@ -1004,7 +1010,6 @@ public class OModel implements ISyncServiceListener {
 
     private void handleManyToManyRecords(OColumn column, RelCommands command, OModel relModel,
                                          int record_id, HashMap<RelCommands, List<Object>> values) {
-
         String table = column.getRelTableName() != null ? column.getRelTableName() :
                 getTableName() + "_" + relModel.getTableName() + "_rel";
         String base_column = column.getRelBaseColumn() != null ? column.getRelBaseColumn() :
@@ -1056,8 +1061,7 @@ public class OModel implements ISyncServiceListener {
                 break;
             case Unlink:
                 // Unlink relation with base record
-                String unlinkSQL = "DELETE FROM " + table + " WHERE " + base_column + " = " + record_id + " AND " + rel_column + " IN (" +
-                        TextUtils.join(",", values.get(command)) + ")";
+                String unlinkSQL = "DELETE FROM " + table + " WHERE " + base_column + " = " + record_id;
                 db.execSQL(unlinkSQL);
                 break;
         }

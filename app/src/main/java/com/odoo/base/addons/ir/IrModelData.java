@@ -22,6 +22,7 @@ public class IrModelData extends OModel {
     OColumn name = new OColumn("Name", OVarchar.class).setSize(150);
     OColumn model = new OColumn("Model", OVarchar.class).setSize(100);
     OColumn res_id = new OColumn("Resource ID", OInteger.class);
+    OColumn module = new OColumn("Module", OVarchar.class).setSize(100);
 
     public IrModelData(Context context, OUser user) {
         super(context, "ir.model.data", user);

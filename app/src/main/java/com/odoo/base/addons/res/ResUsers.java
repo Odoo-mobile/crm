@@ -20,6 +20,8 @@
 package com.odoo.base.addons.res;
 
 import android.content.Context;
+import android.database.Cursor;
+import android.util.Log;
 
 import com.odoo.core.account.setup.utils.OdooSetup;
 import com.odoo.core.account.setup.utils.Priority;
@@ -36,6 +38,20 @@ public class ResUsers extends OModel {
 
     OColumn name = new OColumn("Name", OVarchar.class);
     OColumn login = new OColumn("User Login name", OVarchar.class);
+    OColumn groups_id = new OColumn("Groups", ResGroups.class, OColumn.RelationType.ManyToMany)
+            .setRelTableName("res_groups_users_rel")
+            .setRelBaseColumn("uid")
+            .setRelRelationColumn("gid");
+
+    @Override
+    public boolean checkForCreateDate() {
+        return false;
+    }
+
+    @Override
+    public boolean checkForWriteDate() {
+        return false;
+    }
 
     @Override
     public boolean allowCreateRecordOnServer() {
@@ -66,5 +82,17 @@ public class ResUsers extends OModel {
         ODomain domain = super.defaultDomain();
         domain.add("id", "=", getUser().getUserId());
         return domain;
+    }
+
+    public boolean hasGroup(int user_server_id, String group_xml_id) {
+        String sql = "SELECT count(*) as total FROM res_groups_users_rel WHERE uid = ? AND gid IN ";
+        sql += "(SELECT _id FROM res_groups where id IN (SELECT res_id FROM ir_model_data WHERE module = ? AND name = ?))";
+        String[] xml_ids = group_xml_id.split("\\.");
+        Cursor cr = execute(sql, new String[]{selectRowId(user_server_id) + "", xml_ids[0], xml_ids[1]});
+        cr.moveToFirst();
+        int total = cr.getInt(0);
+        cr.close();
+        Log.v(TAG, "User group : " + group_xml_id + "=" + total);
+        return total > 0;
     }
 }

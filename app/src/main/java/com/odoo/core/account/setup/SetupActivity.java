@@ -93,6 +93,10 @@ public class SetupActivity extends AppCompatActivity {
                     String[] modules = extra.getStringArray(SetupIntentService.KEY_MODULES);
                     showNoModulesInstallDialog(modules);
                 }
+                if (errorKey.equals(SetupIntentService.KEY_NO_APP_ACCESS)) {
+                    String[] modules = extra.getStringArray(SetupIntentService.KEY_MODULES);
+                    showNoApplicationAccessDialog(modules);
+                }
             } else if (extra.containsKey(SetupIntentService.KEY_SETUP_FINISHED)) {
                 setupFinished();
             } else {
@@ -149,6 +153,33 @@ public class SetupActivity extends AppCompatActivity {
             }
         });
         sheetDialog.show();
+    }
+
+    private void showNoApplicationAccessDialog(String[] modules) {
+        final BottomSheetDialog sheetDialog = new BottomSheetDialog(this);
+        View view = LayoutInflater.from(this).inflate(R.layout.base_setup_error_view, null, false);
+        OControls.setText(view, android.R.id.title, getString(R.string.title_access_denied));
+        OControls.setText(view, android.R.id.content, getString(R.string.message_no_app_access,
+                TextUtils.join(", ", modules)));
+        OControls.setVisible(view, R.id.btnOkay);
+        view.findViewById(R.id.btnOkay).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (sheetDialog.isShowing()) sheetDialog.dismiss();
+                finish();
+            }
+        });
+        sheetDialog.setContentView(view);
+        sheetDialog.setCancelable(false);
+        sheetDialog.setCanceledOnTouchOutside(false);
+        sheetDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                finish();
+            }
+        });
+        sheetDialog.show();
+
     }
 
     private void continueSetup() {

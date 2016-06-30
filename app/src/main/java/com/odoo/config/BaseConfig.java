@@ -24,6 +24,13 @@ public class BaseConfig {
 
     // Odoo module dependencies
     public static String[] DEPENDS_ON_MODULES = {"sale", "crm"};
+
+    // User groups required for access application
+    public static String[] USER_GROUPS = {
+            "base.group_sale_manager",
+            "base.group_sale_salesman_all_leads",
+            "base.group_sale_salesman"
+    };
 }
 
 

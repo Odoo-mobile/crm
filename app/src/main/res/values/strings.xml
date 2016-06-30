@@ -108,5 +108,7 @@
     <string name="message_some_module_dependency_failed">Features related to <b>%s</b> are not going to work in application. Please install <b>%s</b> module on server.</string>
     <string name="label_continue">Continue</string>
     <string name="title_no_modules">No modules</string>
-    <string name="message_modules_not_installed">For running this application, %s modules required to be installed on server. Please contact your administrator.</string>
+    <string name="message_modules_not_installed">For running this application %s modules required to be installed on server. Please contact your administrator.</string>
+    <string name="title_access_denied">Access denied</string>
+    <string name="message_no_app_access">You don\'t have permission to access the modules (%s). Please contact your Administrator</string>
 </resources>
