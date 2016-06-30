@@ -20,5 +20,10 @@ public enum Priority {
      * MEDIUM priority models are sync after HIGH models sync finished.
      * Mainly User groups, models access rights
      */
-    MEDIUM
+    MEDIUM,
+
+    /**
+     * CONFIGURATION models
+     */
+    CONFIGURATION
 }

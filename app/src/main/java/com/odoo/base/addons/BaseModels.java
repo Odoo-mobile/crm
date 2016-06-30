@@ -21,6 +21,7 @@ package com.odoo.base.addons;
 
 import android.content.Context;
 
+import com.odoo.addons.sale.models.SaleConfigSettings;
 import com.odoo.base.addons.ir.IrAttachment;
 import com.odoo.base.addons.ir.IrModel;
 import com.odoo.base.addons.ir.IrModelAccess;
@@ -50,6 +51,7 @@ public class BaseModels {
         models.add(new IrModelData(context, user));
         models.add(new ResGroups(context, user));
         models.add(new ResPartner(context, user));
+        models.add(new SaleConfigSettings(context, user));
         models.add(new ResUsers(context, user));
         models.add(new ResCompany(context, user));
         models.add(new IrAttachment(context, user));
