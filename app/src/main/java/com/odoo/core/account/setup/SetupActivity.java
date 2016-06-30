@@ -15,6 +15,7 @@ import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.odoo.OdooActivity;
 import com.odoo.R;
@@ -100,8 +101,26 @@ public class SetupActivity extends AppCompatActivity {
             } else if (extra.containsKey(SetupIntentService.KEY_SETUP_FINISHED)) {
                 setupFinished();
             } else {
-                int progress = intent.getExtras().getInt(SetupIntentService.EXTRA_PROGRESS);
-                progressBar.setProgress(progress);
+                if (extra.containsKey(SetupIntentService.KEY_RUNNING_TASK)) {
+                    String task = extra.getString(SetupIntentService.KEY_RUNNING_TASK);
+                    assert task != null;
+                    TextView taskStatus = (TextView) findViewById(R.id.txvSetupProgressStatus);
+                    if (task.equals(SetupIntentService.KEY_TASK_BASE_DATA)) {
+                        taskStatus.setText(getString(R.string.task_status_base_data));
+                    }
+                    if (task.equals(SetupIntentService.KEY_TASK_USER_RIGHTS_GROUPS)) {
+                        taskStatus.setText(getString(R.string.task_status_user_rights_groups));
+                    }
+                    if (task.equals(SetupIntentService.KEY_TASK_MODULE_CONFIGURATION)) {
+                        taskStatus.setText(getString(R.string.task_status_module_configuration));
+                    }
+                    if (task.equals(SetupIntentService.KEY_TASK_FEATURE_DATA)) {
+                        taskStatus.setText(getString(R.string.task_status_feature_data));
+                    }
+                } else {
+                    int progress = extra.getInt(SetupIntentService.EXTRA_PROGRESS);
+                    progressBar.setProgress(progress);
+                }
             }
         }
     };

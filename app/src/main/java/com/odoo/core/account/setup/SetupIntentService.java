@@ -42,6 +42,13 @@ public class SetupIntentService extends IntentService {
     public static final String KEY_SKIP_MODULE_CHECK = "skip_module_check";
     public static final String KEY_SETUP_FINISHED = "setup_finished";
     public static final String KEY_NO_APP_ACCESS = "no_application_access";
+    public static final String KEY_RUNNING_TASK = "running_task";
+
+    public static final String KEY_TASK_BASE_DATA = "base_data";
+    public static final String KEY_TASK_USER_RIGHTS_GROUPS = "user_rights_and_groups";
+    public static final String KEY_TASK_MODULE_CONFIGURATION = "application_configurations";
+    public static final String KEY_TASK_FEATURE_DATA = "application_feature_data";
+
     private Odoo odoo;
     private SetupUtils setupUtils;
     private OUser user;
@@ -68,6 +75,7 @@ public class SetupIntentService extends IntentService {
 
         // Syncing high priority models first (The Base data)
         Log.v(TAG, "Processing HIGH priority models");
+        pushTaskStatus(KEY_TASK_BASE_DATA);
         syncModels(setupModels.get(Priority.HIGH));
 
         // Check for module dependency
@@ -77,10 +85,15 @@ public class SetupIntentService extends IntentService {
 
         // Syncing user groups and model access rights (Access rights and res groups data)
         Log.v(TAG, "Processing access rights models");
+        pushTaskStatus(KEY_TASK_USER_RIGHTS_GROUPS);
         syncModels(setupModels.get(Priority.MEDIUM));
 
         // Syncing xml id data for models
+        Log.v(TAG, "Processing model data and module configuration");
+        pushTaskStatus(KEY_TASK_MODULE_CONFIGURATION);
         syncModels(setupModels.get(Priority.LOW));
+        //getting application configurations
+        syncModels(setupModels.get(Priority.CONFIGURATION));
 
         // Check for user access to each modules.
         // Returns, if user have no any access to use sale/crm app
@@ -90,11 +103,18 @@ public class SetupIntentService extends IntentService {
         }
         // Master records for each model references
         Log.v(TAG, "Processing master record models for each model");
+        pushTaskStatus(KEY_TASK_FEATURE_DATA);
         syncModels(setupModels.get(Priority.DEFAULT));
 
         Log.v(TAG, "All set. Setup service finished.");
         Bundle data = new Bundle();
         data.putBoolean(KEY_SETUP_FINISHED, true);
+        pushUpdate(data);
+    }
+
+    private void pushTaskStatus(String task) {
+        Bundle data = new Bundle();
+        data.putString(KEY_RUNNING_TASK, task);
         pushUpdate(data);
     }
 
