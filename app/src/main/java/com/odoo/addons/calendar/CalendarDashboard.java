@@ -35,6 +35,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -61,6 +62,9 @@ import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.base.addons.res.ResCurrency;
 import com.odoo.base.addons.res.ResPartner;
+import com.odoo.calendar.listeners.CalendarDateChangeListener;
+import com.odoo.calendar.utils.DateInfo;
+import com.odoo.calendar.widget.WeekCalendarView;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
@@ -81,26 +85,24 @@ import com.odoo.core.utils.StringUtils;
 import com.odoo.core.utils.controls.OBottomSheet;
 import com.odoo.core.utils.dialog.OChoiceDialog;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
-import com.odoo.libs.calendar.SysCal;
-import com.odoo.libs.calendar.view.OdooCalendar;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class CalendarDashboard extends BaseFragment implements View.OnClickListener,
-        OdooCalendar.OdooCalendarDateSelectListener, LoaderManager.LoaderCallbacks<Cursor>,
+        LoaderManager.LoaderCallbacks<Cursor>,
         OCursorListAdapter.OnViewBindListener, SwipeRefreshLayout.OnRefreshListener,
         ISyncStatusObserverListener, IOnSearchViewChangeListener, IOnItemClickListener,
         OCursorListAdapter.OnViewCreateListener, AdapterView.OnItemSelectedListener,
         IOnActivityResultListener, OCursorListAdapter.BeforeBindUpdateData,
         OBottomSheet.OSheetItemClickListener, OBottomSheet.OSheetActionClickListener,
-        OBottomSheet.OSheetMenuCreateListener {
+        OBottomSheet.OSheetMenuCreateListener, CalendarDateChangeListener {
     public static final String TAG = CalendarDashboard.class.getSimpleName();
     public static final String KEY = "key_calendar_dashboard";
     public static final String KEY_DATE = "key_date";
     public static final int REQUEST_CONVERT_TO_QUOTATION_WIZARD = 229;
-    private OdooCalendar odooCalendar;
+    private WeekCalendarView odooCalendar;
     private View calendarView = null;
     private ListView dashboardListView;
     private View mView;
@@ -149,10 +151,9 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         parent().setOnActivityResultListener(this);
         navSpinner = parent().getActionBarSpinner();
         initActionSpinner();
-        odooCalendar = (OdooCalendar) view.findViewById(R.id.dashboard_calendar);
+        odooCalendar = (WeekCalendarView) view.findViewById(R.id.dashboard_calendar);
         crmLead = new CRMLead(getActivity(), null);
-        odooCalendar.setOdooCalendarDateSelectListener(this);
-
+        odooCalendar.setCalendarDateChangeListener(this);
     }
 
     private void initActionSpinner() {
@@ -214,65 +215,69 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     }
 
     @Override
-    public List<OdooCalendar.DateDataObject> weekDataInfo(
-            List<SysCal.DateInfo> week_dates) {
-        List<OdooCalendar.DateDataObject> items = new ArrayList<>();
-        CalendarEvent event = (CalendarEvent) db();
-        CRMPhoneCalls calls = new CRMPhoneCalls(getActivity(), event.getUser());
-        CRMLead lead = new CRMLead(getActivity(), event.getUser());
-        for (SysCal.DateInfo date : week_dates) {
-            String date_str = date.getDateString();
-            int total = 0;
-            switch (mFilterType) {
-                case All:
-                case Meetings:
-                    // Checking for events
-                    total += event.countGroupBy("date_start", "date(date_start)"
-                            , "(date(date_start) <= ? and date(date_end) >= ? )",
-                            new String[]{date_str, date_str}).getInt("total");
-
-                    if (mFilterType != FilterType.All)
-                        break;
-                case PhoneCalls:
-                    // Checking for phone calls
-                    total += calls.countGroupBy("date", "date(date)",
-                            "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)",
-                            new String[]{date_str, date_str, "open", "pending"})
-                            .getInt("total");
-
-                    if (mFilterType != FilterType.All)
-                        break;
-                case Opportunities:
-                    // Leads
-                    total += lead.countGroupBy("date_deadline", "date(date_deadline)",
-                            "(date(date_deadline) >= ? and date(date_deadline) <= ? or " +
-                                    "date(date_action) >= ? and date(date_action) <= ?) and type = ?",
-                            new String[]{date_str, date_str, date_str, date_str, "opportunity"}).getInt("total");
-                    if (mFilterType != FilterType.All)
-                        break;
-            }
-
-            items.add(new OdooCalendar.DateDataObject(date_str, (total > 0)));
-        }
-        return items;
+    public void onCalendarDateChange(DateInfo dateInfo) {
+        Log.e(">>", dateInfo + "");
     }
+//    @Override
+//    public List<OdooCalendar.DateDataObject> weekDataInfo(
+//            List<SysCal.DateInfo> week_dates) {
+//        List<OdooCalendar.DateDataObject> items = new ArrayList<>();
+//        CalendarEvent event = (CalendarEvent) db();
+//        CRMPhoneCalls calls = new CRMPhoneCalls(getActivity(), event.getUser());
+//        CRMLead lead = new CRMLead(getActivity(), event.getUser());
+//        for (SysCal.DateInfo date : week_dates) {
+//            String date_str = date.getDateString();
+//            int total = 0;
+//            switch (mFilterType) {
+//                case All:
+//                case Meetings:
+//                    // Checking for events
+//                    total += event.countGroupBy("date_start", "date(date_start)"
+//                            , "(date(date_start) <= ? and date(date_end) >= ? )",
+//                            new String[]{date_str, date_str}).getInt("total");
+//
+//                    if (mFilterType != FilterType.All)
+//                        break;
+//                case PhoneCalls:
+//                    // Checking for phone calls
+//                    total += calls.countGroupBy("date", "date(date)",
+//                            "date(date) >=  ? and date(date) <= ? and (state = ? or state = ?)",
+//                            new String[]{date_str, date_str, "open", "pending"})
+//                            .getInt("total");
+//
+//                    if (mFilterType != FilterType.All)
+//                        break;
+//                case Opportunities:
+//                    // Leads
+//                    total += lead.countGroupBy("date_deadline", "date(date_deadline)",
+//                            "(date(date_deadline) >= ? and date(date_deadline) <= ? or " +
+//                                    "date(date_action) >= ? and date(date_action) <= ?) and type = ?",
+//                            new String[]{date_str, date_str, date_str, date_str, "opportunity"}).getInt("total");
+//                    if (mFilterType != FilterType.All)
+//                        break;
+//            }
+//
+//            items.add(new OdooCalendar.DateDataObject(date_str, (total > 0)));
+//        }
+//        return items;
+//    }
 
-    @Override
-    public View getEventsView(ViewGroup parent, SysCal.DateInfo date) {
-        calendarView = LayoutInflater.from(getActivity()).inflate(
-                R.layout.calendar_dashboard_items, parent, false);
-        calendarView.findViewById(R.id.dashboard_no_item_view)
-                .setOnClickListener(this);
-        dashboardListView = (ListView) calendarView
-                .findViewById(R.id.items_container);
-        setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
-        initAdapter();
-        mFilterDate = date.getDateString();
-        if (getActivity() != null) {
-            getLoaderManager().restartLoader(0, null, CalendarDashboard.this);
-        }
-        return calendarView;
-    }
+//    @Override
+//    public View getEventsView(ViewGroup parent, SysCal.DateInfo date) {
+//        calendarView = LayoutInflater.from(getActivity()).inflate(
+//                R.layout.calendar_dashboard_items, parent, false);
+//        calendarView.findViewById(R.id.dashboard_no_item_view)
+//                .setOnClickListener(this);
+//        dashboardListView = (ListView) calendarView
+//                .findViewById(R.id.items_container);
+//        setHasFloatingButton(mView, R.id.fabButton, dashboardListView, this);
+//        initAdapter();
+//        mFilterDate = date.getDateString();
+//        if (getActivity() != null) {
+//            getLoaderManager().restartLoader(0, null, CalendarDashboard.this);
+//        }
+//        return calendarView;
+//    }
 
     private void initAdapter() {
         mAdapter = new OCursorListAdapter(getActivity(), null,
@@ -845,7 +850,7 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_dashboard_goto_today:
-                odooCalendar.goToToday();
+//                odooCalendar.goToToday(); // FIXME
                 break;
         }
         return super.onOptionsItemSelected(item);

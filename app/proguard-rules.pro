@@ -15,3 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+-dontobfuscate
+-keep class * extends com.odoo.core.orm.OModel{
+    public *;
+}

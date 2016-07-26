@@ -4,11 +4,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.odoo.libs.calendar.view.OdooCalendar
+    <com.odoo.calendar.widget.WeekCalendarView
         android:id="@+id/dashboard_calendar"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></com.odoo.libs.calendar.view.OdooCalendar>
-
+        android:layout_height="wrap_content" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fabButton"
