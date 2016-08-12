@@ -36,6 +36,8 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.support.hintcase.HintCaseItem;
+import com.odoo.core.support.hintcase.HintCaseUtils;
 import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.IntentUtils;
@@ -75,6 +77,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
     private int customer_id = -1;
     private ODataRow convertRequestRecord = null;
     private Bundle syncBundle = new Bundle();
+    private HintCaseUtils hintCaseUtils;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -104,6 +107,21 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
         }
         setHasSyncStatusObserver(TAG, this, db());
         initAdapter();
+        hintCaseUtils = HintCaseUtils.init(getActivity(), TAG);
+        if (!hintCaseUtils.isDone()) {
+            hintCaseUtils.addHint(
+                    new HintCaseItem()
+                            .setTitle("New")
+                            .setContent("Create new Opportunity on single tap.")
+                            .setViewId(R.id.fabButton)
+                            .withCircleShape());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        hintCaseUtils.show();
     }
 
     private void initAdapter() {

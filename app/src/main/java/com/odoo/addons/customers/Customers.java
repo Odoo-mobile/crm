@@ -51,6 +51,8 @@ import com.odoo.core.support.addons.fragment.BaseFragment;
 import com.odoo.core.support.addons.fragment.IOnSearchViewChangeListener;
 import com.odoo.core.support.addons.fragment.ISyncStatusObserverListener;
 import com.odoo.core.support.drawer.ODrawerItem;
+import com.odoo.core.support.hintcase.HintCaseItem;
+import com.odoo.core.support.hintcase.HintCaseUtils;
 import com.odoo.core.support.list.IOnItemClickListener;
 import com.odoo.core.support.list.OCursorListAdapter;
 import com.odoo.core.utils.BitmapUtils;
@@ -77,6 +79,7 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     private ListView mPartnersList = null;
     private OCursorListAdapter mAdapter = null;
     private boolean syncRequested = false;
+    private HintCaseUtils hintCaseUtils;
 
     public enum Type {
         Leads, Opportunities
@@ -105,6 +108,21 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
         mAdapter.handleItemClickListener(mPartnersList, this);
         setHasFloatingButton(view, R.id.fabButton, mPartnersList, this);
         getLoaderManager().initLoader(0, null, this);
+        hintCaseUtils = HintCaseUtils.init(getActivity(), KEY);
+        if (!hintCaseUtils.isDone()) {
+            hintCaseUtils.addHint(
+                    new HintCaseItem()
+                            .setTitle("New")
+                            .setContent("Create new Customer on single tap.")
+                            .setViewId(R.id.fabButton)
+                            .withCircleShape());
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        hintCaseUtils.show();
     }
 
     @Override
