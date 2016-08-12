@@ -158,18 +158,20 @@ public class CalendarDashboard extends BaseFragment implements View.OnClickListe
         odooCalendar.setOdooCalendarDateSelectListener(this);
 
         // Adding hints for fragment
-        hintCaseUtils = HintCaseUtils.init(getActivity());
-        hintCaseUtils.addHint(
-                new HintCaseItem()
-                        .setTitle("New!")
-                        .setContent("Create new event on single tap.")
-                        .setViewId(R.id.fabButton)
-                        .withCircleShape());
-        hintCaseUtils.addHint(
-                new HintCaseItem()
-                        .setTitle("Today Menu")
-                        .setContent("Quick redirect calendar to today")
-                        .setViewId(R.id.menu_dashboard_goto_today));
+        hintCaseUtils = HintCaseUtils.init(getActivity(), TAG);
+        if (!hintCaseUtils.isDone()) {
+            hintCaseUtils.addHint(
+                    new HintCaseItem()
+                            .setTitle("New!")
+                            .setContent("Create new event on single tap.")
+                            .setViewId(R.id.week_days)
+            );
+            hintCaseUtils.addHint(
+                    new HintCaseItem()
+                            .setTitle("Today Menu")
+                            .setContent("Quick redirect calendar to today")
+                            .setViewId(R.id.menu_dashboard_goto_today));
+        }
     }
 
     @Override

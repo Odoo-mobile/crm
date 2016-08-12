@@ -22,7 +22,6 @@ package com.odoo.core.support.hintcase;
 import android.app.Activity;
 import android.graphics.Color;
 import android.os.Handler;
-import android.util.Log;
 import android.view.View;
 
 import com.joanfuentes.hintcase.HintCase;
@@ -35,6 +34,7 @@ import com.joanfuentes.hintcaseassets.shapeanimators.UnrevealCircleShapeAnimator
 import com.joanfuentes.hintcaseassets.shapeanimators.UnrevealRectangularShapeAnimator;
 import com.joanfuentes.hintcaseassets.shapes.CircularShape;
 import com.odoo.R;
+import com.odoo.core.utils.OPreferenceManager;
 
 import java.util.HashMap;
 
@@ -43,16 +43,21 @@ public class HintCaseUtils implements HintCase.OnClosedListener {
     private Activity mActivity;
     private View mView;
     private HashMap<String, HintCaseItem> hintCaseItems = new HashMap<>();
-    private SimpleHintContentHolder.Builder hintBlock;
     private int currentIndex = 0;
+    private String hintCaseKey = null;
+    private Boolean isShowing = false;
 
-    public static HintCaseUtils init(Activity activity) {
-        return new HintCaseUtils(activity);
+    private OPreferenceManager preferenceManager;
+
+    public static HintCaseUtils init(Activity activity, String key) {
+        return new HintCaseUtils(activity, key);
     }
 
-    public HintCaseUtils(Activity activity) {
+    public HintCaseUtils(Activity activity, String key) {
         mActivity = activity;
+        hintCaseKey = key;
         mView = mActivity.getWindow().getDecorView();
+        preferenceManager = new OPreferenceManager(mView.getContext());
     }
 
     public HintCaseUtils addHint(HintCaseItem item) {
@@ -61,12 +66,15 @@ public class HintCaseUtils implements HintCase.OnClosedListener {
     }
 
     public void show() {
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                loadHint(getNextItem());
-            }
-        }, 700);
+        if (!isShowing) {
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loadHint(getNextItem());
+                    isShowing = true;
+                }
+            }, 700);
+        }
     }
 
     private HintCaseItem getNextItem() {
@@ -81,28 +89,34 @@ public class HintCaseUtils implements HintCase.OnClosedListener {
             finishHintCases();
             return;
         }
-        hintBlock = new SimpleHintContentHolder.Builder(mActivity);
-        hintBlock.setContentTitle(item.getTitle());
-        hintBlock.setContentText(item.getContent());
-        hintBlock.setTitleStyle(R.style.HintCaseTitle);
-        hintBlock.setContentStyle(R.style.HintCaseContent);
+        if (!isDone()) {
+            SimpleHintContentHolder.Builder hintBlock = new SimpleHintContentHolder.Builder(mActivity);
+            hintBlock.setContentTitle(item.getTitle());
+            hintBlock.setContentText(item.getContent());
+            hintBlock.setTitleStyle(R.style.HintCaseTitle);
+            hintBlock.setContentStyle(R.style.HintCaseContent);
 
-        if (item.getDrawableImage() != -1) {
-            hintBlock.setImageDrawableId(item.getDrawableImage());
-        }
+            if (item.getDrawableImage() != -1) {
+                hintBlock.setImageDrawableId(item.getDrawableImage());
+            }
 
-        HintCase hintCase = new HintCase(mView);
-        hintCase.setBackgroundColor(Color.parseColor("#aa000000"));
-        hintCase.setHintBlock(hintBlock.build(), new FadeInContentHolderAnimator());
-        if (item.isCircleShape()) {
-            hintCase.setTarget(mView.findViewById(item.getViewId()), new CircularShape(), HintCase.TARGET_IS_CLICKABLE);
-            hintCase.setShapeAnimators(new RevealCircleShapeAnimator(), new UnrevealCircleShapeAnimator());
-        } else {
-            hintCase.setTarget(mView.findViewById(item.getViewId()), new RectangularShape(), HintCase.TARGET_IS_CLICKABLE);
-            hintCase.setShapeAnimators(new RevealRectangularShapeAnimator(), new UnrevealRectangularShapeAnimator());
+            HintCase hintCase = new HintCase(mView);
+            hintCase.setBackgroundColor(Color.parseColor("#aa000000"));
+            hintCase.setHintBlock(hintBlock.build(), new FadeInContentHolderAnimator());
+            if (item.isCircleShape()) {
+                hintCase.setTarget(mView.findViewById(item.getViewId()), new CircularShape(), HintCase.TARGET_IS_CLICKABLE);
+                hintCase.setShapeAnimators(new RevealCircleShapeAnimator(), new UnrevealCircleShapeAnimator());
+            } else {
+                hintCase.setTarget(mView.findViewById(item.getViewId()), new RectangularShape(), HintCase.TARGET_IS_CLICKABLE);
+                hintCase.setShapeAnimators(new RevealRectangularShapeAnimator(), new UnrevealRectangularShapeAnimator());
+            }
+            hintCase.setOnClosedListener(this);
+            hintCase.show();
         }
-        hintCase.setOnClosedListener(this);
-        hintCase.show();
+    }
+
+    public Boolean isDone() {
+        return preferenceManager.getBoolean(hintCaseKey, false);
     }
 
     @Override
@@ -112,7 +126,8 @@ public class HintCaseUtils implements HintCase.OnClosedListener {
     }
 
     private void finishHintCases() {
-        // Update preference for activity/fragment
-        Log.e(">>", "Finishedddd");
+        if (!isDone())
+            preferenceManager.setBoolean(hintCaseKey, true);
+        isShowing = false;
     }
 }
