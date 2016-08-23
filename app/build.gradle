@@ -16,8 +16,13 @@ android {
         javaMaxHeapSize "2g"
     }
     buildTypes {
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
         release {
-            minifyEnabled false
+            minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -26,10 +31,10 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     compile 'com.android.support:multidex:1.0.1'
-    compile 'com.android.support:appcompat-v7:24.0.0'
-    compile 'com.android.support:cardview-v7:24.0.0'
-    compile 'com.google.android.gms:play-services:9.0.2'
-    compile 'com.android.support:design:24.0.0'
+    compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:cardview-v7:24.1.1'
+    compile 'com.google.android.gms:play-services-gcm:9.2.1'
+    compile 'com.android.support:design:24.1.1'
     compile project(':intro-slider-lib')
     compile project(':odoo-rpc-v3')
     compile project(':calendar-lib')

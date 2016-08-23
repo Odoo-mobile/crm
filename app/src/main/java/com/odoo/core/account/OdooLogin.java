@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.odoo.App;
+import com.odoo.BuildConfig;
 import com.odoo.OdooActivity;
 import com.odoo.R;
 import com.odoo.base.addons.res.ResCompany;
@@ -47,7 +48,7 @@ import odoo.listeners.OdooError;
 public class OdooLogin extends AppCompatActivity implements View.OnClickListener,
         View.OnFocusChangeListener, OdooInstancesSelectorDialog.OnInstanceSelectListener,
         OdooUserLoginSelectorDialog.IUserLoginSelectListener, IOdooConnectionListener, IOdooLoginCallback {
-
+    public static final String TAG = OdooLogin.class.getSimpleName();
     private EditText edtUsername, edtPassword, edtSelfHosted;
     private Boolean mCreateAccountRequest = false;
     private Boolean mSelfHostedURL = false;
@@ -95,6 +96,14 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         findViewById(R.id.create_account).setOnClickListener(this);
         findViewById(R.id.txvAddSelfHosted).setOnClickListener(this);
         edtSelfHosted = (EditText) findViewById(R.id.edtSelfHostedURL);
+        edtUsername = (EditText) findViewById(R.id.edtUserName);
+        edtPassword = (EditText) findViewById(R.id.edtPassword);
+
+        if (BuildConfig.DEBUG) {
+            edtSelfHosted.setText("http://192.168.199.101:8069");
+            edtUsername.setText("admin");
+            edtPassword.setText("admin");
+        }
     }
 
     private void startOdooActivity() {
@@ -169,7 +178,7 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
                         findViewById(R.id.layoutBorderDB).setVisibility(View.GONE);
                         findViewById(R.id.layoutDatabase).setVisibility(View.GONE);
                         String test_url = createServerURL(edtSelfHosted.getText().toString());
-                        Log.v("", "Testing URL :" + test_url);
+                        Log.v(TAG, "Testing URL :" + test_url);
                         try {
                             Odoo.createInstance(OdooLogin.this, test_url).setOnConnect(OdooLogin.this);
                         } catch (OdooVersionException e) {
@@ -200,9 +209,6 @@ public class OdooLogin extends AppCompatActivity implements View.OnClickListener
         String serverURL = createServerURL((mSelfHostedURL) ? edtSelfHosted.getText().toString() :
                 OConstants.URL_ODOO);
         String databaseName;
-        edtUsername = (EditText) findViewById(R.id.edtUserName);
-        edtPassword = (EditText) findViewById(R.id.edtPassword);
-
         if (mSelfHostedURL) {
             edtSelfHosted.setError(null);
             if (TextUtils.isEmpty(edtSelfHosted.getText())) {
