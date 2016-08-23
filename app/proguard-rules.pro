@@ -15,3 +15,8 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+-dontobfuscate
+-keep class * extends com.odoo.core.orm.OModel{*;}
+# Searchview v4
+-keep class android.support.v7.widget.SearchView { *; }
