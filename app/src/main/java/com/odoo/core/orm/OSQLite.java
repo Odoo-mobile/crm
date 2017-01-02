@@ -25,72 +25,39 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
 
+import com.odoo.App;
 import com.odoo.addons.crm.models.CRMCaseCateg;
 import com.odoo.addons.crm.models.CRMCaseStage;
-import com.odoo.App;
-import com.odoo.base.addons.BaseModels;
 import com.odoo.base.addons.mail.MailMessage;
 import com.odoo.base.addons.mail.MailMessageSubType;
-import com.odoo.config.Addons;
-import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.addons.OAddon;
-import com.odoo.core.support.addons.fragment.IBaseFragment;
-import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.datas.OConstants;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 
 public class OSQLite extends SQLiteOpenHelper {
     public static final String TAG = OSQLite.class.getSimpleName();
-    public static final String KEY_MODEL_CLASS_REGISTER = "key_model_class_register";
     private Context mContext;
     private OUser mUser = null;
-    private Addons mAddons;
-    private OPreferenceManager mPref;
+    private App odooApp;
 
     public OSQLite(Context context, OUser user) {
         super(context, (user != null) ? user.getDBName() : OUser.current(context).getDBName(), null
                 , OConstants.DATABASE_VERSION);
         mContext = context;
-        mAddons = new Addons();
+        odooApp = (App) context.getApplicationContext();
         mUser = (user != null) ? user : OUser.current(context);
-        mPref = new OPreferenceManager(mContext);
-        synchronized (this) {
-            if (!mPref.getBoolean(KEY_MODEL_CLASS_REGISTER, false)) {
-                mPref.setBoolean(KEY_MODEL_CLASS_REGISTER, true);
-                // Registering model class paths
-                registerModelsClassPath();
-            }
-        }
-    }
-
-    private List<OModel> getModels() {
-        List<OModel> models = new ArrayList<>();
-        models.addAll(BaseModels.baseModels(mContext, mUser));
-        for (OAddon addon : mAddons.getAddons()) {
-            IBaseFragment fragment = (IBaseFragment) addon.get();
-            try {
-                Class<Object> model = fragment.database();
-                if (model != null) {
-                    OModel dbModel = (OModel) model.getConstructor(Context.class, OUser.class)
-                            .newInstance(mContext, mUser);
-                    models.add(dbModel);
-                }
-            } catch (Exception e) {
-                Log.e(TAG, e.getMessage());
-            }
-        }
-        return models;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.i(TAG, "creating database.");
+        ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
+        HashMap<String, Class<? extends OModel>> models = registryUtils.getModels();
         OSQLHelper sqlHelper = new OSQLHelper(mContext);
-        // Creating tables
-        for (OModel model : getModels()) {
+
+        for (String key : models.keySet()) {
+            OModel model = App.getModel(mContext, key, mUser);
             sqlHelper.createStatements(model);
         }
         for (String key : sqlHelper.getStatements().keySet()) {
@@ -98,43 +65,6 @@ public class OSQLite extends SQLiteOpenHelper {
             db.execSQL(query);
             Log.i(TAG, "Table Created : " + key);
         }
-        registerModels(sqlHelper.getModels());
-    }
-
-    private void registerModels(List<String> models) {
-        OPreferenceManager mPref = new OPreferenceManager(mContext);
-        if (mPref.putStringSet("models", models)) {
-            Log.i(TAG, models.size() + " Models registered.");
-        } else {
-            Log.e(TAG, "Unable to register models");
-        }
-    }
-
-    private synchronized void registerModelsClassPath() {
-        OSQLHelper sqlHelper = new OSQLHelper(mContext);
-        List<OModel> modelsClassPath = sqlHelper.getAllModels(getModels());
-        for (OModel model : modelsClassPath) {
-            String key = model.getModelName();
-            String path = model.getClass().getName();
-            // Setting class path
-            mPref.putString(key, path);
-        }
-        Log.i(TAG, modelsClassPath.size() + " models path registered.");
-    }
-
-    private List<String> getColumns(String model_class, boolean server_columns) {
-        List<String> cols = new ArrayList<String>();
-        try {
-            OModel m = new OModel(mContext, null, null);
-            Class<?> cls = Class.forName(model_class);
-            OModel model = m.createInstance(cls);
-            for (OColumn col : model.getColumns(!server_columns)) {
-                cols.add(col.getName());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return cols;
     }
 
     @Override
@@ -144,20 +74,8 @@ public class OSQLite extends SQLiteOpenHelper {
         MailMessageSubType subType = new MailMessageSubType(mContext, mUser);
         MailMessage mailMessage = new MailMessage(mContext, mUser);
 
-        OSQLHelper osqlHelper;
-        // Dropping mail message
-        db.execSQL("DROP TABLE IF EXISTS mail_message ");
-        // re-creating mail message and sub type
-        osqlHelper = new OSQLHelper(mContext);
-        osqlHelper.createStatements(subType);
-        osqlHelper.createStatements(mailMessage);
-        for (String key : osqlHelper.getStatements().keySet()) {
-            String query = osqlHelper.getStatements().get(key);
-            db.execSQL(query);
-        }
-        registerModelsClassPath();
-        registerModels(osqlHelper.getModels());
-
+        OSQLHelper osqlHelper = new OSQLHelper(mContext);;
+        
         // Updating crm case stage model name for saas-6
         if (mUser.getOdooVersion().getServerSerie().equals("8.saas~6")) {
             osqlHelper = new OSQLHelper(mContext);
@@ -165,21 +83,16 @@ public class OSQLite extends SQLiteOpenHelper {
             CRMCaseStage caseStage = new CRMCaseStage(mContext, mUser);
             osqlHelper.createStatements(caseCateg);
             osqlHelper.createStatements(caseStage);
-            registerModels(osqlHelper.getModels());
             db.execSQL("ALTER TABLE crm_case_stage RENAME TO crm_stage");
             db.execSQL("ALTER TABLE crm_case_categ RENAME TO crm_lead_tag");
         }
 
-//            OSQLHelper sqlHelper = new OSQLHelper(mContext);
-//            for (OModel model : getModels()) {
-//                sqlHelper.createDropStatements(model);
-//            }
-//            for (String key : sqlHelper.getStatements().keySet()) {
-//                String query = sqlHelper.getStatements().get(key);
-//                db.execSQL(query);
-//                Log.i(TAG, "Table dropped " + key);
-//            }
-//            onCreate(db);
+        ModelRegistryUtils registryUtils = odooApp.getModelRegistry();
+        HashMap<String, Class<? extends OModel>> models = registryUtils.getModels();
+        for (String key : models.keySet()) {
+            OModel model = App.getModel(mContext, key, mUser);
+            if (model != null) model.onModelUpgrade(db, oldVersion, newVersion);
+        }
     }
 
     public void dropDatabase() {
@@ -194,4 +107,7 @@ public class OSQLite extends SQLiteOpenHelper {
                 "/data/" + app.getPackageName() + "/databases/" + getDatabaseName();
     }
 
+    public String getUserAndroidName() {
+        return (this.mUser != null) ? this.mUser.getAndroidName() : "";
+    }
 }

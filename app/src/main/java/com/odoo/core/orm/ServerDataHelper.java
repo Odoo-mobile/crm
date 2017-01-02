@@ -21,22 +21,23 @@ package com.odoo.core.orm;
 
 import android.content.Context;
 
+import com.google.gson.internal.LinkedTreeMap;
 import com.odoo.App;
+import com.odoo.core.rpc.Odoo;
+import com.odoo.core.rpc.helper.OArguments;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.ORecordValues;
+import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;
-import com.odoo.core.support.OdooFields;
 import com.odoo.core.utils.OdooRecordUtils;
+import com.odoo.datas.OConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import odoo.Odoo;
-import odoo.helper.OArguments;
-import odoo.helper.ODomain;
-import odoo.helper.ORecordValues;
-import odoo.helper.utils.gson.OdooRecord;
-import odoo.helper.utils.gson.OdooResult;
 
 public class ServerDataHelper {
     public static final String TAG = ServerDataHelper.class.getSimpleName();
@@ -57,7 +58,9 @@ public class ServerDataHelper {
     public List<ODataRow> nameSearch(String name, ODomain domain, int limit) {
         List<ODataRow> items = new ArrayList<>();
         if (mApp.inNetwork()) {
-            OdooResult result = mOdoo.nameSearch(mModel.getModelName(), name, domain, limit);
+            OdooResult result = mOdoo
+                    .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                    .nameSearch(mModel.getModelName(), name, domain, limit);
             if (!result.getRecords().isEmpty()) {
                 for (OdooRecord record : result.getRecords()) {
                     // FIXME : What response i'll get. I DON'T KNOW YET
@@ -71,9 +74,21 @@ public class ServerDataHelper {
         return items;
     }
 
-    public OdooResult read(odoo.helper.OdooFields fields, int id) {
+    public OdooResult read(com.odoo.core.rpc.helper.OdooFields fields, int id) {
         if (mApp.inNetwork()) {
-            return mOdoo.read(mModel.getModelName(), id, fields);
+            OdooResult result = mOdoo
+                    .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                    .read(mModel.getModelName(), id, fields);
+            if (mOdoo.getVersion().getVersionNumber() >= 10) {
+                if (result.containsKey("result") && result.get("result") instanceof ArrayList) {
+                    LinkedTreeMap record = (LinkedTreeMap) result.getArray("result").get(0);
+                    OdooResult odooResult = new OdooResult();
+                    odooResult.putAll(record);
+                    return odooResult;
+                }
+            } else {
+                return result;
+            }
         }
         return null;
     }
@@ -81,7 +96,9 @@ public class ServerDataHelper {
     public List<ODataRow> searchRecords(OdooFields fields, ODomain domain, int limit) {
         List<ODataRow> items = new ArrayList<>();
         if (mApp.inNetwork()) {
-            OdooResult result = mOdoo.searchRead(mModel.getModelName(), fields, domain, 0, limit, null);
+            OdooResult result = mOdoo
+                    .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                    .searchRead(mModel.getModelName(), fields, domain, 0, limit, null);
             if (result != null && !result.getRecords().isEmpty()) {
                 for (OdooRecord record : result.getRecords()) {
                     items.add(OdooRecordUtils.toDataRow(record));
@@ -93,10 +110,6 @@ public class ServerDataHelper {
 
     public Odoo getOdoo() {
         return mOdoo;
-    }
-
-    public OdooResult executeWorkFlow(int server_id, String signal) {
-        return mOdoo.executeWorkFlow(mModel.getModelName(), server_id, signal);
     }
 
     public Object callMethod(String method, OArguments args) {
@@ -117,7 +130,9 @@ public class ServerDataHelper {
         if (context != null) {
             args.add(mOdoo.updateContext(context));
         }
-        OdooResult result = mOdoo.callMethod(model, method, args, kwargs, context);
+        OdooResult result = mOdoo
+                .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                .callMethod(model, method, args, kwargs, context);
         if (result.has("result")) {
             return result.get("result");
         }
@@ -133,5 +148,9 @@ public class ServerDataHelper {
     public int updateOnServer(ORecordValues data, Integer id) {
         mOdoo.updateRecord(mModel.getModelName(), data, id);
         return mModel.selectRowId(id);
+    }
+
+    public OdooResult executeWorkFlow(int server_id, String signal) {
+        return mOdoo.executeWorkFlow(mModel.getModelName(), server_id, signal);
     }
 }

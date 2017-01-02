@@ -53,7 +53,6 @@ import com.odoo.core.account.OdooUserAskPassword;
 import com.odoo.core.account.OdooUserObjectUpdater;
 import com.odoo.core.auth.OdooAccountManager;
 import com.odoo.core.auth.OdooAuthenticator;
-import com.odoo.core.orm.OModel;
 import com.odoo.core.support.OUser;
 import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.support.addons.fragment.IBaseFragment;
@@ -69,7 +68,6 @@ import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.drawer.DrawerUtils;
 import com.odoo.core.utils.sys.IOnActivityResultListener;
 import com.odoo.core.utils.sys.IOnBackPressListener;
-import com.odoo.R;
 
 import java.util.List;
 
@@ -288,7 +286,7 @@ public class OdooActivity extends OdooCompatActivity {
         TextView url = (TextView) chosenAccountView.findViewById(R.id.profile_url_text);
 
         name.setText(currentUser.getName());
-        url.setText((currentUser.isOAuthLogin()) ? currentUser.getInstanceURL() : currentUser.getHost());
+        url.setText(currentUser.getHost());
 
         if (!currentUser.getAvatar().equals("false")) {
             Bitmap bitmap = BitmapUtils.getBitmapImage(this, currentUser.getAvatar());
@@ -391,7 +389,7 @@ public class OdooActivity extends OdooCompatActivity {
                         avatar.setImageBitmap(img);
                 }
                 OControls.setText(view, R.id.profile_name_text, user.getName());
-                OControls.setText(view, R.id.profile_url_text, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
+                OControls.setText(view, R.id.profile_url_text, user.getHost());
                 // Setting login event for other account
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -405,8 +403,6 @@ public class OdooActivity extends OdooCompatActivity {
                                                 // Logging in to other account
                                                 OdooAccountManager.login(OdooActivity.this,
                                                         user.getAndroidName());
-                                                OModel.sqLite = null;
-
                                                 mAccountBoxExpanded = false;
                                                 accountBoxToggle();
                                                 mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -526,7 +522,6 @@ public class OdooActivity extends OdooCompatActivity {
                     accountBoxToggle();
                 }
                 OdooAccountManager.login(this, data.getStringExtra(KEY_NEW_USER_NAME));
-                OModel.sqLite = null;
                 restartActivity();
             }
             if (requestCode == REQUEST_ACCOUNTS_MANAGE) {
@@ -627,6 +622,10 @@ public class OdooActivity extends OdooCompatActivity {
             spinner.setAdapter(null);
         }
         return spinner;
+    }
+
+    public boolean hasActionBarSpinner() {
+        return mHasActionBarSpinner;
     }
 
     public void refreshDrawer() {

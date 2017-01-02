@@ -27,7 +27,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Color;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,15 +48,18 @@ import android.widget.Toast;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OM2ORecord;
 import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.utils.OControls;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class OSelectionField extends LinearLayout implements IOControlData,
-        AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener, RadioGroup.OnCheckedChangeListener {
+        AdapterView.OnItemSelectedListener, AdapterView.OnItemClickListener,
+        RadioGroup.OnCheckedChangeListener {
     public static final String TAG = OSelectionField.class.getSimpleName();
 
     private Context mContext;
@@ -75,6 +81,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
     private float textSize = -1;
     private int appearance = -1;
     private int textColor = Color.BLACK;
+    private OForm formView;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public OSelectionField(Context context, AttributeSet attrs,
@@ -181,34 +188,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
 
                             @Override
                             public void onClick(View v) {
-                                Intent intent = new Intent(mContext,
-                                        SearchableItemActivity.class);
-                                intent.putExtra("resource_id", mResourceArray);
-                                intent.putExtra("selected_position", getPos());
-                                intent.putExtra(OColumn.ROW_ID, getPos());
-                                intent.putExtra("search_hint", getLabel());
-                                if (mCol != null) {
-                                    intent.putExtra("column_name", mCol.getName());
-                                }
-                            /*
-                             * FIXME: What about filter domain. Pass detail for
-							 * filter domain
-							 */
-                                intent.putExtra("model", mModel.getModelName());
-                                intent.putExtra("live_search",
-                                        (mWidget == OField.WidgetType.SearchableLive));
-                                try {
-                                    mContext.unregisterReceiver(valueReceiver);
-                                } catch (Exception e) {
-
-                                }
-                                try {
-                                    mContext.registerReceiver(valueReceiver,
-                                            new IntentFilter("searchable_value_select"));
-                                } catch (Exception e) {
-
-                                }
-                                mContext.startActivity(intent);
+                                startSearchableActivity();
                             }
                         });
                         if (textSize > -1) {
@@ -247,6 +227,28 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         }
     }
 
+    private void startSearchableActivity() {
+        LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(mContext);
+        Intent intent = new Intent(mContext, SearchableItemActivity.class);
+        intent.putExtra("resource_id", mResourceArray);
+        intent.putExtra("selected_position", getPos());
+        intent.putExtra(OColumn.ROW_ID, getPos());
+        intent.putExtra("search_hint", getLabel());
+        if (mCol != null) {
+            intent.putExtra("column_name", mCol.getName());
+            if (mCol.hasDomainFilterColumn()) {
+                OValues formValues = formView.getControlValues();
+                Bundle formData = formValues != null ?
+                        formValues.toFilterColumnsBundle(mModel, mCol) : new Bundle();
+                intent.putExtra("form_data", formData);
+            }
+        }
+        intent.putExtra("model", mModel.getModelName());
+        intent.putExtra("live_search", (mWidget == OField.WidgetType.SearchableLive));
+        broadcastManager.registerReceiver(valueReceiver, new IntentFilter("searchable_value_select"));
+        mContext.startActivity(intent);
+    }
+
     private void createItems() {
         items.clear();
         if (!mContext.getClass().getSimpleName().contains("BridgeContext")) {
@@ -279,7 +281,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 }
                 items.addAll(rows);
             } else {
-                items.addAll(getRecordItems(mModel, mCol));
+                OValues formValues = formView.getControlValues();
+                Bundle data = formValues != null ? formValues
+                        .toFilterColumnsBundle(mModel, mCol) : new Bundle();
+                items.addAll(getRecordItems(mModel, mCol, data));
             }
         }
     }
@@ -322,7 +327,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                                     .setChecked(true);
                             row = items.get(getPos());
                         } else {
-                            Integer row_id = null;
+                            Integer row_id;
                             if (mValue instanceof OM2ORecord) {
                                 row = ((OM2ORecord) mValue).browse();
                                 row_id = row.getInt(OColumn.ROW_ID);
@@ -351,7 +356,8 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                             else if (mValue instanceof Integer)
                                 row = getRecordData((Integer) mValue);
                         }
-                        txvView.setText(row.getString(mModel.getDefaultNameColumn()));
+                        if (row != null)
+                            txvView.setText(row.getString(mModel.getDefaultNameColumn()));
                         if (txvView.getTag() != null) {
                             AlertDialog dialog = (AlertDialog) txvView.getTag();
                             dialog.dismiss();
@@ -367,6 +373,9 @@ public class OSelectionField extends LinearLayout implements IOControlData,
                 } else if (mCol.getType().isAssignableFrom(OSelection.class)) {
                     int pos = getPos();
                     mSpinner.setSelection(pos);
+                    if (pos != -1) {
+                        row = mAdapter.getItem(pos);
+                    }
                 } else {
                     Integer row_id = null;
                     if (mValue instanceof OM2ORecord) {
@@ -389,8 +398,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (mResourceArray != -1 || mCol.getType().isAssignableFrom(OSelection.class)) {
                 int position = getPos();
                 // Ignoring if default value not set for field.
-                if (position != -1)
-                    row = items.get(position);
+                if (position != -1) row = items.get(position);
             } else {
                 if (mValue instanceof OM2ORecord) {
                     row = ((OM2ORecord) mValue).browse();
@@ -410,8 +418,8 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             if (!row.getString(mModel.getDefaultNameColumn()).equals("false"))
                 txvView.setText(row.getString(mModel.getDefaultNameColumn()));
         }
-        if (isEditable() && mValueUpdateListener != null && (mValue instanceof Integer &&
-                (int) mValue != -1)) {
+        if (isEditable() && mValueUpdateListener != null) {
+            if (mValue instanceof Integer && (int) mValue == -1) return;
             mValueUpdateListener.onValueUpdate(row);
         }
     }
@@ -482,6 +490,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             row = items.get(0);
         }
         return row;
+    }
+
+    public void setFormView(OForm formView) {
+        this.formView = formView;
     }
 
     private class SpinnerAdapter extends ArrayAdapter<ODataRow> {
@@ -567,8 +579,10 @@ public class OSelectionField extends LinearLayout implements IOControlData,
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            setValue(intent.getIntExtra("selected_position", -1));
-            mContext.unregisterReceiver(valueReceiver);
+            if (mCol.getName().equals(intent.getStringExtra("column_name"))) {
+                setValue(intent.getIntExtra("selected_position", -1));
+                LocalBroadcastManager.getInstance(mContext).unregisterReceiver(valueReceiver);
+            }
         }
     };
 
@@ -576,26 +590,29 @@ public class OSelectionField extends LinearLayout implements IOControlData,
         mModel = model;
     }
 
-    public static List<ODataRow> getRecordItems(OModel model, OColumn column) {
-        List<ODataRow> items = new ArrayList<ODataRow>();
+    public static List<ODataRow> getRecordItems(OModel model, OColumn column, Bundle formData) {
+        List<ODataRow> items = new ArrayList<>();
 
         OModel rel_model = model.createInstance(column.getType());
-        StringBuffer whr = new StringBuffer();
-        List<Object> args_list = new ArrayList<Object>();
-        // Skipping onchange domain filter
-        if (!column.hasDomainFilterColumn()) {
-            for (String key : column.getDomains().keySet()) {
-                OColumn.ColumnDomain domain = column.getDomains().get(key);
-                if (domain.getConditionalOperator() != null) {
-                    whr.append(domain.getConditionalOperator());
-                } else {
-                    whr.append(" ");
-                    whr.append(domain.getColumn());
-                    whr.append(" ");
-                    whr.append(domain.getOperator());
-                    whr.append(" ? ");
-                    args_list.add(domain.getValue().toString());
-                }
+        StringBuilder whr = new StringBuilder();
+        List<Object> args_list = new ArrayList<>();
+
+        LinkedHashMap<String, OColumn.ColumnDomain> domains = new LinkedHashMap<>();
+        domains.putAll(column.getDomains());
+        if (column.hasDomainFilterColumn()) {
+            domains.putAll(column.getDomainFilterParser(model).getDomain(formData));
+        }
+        for (String key : domains.keySet()) {
+            OColumn.ColumnDomain domain = domains.get(key);
+            if (domain.getConditionalOperator() != null) {
+                whr.append(domain.getConditionalOperator());
+            } else {
+                whr.append(" ");
+                whr.append(domain.getColumn());
+                whr.append(" ");
+                whr.append(domain.getOperator());
+                whr.append(" ? ");
+                args_list.add(domain.getValue() + "");
             }
         }
         String where = null;
@@ -604,8 +621,7 @@ public class OSelectionField extends LinearLayout implements IOControlData,
             where = whr.toString();
             args = args_list.toArray(new String[args_list.size()]);
         }
-        List<ODataRow> rows = new ArrayList<>();
-        rows = rel_model.select(new String[]{rel_model.getDefaultNameColumn()}, where,
+        List<ODataRow> rows = rel_model.select(new String[]{rel_model.getDefaultNameColumn()}, where,
                 args, rel_model.getDefaultNameColumn());
         ODataRow row = new ODataRow();
         row.put(OColumn.ROW_ID, -1);

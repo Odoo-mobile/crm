@@ -45,7 +45,7 @@
                 <odoo.controls.OField
                     android:layout_width="match_parent"
                     android:id="@+id/fname"
-                    app:defaultValue="/"
+                    app:defaultFieldValue="/"
                     app:fieldName="name"
                     app:showLabel="false"
                     app:showIcon="false"
@@ -78,7 +78,7 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     app:fieldName="date_order"
-                    app:defaultValue="now()"
+                    app:defaultFieldValue="now()"
                     app:showLabel="true"
                     app:iconResource="@drawable/ic_action_time_clock"
                     app:parsePattern="MMM dd yyyy, hh:MM a"

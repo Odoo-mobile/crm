@@ -181,7 +181,7 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setVisible(mView, R.id.swipe_container);
-                    OControls.setGone(mView, R.id.customer_no_items);
+                    OControls.setGone(mView, R.id.data_list_no_item);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, CRMLeads.this);
                 }
             }, 500);
@@ -195,8 +195,8 @@ public class CRMLeads extends BaseFragment implements OCursorListAdapter.OnViewB
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
-                    OControls.setVisible(mView, R.id.customer_no_items);
-                    setHasSwipeRefreshView(mView, R.id.customer_no_items, CRMLeads.this);
+                    OControls.setVisible(mView, R.id.data_list_no_item);
+                    setHasSwipeRefreshView(mView, R.id.data_list_no_item, CRMLeads.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_leads
                     );
                     OControls.setText(mView, R.id.title, "No Leads Found");

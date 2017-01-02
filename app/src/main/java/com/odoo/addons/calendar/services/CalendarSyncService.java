@@ -39,8 +39,6 @@ import com.odoo.core.utils.reminder.ReminderUtils;
 import java.util.Date;
 import java.util.List;
 
-import odoo.Odoo;
-
 public class CalendarSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = CalendarSyncService.class.getSimpleName();
     public static final int SYNC_SLEEP_DELAY = 2000;

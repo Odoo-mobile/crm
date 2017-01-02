@@ -10,9 +10,7 @@
     <color name="body_text_1">#de000000</color>
     <color name="body_text_2">#8a000000</color>
     <color name="body_text_3">#60000000</color>
-    <color name="body_text_disabled">#44000000</color>
     <color name="body_text_1_inverse">#deffffff</color>
-    <color name="body_text_2_inverse">#8affffff</color>
 
     <!-- Text Sizes -->
     <dimen name="text_size_xsmall">11sp</dimen>
@@ -23,5 +21,4 @@
     <dimen name="text_size_large">18sp</dimen>
     <dimen name="text_size_xlarge">20sp</dimen>
     <dimen name="text_size_xxlarge">25sp</dimen>
-
 </resources>

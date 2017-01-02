@@ -26,14 +26,13 @@ import android.os.Bundle;
 import com.odoo.addons.phonecall.models.CRMPhoneCalls;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
 
 import java.util.List;
-
-import odoo.helper.ODomain;
 
 public class PhoneCallSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = PhoneCallSyncService.class.getSimpleName();

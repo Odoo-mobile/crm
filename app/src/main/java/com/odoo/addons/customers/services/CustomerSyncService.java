@@ -23,11 +23,10 @@ import android.content.Context;
 import android.os.Bundle;
 
 import com.odoo.base.addons.res.ResPartner;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
-
-import odoo.helper.ODomain;
 
 public class CustomerSyncService extends OSyncService {
     public static final String TAG = CustomerSyncService.class.getSimpleName();

@@ -55,7 +55,7 @@
                     app:showLabel="false"
                     app:controlLabel="Mark won"
                     app:fieldType="Boolean"
-                    app:defaultValue="false"
+                    app:defaultFieldValue="false"
                     app:fieldLabelColor="@color/body_text_3"
                     app:fieldTextAppearance="?android:textAppearanceMedium"
                     android:layout_width="match_parent"

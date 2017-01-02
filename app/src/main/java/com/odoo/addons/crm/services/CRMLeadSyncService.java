@@ -29,12 +29,11 @@ import com.odoo.addons.crm.models.CRMCaseStage;
 import com.odoo.addons.crm.models.CRMLead;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
 import com.odoo.core.support.OUser;
-
-import odoo.helper.ODomain;
 
 public class CRMLeadSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = CRMLeadSyncService.class.getSimpleName();

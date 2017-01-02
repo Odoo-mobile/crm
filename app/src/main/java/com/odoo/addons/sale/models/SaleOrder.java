@@ -42,6 +42,7 @@ import com.odoo.core.orm.fields.types.ODateTime;
 import com.odoo.core.orm.fields.types.OFloat;
 import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.OArguments;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OResource;
 
@@ -50,8 +51,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.List;
-
-import odoo.helper.OArguments;
 
 public class SaleOrder extends OModel {
     public static final String TAG = SaleOrder.class.getSimpleName();

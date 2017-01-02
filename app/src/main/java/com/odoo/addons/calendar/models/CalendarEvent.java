@@ -37,11 +37,10 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
 
 import org.json.JSONArray;
-
-import odoo.helper.ODomain;
 
 public class CalendarEvent extends OModel {
     public static final String TAG = CalendarEvent.class.getSimpleName();

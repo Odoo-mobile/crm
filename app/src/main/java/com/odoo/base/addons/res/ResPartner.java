@@ -20,9 +20,11 @@
 package com.odoo.base.addons.res;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
 import com.odoo.addons.sale.models.AccountPaymentTerm;
+import com.odoo.BuildConfig;
 import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
@@ -38,7 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResPartner extends OModel {
-    public static final String AUTHORITY = "com.odoo.crm.provider.content.sync.res_partner";
+    public static final String AUTHORITY = BuildConfig.APPLICATION_ID +
+            ".provider.content.sync.res_partner";
+
     OColumn name = new OColumn("Name", OVarchar.class).setSize(100).setRequired();
     OColumn is_company = new OColumn("Is Company", OBoolean.class).setDefaultValue(false);
     OColumn image_small = new OColumn("Avatar", OBlob.class).setDefaultValue(false);
@@ -53,6 +57,9 @@ public class ResPartner extends OModel {
     OColumn company_id = new OColumn("Company", ResCompany.class, OColumn.RelationType.ManyToOne);
     OColumn parent_id = new OColumn("Related Company", ResPartner.class, OColumn.RelationType.ManyToOne)
             .addDomain("is_company", "=", true);
+
+    @Odoo.Domain("[['country_id', '=', @country_id]]")
+    OColumn state_id = new OColumn("State", ResCountryState.class, OColumn.RelationType.ManyToOne);
     OColumn country_id = new OColumn("Country", ResCountry.class, OColumn.RelationType.ManyToOne);
     OColumn customer = new OColumn("Customer", OBoolean.class).setDefaultValue("true");
     OColumn comment = new OColumn("Internal Note", OText.class);
@@ -115,5 +122,10 @@ public class ResPartner extends OModel {
 
     public Uri liveSearchURI() {
         return uri().buildUpon().appendPath("live_searchable_customer").build();
+    }
+
+    @Override
+    public void onModelUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Execute upgrade script
     }
 }

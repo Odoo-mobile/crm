@@ -25,9 +25,8 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.fields.OColumn;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
-
-import odoo.helper.ODomain;
 
 public class CRMPhoneCallsCategory extends OModel {
     public static final String TAG = CRMPhoneCallsCategory.class.getSimpleName();

@@ -43,7 +43,7 @@
                     app:showIcon="false"
                     app:controlLabel="@string/label_conversion_action"
                     app:fieldType="Selection"
-                    app:defaultValue="2"
+                    app:defaultFieldValue="2"
                     app:fieldLabelColor="@color/body_text_3"
                     app:fieldTextAppearance="?android:textAppearanceMedium"
                     app:valueArray="@array/array_conversation_actions"

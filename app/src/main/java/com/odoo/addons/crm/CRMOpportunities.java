@@ -205,7 +205,7 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setVisible(mView, R.id.swipe_container);
-                    OControls.setGone(mView, R.id.customer_no_items);
+                    OControls.setGone(mView, R.id.data_list_no_item);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, CRMOpportunities.this);
                 }
             }, 500);
@@ -219,8 +219,8 @@ public class CRMOpportunities extends BaseFragment implements OCursorListAdapter
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
-                    OControls.setVisible(mView, R.id.customer_no_items);
-                    setHasSwipeRefreshView(mView, R.id.customer_no_items, CRMOpportunities.this);
+                    OControls.setVisible(mView, R.id.data_list_no_item);
+                    setHasSwipeRefreshView(mView, R.id.data_list_no_item, CRMOpportunities.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_opportunities);
                     if (getActivity() != null)
                         OControls.setText(mView, R.id.title, OResource.string(getActivity(), R.string.label_no_opportunity_found));

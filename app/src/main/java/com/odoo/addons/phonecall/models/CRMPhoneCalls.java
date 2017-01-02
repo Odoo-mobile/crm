@@ -38,6 +38,7 @@ import com.odoo.core.orm.fields.types.OInteger;
 import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.fields.types.OText;
 import com.odoo.core.orm.fields.types.OVarchar;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.reminder.ReminderUtils;
@@ -45,8 +46,6 @@ import com.odoo.core.utils.reminder.ReminderUtils;
 import org.json.JSONArray;
 
 import java.util.Date;
-
-import odoo.helper.ODomain;
 
 public class CRMPhoneCalls extends OModel {
     public static final String TAG = CRMPhoneCalls.class.getSimpleName();

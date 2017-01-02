@@ -176,7 +176,8 @@ public abstract class BaseFragment extends Fragment implements IBaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        onNavSpinnerDestroy();
+        if (!parent().hasActionBarSpinner())
+            onNavSpinnerDestroy();
     }
 
     protected void onNavSpinnerDestroy() {

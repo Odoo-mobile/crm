@@ -140,13 +140,13 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.changeCursor(data);
-        if (data.getCount() > 0) {
+        if (data != null && data.getCount() > 0) {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setVisible(mView, R.id.swipe_container);
-                    OControls.setGone(mView, R.id.customer_no_items);
+                    OControls.setGone(mView, R.id.data_list_no_item);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, Customers.this);
                 }
             }, 500);
@@ -156,8 +156,8 @@ public class Customers extends BaseFragment implements ISyncStatusObserverListen
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
-                    OControls.setVisible(mView, R.id.customer_no_items);
-                    setHasSwipeRefreshView(mView, R.id.customer_no_items, Customers.this);
+                    OControls.setVisible(mView, R.id.data_list_no_item);
+                    setHasSwipeRefreshView(mView, R.id.data_list_no_item, Customers.this);
                     OControls.setImage(mView, R.id.icon, R.drawable.ic_action_customers);
                     OControls.setText(mView, R.id.title, _s(R.string.label_no_customer_found));
                     OControls.setText(mView, R.id.subTitle, "");

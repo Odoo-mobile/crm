@@ -21,15 +21,24 @@ package com.odoo.core.auth;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
+import android.accounts.AccountManagerFuture;
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.BoolRes;
+import android.support.design.widget.BottomSheetDialog;
 import android.util.Log;
 
 import com.odoo.App;
-import com.odoo.core.orm.OModelRegistry;
+import com.odoo.core.orm.OModel;
+import com.odoo.core.orm.OSQLite;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.sys.OCacheUtils;
 
+import java.io.IOException;
+import java.net.Authenticator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -116,10 +125,33 @@ public class OdooAccountManager {
         OUser user = getDetails(context, username);
         if (user != null) {
             AccountManager accountManager = AccountManager.get(context);
-            accountManager.removeAccount(user.getAccount(), null, null);
-            return true;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                if (accountManager.removeAccountExplicitly(user.getAccount())) {
+                    dropDatabase(user);
+                }
+                return true;
+            } else {
+                try {
+                    AccountManagerFuture<Boolean> result = accountManager.
+                            removeAccount(user.getAccount(), null, null);
+                    if (result.getResult()) {
+                        dropDatabase(user);
+                    }
+                    return true;
+                } catch (OperationCanceledException | IOException | AuthenticatorException e) {
+                    e.printStackTrace();
+                }
+            }
         }
         return false;
+    }
+
+    public static void dropDatabase(OUser user) {
+        OSQLite sqLite = App.getSQLite(user.getAndroidName());
+        if (sqLite != null) {
+            sqLite.dropDatabase();
+            App.setSQLite(user.getAndroidName(), null);
+        }
     }
 
     public static OUser updateUserData(Context context, OUser user, OUser newData) {
@@ -206,9 +238,6 @@ public class OdooAccountManager {
         // Setting odoo instance to null
         App app = (App) context.getApplicationContext();
         app.setOdoo(null, null);
-        // Clearing models registry
-        OModelRegistry registry = new OModelRegistry();
-        registry.clearAll();
         OUser activeUser = getActiveUser(context);
         // Logging out user if any
         if (activeUser != null) {

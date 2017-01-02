@@ -40,6 +40,8 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.BitmapUtils;
 import com.odoo.core.utils.IntentUtils;
@@ -47,8 +49,6 @@ import com.odoo.core.utils.OStringColorUtil;
 
 import odoo.controls.OField;
 import odoo.controls.OForm;
-import odoo.helper.OdooFields;
-import odoo.helper.utils.gson.OdooResult;
 
 public class CustomerDetails extends OdooCompatActivity
         implements View.OnClickListener, OField.IOnFieldValueChangeListener {
@@ -170,7 +170,7 @@ public class CustomerDetails extends OdooCompatActivity
                 IntentUtils.requestCall(this, record.getString("mobile"));
                 break;
             case R.id.captureImage:
-                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_HIGH_IMAGE);
+                fileManager.requestForFile(OFileManager.RequestType.IMAGE_OR_CAPTURE_IMAGE);
                 break;
         }
     }

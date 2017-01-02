@@ -1,5 +1,6 @@
 package com.odoo.widgets.slider;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -48,7 +49,8 @@ public class SliderPagerAdapter extends FragmentStatePagerAdapter {
         return mItems.size();
     }
 
-    class PageFragment extends Fragment {
+    @SuppressLint("ValidFragment")
+    public class PageFragment extends Fragment {
         @Override
         public View onCreateView(LayoutInflater inflater,
                                  @Nullable ViewGroup container,

@@ -181,7 +181,7 @@ public class Sales extends BaseFragment implements
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setVisible(mView, R.id.swipe_container);
-                    OControls.setGone(mView, R.id.customer_no_items);
+                    OControls.setGone(mView, R.id.data_list_no_item);
                     setHasSwipeRefreshView(mView, R.id.swipe_container, Sales.this);
                 }
             }, 500);
@@ -195,8 +195,8 @@ public class Sales extends BaseFragment implements
                 public void run() {
                     OControls.setGone(mView, R.id.loadingProgress);
                     OControls.setGone(mView, R.id.swipe_container);
-                    OControls.setVisible(mView, R.id.customer_no_items);
-                    setHasSwipeRefreshView(mView, R.id.customer_no_items, Sales.this);
+                    OControls.setVisible(mView, R.id.data_list_no_item);
+                    setHasSwipeRefreshView(mView, R.id.data_list_no_item, Sales.this);
                     OControls.setImage(mView, R.id.icon,
                             (mType == Type.Quotation) ? R.drawable.ic_action_quotation : R.drawable.ic_action_sale_order);
                     OControls.setText(mView, R.id.title, "No " + mType + " Found");

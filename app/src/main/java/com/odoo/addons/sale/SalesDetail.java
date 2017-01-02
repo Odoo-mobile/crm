@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,6 +43,8 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.ServerDataHelper;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.helper.OArguments;
+import com.odoo.core.rpc.helper.ORecordValues;
 import com.odoo.core.support.OdooCompatActivity;
 import com.odoo.core.utils.JSONUtils;
 import com.odoo.core.utils.OAlert;
@@ -59,11 +60,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import odoo.helper.OArguments;
 import odoo.controls.ExpandableListControl;
 import odoo.controls.OField;
 import odoo.controls.OForm;
-import odoo.helper.ORecordValues;
 
 import static com.odoo.addons.sale.Sales.Type;
 

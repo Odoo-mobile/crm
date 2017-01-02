@@ -122,7 +122,7 @@
                 android:layout_width="match_parent"
                 app:fieldName="date"
                 app:parsePattern="MMM, dd hh:mm a"
-                app:defaultValue="now()"
+                app:defaultFieldValue="now()"
                 app:iconResource="@drawable/ic_action_time_clock"
                 app:fieldTextSize="@dimen/text_size_xmedium"
                 android:layout_height="wrap_content">

@@ -26,6 +26,7 @@ import android.os.Bundle;
 import com.odoo.addons.sale.models.AccountPaymentTerm;
 import com.odoo.addons.sale.models.SaleOrder;
 import com.odoo.core.orm.ODataRow;
+import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.service.ISyncFinishListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.service.OSyncService;
@@ -33,9 +34,6 @@ import com.odoo.core.support.OUser;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import odoo.helper.ODomain;
-
 
 public class SaleOrderSyncService extends OSyncService implements ISyncFinishListener {
     public static final String TAG = SaleOrderSyncService.class.getSimpleName();

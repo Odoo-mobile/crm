@@ -1,20 +1,20 @@
 /**
  * Odoo, Open Source Management Solution
  * Copyright (C) 2012-today Odoo SA (<http:www.odoo.com>)
- *
+ * <p>
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
  * published by the Free Software Foundation, either version 3 of the
  * License, or (at your option) any later version
- *
+ * <p>
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Affero General Public License for more details
- *
+ * <p>
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <http:www.gnu.org/licenses/>
- *
+ * <p>
  * Created on 19/12/14 2:30 PM
  */
 package com.odoo.core.account;
@@ -22,6 +22,7 @@ package com.odoo.core.account;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
@@ -67,7 +68,7 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
 
     private void generateView(View view, OUser user) {
         OControls.setText(view, R.id.accountName, user.getName());
-        OControls.setText(view, R.id.accountURL, (user.isOAuthLogin()) ? user.getInstanceURL() : user.getHost());
+        OControls.setText(view, R.id.accountURL, user.getHost());
         OControls.setImage(view, R.id.profile_image, R.drawable.avatar);
         if (!user.getAvatar().equals("false")) {
             Bitmap bmp = BitmapUtils.getBitmapImage(this, user.getAvatar());
@@ -153,17 +154,9 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         OUser user = (OUser) v.getTag();
-                        OdooAccountManager.removeAccount(ManageAccounts.this, user.getAndroidName());
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(ManageAccounts.this, OResource.string(ManageAccounts.this,
-                                        R.string.toast_account_removed), Toast.LENGTH_LONG).show();
-                                setResult(RESULT_OK);
-                                finish();
-                            }
-                        }, OdooActivity.DRAWER_ITEM_LAUNCH_DELAY);
-
+                        new AccountDeleteTask().execute(user);
+                        setResult(RESULT_OK);
+                        finish();
                     }
                 });
                 builder.setNegativeButton(R.string.label_cancel, new DialogInterface.OnClickListener() {
@@ -174,6 +167,30 @@ public class ManageAccounts extends AppCompatActivity implements View.OnClickLis
                 });
                 builder.show();
                 break;
+        }
+    }
+
+    private class AccountDeleteTask extends AsyncTask<OUser, Void, Boolean> {
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected Boolean doInBackground(OUser... odooUsers) {
+            return OdooAccountManager.removeAccount(ManageAccounts.this, odooUsers[0].getAndroidName());
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (result) {
+                Toast.makeText(ManageAccounts.this, R.string.toast_account_removed,
+                        Toast.LENGTH_LONG).show();
+                accounts.clear();
+                accounts.addAll(OdooAccountManager.getAllAccounts(ManageAccounts.this));
+                mAdapter.notifyDataSetChanged(accounts);
+            }
         }
     }
 

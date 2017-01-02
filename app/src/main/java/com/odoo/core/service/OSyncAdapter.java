@@ -37,26 +37,24 @@ import com.odoo.core.orm.ODataRow;
 import com.odoo.core.orm.OModel;
 import com.odoo.core.orm.OValues;
 import com.odoo.core.orm.fields.OColumn;
+import com.odoo.core.rpc.Odoo;
+import com.odoo.core.rpc.handler.OdooVersionException;
+import com.odoo.core.rpc.helper.ODomain;
+import com.odoo.core.rpc.helper.ORecordValues;
+import com.odoo.core.rpc.helper.OdooFields;
+import com.odoo.core.rpc.helper.utils.gson.OdooRecord;
+import com.odoo.core.rpc.helper.utils.gson.OdooResult;
 import com.odoo.core.support.OUser;
 import com.odoo.core.utils.ODateUtils;
 import com.odoo.core.utils.OPreferenceManager;
 import com.odoo.core.utils.OResource;
 import com.odoo.core.utils.OdooRecordUtils;
 import com.odoo.core.utils.logger.OLog;
+import com.odoo.datas.OConstants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import odoo.Odoo;
-import odoo.handler.OdooVersionException;
-import odoo.helper.ODomain;
-import odoo.helper.ORecordValues;
-import odoo.helper.OdooFields;
-import odoo.helper.utils.gson.OdooRecord;
-import odoo.helper.utils.gson.OdooResult;
-import odoo.listeners.IOdooLoginCallback;
-import odoo.listeners.OdooError;
 
 public class OSyncAdapter extends AbstractThreadedSyncAdapter {
     public static final String TAG = OSyncAdapter.class.getSimpleName();
@@ -179,11 +177,14 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
                 }
             }
             // Getting data
-            OdooResult response = mOdoo.searchRead(model.getModelName(), getFields(model)
-                    , domain, 0, mSyncDataLimit, "create_date DESC");
+            OdooResult response = mOdoo
+                    .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                    .searchRead(model.getModelName(), getFields(model)
+                            , domain, 0, mSyncDataLimit, "create_date DESC");
             if (response == null) {
                 // FIXME: Check in library. May be timeout issue with slow network.
                 Log.w(TAG, "Response null from server.");
+                model.onSyncTimedOut();
                 return;
             }
             if (response.containsKey("error")) {
@@ -230,6 +231,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             model.onSyncFinished();
         } catch (Exception e) {
             e.printStackTrace();
+            model.onSyncFailed();
         }
         // Performing next sync if any in service
         if (mSyncFinishListeners.containsKey(model.getModelName())) {
@@ -261,7 +263,7 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
             if (!record.getUniqueIds().isEmpty()) {
                 ODomain domain = new ODomain();
                 domain.add("id", "in", record.getUniqueIds());
-                syncData(rel_model, user, domain, result, true, false);
+                syncData(rel_model, user, domain, result, false, false);
             }
             // Updating manyToOne record with their relation record row_id
             switch (record.getRelationType()) {
@@ -292,11 +294,10 @@ public class OSyncAdapter extends AbstractThreadedSyncAdapter {
         Odoo odoo = app.getOdoo(user);
         try {
             if (odoo == null) {
-                odoo = Odoo.createQuickInstance(context, (user.isOAuthLogin())
-                        ? user.getInstanceURL() : user.getHost());
-                odoo.helper.OUser mUser =
-                        odoo.authenticate(user.getUsername(), user.getPassword(), (user.isOAuthLogin()) ?
-                                user.getInstanceDatabase() : user.getDatabase());
+                odoo = Odoo.createQuickInstance(context, user.getHost());
+                OUser mUser = odoo
+                        .withRetryPolicy(OConstants.RPC_REQUEST_TIME_OUT, OConstants.RPC_REQUEST_RETRIES)
+                        .authenticate(user.getUsername(), user.getPassword(), user.getDatabase());
                 app.setOdoo(odoo, user);
                 if (mUser != null) {
                     ResCompany company = new ResCompany(context, user);
