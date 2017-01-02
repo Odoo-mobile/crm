@@ -43,7 +43,7 @@ import odoo.listeners.OdooError;
 
 public class OdooLogin extends AppCompatActivity implements View.OnClickListener,
         View.OnFocusChangeListener, OdooInstancesSelectorDialog.OnInstanceSelectListener,
-        OdooUserLoginSelectorDialog.IUserLoginSelectListener, IOdooConnectionListener, IOdooLoginCallback {
+        IOdooConnectionListener, IOdooLoginCallback {
 
     public static final String TAG = OdooLogin.class.getSimpleName();
     private EditText edtUsername, edtPassword, edtSelfHosted;
