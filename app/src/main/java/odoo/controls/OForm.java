@@ -29,7 +29,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -227,6 +226,7 @@ public class OForm extends LinearLayout {
         if (mRecord != null && values != null) {
             for (String key : values.keys()) {
                 if (values.get(key).toString().equals("false") &&
+                        mRecord.get(key) != null &&
                         !mRecord.get(key).toString().equals("false")) {
                     values.put(key, mRecord.get(key));
                 }
