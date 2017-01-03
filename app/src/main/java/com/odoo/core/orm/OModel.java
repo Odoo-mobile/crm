@@ -41,7 +41,6 @@ import com.odoo.core.orm.fields.types.OSelection;
 import com.odoo.core.orm.provider.BaseModelProvider;
 import com.odoo.core.rpc.helper.ODomain;
 import com.odoo.core.rpc.helper.OdooVersion;
-import com.odoo.core.rpc.listeners.IModuleInstallListener;
 import com.odoo.core.service.ISyncServiceListener;
 import com.odoo.core.service.OSyncAdapter;
 import com.odoo.core.support.OUser;

@@ -156,17 +156,19 @@ public class OForm extends LinearLayout {
                 c.setEditable(mEditable);
                 c.useTemplate(autoUIGenerate);
                 c.setModel(model);
-                OColumn column = model.getColumn(c.getFieldName());
-                if (column != null) {
-                    c.setColumn(column);
-                    // Setting OnChange Event
-                    if (column.hasOnChange()) {
-                        setOnChangeForControl(column, c);
-                    }
+                if (model.getColumn(c.getFieldName()) != null) {
+                    OColumn column = model.getColumn(c.getFieldName());
+                    if (column != null) {
+                        c.setColumn(column);
+                        // Setting OnChange Event
+                        if (column.hasOnChange()) {
+                            setOnChangeForControl(column, c);
+                        }
 
-                    // Setting domain Filter for column
-                    if (column.hasDomainFilterColumn()) {
-                        setOnDomainFilterCallBack(column, c);
+                        // Setting domain Filter for column
+                        if (column.hasDomainFilterColumn()) {
+                            setOnDomainFilterCallBack(column, c);
+                        }
                     }
                 }
                 c.initControl();
